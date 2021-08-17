@@ -12,7 +12,8 @@ body {
 }
 
 h1,
-h2 {
+h2,
+h3 {
   font-family: 'Nunito Sans', 'Nunito';
 }
 
@@ -20,7 +21,7 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-:root {
+#root {
   width: 100vw;
   height: 100vh;
 }
