@@ -1,7 +1,7 @@
 import React from 'react';
 import Styled from 'styled-components';
-import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import { FormButton, FormInput, FormLink, FormTitle } from '../components/atoms';
 
 const Background = Styled.div`
     width: 100vw;
@@ -18,22 +18,12 @@ const Background = Styled.div`
 function LoginPage() {
     return (
         <Background>
-            <Form>
-                <h3>Sign In</h3>
-                <Form.Group controlId="loginEmail">
-                    <Form.Label>Email Address</Form.Label>
-                    <Form.Control type="email" />
-                </Form.Group>
-                <Form.Group controlId="loginPassword">
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control type="password" />
-                </Form.Group>
-                <Button variant="primary" type="submit">
-                    Sign In
-                </Button>
-                <Form.Group controlId="loginForgotPassword">
-                    <a>Forgot password?</a>
-                </Form.Group>
+            <Form className="loginForm">
+                <FormTitle label="Sign In" />
+                <FormInput controlId="loginEmail" type="email" label="Email Address" />
+                <FormInput controlId="loginPassword" type="password" label="Password" />
+                <FormButton variant="main" type="submit" onClick={(e) => e.preventDefault()} label="Sign In" />
+                <FormLink controlId="loginForgotPassword" variant="main" href={"/"} label="Forgot password?" />
             </Form>
         </Background>
     );

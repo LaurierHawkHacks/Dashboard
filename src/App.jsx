@@ -1,10 +1,11 @@
 import LoginPage from './pages/LoginPage';
+import Theme from './misc/Theme';
 
 function App() {
   return (
-    <div className="App">
+    <Theme>
       <LoginPage />
-    </div>
+    </Theme>
   );
 }
 
