@@ -29,14 +29,14 @@ const LoginPage = (props)=> {
                 <div className="btnContainer">
                     {hasAccount ? (
                         <div>
-                        <FormButton variant="main" type="click" onClick={handleLogin} label="Log In" />
-                        <p>Don't have an account? <a title="Sign up" href="#"><span onClick={()=> setHasAccount(!hasAccount)}>Sign up</span></a></p>
+                        <FormButton variant="main" onClick={handleLogin} label="Log In" />
+                        <p>Don't have an account? <a title="Sign up" ><span onClick={()=> setHasAccount(!hasAccount)}>Sign up here!</span></a></p>
                         </div>
                     ):( 
                         <div>
                         
-                        <FormButton variant="main" type="Click"  onClick={handleSignUp} label="Sign Up" />
-                        <p>Have an account? <a title="Sign in" href="#"><span  onClick={()=> setHasAccount(!hasAccount)}>Sign In</span></a></p>
+                        <FormButton variant="main" onClick={handleSignUp} label="Sign Up" />
+                        <p>Have an account? <a title="Sign in" ><span  onClick={()=> setHasAccount(!hasAccount)}>Click here to sign In</span></a></p>
                         </div>
                     )}
                 </div>
