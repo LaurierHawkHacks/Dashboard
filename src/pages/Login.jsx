@@ -1,19 +1,7 @@
 import React from "react";
-import Styled from "styled-components";
 import Card from "@material-ui/core/Card";
 import makeStyles from "@material-ui/styles/makeStyles";
-import { BrandingIcon, FormButton, FormInput, FormLink, FormTitle, FormText } from "@atoms";
-
-const Background = Styled.div`
-    width: 100vw;
-    height: 100vh;
-    position: fixed;
-    top: 0; left: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(200, 240, 255);
-`;
+import { BrandingIcon, FormButton, FormInput, FormLink, FormTitle, FormText, PageBackground } from "@atoms";
 
 const useStyles = makeStyles({
     card: {
@@ -27,7 +15,7 @@ const LoginPage = (props) => {
     const { email, setEmail, password, setPassword, handleLogin, handleSignUp, hasAccount, setHasAccount, emailError, passwordError } = props;
     const classes = useStyles();
     return (
-        <Background>
+        <PageBackground>
             <Card className={classes.card}>
                 <form className="loginForm" autoComplete="off">
                     <BrandingIcon />
@@ -70,7 +58,7 @@ const LoginPage = (props) => {
                     </div>
                 </form>
             </Card>
-        </Background>
+        </PageBackground>
     );
 }
 

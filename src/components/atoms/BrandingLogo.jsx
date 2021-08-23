@@ -1,10 +1,7 @@
 import { LogoBlack, LogoWhite } from "@assets";
 
 function BrandingLogo({ variant="black", ...rest }) {
-    switch (variant.toLowerCase()) {
-        case "black":
-        case "dark":
-            return <img src={LogoBlack} alt="Hawk Hacks Logo" {...rest} />
+    switch (variant) {
         case "white":
         case "light":
             return <img src={LogoWhite} alt="Hawk Hacks Logo" {...rest} />

@@ -5,7 +5,7 @@ const useStyles = makeStyles({
     icon: {
         width: "auto",
         height: "3.4em",
-        // spins 100 times before stopping (unwinds when not hovering)
+        // spins up to 100 times before stopping (unwinds when no longer hovering)
         transition: "150s ease",
         "&:hover": {
             transition: "350s linear",
