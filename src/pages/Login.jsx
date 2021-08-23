@@ -17,7 +17,7 @@ const LoginPage = (props) => {
     return (
         <PageBackground>
             <Card className={classes.card}>
-                <form className="loginForm" autoComplete="off">
+                <form className="loginForm">
                     <BrandingIcon />
                     <FormTitle label="Hawk Hacks Portal" />
                     <FormInput

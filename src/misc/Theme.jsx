@@ -35,6 +35,17 @@ const style = <style type="text/css">{`
         .link-primary:hover {
             color: ${theme.palette.primary.dark};
         }
+
+    .spin-hover-animation {
+        width: auto;
+        height: 3.4em;
+        transition: 150s ease;
+    }
+        .spin-hover-animation:hover {
+            transition: 350s linear;
+            transform: rotate(36000deg);
+            cursor: pointer;
+        }
 `}</style>;
 
 function Theme({ children }) {
