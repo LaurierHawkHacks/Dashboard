@@ -1,12 +1,18 @@
-import React from 'react';
-import Form from 'react-bootstrap/Form';
+import React from "react";
+import Styled from "styled-components";
+import MuiTextField from "@material-ui/core/TextField";
 
-function FormInput({ controlId, type, label, placeholder, ...rest }) {
+const InputField = Styled(MuiTextField)`
+    width: 100%;
+    margin: 2em 0;
+`;
+
+function FormInput({ controlId, type, label, variant="outlined", ...rest }) {
     return (
-        <Form.Group controlId={controlId} {...rest}>
-            <Form.Label>{label}</Form.Label>
-            <Form.Control type={type} placeholder={placeholder} />
-        </Form.Group>
+        <>
+            <InputField  style={{margin:"0.6em 0"}} id={controlId} type={type} label={label} variant={variant} {...rest} />
+            <br/>
+        </>
     );
 }
 

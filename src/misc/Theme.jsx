@@ -1,7 +1,24 @@
 import React from 'react';
-import { ThemeProvider } from "styled-components";
+import { createTheme, ThemeProvider } from "@material-ui/core/styles";
 
-const theme = {
+const theme = createTheme({
+    palette: {
+        primary: {
+            light: "#5dd5e3",
+            main: "#0fa3b1",
+            dark: "#0a6972",
+            contrastText: "#fcfcfc",
+        },
+        secondary: {
+            light: "#0fa3b1",
+            main: "#0a6972",
+            dark: "#2f4858",
+            contrastText: "#fcfcfc",
+        },
+    },
+});
+
+const vars = {
     colors: {
         black: "#30292F",
         white: "#FCFCFC",
@@ -12,20 +29,21 @@ const theme = {
 };
 
 const style = <style type="text/css">{`
-    .btn-main {
-        background-color: ${theme.colors.light};
-        color: ${theme.colors.white};
+    .link {
+        cursor: pointer;
+        color: ${theme.palette.primary.main};
+        text-decoration: none;
     }
-        .btn-main:hover {
-            background-color: ${theme.colors.main};
-            color: ${theme.colors.white};
+        .link:hover {
+            color: ${theme.palette.primary.dark};
+            text-decoration: underline;
         }
-        
-    .link-main {
-        color: ${theme.colors.main};
+
+    .link-primary {
+        color: ${theme.palette.primary.main};
     }
-        .link-main:hover {
-            color: ${theme.colors.dark};
+        .link-primary:hover {
+            color: ${theme.palette.primary.dark};
         }
 `}</style>;
 

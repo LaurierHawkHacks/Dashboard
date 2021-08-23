@@ -1,7 +1,7 @@
 import React from 'react';
 import Styled from 'styled-components';
-import Form from 'react-bootstrap/Form';
-import { FormButton, FormInput, FormLink, FormTitle } from '../components/atoms';
+import MuiCard from "@material-ui/core/Card";
+import { FormButton, FormInput, FormLink, FormTitle, FormText } from '../components/atoms';
 
 const Background = Styled.div`
     width: 100vw;
@@ -14,35 +14,57 @@ const Background = Styled.div`
     background-color: rgba(200, 240, 255);
 `;
 
-// see https://react-bootstrap.github.io/components/forms/
-const LoginPage = (props)=> {
+const Card = Styled(MuiCard)`
+    padding: 2em;
+    width: 20vw;
+`;
 
-    const {email, setEmail, password, setPassword, handleLogin, handleSignUp, hasAccount, setHasAccount, emailError, passwordError} = props;
+// see https://react-bootstrap.github.io/components/forms/
+const LoginPage = (props) => {
+    const { email, setEmail, password, setPassword, handleLogin, handleSignUp, hasAccount, setHasAccount, emailError, passwordError } = props;
     return (
         <Background>
-            <Form className="loginForm">
-                <FormTitle label="Hawk Hack Portal" />
-                <FormInput controlId="loginEmail" label="Email Address" type="text" value={email} onChange={e=>setEmail(e.target.value)}/>
-                <p>{emailError}</p>
-                <FormInput controlId="loginPassword" type="password" label="Password" value={password} onChange={e=>setPassword(e.target.value)}/>
-                <p>{passwordError}</p>
+            <Card>
+            <form className="loginForm" noValidate autoComplete="off" >
+                <FormTitle label="Hawk Hacks Portal" />
+                <FormInput
+                    controlId="loginEmail"
+                    type="text"
+                    label="Email Address"
+                    value={email}
+                    onChange={e=>setEmail(e.target.value)}
+                    error={emailError ? true : false}
+                    helperText={emailError}
+                    required
+                />
+                <FormInput
+                    controlId="loginPassword"
+                    type="password"
+                    label="Password"
+                    value={password}
+                    onChange={e=>setPassword(e.target.value)}
+                    error={passwordError ? true : false}
+                    helperText={passwordError}
+                    required
+                />
                 <div className="btnContainer">
-                    {hasAccount ? (
-                        <div>
-                        <FormButton variant="main" onClick={handleLogin} label="Log In" />
-                        <p>Don't have an account? <a title="Sign up" ><span onClick={()=> setHasAccount(!hasAccount)}>Sign up here!</span></a></p>
-                        </div>
-                    ):( 
-                        <div>
-                        
-                        <FormButton variant="main" onClick={handleSignUp} label="Sign Up" />
-                        <p>Have an account? <a title="Sign in" ><span  onClick={()=> setHasAccount(!hasAccount)}>Click here to sign In</span></a></p>
-                        </div>
-                    )}
+                    <FormButton
+                        variant="contained"
+                        color="primary"
+                        label={hasAccount ? "Log In" : "Sign Up"}
+                        onClick={hasAccount ? handleLogin : handleSignUp}
+                    />
+                    <FormText>
+                        {hasAccount ? "Don't have an account? " : "Already have an account? "}
+                        <FormLink
+                            variant="primary"
+                            label={hasAccount? "Sign Up here!" : "Sign In here!"}
+                            onClick={() => setHasAccount(!hasAccount)}
+                        />
+                    </FormText>
                 </div>
-                
-                <FormLink controlId="loginForgotPassword" variant="main" href={"/"} label="Forgot password?" />
-            </Form>
+            </form>
+            </Card>
         </Background>
     );
 }

@@ -1,9 +1,14 @@
-import React from 'react';
-import Button from 'react-bootstrap/Button';
+import React from "react";
+import Styled from "styled-components";
+import MuiButton from "@material-ui/core/Button";
 
-function FormButton({ variant, type, label, onClick, ...rest }) {
+const Button = Styled(MuiButton)`
+    width: 100%;
+`;
+
+function FormButton({ variant, color, type, label, onClick, ...rest }) {
     return (
-        <Button variant={variant} type={type} onClick={onClick} {...rest}>
+        <Button style={{margin:"0.4em 0"}} variant={variant} color={color} type={type} onClick={onClick} {...rest}>
             {label}
         </Button>
     );

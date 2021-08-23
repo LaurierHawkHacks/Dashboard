@@ -1,12 +1,14 @@
-import React from 'react';
-import Form from 'react-bootstrap/Form';
+import React from "react";
+import Styled from "styled-components";
 
-function FormLink({ controlId, variant, href, target="", label, ...rest }) {
+const Link = Styled.span``;
+
+function FormLink({ variant, onClick, label, ...rest }) {
     const className = variant ? "link link-".concat(variant) : "link";
     return (
-        <Form.Group controlId={controlId} {...rest}>
-            <a href={href} className={className} target={target}>{label}</a>
-        </Form.Group>
+        <Link className={className} onClick={onClick} {...rest}>
+            {label}
+        </Link>
     );
 }
 
