@@ -1,6 +1,6 @@
-import React from 'react';
-import Styled from 'styled-components';
-import { FormButton} from '../components/atoms';
+import React from "react";
+import Styled from "styled-components";
+import { FormButton, FormTitle } from "@atoms";
 
 const Background = Styled.div`
     width: 100vw;
@@ -13,12 +13,11 @@ const Background = Styled.div`
     background-color: rgba(200, 240, 255);
 `;
 
-const LandingPage =({handleLogout})=>{
+const LandingPage = ({ handleLogout }) => {
     return(
         <Background>
-                <h2>Welcome Hawk!</h2>
+                <FormTitle variant="h4">Welcome Hawk!</FormTitle>
                 <FormButton type="submit" onClick={handleLogout} label="Logout">Logout</FormButton>
-            
         </Background>
     )
 }

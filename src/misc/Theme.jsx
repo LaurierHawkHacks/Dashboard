@@ -18,16 +18,6 @@ const theme = createTheme({
     },
 });
 
-const vars = {
-    colors: {
-        black: "#30292F",
-        white: "#FCFCFC",
-        main: "#0A6972",
-        dark: "#2F4858",
-        light: "#0FA3B1"
-    }
-};
-
 const style = <style type="text/css">{`
     .link {
         cursor: pointer;

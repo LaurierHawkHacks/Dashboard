@@ -1,10 +1,8 @@
-import LoginPage from './pages/LoginPage';
-import LandingPage from './pages/Landing';
-import Theme from './misc/Theme';
-import config from "./config.json";
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from "react";
 import firebase from "firebase";
-
+import config from "./config.json";
+import { Theme } from "@misc";
+import { LandingPage, LoginPage } from "@pages";
 
 const fire = firebase.initializeApp(config.firebaseConfig);
 
@@ -17,33 +15,33 @@ function App() {
   const [passwordError, setPasswordError] = useState("");
   const [hasAccount, setHasAccount]= useState(false);
 
-
-  const clearError =()=>{
+  const clearError = () => {
     setEmailError("");
     setPasswordError("");
   }
 
-  const clearInputs = () =>{
+  const clearInputs = () => {
     setUser("");
     setPassword("");
   }
-  const handleLogin = () =>{
+
+  const handleLogin = () => {
     clearError();
-    fire.auth().signInWithEmailAndPassword(email, password).catch(error => {
-      
-      switch(error.code){
-        case "auth/invalid-email":
-        case "auth/user-disabled":
-        case "auth/user-notfound":
-          setEmailError(error.message);
-          break;
-        case "auth/wrong-password":
-          setPasswordError(error.message);
-          break;
-      }
-    })
-    
-  }
+    fire.auth().signInWithEmailAndPassword(email, password)
+      .catch(error => {
+        switch(error.code){
+          case "auth/invalid-email":
+          case "auth/user-disabled":
+          case "auth/user-notfound":
+            setEmailError(error.message);
+            break;
+          case "auth/wrong-password":
+            setPasswordError(error.message);
+            break;
+          default: break;
+        }
+      });
+  };
 
   const handleSignUp = () => {
     clearError();
@@ -57,51 +55,47 @@ function App() {
         case "auth/weak-password":
           setPasswordError(error.message);
           break;
+        default: break;
       }
     })
-  }
+  };
 
-  const handleLogout =()=>{
+  const handleLogout = () => {
     fire.auth().signOut();
-  }
+  };
 
-  const authListener =() =>{
-    fire.auth().onAuthStateChanged((user)=>{
-      if(user){
-        clearInputs();
-        setUser(user);
-      }else{
-        setUser("");
-      }
-    })
-  }
   
-  useEffect(()=>{
+  useEffect(() => {
+    const authListener = () => {
+      fire.auth().onAuthStateChanged((user) => {
+        if(user) {
+          clearInputs();
+          setUser(user);
+        } else {
+          setUser("");
+        }
+      });
+    };
     authListener();
-    
-  },[])
+  }, []);
 
   return (
-
     <Theme>
-      {user ? 
-        (<LandingPage handleLogout={handleLogout}/>)
-        :
-        (
-        <LoginPage 
-        email={email}
-        setEmail={setEmail}
-        password={password}
-        setPassword={setPassword}
-        handleLogin={handleLogin}
-        handleSignUp={handleSignUp}
-        hasAccount={hasAccount}
-        setHasAccount={setHasAccount}
-        emailError={emailError}
-        passwordError={passwordError}
-         />
-
-      )}
+      { user
+        ? <LandingPage handleLogout={handleLogout}/>
+        : <LoginPage 
+            email={email}
+            setEmail={setEmail}
+            password={password}
+            setPassword={setPassword}
+            handleLogin={handleLogin}
+            handleSignUp={handleSignUp}
+            hasAccount={hasAccount}
+            setHasAccount={setHasAccount}
+            emailError={emailError}
+            passwordError={passwordError}
+          />
+      }
     </Theme>
   );
 };

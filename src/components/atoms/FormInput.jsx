@@ -1,16 +1,19 @@
 import React from "react";
-import Styled from "styled-components";
-import MuiTextField from "@material-ui/core/TextField";
+import makeStyles from "@material-ui/styles/makeStyles";
+import TextField from "@material-ui/core/TextField";
 
-const InputField = Styled(MuiTextField)`
-    width: 100%;
-    margin: 2em 0;
-`;
+const useStyles = makeStyles({
+    textField: {
+        width: "100%",
+        margin: "0.6em 0",
+    },
+});
 
-function FormInput({ controlId, type, label, variant="outlined", ...rest }) {
+function FormInput({ id, type, label, variant="outlined", ...rest }) {
+    const classes = useStyles();
     return (
         <>
-            <InputField  style={{margin:"0.6em 0"}} id={controlId} type={type} label={label} variant={variant} {...rest} />
+            <TextField id={id} className={classes.textField} type={type} label={label} variant={variant} {...rest} />
             <br/>
         </>
     );
