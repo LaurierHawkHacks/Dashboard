@@ -1,14 +1,18 @@
 import React from "react";
-import Styled from "styled-components";
-import MuiButton from "@material-ui/core/Button";
+import makeStyles from "@material-ui/styles/makeStyles";
+import Button from "@material-ui/core/Button";
 
-const Button = Styled(MuiButton)`
-    width: 100%;
-`;
+const useStyles = makeStyles({
+    button: {
+        width: "100%",
+        margin: "0.4em 0",
+    },
+});
 
 function FormButton({ variant, color, type, label, onClick, ...rest }) {
+    const classes = useStyles();
     return (
-        <Button style={{margin:"0.4em 0"}} variant={variant} color={color} type={type} onClick={onClick} {...rest}>
+        <Button className={classes.button} variant={variant} color={color} type={type} onClick={onClick} {...rest}>
             {label}
         </Button>
     );

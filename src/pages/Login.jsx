@@ -2,7 +2,7 @@ import React from "react";
 import Styled from "styled-components";
 import Card from "@material-ui/core/Card";
 import makeStyles from "@material-ui/styles/makeStyles";
-import { FormButton, FormInput, FormLink, FormTitle, FormText } from "@atoms";
+import { BrandingIcon, FormButton, FormInput, FormLink, FormTitle, FormText } from "@atoms";
 
 const Background = Styled.div`
     width: 100vw;
@@ -18,7 +18,7 @@ const Background = Styled.div`
 const useStyles = makeStyles({
     card: {
         padding: "2em",
-        width: "20vw",
+        minWidth: "20vw",
     },
 });
 
@@ -30,13 +30,14 @@ const LoginPage = (props) => {
         <Background>
             <Card className={classes.card}>
                 <form className="loginForm" autoComplete="off">
+                    <BrandingIcon />
                     <FormTitle label="Hawk Hacks Portal" />
                     <FormInput
                         id="loginEmail"
                         type="text"
                         label="Email Address"
                         value={email}
-                        onChange={e=>setEmail(e.target.value)}
+                        onChange={e => setEmail(e.target.value)}
                         error={emailError ? true : false}
                         helperText={emailError}
                         required
@@ -46,7 +47,7 @@ const LoginPage = (props) => {
                         type="password"
                         label="Password"
                         value={password}
-                        onChange={e=>setPassword(e.target.value)}
+                        onChange={e => setPassword(e.target.value)}
                         error={passwordError ? true : false}
                         helperText={passwordError}
                         required
