@@ -3,6 +3,7 @@ import { createTheme, ThemeProvider } from "@material-ui/core/styles";
 
 const fontFamilyBody = `"Nunito", "Nunito Sans", "Roboto", "Open Sans", "Helvetica", "Arial", sans-serif`;
 const fontFamilyHeaders = `"Nunito Sans", "Nunito", "Roboto", "Open Sans", "Helvetica", "Arial", sans-serif`;
+const headersObj = { fontFamily: fontFamilyHeaders }
 
 const theme = createTheme({
     palette: {
@@ -21,12 +22,12 @@ const theme = createTheme({
     },
     typography: {
         fontFamily: fontFamilyBody,
-        h1: { fontFamily: fontFamilyHeaders },
-        h2: { fontFamily: fontFamilyHeaders },
-        h3: { fontFamily: fontFamilyHeaders },
-        h4: { fontFamily: fontFamilyHeaders },
-        h5: { fontFamily: fontFamilyHeaders },
-        h6: { fontFamily: fontFamilyHeaders },
+        h1: headersObj,
+        h2: headersObj,
+        h3: headersObj,
+        h4: headersObj,
+        h5: headersObj,
+        h6: headersObj,
     },
 });
 
@@ -61,7 +62,7 @@ const style = <style type="text/css">{`
 
     .MuiButton-root {
         font-family: ${fontFamilyHeaders};
-        font-weigth: bold;
+        font-weight: bold;
     }
 `}</style>;
 

@@ -7,6 +7,7 @@ const Background = Styled.div`
     position: fixed;
     top: 0; left: 0;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     background-color: rgba(200, 240, 255);
