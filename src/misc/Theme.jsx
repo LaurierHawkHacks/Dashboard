@@ -70,7 +70,7 @@ function Theme({ children }) {
     return (
         <>
             {style}
-            <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+            <ThemeProvider theme={theme}>{children}</ThemeProvider>
         </>
     );
 }

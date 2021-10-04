@@ -81,7 +81,9 @@ function App() {
   return (
     <Theme>
       { user
-        ? <LandingPage handleLogout={handleLogout}/>
+        ? <LandingPage
+            handleLogout={handleLogout}
+          />
         : <LoginPage 
             email={email}
             setEmail={setEmail}

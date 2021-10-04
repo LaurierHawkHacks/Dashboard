@@ -5,7 +5,7 @@ import Box from "@material-ui/core/Box";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
-import { FormButton, FormTitle } from "@atoms";
+import { ApplicationStatus, FormButton, FormTitle } from "@atoms";
 
 const useStyles = makeStyles(theme => ({
     row: {
@@ -25,14 +25,14 @@ const useStyles = makeStyles(theme => ({
     barTitle: {
         textAlign: "center",
     },
-    module: {
-        borderColor: theme.palette.primary.light,
-        borderWidth: "1px",
-        borderStyle: "solid",
-    },
+    progressBar: {
+        width: "100%",
+    }
 }));
 
-const LandingPage = ({ handleLogout }) => {
+const onFormSubmit = () => null;
+
+const LandingPage = ({ handleLogout, theme }) => {
     const classes = useStyles();
     return(
         <Box>
@@ -49,15 +49,13 @@ const LandingPage = ({ handleLogout }) => {
                 </Grid>
                 <Grid item xs={0} sm={4} md={3} />
             </Grid>
-            <Container className={classes.module}>
-
-            </Container>
+            <ApplicationStatus step={2} /> {/* from 0 to 4 */}
             <Container className={classes.row}>
                 <FormTitle variant="h4" label="Welcome Hawk!" />
                 <FormButton type="submit" onClick={handleLogout} label="Logout">Logout</FormButton>
             </Container>
         </Box>
-    )
+    );
 }
 
 export default LandingPage;
