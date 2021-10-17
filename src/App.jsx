@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import firebase from "firebase";
 import config from "./config.json";
-import { Theme } from "@misc";
+import { Theme, Breakpoints } from "@misc";
 import { LandingPage, LoginPage } from "@pages";
 
 const fire = firebase.initializeApp(config.firebaseConfig);
@@ -80,23 +80,25 @@ function App() {
 
   return (
     <Theme>
-      { user
-        ? <LandingPage
-            handleLogout={handleLogout}
-          />
-        : <LoginPage 
-            email={email}
-            setEmail={setEmail}
-            password={password}
-            setPassword={setPassword}
-            handleLogin={handleLogin}
-            handleSignUp={handleSignUp}
-            hasAccount={hasAccount}
-            setHasAccount={setHasAccount}
-            emailError={emailError}
-            passwordError={passwordError}
-          />
-      }
+      <Breakpoints>
+        { user
+          ? <LandingPage
+              handleLogout={handleLogout}
+            />
+          : <LoginPage 
+              email={email}
+              setEmail={setEmail}
+              password={password}
+              setPassword={setPassword}
+              handleLogin={handleLogin}
+              handleSignUp={handleSignUp}
+              hasAccount={hasAccount}
+              setHasAccount={setHasAccount}
+              emailError={emailError}
+              passwordError={passwordError}
+            />
+        }
+      </Breakpoints>
     </Theme>
   );
 };

@@ -5,6 +5,7 @@ import Typography from "@material-ui/core/Typography";
 import "react-step-progress-bar/styles.css";
 import { ProgressBar, Step } from "react-step-progress-bar";
 import { MdTaskAlt as StepIconDone } from "react-icons/md";
+import { Media } from 'react-breakpoints';
 
 const size = "1.6em";
 const size2 = "2.4em";
@@ -21,8 +22,22 @@ const useStyles = makeStyles(theme => {
             flexDirection: "column",
             alignItems: "center",
         },
+        moduleTitle: {
+            textAlign: "center",
+        },
+        moduleTitleStep: {
+            marginLeft: "0.2em",
+        },
         container: {
-            padding: "2.5em 5em 4em 5em",
+            [theme.breakpoints.down('sm')]: {
+                padding: "2.5em 1em 4em 1em",
+            },
+            [theme.breakpoints.up('sm')]: {
+                padding: "2.5em 2em 4em 2em",
+            },
+            [theme.breakpoints.up('md')]: {
+                padding: "2.5em 5em 4em 5em",
+            }
         },
         stepIcon: {
             color: theme.palette.primary.contrastText,
@@ -50,7 +65,11 @@ const useStyles = makeStyles(theme => {
             alignItems: "center",
             textAlign: "center",
             width: "max-content",
-            marginTop: "1.4em",
+            marginTop: "1em",
+            marginBottom: "-0.36em",
+        },
+        spacer: {
+            height: "1.5em",
         },
     };
 });
@@ -70,11 +89,21 @@ const ApplicationStatus = ({ theme, step }) => {
                                 className={classes.stepIcon}
                                 style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
                             />
-                            <Typography>{messages[i]}</Typography>
+                            <Media>
+                                {({ breakpoints, currentBreakpoint }) =>
+                                    breakpoints[currentBreakpoint] >= breakpoints.tabletLandscape
+                                    ? <Typography>{messages[i]}</Typography>
+                                    : <div className={classes.spacer}/> }
+                            </Media>
                         </div>
                     :   <div className={classes.stepContainer}>
                             <Typography className={classes.stepIconIncomplete}>{index+1}</Typography>
-                            <Typography>{messages[i]}</Typography>
+                            <Media>
+                                {({ breakpoints, currentBreakpoint }) =>
+                                    breakpoints[currentBreakpoint] >= breakpoints.tabletLandscape
+                                    ? <Typography>{messages[i]}</Typography>
+                                    : <div className={classes.spacer}/> }
+                            </Media>
                         </div>
                 }
             </Step>

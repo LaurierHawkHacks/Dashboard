@@ -2,6 +2,7 @@ import React from "react";
 import Card from "@material-ui/core/Card";
 import makeStyles from "@material-ui/styles/makeStyles";
 import { BrandingIcon, FormButton, FormInput, FormLink, FormTitle, FormText, PageBackground } from "@atoms";
+import { BackgroundIllustration } from "@assets";
 
 const useStyles = makeStyles({
     card: {
@@ -15,7 +16,7 @@ const LoginPage = (props) => {
     const { email, setEmail, password, setPassword, handleLogin, handleSignUp, hasAccount, setHasAccount, emailError, passwordError } = props;
     const classes = useStyles();
     return (
-        <PageBackground>
+        <PageBackground src={BackgroundIllustration}>
             <Card className={classes.card}>
                 <form className="loginForm">
                     <BrandingIcon />
