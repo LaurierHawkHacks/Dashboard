@@ -9,7 +9,7 @@
 ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ 
 ```
 
-<h1>Hawk Hacks' Dashoard Application for Hackers & Mentors</h1>
+<h1>Hawk Hacks' Dashboard Application for Hackers & Mentors</h1>
 
 </div>
 
