@@ -13,16 +13,11 @@
 
 </div>
 
-## Pre-Requisites
-
-- PNPM
-- Node 18.x
-- Internet
-- VS Code (Can't code without this)
-
 ## Development
 
-Setting up local development is very easy
+Before you begin development, please read our [CONTRIBUTING](/docs/CONTRIBUTING.md) file.
+
+Setting up local development is very easy:
 
 Steps:
 
