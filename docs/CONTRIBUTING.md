@@ -23,8 +23,9 @@ LaurierHawkHacks/Dashboard
 |
 |_ config/ -> firebase configuration files
 |_ functions/ -> firebase functions
-|_ public/ -> static assets
+|_ public/ -> static assets that are not reference in source code
 |_ src/
+   |_ assets/ -> static assets that are reference or imported in source code
    |_ components/
    |  |_ Button/ -> each component should be in its own folder
    |  |  |_ Button.tsx
