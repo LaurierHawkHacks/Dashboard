@@ -1,0 +1,7 @@
+coverage
+dist
+.vscode
+
+**/*.md
+
+pnpm-lock.yaml
