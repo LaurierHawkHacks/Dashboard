@@ -1,18 +1,11 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-html {
-    /* normalize font size to multiple of 10 when using rem/em */
-    font-size: 62.5%;
-}
-
-html,
-body,
-#root {
-    width: 100%;
-    height: 100%;
-    background-color: black;
+@layer base {
+    html,
+    body,
+    #root {
+        @apply w-full h-full bg-zinc-900;
+    }
 }

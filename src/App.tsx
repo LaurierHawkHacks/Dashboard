@@ -1,9 +1,8 @@
 import Logo from "@assets/logo.svg";
-import classes from "@styles/App.module.css";
 
 function App() {
     return (
-        <div className={classes.container}>
+        <div className="w-full h-full flex items-center justify-center">
             <img src={Logo} alt="Hawk Hacks Logo" />
         </div>
     );
