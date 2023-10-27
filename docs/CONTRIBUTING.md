@@ -34,6 +34,9 @@ LaurierHawkHacks/Dashboard
    |  |  |_ Button.test.tsx
    |  |_ index.ts
    |
+   |_ pages/
+   |  |_ Landing/ -> follow the same structure as components
+   |
    |_ index.css -> entry css file
    |_ main.tsx -> entry react file
 ```
