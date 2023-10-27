@@ -30,7 +30,7 @@ LaurierHawkHacks/Dashboard
    |  |_ Button/ -> each component should be in its own folder
    |  |  |_ Button.tsx
    |  |  |_ Button.module.css -> only if we can't use tailwind to style something
-   |  |  |_ Button.styles.js
+   |  |  |_ Button.styles.ts
    |  |  |_ Button.test.tsx
    |  |_ index.ts
    |
