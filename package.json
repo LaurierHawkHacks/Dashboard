@@ -16,6 +16,7 @@
     "dependencies": {
         "@types/node": "^20.6.0",
         "class-variance-authority": "^0.7.0",
+        "firebase": "^10.5.2",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "tailwind-merge": "^1.14.0"
