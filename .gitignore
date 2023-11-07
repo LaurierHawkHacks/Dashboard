@@ -26,3 +26,6 @@ dist-ssr
 
 # Test Coverage
 coverage
+
+.env
+.env.*
