@@ -22,9 +22,9 @@
         "types": ["vitest/globals", "@testing-library/jest-dom"],
         "paths": {
             "@/*": ["./src/*"],
-            "@assets": ["./src/assets/*"],
-            "@components/": ["./src/components/*"],
-            "@styles": ["./src/styles/*"]
+            "@assets/*": ["./src/assets/*"],
+            "@components/*": ["./src/components/*"],
+            "@services/*": ["./src/services/*"]
         }
     },
     "include": ["src"],
