@@ -46,7 +46,7 @@ export const LoginForm = () => {
         // Todo: add a html form interface for this component (done)
         // Todo: add action to handle the event (done)
         // Todo: connect the value of the input with the firebase (done)
-        // Todo: 
+        // Todo:
         <Form onSubmit={handleFormSubmit}>
             <div>
                 <label>Email</label>
