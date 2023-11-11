@@ -1,4 +1,5 @@
-export const Form: React.FC<any> = ({ children, handleFormSubmit }) => {
-    return <form onSubmit={handleFormSubmit}>{children}</form>;
-};
+type FormProps = React.FormHTMLAttributes<HTMLFormElement>;
 
+export const Form: React.FC<FormProps> = ({ children, ...props }) => {
+    return <form {...props}>{children}</form>;
+};
