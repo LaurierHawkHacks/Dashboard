@@ -1,12 +1,15 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+    createBrowserRouter,
+    RouterProvider,
+    Navigate,
+} from "react-router-dom";
 
 import LoginPage from "@/pages/LoginPage";
-import App from "@/App";
 
 const routerConfig = createBrowserRouter([
     {
         path: "/",
-        element: <App />,
+        element: <Navigate to="/login" replace={true} />,
     },
     {
         path: "/login",
@@ -14,7 +17,12 @@ const routerConfig = createBrowserRouter([
     },
     {
         path: "/admin",
+        // Todo: user cannot directly go to this admin page
         element: <h1>Welcome to admin page!!!</h1>,
+    },
+    {
+        path: "*",
+        element: <Navigate to="/" />,
     },
 ]);
 
