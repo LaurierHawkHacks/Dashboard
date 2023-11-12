@@ -2,9 +2,6 @@ import { cva, VariantProps } from "class-variance-authority";
 import { ClassProp } from "class-variance-authority/types";
 import { twMerge } from "tailwind-merge";
 
-
-// class-variance-authority: allowed css-in-ts
-// cva, takes in a string and an object
 const buttonStyles = cva(
     "rounded-md px-3 py-2 text-sm font-semibold text-white transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:cursor-not-allowed disabled:text-zinc-400 disabled:opacity-50",
     {
@@ -24,9 +21,7 @@ const buttonStyles = cva(
     }
 );
 
-// here we set the type of the button style properties
 export type ButtonStylesProps = VariantProps<typeof buttonStyles>;
-
 
 export function getButtonStyles(opts: ButtonStylesProps & ClassProp): string {
     return twMerge(buttonStyles(opts));

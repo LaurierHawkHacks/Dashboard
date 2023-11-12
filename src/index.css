@@ -6,15 +6,6 @@
     html,
     body,
     #root {
-        @apply w-full h-full bg-slate-200;
+        @apply w-full h-full bg-zinc-900 text-white;
     }
-}
-
-/* component style class */
-/* .btn-blue {
-    @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded;
-  }  -> adding btn-blue to classList will apply all this value
-*/
-@layer components {
-
 }
