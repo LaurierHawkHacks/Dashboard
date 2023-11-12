@@ -1,28 +1,21 @@
-import {
-    createBrowserRouter,
-    RouterProvider,
-    Navigate,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import LoginPage from "@/pages/LoginPage";
+import LoginPage from "@/pages/admin/LoginPage";
+import { AdminPage } from "@/pages/admin/AdminPage";
+import { RequireAuth } from "./RequiredAuth";
 
 const routerConfig = createBrowserRouter([
     {
-        path: "/",
-        element: <Navigate to="/login" replace={true} />,
-    },
-    {
-        path: "/login",
+        path: "/admin/login",
         element: <LoginPage />,
     },
     {
         path: "/admin",
-        // Todo: user cannot directly go to this admin page
-        element: <h1>Welcome to admin page!!!</h1>,
-    },
-    {
-        path: "*",
-        element: <Navigate to="/" />,
+        element: (
+            <RequireAuth>
+                <AdminPage />
+            </RequireAuth>
+        ),
     },
 ]);
 
