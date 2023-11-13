@@ -27,7 +27,7 @@
             "@pages": ["./src/pages/index"],
             "@services": ["./src/services/index"],
             "@providers": ["./src/providers/index"],
-            "@utils": ["./src/utils/index"],
+            "@utils": ["./src/utils/index"]
         }
     },
     "include": ["src"],
