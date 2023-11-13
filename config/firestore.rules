@@ -1,4 +1,10 @@
 service cloud.firestore {
+  "rules": {
+    "adminContent": {
+      ".read": "auth.token.admin === true",
+      ".write": "auth.token.admin === true",
+    }
+  }
   match /databases/{database}/documents {
     match /{document=**} {
       // This rule allows anyone with your database reference to view, edit,
@@ -11,6 +17,12 @@ service cloud.firestore {
       // else all client requests to your database will be denied until you
       // update your rules.
       allow read, write: if request.time < timestamp.date(2023, 10, 14);
+    }
+    match /{all=**} {
+      allow read, write: if request.auth.uid == "admin";
+    }
+    match /users/{userID} {
+      alow read, write: if request.auth. != null;
     }
   }
 }
