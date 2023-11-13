@@ -1,20 +1,20 @@
-import { createContext, useState, useContext } from "react";
-import { app } from "@services/firebase";
-import { Auth, User, getAuth, signOut } from "firebase/auth";
+import { createContext, useState, useContext, useEffect } from "react";
+import { auth } from "@services/firebase";
+import { User, signOut, signInWithEmailAndPassword } from "firebase/auth";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
-    const auth = getAuth(app);
-
-    const login = (user: User) => {
+    
+    const login = async (email: string, password: string) => {
+        const { user } = await signInWithEmailAndPassword(auth, email, password);
         setCurrentUser(user);
     };
 
-    const logout = async (authObject: Auth = auth) => {
+    const logout = async () => {
         try {
-            await signOut(authObject);
+            await signOut(auth);
         } catch (error) {
             console.error(error);
         }
@@ -22,12 +22,16 @@ export const AuthProvider = ({ children }) => {
         setCurrentUser(null);
     };
 
-    auth.onAuthStateChanged((currentUser) => {
-        if (!currentUser) {
-            logout(auth);
-        } else {
-            login(currentUser);
-        }
+    useEffect(() => {
+        const unsub = auth.onAuthStateChanged((user) => {
+            if (user) {
+                setCurrentUser(user);
+            } else {
+                logout();
+            }
+        });
+
+        return unsub;
     });
 
     return (
