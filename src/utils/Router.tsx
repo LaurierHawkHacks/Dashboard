@@ -1,26 +1,22 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Placeholder, LoginPage, AdminPage } from "@pages";
+import { RequireAuth } from "@utils"; // maybe need to fix the path
 
-import LoginPage from "@/pages/admin/LoginPage";
-import { AdminPage } from "@/pages/admin/AdminPage";
-import { RequireAuth } from "./RequiredAuth";
+const Router = () => (
+    <BrowserRouter>
+        <Routes>
+            <Route path="/" element={<Placeholder />} />
+            <Route
+                path="/admin"
+                element={
+                    <RequireAuth>
+                        <AdminPage />
+                    </RequireAuth>
+                }
+            />
+            <Route path="/admin/login" element={<LoginPage />} />
+        </Routes>
+    </BrowserRouter>
+);
 
-const routerConfig = createBrowserRouter([
-    {
-        path: "/admin/login",
-        element: <LoginPage />,
-    },
-    {
-        path: "/admin",
-        element: (
-            <RequireAuth>
-                <AdminPage />
-            </RequireAuth>
-        ),
-    },
-]);
-
-const Router = () => {
-    return <RouterProvider router={routerConfig} />;
-};
-
-export default Router;
+export { Router };

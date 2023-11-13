@@ -1,6 +1,6 @@
-import { Button } from "@/components";
+import { Button } from "@components";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/providers/AuthProvider";
+import { useAuth } from "@providers";
 
 export const AdminPage = () => {
     const authProvider = useAuth();

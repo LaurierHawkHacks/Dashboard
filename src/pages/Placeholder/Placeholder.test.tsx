@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/react";
-import App from "@/App";
+import { Placeholder } from "@pages";
 
 describe("App Component", () => {
     it("should render Hawk Hacks Logo", () => {
-        render(<App />);
+        render(<Placeholder />);
 
         expect(
             screen.getByRole("img", { name: "Hawk Hacks Logo" })

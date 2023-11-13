@@ -1,4 +1,4 @@
-import { useAuth } from "@/providers/AuthProvider";
+import { useAuth } from "@providers";
 import { Navigate } from "react-router-dom";
 
 export const RequireAuth = ({ children }) => {

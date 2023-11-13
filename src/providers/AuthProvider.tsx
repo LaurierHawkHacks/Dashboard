@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, useEffect } from "react";
-import { auth } from "@services/firebase";
+import { auth } from "@services";
 import { User, signOut, signInWithEmailAndPassword } from "firebase/auth";
 
 const AuthContext = createContext(null);
