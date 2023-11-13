@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@components/Button/Button";
-import { getUserCredential } from "@/services/firebase";
 import { useAuth } from "@/providers/AuthProvider";
 
 const LoginPage = () => {
@@ -12,6 +11,20 @@ const LoginPage = () => {
     const authProvider = useAuth();
     const navigate = useNavigate();
 
+    const loginWithEmailAndPassword = async (email: string, password: string) => {
+        try {
+            await authProvider.login(email, password);
+            navigate("/admin", { replace: true });
+        } catch (errorObject) {
+            setError(errorObject);
+        }
+    };
+
+    const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        loginWithEmailAndPassword(email, password);
+    };
+
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
 
@@ -20,22 +33,6 @@ const LoginPage = () => {
         } else {
             setPassword(value);
         }
-    };
-
-    const loginEmailPassword = async (email: string, password: string) => {
-        try {
-            const userCredential = await getUserCredential(email, password);
-            authProvider.login(userCredential.user);
-            navigate("/admin", { replace: true });
-            setError(null);
-        } catch (errorObject) {
-            setError(errorObject);
-        }
-    };
-
-    const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        loginEmailPassword(email, password);
     };
 
     return (
@@ -82,7 +79,7 @@ const LoginPage = () => {
                     ""
                 ) : (
                     <p className="text-red-500">
-                        {JSON.stringify(error.message)}
+                        Wrong Credential. Try Again You Dummy🥹
                     </p>
                 )}
 
