@@ -2,13 +2,27 @@ import { createContext, useState, useContext, useEffect } from "react";
 import { auth } from "@services";
 import { User, signOut, signInWithEmailAndPassword } from "firebase/auth";
 
-const AuthContext = createContext(null);
+type AuthContextValue = {
+    currentUser: User | null;
+    login: (email: string, password: string) => Promise<void>;
+    logout: () => Promise<void>;
+};
 
-export const AuthProvider = ({ children }) => {
+const AuthContext = createContext<AuthContextValue>({
+    currentUser: null,
+    login: async () => {},
+    logout: async () => {},
+});
+
+export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
-    
+
     const login = async (email: string, password: string) => {
-        const { user } = await signInWithEmailAndPassword(auth, email, password);
+        const { user } = await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+        );
         setCurrentUser(user);
     };
 
