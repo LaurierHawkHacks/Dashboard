@@ -21,10 +21,12 @@
         "noFallthroughCasesInSwitch": true,
         "types": ["vitest/globals", "@testing-library/jest-dom"],
         "paths": {
-            "@/*": ["./src/*"],
-            "@assets/*": ["./src/assets/*"],
-            "@components/*": ["./src/components/*"],
-            "@services/*": ["./src/services/*"]
+            "@": ["./src/index"],
+            "@assets": ["./src/assets/index"],
+            "@components": ["./src/components/index"],
+            "@pages": ["./src/pages/index"],
+            "@services": ["./src/services/index"],
+            "@utils": ["./src/utils/index"],
         }
     },
     "include": ["src"],
