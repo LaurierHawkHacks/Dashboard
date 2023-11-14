@@ -12,11 +12,31 @@ service cloud.firestore {
       // update your rules.
       allow read, write: if request.time < timestamp.date(2023, 10, 14);
     }
-    match /{all=**} {
-      allow read, write: if request.auth.uid == "admin";
+    
+    // Allow read/write access to everything if the user is ADMIN
+    match /{document=**} {
+      allow read, write: if get(/databases/$(database)/documents/applications/dummy-placeholder/$(request.auth.uid)).data.isAdmin == true;
     }
-    match /users/{userID} {
-      alow read, write: if request.auth. != null;
+
+
+
+    
+
+    // Allow read/write access to the "applications" collection
+    match /applications/{document=**} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Example for restricting access to specific fields within documents
+    match /applications/{document=**} {
+      allow read, write: if request.auth != null;
+      allow read, write: if resource.data.field1 == true && request.auth.uid == resource.data.userId;
+}
+
+
+    // Default rule to deny read and write access
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
