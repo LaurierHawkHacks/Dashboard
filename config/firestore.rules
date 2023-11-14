@@ -1,10 +1,4 @@
 service cloud.firestore {
-  "rules": {
-    "adminContent": {
-      ".read": "auth.token.admin === true",
-      ".write": "auth.token.admin === true",
-    }
-  }
   match /databases/{database}/documents {
     match /{document=**} {
       // This rule allows anyone with your database reference to view, edit,
