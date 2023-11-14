@@ -26,7 +26,8 @@
             "@components": ["./src/components/index"],
             "@pages": ["./src/pages/index"],
             "@services": ["./src/services/index"],
-            "@utils": ["./src/utils/index"],
+            "@providers": ["./src/providers/index"],
+            "@utils": ["./src/utils/index"]
         }
     },
     "include": ["src"],
