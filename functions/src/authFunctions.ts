@@ -5,6 +5,7 @@ admin.initializeApp();
 
 export const addRoleClaims = functions.auth.user().onCreate(async (user) => {
     const { uid } = user;
+
     try {
         await admin.auth().setCustomUserClaims(uid, {
             // Add custom claims for roles as needed
