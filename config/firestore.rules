@@ -13,14 +13,14 @@ service cloud.firestore {
       allow read, write: if request.time < timestamp.date(2023, 10, 14);
     }
     
-    // Allow read/write access to everything if the user is ADMIN
+    // Allow read/write access to the entire database for admin users
     match /{document=**} {
-      allow read, write: if get(/databases/$(database)/documents/applications/dummy-placeholder/$(request.auth.uid)).data.isAdmin == true;
+      allow read, write: if request.auth != null && request.auth.token.admin == true;
     }
 
 
 
-    
+
 
     // Allow read/write access to the "applications" collection
     match /applications/{document=**} {
