@@ -8,7 +8,7 @@ export const addRoleClaims = functions.auth.user().onCreate(async (user) => {
 
     try {
         await admin.auth().setCustomUserClaims(uid, {
-            // Add custom claims for roles as needed
+            // Default Claims
             admin: false, // Example: set to true for admin users
         });
 

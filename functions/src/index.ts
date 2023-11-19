@@ -19,3 +19,30 @@
 //   logger.info("Hello logs!", {structuredData: true});
 //   response.send("Hello from Firebase!");
 // });
+
+import * as functions from "firebase-functions";
+import * as admin from "firebase-admin";
+
+admin.initializeApp();
+
+// onCall Function to be able to call it from the Frontend
+exports.addAdminRole = functions.https.onCall((data, context) => {
+    // Get USER and ADD custom claim (admin)
+    console.log(context);
+    return admin
+        .auth()
+        .getUserByEmail(data.email)
+        .then((user) => {
+            return admin.auth().setCustomUserClaims(user.uid, {
+                admin: true,
+            });
+        })
+        .then(() => {
+            return {
+                message: `Success! ${data.email} is now an Admin!`,
+            };
+        })
+        .catch((err) => {
+            return err;
+        });
+});
