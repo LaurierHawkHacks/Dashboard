@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "hawkhacks-dashboard"
-  }
+    "default": "hawkhacks-dashboard",
+    "staging": "hawkhacks-dashboard"
+  },
+  "targets": {},
+  "etags": {}
 }

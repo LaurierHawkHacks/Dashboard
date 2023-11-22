@@ -14,7 +14,11 @@ module.exports = {
             env: {
                 node: true,
             },
-            files: [".eslintrc.{js,cjs}"],
+            files: [
+                ".eslintrc.{js,cjs}",
+                "functions/**/*.ts",
+                "functions/**/*.js",
+            ],
             parserOptions: {
                 sourceType: "script",
             },
@@ -33,6 +37,7 @@ module.exports = {
         semi: ["error", "always"],
         "react/react-in-jsx-scope": "off",
         "react/prop-types": "off",
+        "@typescript-eslint/no-var-requires": 0,
     },
     settings: {
         react: {

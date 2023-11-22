@@ -12,5 +12,22 @@ service cloud.firestore {
       // update your rules.
       allow read, write: if request.time < timestamp.date(2023, 10, 14);
     }
+
+    // Default rule to deny read/write access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    
+    // Allow read/write access to the user owns documents
+    // Allow read/write access to ALL user documents if the user is Admin
+    match /users/{userId} {
+      allow read, write: if request.auth != null && (request.auth.token.admin == true || request.auth.uid == userId);
+    }
+
+    // Allow read/write access to the entire database for admin users
+    match /{document=**} {
+      allow read, write: if request.auth != null && request.auth.token.admin == true;
+    }
+
   }
 }
