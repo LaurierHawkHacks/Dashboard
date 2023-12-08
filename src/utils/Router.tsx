@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Placeholder, LoginPage, AdminPage } from "@pages";
-import { ProtectedRoutes } from "@utils"; // maybe need to fix the path
+import { ProtectedRoutes } from "@utils";
 
 const Router = () => (
     <BrowserRouter>
