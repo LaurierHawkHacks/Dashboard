@@ -7,7 +7,7 @@ const Router = () => (
         <Routes>
             <Route path="/" element={<Placeholder />} />
             <Route path="/admin" element={<ProtectedRoutes />}>
-                <Route path="/admin" element={<AdminPage />} />
+                <Route path="" element={<AdminPage />} />
             </Route>
             <Route path="/admin/login" element={<LoginPage />} />
         </Routes>
