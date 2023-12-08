@@ -4,4 +4,11 @@
  *
  */
 export { Router } from "./Router";
-export { RequireAuth } from "./RequireAuth";
+export { ProtectedRoutes } from "./ProtectedRoutes/ProtectedRoutes";
+
+/*
+ *
+ * @utility Test Utils
+ *
+ */
+export { renderWithRouter } from "./test-utils";
