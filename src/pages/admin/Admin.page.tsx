@@ -1,20 +1,14 @@
-import { Button } from "@components";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@providers";
+import { AdminNavbar } from "@components";
 
 export const AdminPage = () => {
-    const authProvider = useAuth();
-    const navigate = useNavigate();
-
-    const handleLogout = () => {
-        authProvider.logout();
-        navigate("/admin/login", { replace: true });
-    };
-
     return (
         <div>
-            <h1>Welcome to admin page!!!</h1>
-            <Button onClick={handleLogout}>Sign out</Button>
+            <AdminNavbar />
+            <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <main className="py-8">
+                    <h1>Welcome to admin page!!!</h1>
+                </main>
+            </div>
         </div>
     );
 };
