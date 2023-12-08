@@ -1,12 +1,12 @@
 import { useAuth } from "@providers";
-import { Navigate } from "react-router-dom";
+import { Outlet, Navigate } from "react-router-dom";
 
-export const RequireAuth = ({ children }) => {
+export const ProtectedRoutes = () => {
     const auth = useAuth();
 
     if (!auth.currentUser) {
         return <Navigate to="/admin/login" />;
     }
 
-    return children;
+    return <Outlet />;
 };
