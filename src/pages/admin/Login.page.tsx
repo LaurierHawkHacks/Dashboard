@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@components";
 import { useAuth } from "@providers";
@@ -11,7 +11,10 @@ const LoginPage = () => {
     const authProvider = useAuth();
     const navigate = useNavigate();
 
-    const loginWithEmailAndPassword = async (email: string, password: string) => {
+    const loginWithEmailAndPassword = async (
+        email: string,
+        password: string
+    ) => {
         try {
             await authProvider.login(email, password);
             navigate("/admin", { replace: true });
@@ -34,6 +37,12 @@ const LoginPage = () => {
             setPassword(value);
         }
     };
+
+    useEffect(() => {
+        if (authProvider.currentUser) {
+            navigate("/admin");
+        }
+    }, [authProvider]);
 
     return (
         <div className="p-6 space-y-4">
