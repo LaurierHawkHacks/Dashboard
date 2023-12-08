@@ -1,6 +1,7 @@
 import { createContext, useState, useContext, useEffect } from "react";
-import { auth } from "@services";
 import { User, signOut, signInWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import { auth } from "@services";
 
 type AuthContextValue = {
     currentUser: User | null;
@@ -16,6 +17,7 @@ const AuthContext = createContext<AuthContextValue>({
 
 export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
+    const nav = useNavigate();
 
     const login = async (email: string, password: string) => {
         const { user } = await signInWithEmailAndPassword(
@@ -31,9 +33,10 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
             await signOut(auth);
         } catch (error) {
             console.error(error);
+        } finally {
+            setCurrentUser(null);
+            nav("/admin/login", { replace: true });
         }
-
-        setCurrentUser(null);
     };
 
     useEffect(() => {
