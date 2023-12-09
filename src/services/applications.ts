@@ -1,6 +1,12 @@
-import firebase from "firebase/compat/app";
-import "firebase/compat/firestore";
-import "firebase/compat/auth";
+import { initializeApp } from "firebase/app";
+import {
+    getFirestore,
+    collection,
+    query,
+    where,
+    getDocs,
+} from "firebase/firestore";
+import { getAuth, User } from "firebase/auth";
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -11,26 +17,27 @@ const firebaseConfig = {
     appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-firebase.initializeApp(firebaseConfig);
-
-const db = firebase.firestore();
-const auth = firebase.auth();
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
+const auth = getAuth(firebaseApp);
 
 export const getApplications = async (
     hackathonTerm: string
 ): Promise<Record<string, unknown>[]> => {
     try {
-        const user = auth.currentUser;
+        const user: User | null = auth.currentUser;
 
         if (!user) {
             throw new Error("User not authenticated");
         }
 
-        const querySnapshot = await db
-            .collection("applications")
-            .where("hackathonTerm", "==", hackathonTerm)
-            .where("userId", "==", user.uid)
-            .get();
+        const q = query(
+            collection(db, "applications"),
+            where("hackathonTerm", "==", hackathonTerm),
+            where("userId", "==", user.uid)
+        );
+
+        const querySnapshot = await getDocs(q);
 
         const applications: Record<string, unknown>[] = [];
         querySnapshot.forEach((doc) => {
