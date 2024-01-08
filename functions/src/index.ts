@@ -12,6 +12,8 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as Notion from "@notionhq/client"; 
 import { Parser } from "json2csv";
+import { CollectionReference, Query, QueryDocumentSnapshot } from "firebase-admin/firestore";
+
 
 admin.initializeApp();
 
@@ -74,16 +76,17 @@ export const addAdminRole = functions.https.onCall((data, context) => {
 });
 
 
+export const exportData = functions.https.onCall(async (data, context) => {
+    if (!context.auth || context.auth.token.admin !== true) {
+        throw new functions.https.HttpsError('permission-denied', 'Access denied. Only admins can export data.');
+    }
 
-export const exportData = functions.https.onRequest(async (request, response) => {
     try {
-        const startDate = request.query.startDate ? new Date(request.query.startDate as string) : null;
-        const endDate = request.query.endDate ? new Date(request.query.endDate as string) : null;
-
+        const startDate = data.startDate ? new Date(data.startDate) : null;
+        const endDate = data.endDate ? new Date(data.endDate) : null;
+        const route = data.route;
         const db = admin.firestore();
-        const applicationsRef = db.collection('applications');
-
-        let query: FirebaseFirestore.Query<FirebaseFirestore.DocumentData> = applicationsRef;
+        let query: CollectionReference | Query = db.collection('applications');
 
         if (startDate && endDate) {
             query = query.where('applicationDate', '>=', startDate)
@@ -91,26 +94,24 @@ export const exportData = functions.https.onRequest(async (request, response) =>
         }
 
         const snapshot = await query.get();
-        const applications = snapshot.docs.map(doc => doc.data() as Application);
+        const applications = snapshot.docs.map((doc: QueryDocumentSnapshot) => doc.data() as Application);
 
-        const route = request.query.route as string;
 
         if (route === 'notion') {
             await createNotionPage(applications);
-            response.send('Data exported to Notion successfully.');
+            return { message: 'Data exported to Notion successfully.' };
         } else if (route === 'csv') {
             const csv = convertToCSV(applications);
-            response.setHeader('Content-disposition', 'attachment; filename=applications.csv');
-            response.set('Content-Type', 'text/csv');
-            response.status(200).send(csv);
+            return { csvData: csv };
         } else {
-            response.status(400).send('Invalid route specified.');
+            throw new functions.https.HttpsError('invalid-argument', 'Invalid route specified.');
         }
     } catch (error) {
         console.error('Error:', error);
-        response.status(500).send('Internal Server Error');
+        throw new functions.https.HttpsError('internal', 'Internal server error');
     }
 });
+
 
 async function createNotionPage(applications: Application[]): Promise<void> {
     const existingPages = await notionClient.databases.query({
