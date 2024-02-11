@@ -1,12 +1,20 @@
 import { useAuth } from "@providers";
-import { Outlet, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Outlet, Navigate, useLocation } from "react-router-dom";
 
 export const ProtectedRoutes = () => {
     const auth = useAuth();
+    const location = useLocation();
 
-    if (!auth.currentUser) {
+    useEffect(() => {
+        console.log(location);
+    }, []);
+
+    if (auth.currentUser) return <Outlet />;
+
+    if (location.pathname === "/admin") {
         return <Navigate to="/admin/login" />;
+    } else if (location.pathname === "/user") {
+        return <Navigate to="/user/login" />;
     }
-
-    return <Outlet />;
 };
