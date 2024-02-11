@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@components";
 import { useAuth } from "@providers";
 
-const LoginPage = () => {
+const AdminLoginPage = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState<null | unknown>(null);
@@ -94,4 +94,4 @@ const LoginPage = () => {
     );
 };
 
-export { LoginPage };
+export { AdminLoginPage };
