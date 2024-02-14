@@ -14,7 +14,7 @@ const Router = () => (
     <BrowserRouter>
         <Routes>
             <Route path={routes.landing} element={<Placeholder />} />
-            <Route path={routes.admin} element={<ProtectedRoutes />}>
+            <Route path={routes.admin} element={<ProtectedRoutes adminOnly />}>
                 <Route path="" element={<AdminPage />} />
             </Route>
             <Route path={routes.login} element={<LoginPage />} />
