@@ -5,4 +5,6 @@
  */
 export { Placeholder } from "./Placeholder/Placeholder.page";
 export { AdminPage } from "./admin/Admin.page";
-export { LoginPage } from "./admin/Login.page";
+export { AdminLoginPage } from "./admin/Login.page";
+export { UserPage } from "./user/User.page";
+export { UserLoginPage } from "./user/Login.page";
