@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@components";
 import { useAuth } from "@providers";
+import { routes } from "../../utils/Router";
 
 const UserLoginPage = () => {
     const [email, setEmail] = useState("");
@@ -11,18 +12,14 @@ const UserLoginPage = () => {
     const authProvider = useAuth();
     const navigate = useNavigate();
 
-    const login = async (email: string, password: string) => {
+    const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
         try {
             await authProvider.login(email, password);
-            navigate("/user", { replace: true });
+            navigate(routes.profile);
         } catch (error) {
             setError(error);
         }
-    };
-
-    const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        login(email, password);
     };
 
     return (
