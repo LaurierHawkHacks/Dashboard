@@ -7,19 +7,14 @@ import { routes } from "../../utils/Router";
 const UserLoginPage = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState<null | unknown>(null);
 
     const authProvider = useAuth();
     const navigate = useNavigate();
 
     const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        try {
-            await authProvider.login(email, password);
-            navigate(routes.profile);
-        } catch (error) {
-            setError(error);
-        }
+        await authProvider.login(email, password);
+        navigate(routes.profile);
     };
 
     return (
@@ -62,14 +57,6 @@ const UserLoginPage = () => {
                         onChange={(e) => setPassword(e.target.value)}
                     />
                 </div>
-
-                {!error ? (
-                    ""
-                ) : (
-                    <p className="text-red-500">
-                        Wrong Credential. Try Again You Dummy🥹
-                    </p>
-                )}
 
                 <Button
                     type="submit"
