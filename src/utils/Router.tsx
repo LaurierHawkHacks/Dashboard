@@ -8,22 +8,34 @@ import {
 } from "@pages";
 import { ProtectedRoutes } from "@utils";
 
+const routes = {
+    landing: "/",
+    admin: "/admin",
+    adminLogin: "/admin/login",
+    notFound: "/not-found",
+    login: "/login",
+    portal: "/portal",
+    profile: "/portal/me",
+};
+
 const Router = () => (
     <BrowserRouter>
         <Routes>
-            <Route path="/" element={<Placeholder />} />
+            <Route path={routes.landing} element={<Placeholder />} />
+            <Route path={routes.login} element={<UserLoginPage />} />
 
-            <Route path="/admin" element={<ProtectedRoutes />}>
+            {/* User Routes */}
+            <Route path={routes.portal} element={<ProtectedRoutes />}>
+                <Route path={routes.profile} element={<UserPage />} />
+            </Route>
+
+            {/* Admin Routes */}
+            <Route path={routes.admin} element={<ProtectedRoutes adminOnly />}>
                 <Route path="" element={<AdminPage />} />
+                <Route path={routes.adminLogin} element={<AdminLoginPage />} />
             </Route>
-            <Route path="/admin/login" element={<AdminLoginPage />} />
-
-            <Route path="/user" element={<ProtectedRoutes />}>
-                <Route path="" element={<UserPage />} />
-            </Route>
-            <Route path="/user/login" element={<UserLoginPage />} />
         </Routes>
     </BrowserRouter>
 );
 
-export { Router };
+export { Router, routes };

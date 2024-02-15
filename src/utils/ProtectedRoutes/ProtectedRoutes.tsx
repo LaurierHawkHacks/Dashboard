@@ -1,20 +1,28 @@
 import { useAuth } from "@providers";
-import { useEffect } from "react";
-import { Outlet, Navigate, useLocation } from "react-router-dom";
+import { Outlet, Navigate } from "react-router-dom";
+import { routes } from "@utils";
 
-export const ProtectedRoutes = () => {
-    const auth = useAuth();
-    const location = useLocation();
+export interface ProtectedRoutesProps {
+    /**
+     * Controls the route group to be accessible for admin only
+     * @default false
+     */
+    adminOnly?: boolean;
+}
 
-    useEffect(() => {
-        console.log(location);
-    }, []);
+export const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
+    adminOnly = false,
+}) => {
+    const session = useAuth();
 
-    if (auth.currentUser) return <Outlet />;
-
-    if (location.pathname === "/admin") {
-        return <Navigate to="/admin/login" />;
-    } else if (location.pathname === "/user") {
-        return <Navigate to="/user/login" />;
+    if (!session.currentUser) {
+        return <Navigate to={adminOnly ? routes.notFound : routes.login} />;
     }
+
+    if (adminOnly && !session.currentUser.hawkAdmin) {
+        // redirect to not found page if user is not authorized to view
+        return <Navigate to={routes.notFound} />;
+    }
+
+    return <Outlet />;
 };
