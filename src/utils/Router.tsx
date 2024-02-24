@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {
     Placeholder,
     AdminPage,
-    AdminLoginPage,
     UserPage,
     UserLoginPage,
 } from "@pages";
@@ -11,7 +10,6 @@ import { ProtectedRoutes } from "@utils";
 const routes = {
     landing: "/",
     admin: "/admin",
-    adminLogin: "/admin/login",
     notFound: "/not-found",
     login: "/login",
     portal: "/portal",
@@ -32,7 +30,6 @@ const Router = () => (
             {/* Admin Routes */}
             <Route path={routes.admin} element={<ProtectedRoutes adminOnly />}>
                 <Route path="" element={<AdminPage />} />
-                <Route path={routes.adminLogin} element={<AdminLoginPage />} />
             </Route>
         </Routes>
     </BrowserRouter>
