@@ -96,7 +96,11 @@ export const LoginPage = () => {
                     <h2 className="font-bold text-3xl text-tbrand">
                         {isLogin ? "Log In" : "Create Account"}
                     </h2>
-                    <form onSubmit={handlerSubmit} className="mt-6 space-y-6">
+                    <form
+                        onSubmit={handlerSubmit}
+                        className="mt-6 space-y-6"
+                        aria-label="Authentication form"
+                    >
                         <TextInput
                             label="Email:"
                             id="email"
