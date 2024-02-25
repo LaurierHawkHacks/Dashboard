@@ -3,16 +3,20 @@ import { ClassProp } from "class-variance-authority/types";
 import { twMerge } from "tailwind-merge";
 
 const buttonStyles = cva(
-    "rounded-md px-3 py-2 text-sm font-semibold text-white transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:cursor-not-allowed disabled:text-zinc-400 disabled:opacity-50",
+    [
+        "rounded-lg px-5 py-2 text-sm font-semibold transition border-[#22565b] border relative",
+        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tbrand",
+        "disabled:cursor-not-allowed disabled:after:hidden",
+        "after:absolute after:bg-black after:top-0 after:left-0 after:-z-10 after:rounded-lg after:w-full after:h-full", // "solid shadow" shape
+        "after:translate-x-0.75 after:translate-y-0.75", // "solid shadow" positioning
+    ],
     {
         variants: {
             intent: {
                 primary:
-                    "bg-indigo-600 shadow-sm hover:bg-indigo-500 focus-visible:bg-indigo-500 disabled:bg-white/10",
+                    "bg-tbrand text-white hover:bg-[#3f9098] disabled:hover:bg-tbrand active:bg-[#214b4f]",
                 secondary:
-                    "border-2 border-indigo-600 bg-indigo-950 text-indigo-400 opacity-75 enabled:hover:opacity-100 enabled:focus-visible:opacity-100 disabled:border-white/10 disabled:bg-zinc-900",
-                clear: "hover:text-indigo-400 focus-visible:text-indigo-400",
-                danger: "bg-red-500 text-red-100 hover:bg-red-400 focus-visible:bg-red-400 focus-visible:outline-red-400",
+                    "bg-white text-tbrand hover:bg-[#ebebeb] disabled:hover:bg-white active:bg-[#d9d9d9]",
             },
         },
         defaultVariants: {
