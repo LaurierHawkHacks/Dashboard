@@ -1,6 +1,11 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import { auth } from "@services";
-import { User, signOut, signInWithEmailAndPassword } from "firebase/auth";
+import {
+    User,
+    signOut,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+} from "firebase/auth";
 
 export type UserWithRole = User & { hawkAdmin: boolean };
 
@@ -8,12 +13,14 @@ type AuthContextValue = {
     currentUser: UserWithRole | null;
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
+    createAccount: (email: string, password: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue>({
     currentUser: null,
     login: async () => {},
     logout: async () => {},
+    createAccount: async () => {},
 });
 
 /**
@@ -56,6 +63,20 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
         }
     };
 
+    const createAccount = async (email: string, password: string) => {
+        try {
+            const { user } = await createUserWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
+            setCurrentUser(await validateUserRole(user));
+        } catch (error) {
+            // TODO: should use notification system to show an error message to user
+            console.error(error);
+        }
+    };
+
     useEffect(() => {
         const unsub = auth.onAuthStateChanged(async (user) => {
             if (user) {
@@ -74,6 +95,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 currentUser,
                 login,
                 logout,
+                createAccount,
             }}
         >
             {children}

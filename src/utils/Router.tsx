@@ -1,28 +1,19 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import {
-    Placeholder,
-    AdminPage,
-    AdminLoginPage,
-    UserPage,
-    UserLoginPage,
-} from "@pages";
+import { AdminPage, UserPage, LoginPage } from "@pages";
 import { ProtectedRoutes } from "@utils";
 
 const routes = {
-    landing: "/",
     admin: "/admin",
-    adminLogin: "/admin/login",
     notFound: "/not-found",
     login: "/login",
-    portal: "/portal",
-    profile: "/portal/me",
+    portal: "/",
+    profile: "/me",
 };
 
 const Router = () => (
     <BrowserRouter>
         <Routes>
-            <Route path={routes.landing} element={<Placeholder />} />
-            <Route path={routes.login} element={<UserLoginPage />} />
+            <Route path={routes.login} element={<LoginPage />} />
 
             {/* User Routes */}
             <Route path={routes.portal} element={<ProtectedRoutes />}>
@@ -32,7 +23,6 @@ const Router = () => (
             {/* Admin Routes */}
             <Route path={routes.admin} element={<ProtectedRoutes adminOnly />}>
                 <Route path="" element={<AdminPage />} />
-                <Route path={routes.adminLogin} element={<AdminLoginPage />} />
             </Route>
         </Routes>
     </BrowserRouter>
