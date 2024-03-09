@@ -5,15 +5,25 @@ import {
     signOut,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
+    signInWithPopup,
+    GoogleAuthProvider,
 } from "firebase/auth";
+import { GoogleLogin, GoogleLogout, GoogleLoginResponse } from "react-google-login";
 
 export type UserWithRole = User & { hawkAdmin: boolean };
+
+interface GoogleLoginResponseWithCredential extends GoogleLoginResponse {
+  credential: string;
+}
+
+type GoogleLoginResponseUnion = GoogleLoginResponse | GoogleLoginResponseWithCredential;
 
 type AuthContextValue = {
     currentUser: UserWithRole | null;
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
     createAccount: (email: string, password: string) => Promise<void>;
+    loginWithGoogle: (response: GoogleLoginResponseUnion) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue>({
@@ -21,6 +31,7 @@ const AuthContext = createContext<AuthContextValue>({
     login: async () => {},
     logout: async () => {},
     createAccount: async () => {},
+    loginWithGoogle: async () => {},
 });
 
 /**
@@ -49,6 +60,20 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
         } catch (error) {
             // TODO: should use notification system to show an error message to user
             console.error(error);
+        }
+    };
+
+    const loginWithGoogle = async (response: GoogleLoginResponseUnion) => {
+        if ("credential" in response) {
+            const credential = GoogleAuthProvider.credential(response.credential);
+            try {
+                const { user } = await signInWithPopup(auth, credential);
+                setCurrentUser(await validateUserRole(user));
+            } catch (error) {
+                console.error(error);
+            }
+        } else {
+            console.error("Google login response is missing credential");
         }
     };
 
@@ -96,9 +121,21 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 login,
                 logout,
                 createAccount,
+                loginWithGoogle
             }}
         >
             {children}
+            <GoogleLogin
+                clientId="587778980690-d0vll2ts3ubnofb21kre5r3qb6959hfo.apps.googleusercontent.com"
+                buttonText="Sign in with Google"
+                onSuccess={(response) => loginWithGoogle(response as GoogleLoginResponseUnion)}
+                cookiePolicy={"single_host_origin"}
+            />
+            <GoogleLogout
+                clientId="587778980690-d0vll2ts3ubnofb21kre5r3qb6959hfo.apps.googleusercontent.com"
+                buttonText="Sign out"
+                onLogoutSuccess={logout}
+            />
         </AuthContext.Provider>
     );
 };
