@@ -4,6 +4,7 @@ import { Navigate } from "react-router-dom";
 import { Button, TextInput } from "@components";
 import { useAuth } from "@providers";
 import { routes } from "@utils";
+import { GithubLogo, AppleLogo } from "@assets";
 
 // TODO: add providers, not just basic email/password
 
@@ -26,7 +27,7 @@ export const LoginPage = () => {
     // control auth flow and form state to show correct title, toggle button
     const [isLogin, setIsLogin] = useState(true);
 
-    const { login, createAccount, currentUser } = useAuth();
+    const { login, createAccount, loginWithGithub, loginWithApple, currentUser } = useAuth();
 
     const handlerSubmit: FormEventHandler = (e) => {
         // prevent page refresh when form is submitted
@@ -154,6 +155,38 @@ export const LoginPage = () => {
                             {isLogin ? "Create Account" : "Log In"}
                         </button>
                     </p>
+                </div>
+                {/* just a separator line */}
+                <div className="h-0.5 bg-tbrand my-6"></div>
+                <div>
+                    <div className="max-w-sm m-auto">
+                        <Button
+                            onClick={loginWithGithub}
+                            className="w-full bg-white text-gray-900 flex justify-center items-center gap-4 border-gray-900 hover:bg-gray-100 active:bg-gray-200"
+                        >
+                            <img
+                                src={GithubLogo}
+                                aria-hidden="true"
+                                className="w-6 h-6"
+                            />
+                            Login With GitHub
+                        </Button>
+                        <div className="h-4" /> {/* Add some vertical spacing */}
+                        <Button
+    onClick={() => {
+        console.log("Apple button clicked");
+        loginWithApple();
+    }}
+    className="w-full bg-white text-gray-900 flex justify-center items-center gap-4 border-gray-900 hover:bg-gray-100 active:bg-gray-200"
+>
+    <img
+        src={AppleLogo}
+        aria-hidden="true"
+        className="w-6 h-6"
+    />
+    Login With Apple
+</Button>
+                    </div>
                 </div>
             </div>
         </div>

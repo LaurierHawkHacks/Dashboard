@@ -5,6 +5,9 @@ import {
     signOut,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
+    GithubAuthProvider,
+    OAuthProvider,
+    signInWithPopup,
 } from "firebase/auth";
 
 export type UserWithRole = User & { hawkAdmin: boolean };
@@ -14,6 +17,8 @@ type AuthContextValue = {
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
     createAccount: (email: string, password: string) => Promise<void>;
+    loginWithGithub: () => Promise<void>;
+    loginWithApple: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue>({
@@ -21,12 +26,10 @@ const AuthContext = createContext<AuthContextValue>({
     login: async () => {},
     logout: async () => {},
     createAccount: async () => {},
+    loginWithGithub: async () => {},
+    loginWithApple: async () => {},
 });
 
-/**
- * Validates given user for admin authorization.
- * Return object adds `hawkAdmin` boolean field.
- */
 async function validateUserRole(user: User): Promise<UserWithRole> {
     const { claims } = await user.getIdTokenResult();
     return {
@@ -34,6 +37,10 @@ async function validateUserRole(user: User): Promise<UserWithRole> {
         hawkAdmin: Boolean(claims.admin),
     };
 }
+
+const githubProvider = new GithubAuthProvider();
+githubProvider.addScope("read:user");
+githubProvider.addScope("user:email");
 
 export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<UserWithRole | null>(null);
@@ -47,7 +54,6 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
             );
             setCurrentUser(await validateUserRole(user));
         } catch (error) {
-            // TODO: should use notification system to show an error message to user
             console.error(error);
         }
     };
@@ -56,7 +62,6 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
         try {
             await signOut(auth);
         } catch (error) {
-            // TODO: should use notification system to show an error message to user
             console.error(error);
         } finally {
             setCurrentUser(null);
@@ -72,8 +77,30 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
             );
             setCurrentUser(await validateUserRole(user));
         } catch (error) {
-            // TODO: should use notification system to show an error message to user
             console.error(error);
+        }
+    };
+
+    const loginWithGithub = async () => {
+        try {
+            const results = await signInWithPopup(auth, githubProvider);
+            if (results) {
+                setCurrentUser(await validateUserRole(results.user));
+            } else {
+                console.warn("login with github: results is null");
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const loginWithApple = async () => {
+        try {
+            const appleProvider = new OAuthProvider("apple.com");
+            const result = await signInWithPopup(auth, appleProvider);
+            setCurrentUser(await validateUserRole(result.user));
+        } catch (error) {
+            console.error("Error logging in with Apple:", error);
         }
     };
 
@@ -96,6 +123,8 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 login,
                 logout,
                 createAccount,
+                loginWithGithub,
+                loginWithApple,
             }}
         >
             {children}
