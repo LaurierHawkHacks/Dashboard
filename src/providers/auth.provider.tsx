@@ -5,6 +5,8 @@ import {
     signOut,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
+    GithubAuthProvider,
+    signInWithPopup,
 } from "firebase/auth";
 
 export type UserWithRole = User & { hawkAdmin: boolean };
@@ -14,6 +16,7 @@ type AuthContextValue = {
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
     createAccount: (email: string, password: string) => Promise<void>;
+    loginWithGithub: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue>({
@@ -21,6 +24,7 @@ const AuthContext = createContext<AuthContextValue>({
     login: async () => {},
     logout: async () => {},
     createAccount: async () => {},
+    loginWithGithub: async () => {},
 });
 
 /**
@@ -34,6 +38,11 @@ async function validateUserRole(user: User): Promise<UserWithRole> {
         hawkAdmin: Boolean(claims.admin),
     };
 }
+
+const githubProvider = new GithubAuthProvider();
+// scope for user profile data and email
+githubProvider.addScope("read:user");
+githubProvider.addScope("user:email");
 
 export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<UserWithRole | null>(null);
@@ -77,6 +86,24 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
         }
     };
 
+    const loginWithGithub = async () => {
+        // TODO: separate the calls into their own try/catch for granular error handling
+        try {
+            const results = await signInWithPopup(auth, githubProvider);
+            if (results) {
+                // NOTE: just in case we want to use this for the future
+                // results.token // github access token to access github api
+                setCurrentUser(await validateUserRole(results.user));
+            } else {
+                // TODO: handle situation that results returned as null
+                console.warn("login with github: results is null");
+            }
+        } catch (error) {
+            // TODO: should use notification system to show an error message to user
+            console.error(error);
+        }
+    };
+
     useEffect(() => {
         const unsub = auth.onAuthStateChanged(async (user) => {
             if (user) {
@@ -96,6 +123,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 login,
                 logout,
                 createAccount,
+                loginWithGithub,
             }}
         >
             {children}
