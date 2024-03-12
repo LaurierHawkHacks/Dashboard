@@ -1,12 +1,25 @@
 import { FormEventHandler, useState } from "react";
 import { z } from "zod";
 import { Navigate } from "react-router-dom";
+import {
+    GoogleLogin,
+    GoogleOAuthProvider,
+    CredentialResponse,
+} from "@react-oauth/google";
 import { Button, TextInput } from "@components";
 import { useAuth } from "@providers";
 import { routes } from "@utils";
 import { GithubLogo } from "@assets";
 
 // TODO: add providers, not just basic email/password
+
+interface GoogleLoginResponseWithCredential extends CredentialResponse {
+    credential: string;
+}
+
+type GoogleLoginResponseUnion =
+    | GoogleLoginResponseWithCredential
+    | CredentialResponse;
 
 // email validation with zod, double guard just in case someone changes the input type in html
 const emailParser = z.string().email();
@@ -27,7 +40,29 @@ export const LoginPage = () => {
     // control auth flow and form state to show correct title, toggle button
     const [isLogin, setIsLogin] = useState(true);
 
-    const { login, createAccount, loginWithGithub, currentUser } = useAuth();
+    const {
+        login,
+        createAccount,
+        loginWithGithub,
+        loginWithGoogle,
+        currentUser,
+    } = useAuth();
+
+    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+    const handleGoogleLoginSuccess = async (
+        response: GoogleLoginResponseUnion
+    ) => {
+        try {
+            await loginWithGoogle(response);
+        } catch (error) {
+            console.error("Google authentication failed:", error);
+        }
+    };
+
+    const handleGoogleLoginFailure = () => {
+        console.error("Google authentication failed:");
+    };
 
     const handlerSubmit: FormEventHandler = (e) => {
         // prevent page refresh when form is submitted
@@ -145,6 +180,12 @@ export const LoginPage = () => {
                         <Button type="submit">
                             {isLogin ? "Log In" : "Create Account"}
                         </Button>
+                        <GoogleOAuthProvider clientId={googleClientId}>
+                            <GoogleLogin
+                                onSuccess={handleGoogleLoginSuccess}
+                                onError={handleGoogleLoginFailure}
+                            />
+                        </GoogleOAuthProvider>
                     </form>
                     <p className="mt-6 text-[#32848C]">
                         Does not have an account yet?{" "}
@@ -177,3 +218,4 @@ export const LoginPage = () => {
         </div>
     );
 };
+

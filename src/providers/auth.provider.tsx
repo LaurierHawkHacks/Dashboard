@@ -6,10 +6,21 @@ import {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
     GithubAuthProvider,
+    GoogleAuthProvider,
+    signInWithCredential,
     signInWithPopup,
 } from "firebase/auth";
+import { CredentialResponse } from "@react-oauth/google";
 
 export type UserWithRole = User & { hawkAdmin: boolean };
+
+interface GoogleLoginResponseWithCredential extends CredentialResponse {
+    credential: string;
+}
+
+type GoogleLoginResponseUnion =
+    | GoogleLoginResponseWithCredential
+    | CredentialResponse;
 
 type AuthContextValue = {
     currentUser: UserWithRole | null;
@@ -17,6 +28,7 @@ type AuthContextValue = {
     logout: () => Promise<void>;
     createAccount: (email: string, password: string) => Promise<void>;
     loginWithGithub: () => Promise<void>;
+    loginWithGoogle: (response: GoogleLoginResponseUnion) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue>({
@@ -25,6 +37,7 @@ const AuthContext = createContext<AuthContextValue>({
     logout: async () => {},
     createAccount: async () => {},
     loginWithGithub: async () => {},
+    loginWithGoogle: async () => {},
 });
 
 /**
@@ -58,6 +71,27 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
         } catch (error) {
             // TODO: should use notification system to show an error message to user
             console.error(error);
+        }
+    };
+
+    const loginWithGoogle = async (response: GoogleLoginResponseUnion) => {
+        const credential =
+            (response as GoogleLoginResponseWithCredential).credential ||
+            undefined;
+
+        if (credential) {
+            try {
+                const userCredential = await signInWithCredential(
+                    auth,
+                    GoogleAuthProvider.credential(credential)
+                );
+                const user = userCredential.user;
+                setCurrentUser(await validateUserRole(user));
+            } catch (error) {
+                console.error(error);
+            }
+        } else {
+            console.error("Google login response is missing credential");
         }
     };
 
@@ -124,6 +158,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 logout,
                 createAccount,
                 loginWithGithub,
+                loginWithGoogle,
             }}
         >
             {children}
