@@ -4,6 +4,7 @@ import { Navigate } from "react-router-dom";
 import { Button, TextInput } from "@components";
 import { useAuth } from "@providers";
 import { routes } from "@utils";
+import { GoogleLoginResponse, GoogleLoginResponseOffline, GoogleLogin } from "react-google-login";
 
 // TODO: add providers, not just basic email/password
 
@@ -27,6 +28,16 @@ export const LoginPage = () => {
     const [isLogin, setIsLogin] = useState(true);
 
     const { login, createAccount, currentUser } = useAuth();
+
+    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+    const handleGoogleLoginSuccess = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
+        console.log("Google authentication successful:", response);
+    };
+
+    const handleGoogleLoginFailure = (error: Error) => {
+        console.error("Google authentication failed:", error);
+    };
 
     const handlerSubmit: FormEventHandler = (e) => {
         // prevent page refresh when form is submitted
@@ -144,6 +155,13 @@ export const LoginPage = () => {
                         <Button type="submit">
                             {isLogin ? "Log In" : "Create Account"}
                         </Button>
+                        <GoogleLogin
+                            clientId={googleClientId}
+                            buttonText="Sign in with Google"
+                            onSuccess={handleGoogleLoginSuccess}
+                            onFailure={handleGoogleLoginFailure}
+                            cookiePolicy={"single_host_origin"}
+                        />
                     </form>
                     <p className="mt-6 text-[#32848C]">
                         Does not have an account yet?{" "}
