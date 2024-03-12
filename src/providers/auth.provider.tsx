@@ -8,7 +8,7 @@ import {
     signInWithPopup,
     GoogleAuthProvider,
 } from "firebase/auth";
-import { GoogleLogin, GoogleLogout, GoogleLoginResponse } from "react-google-login";
+import { GoogleLoginResponse } from "react-google-login";
 
 export type UserWithRole = User & { hawkAdmin: boolean };
 
@@ -125,17 +125,6 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
             }}
         >
             {children}
-            <GoogleLogin
-                clientId="587778980690-d0vll2ts3ubnofb21kre5r3qb6959hfo.apps.googleusercontent.com"
-                buttonText="Sign in with Google"
-                onSuccess={(response) => loginWithGoogle(response as GoogleLoginResponseUnion)}
-                cookiePolicy={"single_host_origin"}
-            />
-            <GoogleLogout
-                clientId="587778980690-d0vll2ts3ubnofb21kre5r3qb6959hfo.apps.googleusercontent.com"
-                buttonText="Sign out"
-                onLogoutSuccess={logout}
-            />
         </AuthContext.Provider>
     );
 };
