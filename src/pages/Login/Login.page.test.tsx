@@ -70,4 +70,15 @@ describe("Login Page", () => {
             within(form).getByRole("button", { name: /create account/i })
         ).toBeEnabled();
     });
+
+    it("should render login with GitHub button", () => {
+        render(<LoginPage />);
+
+        expect(
+            screen.getByRole("button", { name: "Login With GitHub" })
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: "Login With GitHub" })
+        ).toBeEnabled();
+    });
 });
