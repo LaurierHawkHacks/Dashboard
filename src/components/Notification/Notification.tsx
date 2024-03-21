@@ -14,7 +14,6 @@ const Notification: React.FC<NotificationProps> = ({
 }) => {
     return (
         <>
-            {/* Global notification live region, render this permanently at the end of the document */}
             <div
                 aria-live="assertive"
                 className="pointer-events-none flex items-end sm:items-start"
