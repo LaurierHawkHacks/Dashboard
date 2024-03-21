@@ -1,4 +1,6 @@
 import { createContext, useState, useContext } from "react";
+import Notification from "../components/Notification/Notification";
+import { createPortal } from "react-dom";
 
 export type NotificationOptions = {
     id?: string;
@@ -10,7 +12,6 @@ export type NotificationData = {
     id: string;
     title: string;
     message: string;
-    visible: boolean;
 };
 
 /**
@@ -42,18 +43,34 @@ export const NotificationProvider = ({
             id: options.id ?? Math.random().toString(32),
             title: options.title,
             message: options.message,
-            visible: true,
         };
         setVisibleNotifications((prev) => [...prev, notification]);
         return notification.id;
     };
 
+    const closeNotification = (id: string) => {
+        setVisibleNotifications((prev) => prev.filter((n) => n.id != id));
+    };
+
+    const notifications = visibleNotiications.map((data) => (
+        <Notification
+            key={data.id}
+            title={data.title}
+            message={data.message}
+            onClose={() => closeNotification(data.id)}
+        />
+    ));
+
     return (
         <NotificationProviderContext.Provider value={{ showNotification }}>
             {children}
-            {visibleNotiications.map((data) => (
-                <div key={data.id}>{data.title}</div>
-            ))}
+            {notifications.length > 0 &&
+                createPortal(
+                    <div className="z-50 fixed bottom-4 md:bottom-auto md:top-4 right-4 w-80">
+                        <div className="space-y-4">{notifications}</div>
+                    </div>,
+                    document.getElementById("notifications")!
+                )}
         </NotificationProviderContext.Provider>
     );
 };
