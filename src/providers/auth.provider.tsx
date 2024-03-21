@@ -1,45 +1,128 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import { auth } from "@services";
-import { User, signOut, signInWithEmailAndPassword } from "firebase/auth";
+import {
+    User,
+    signOut,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    GithubAuthProvider,
+    GoogleAuthProvider,
+    signInWithPopup,
+    type AuthProvider as OAuthProvider,
+} from "firebase/auth";
 
-type AuthContextValue = {
-    currentUser: User | null;
+export type UserWithRole = User & { hawkAdmin: boolean };
+
+export type ProviderName = "github" | "google";
+
+export type AuthContextValue = {
+    currentUser: UserWithRole | null;
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
+    createAccount: (email: string, password: string) => Promise<void>;
+    loginWithProvider: (name: ProviderName) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue>({
     currentUser: null,
     login: async () => {},
     logout: async () => {},
+    createAccount: async () => {},
+    loginWithProvider: async () => {},
 });
 
+/**
+ * Validates given user for admin authorization.
+ * Return object adds `hawkAdmin` boolean field.
+ */
+async function validateUserRole(user: User): Promise<UserWithRole> {
+    const { claims } = await user.getIdTokenResult();
+    return {
+        ...user,
+        hawkAdmin: Boolean(claims.admin),
+    };
+}
+
+const githubProvider = new GithubAuthProvider();
+// scope for user profile data and email
+githubProvider.addScope("read:user");
+githubProvider.addScope("user:email");
+
+const googleProvider = new GoogleAuthProvider();
+googleProvider.addScope("profile");
+googleProvider.addScope("email");
+
+function getProvider(provider: ProviderName): OAuthProvider | undefined {
+    if (provider === "google") return googleProvider;
+    if (provider === "github") return githubProvider;
+}
+
 export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
-    const [currentUser, setCurrentUser] = useState<User | null>(null);
+    const [currentUser, setCurrentUser] = useState<UserWithRole | null>(null);
 
     const login = async (email: string, password: string) => {
-        const { user } = await signInWithEmailAndPassword(
-            auth,
-            email,
-            password
-        );
-        setCurrentUser(user);
+        try {
+            const { user } = await signInWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
+            setCurrentUser(await validateUserRole(user));
+        } catch (error) {
+            // TODO: should use notification system to show an error message to user
+            console.error(error);
+        }
     };
 
     const logout = async () => {
         try {
             await signOut(auth);
         } catch (error) {
+            // TODO: should use notification system to show an error message to user
+            console.error(error);
+        } finally {
+            setCurrentUser(null);
+        }
+    };
+
+    const createAccount = async (email: string, password: string) => {
+        try {
+            const { user } = await createUserWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
+            setCurrentUser(await validateUserRole(user));
+        } catch (error) {
+            // TODO: should use notification system to show an error message to user
             console.error(error);
         }
+    };
 
-        setCurrentUser(null);
+    const loginWithProvider = async (name: ProviderName) => {
+        try {
+            const provider = getProvider(name);
+            if (!provider) throw new Error("Invalid provider name");
+
+            const results = await signInWithPopup(auth, provider);
+            if (results) {
+                // NOTE: just in case we want to use this for the future
+                // results.token // github access token to access github api
+                setCurrentUser(await validateUserRole(results.user));
+            } else {
+                // TODO: handle situation that results returned as null
+                console.warn("login with github: results is null");
+            }
+        } catch (error) {
+            // TODO: should use notification system to show an error message to user
+            console.error(error);
+        }
     };
 
     useEffect(() => {
-        const unsub = auth.onAuthStateChanged((user) => {
+        const unsub = auth.onAuthStateChanged(async (user) => {
             if (user) {
-                setCurrentUser(user);
+                setCurrentUser(await validateUserRole(user));
             } else {
                 logout();
             }
@@ -49,7 +132,15 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ currentUser, login, logout }}>
+        <AuthContext.Provider
+            value={{
+                currentUser,
+                login,
+                logout,
+                createAccount,
+                loginWithProvider,
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );

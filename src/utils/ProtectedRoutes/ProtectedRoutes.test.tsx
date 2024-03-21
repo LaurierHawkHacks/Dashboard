@@ -1,23 +1,20 @@
 import { screen } from "@testing-library/react";
-import { Routes, Route } from "react-router-dom";
-import { ProtectedRoutes, renderWithRouter } from "@utils";
+import { Routes, Route, Link } from "react-router-dom";
+import { ProtectedRoutes, renderWithRouter, routes } from "@utils";
 import { mockUseAuth } from "@mocks/providers";
 
 vi.mock("@providers");
 
 describe("ProctectedRoutes Component", () => {
-    it("should render if user is authorized", () => {
-        mockUseAuth.mockReturnValueOnce({ currentUser: true });
+    it("should render if user is authenticated and authorized", () => {
+        mockUseAuth.mockReturnValueOnce({ currentUser: {} });
         renderWithRouter(
             <Routes>
                 <Route path="/" element={<ProtectedRoutes />}>
-                    <Route
-                        path="/"
-                        element={<div data-testid="in-doc"></div>}
-                    />
+                    <Route path="" element={<div data-testid="in-doc"></div>} />
                 </Route>
                 <Route
-                    path="/admin/login"
+                    path={routes.login}
                     element={<div data-testid="login"></div>}
                 />
             </Routes>
@@ -27,18 +24,18 @@ describe("ProctectedRoutes Component", () => {
         expect(screen.getByTestId("in-doc")).toBeInTheDocument();
     });
 
-    it("should redirect to login if user is not authorized", () => {
+    it("should redirect to login page if user is not authenticated", () => {
         mockUseAuth.mockReturnValueOnce({ currentUser: null });
         renderWithRouter(
             <Routes>
                 <Route path="/" element={<ProtectedRoutes />}>
                     <Route
-                        path="/"
+                        path=""
                         element={<div data-testid="not-in-doc"></div>}
                     />
                 </Route>
                 <Route
-                    path="/admin/login"
+                    path={routes.login}
                     element={<div data-testid="login"></div>}
                 />
             </Routes>
@@ -46,5 +43,74 @@ describe("ProctectedRoutes Component", () => {
 
         expect(screen.getByTestId("login")).toBeInTheDocument();
         expect(screen.queryByTestId("not-in-doc")).not.toBeInTheDocument();
+    });
+
+    it("should redirect to not found page if user is not authenticated and authorized", () => {
+        mockUseAuth.mockReturnValueOnce({ currentUser: null });
+        renderWithRouter(
+            <Routes>
+                <Route path="/" element={<ProtectedRoutes adminOnly />}>
+                    <Route
+                        path=""
+                        element={<div data-testid="not-in-doc"></div>}
+                    />
+                </Route>
+                <Route
+                    path={routes.notFound}
+                    element={<div data-testid="not-found"></div>}
+                />
+            </Routes>
+        );
+
+        expect(screen.getByTestId("not-found")).toBeInTheDocument();
+        expect(screen.queryByTestId("not-in-doc")).not.toBeInTheDocument();
+    });
+
+    it("should redirect to not found page if not authorized to view", async () => {
+        mockUseAuth.mockReturnValue({ currentUser: { isAdmin: false } });
+        const { user } = renderWithRouter(
+            <Routes>
+                <Route path="/" element={<ProtectedRoutes />}>
+                    <Route
+                        path=""
+                        element={
+                            <Link
+                                to={routes.admin}
+                                data-testid="regular-access-level"
+                            >
+                                test
+                            </Link>
+                        }
+                    />
+                </Route>
+                <Route
+                    path={routes.admin}
+                    element={<ProtectedRoutes adminOnly />}
+                >
+                    <Route
+                        path=""
+                        element={<div data-testid="admin-access-level"></div>}
+                    />
+                </Route>
+                <Route
+                    path={routes.notFound}
+                    element={<div data-testid="not-found"></div>}
+                />
+            </Routes>
+        );
+
+        expect(screen.getByTestId("regular-access-level")).toBeInTheDocument();
+
+        await user.click(screen.getByRole("link", { name: "test" }));
+
+        expect(
+            screen.queryByTestId("regular-access-level")
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("admin-access-level")
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("not-found")).toBeInTheDocument();
+
+        mockUseAuth.mockClear();
     });
 });

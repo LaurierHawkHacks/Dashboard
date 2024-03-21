@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-    html,
-    body,
-    #root {
-        @apply w-full h-full bg-zinc-900 text-white;
-    }
+html {
+    background: #fdddb7;
 }
