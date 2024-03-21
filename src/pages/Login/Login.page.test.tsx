@@ -71,14 +71,25 @@ describe("Login Page", () => {
         ).toBeEnabled();
     });
 
-    it("should render login with GitHub button", () => {
+    it("should render continue with GitHub button", () => {
         render(<LoginPage />);
 
         expect(
-            screen.getByRole("button", { name: "Login With GitHub" })
+            screen.getByRole("button", { name: "continue with github" })
         ).toBeInTheDocument();
         expect(
-            screen.getByRole("button", { name: "Login With GitHub" })
+            screen.getByRole("button", { name: "continue with github" })
+        ).toBeEnabled();
+    });
+
+    it("should render continue with Google button", () => {
+        render(<LoginPage />);
+
+        expect(
+            screen.getByRole("button", { name: "continue with google" })
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: "continue with google" })
         ).toBeEnabled();
     });
 });
