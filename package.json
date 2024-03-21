@@ -15,7 +15,6 @@
     },
     "dependencies": {
         "@google-cloud/functions-framework": "^3.3.0",
-        "@react-oauth/google": "^0.12.1",
         "@types/node": "^20.6.0",
         "class-variance-authority": "^0.7.0",
         "firebase": "^10.5.2",
