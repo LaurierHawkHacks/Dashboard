@@ -4,11 +4,14 @@ import "./index.css";
 
 import { Router } from "@utils";
 import { AuthProvider } from "@providers";
+import { NotificationProvider } from "./providers/notification.provider";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
         <AuthProvider>
-            <Router />
+            <NotificationProvider>
+                <Router />
+            </NotificationProvider>
         </AuthProvider>
     </React.StrictMode>
 );
