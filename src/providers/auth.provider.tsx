@@ -6,17 +6,21 @@ import {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
     GithubAuthProvider,
+    GoogleAuthProvider,
     signInWithPopup,
+    type AuthProvider as OAuthProvider,
 } from "firebase/auth";
 
 export type UserWithRole = User & { hawkAdmin: boolean };
 
-type AuthContextValue = {
+export type ProviderName = "github" | "google";
+
+export type AuthContextValue = {
     currentUser: UserWithRole | null;
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
     createAccount: (email: string, password: string) => Promise<void>;
-    loginWithGithub: () => Promise<void>;
+    loginWithProvider: (name: ProviderName) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue>({
@@ -24,7 +28,7 @@ const AuthContext = createContext<AuthContextValue>({
     login: async () => {},
     logout: async () => {},
     createAccount: async () => {},
-    loginWithGithub: async () => {},
+    loginWithProvider: async () => {},
 });
 
 /**
@@ -43,6 +47,15 @@ const githubProvider = new GithubAuthProvider();
 // scope for user profile data and email
 githubProvider.addScope("read:user");
 githubProvider.addScope("user:email");
+
+const googleProvider = new GoogleAuthProvider();
+googleProvider.addScope("profile");
+googleProvider.addScope("email");
+
+function getProvider(provider: ProviderName): OAuthProvider | undefined {
+    if (provider === "google") return googleProvider;
+    if (provider === "github") return githubProvider;
+}
 
 export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<UserWithRole | null>(null);
@@ -86,10 +99,12 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
         }
     };
 
-    const loginWithGithub = async () => {
-        // TODO: separate the calls into their own try/catch for granular error handling
+    const loginWithProvider = async (name: ProviderName) => {
         try {
-            const results = await signInWithPopup(auth, githubProvider);
+            const provider = getProvider(name);
+            if (!provider) throw new Error("Invalid provider name");
+
+            const results = await signInWithPopup(auth, provider);
             if (results) {
                 // NOTE: just in case we want to use this for the future
                 // results.token // github access token to access github api
@@ -123,7 +138,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 login,
                 logout,
                 createAccount,
-                loginWithGithub,
+                loginWithProvider,
             }}
         >
             {children}
