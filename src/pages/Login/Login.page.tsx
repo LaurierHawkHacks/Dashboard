@@ -162,7 +162,7 @@ export const LoginPage = () => {
                                 className="text-charcoalBlack font-bold underline hover:text-tbrand-hover"
                                 onClick={toggleForm}
                             >
-                                {isLogin ? "Sign Up" : "Log In"}
+                                {isLogin ? "Create Account" : "Log In"}
                             </button>
                         </p>
                     </div>
