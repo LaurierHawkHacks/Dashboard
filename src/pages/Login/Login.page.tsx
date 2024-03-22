@@ -96,7 +96,7 @@ export const LoginPage = () => {
         <div className="font-medium flex justify-center items-center h-screen">
             <div className="mx-auto max-w-3xl">
                 <h1 className="text-5xl text-charcoalBlack font-body font-bold">
-                    {isLogin ? "Log into your account" : "Create Account"}
+                    HawkHacks Hacker Portal
                 </h1>
                 <div className="h-6" />
                 <div>
@@ -110,7 +110,7 @@ export const LoginPage = () => {
                             aria-label="Authentication form"
                         >
                             <TextInput
-                                label="Email:"
+                                label="Email"
                                 id="email"
                                 type="email"
                                 placeholder="awesome@hawkhack.ca"
@@ -125,9 +125,10 @@ export const LoginPage = () => {
                                 required
                             />
                             <TextInput
-                                label="Password:"
+                                label="Password"
                                 id="password"
                                 type="password"
+                                placeholder="************"
                                 minLength={isLogin ? 0 : 8}
                                 value={password}
                                 invalid={!isLogin && isInvalidPassword}
@@ -155,19 +156,19 @@ export const LoginPage = () => {
                                 {isLogin ? "Log In" : "Create Account"}
                             </Button>
                         </form>
-                        <p className="mt-6 text-[#32848C]">
-                            Does not have an account yet?{" "}
+                        <p className="mt-6 text-center text-charcoalBlack font-medium">
+                            Don&apos;t have an account?{" "}
                             <button
-                                className="text-tbrand underline hover:text-tbrand-hover"
+                                className="text-charcoalBlack font-bold underline hover:text-tbrand-hover"
                                 onClick={toggleForm}
                             >
-                                {isLogin ? "Create Account" : "Log In"}
+                                {isLogin ? "Sign Up" : "Log In"}
                             </button>
                         </p>
                     </div>
                 </div>
                 {/* just a separator line */}
-                <div className="h-0.5 bg-tbrand my-6"></div>
+                <div className="h-0.5 bg-transparent my-6"></div>
                 <div>
                     <div className="max-w-sm m-auto space-y-4">
                         {authProviders.map((provider) => (

@@ -31,6 +31,8 @@ export default {
                 copper: "#DE846E",
                 khakiYellow: "#F0E698",
                 dimGray: "#4A4F50",
+                sageGray: "#577893",
+                peachWhite: "#FFEEE4",
                 tbrand: "#2B6469",
                 "tbrand-hover": "#0FA3B1",
                 "tbrand-mouse-down": "#1D7882",
