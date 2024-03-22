@@ -4,6 +4,8 @@ import {
     type NotificationData,
 } from "../components/Notification/Notification";
 import { createPortal } from "react-dom";
+import { Transition } from "@headlessui/react";
+import { Fragment } from "react";
 
 export interface NotificationOptions
     extends Omit<NotificationData, "id" | "show"> {
@@ -39,19 +41,9 @@ export const NotificationProvider = ({
             id: options.id ?? new Date().getTime(),
             title: options.title,
             message: options.message,
-            show: false,
+            show: true,
         };
         setVisibleNotifications((prev) => [...prev, notification]);
-        setTimeout(
-            () =>
-                setVisibleNotifications((prev) =>
-                    prev.map((n) => {
-                        if (n.id === notification.id) n.show = true;
-                        return n;
-                    })
-                ),
-            100
-        );
         return notification.id;
     };
 
@@ -64,20 +56,37 @@ export const NotificationProvider = ({
         );
     };
 
+    const removeNotification = (id: number) => {
+        setVisibleNotifications((prev) => prev.filter((n) => n.id !== id));
+    };
+
     const notifications = visibleNotiications.map((data) => (
-        <Notification key={data.id} onClose={closeNotification} {...data} />
+        <Transition
+            key={data.id}
+            show={data.show}
+            appear
+            as={Fragment}
+            afterLeave={() => removeNotification(data.id)}
+            enter="transition-notification duration-200"
+            enterFrom="opacity-0 translate-x-full"
+            enterTo="opacity-100 translate-x-0"
+            leave="transition-notification duration-200"
+            leaveFrom="opacity-100 max-h-32 translate-x-0"
+            leaveTo="opacity-0 max-h-0 translate-x-full"
+        >
+            <Notification onClose={closeNotification} {...data} />
+        </Transition>
     ));
 
     return (
         <NotificationProviderContext.Provider value={{ showNotification }}>
             {children}
-            {notifications.length > 0 &&
-                createPortal(
-                    <div className="z-50 fixed bottom-4 md:bottom-auto md:top-4 md:right-4 w-full px-4 md:w-80">
-                        <div className="space-y-4">{notifications}</div>
-                    </div>,
-                    document.getElementById("notifications")!
-                )}
+            {createPortal(
+                <div className="z-50 fixed bottom-4 md:bottom-auto md:top-4 md:right-4 w-full px-4 md:w-80">
+                    <div className="space-y-4">{notifications}</div>
+                </div>,
+                document.getElementById("notifications")!
+            )}
         </NotificationProviderContext.Provider>
     );
 };
