@@ -101,7 +101,7 @@ export const LoginPage = () => {
                 <div className="h-6" />
                 <div>
                     <h2 className="font-normal text-xl text-charcoalBlack">
-                    Join hundreds of students across Canada in a 36 hour period of exploration, creativity, and learning!
+                        {isLogin ? "Log In" : "Create Account"}
                     </h2>
                     <div className="max-w-sm m-auto">
                         <form
