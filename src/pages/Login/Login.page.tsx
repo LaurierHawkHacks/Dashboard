@@ -93,15 +93,15 @@ export const LoginPage = () => {
     }
 
     return (
-        <div className="font-medium mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="font-medium flex justify-center items-center h-screen">
             <div className="mx-auto max-w-3xl">
-                <h1 className="text-5xl text-transparent bg-clip-text bg-gradient-to-b from-tbrand to-tbrand-highlight">
-                    HawkHacks Hacker Portal
+                <h1 className="text-5xl text-charcoalBlack font-body font-bold">
+                    {isLogin ? "Log into your account" : "Create Account"}
                 </h1>
                 <div className="h-6" />
                 <div>
-                    <h2 className="font-bold text-3xl text-tbrand">
-                        {isLogin ? "Log In" : "Create Account"}
+                    <h2 className="font-normal text-xl text-charcoalBlack">
+                    Join hundreds of students across Canada in a 36 hour period of exploration, creativity, and learning!
                     </h2>
                     <div className="max-w-sm m-auto">
                         <form
