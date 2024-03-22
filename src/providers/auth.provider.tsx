@@ -8,6 +8,7 @@ import {
     GithubAuthProvider,
     GoogleAuthProvider,
     signInWithPopup,
+    sendEmailVerification,
     type AuthProvider as OAuthProvider,
 } from "firebase/auth";
 import { useNotification } from "./notification.provider";
@@ -70,14 +71,18 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 email,
                 password
             );
-            setCurrentUser(await validateUserRole(user));
+            if (user.emailVerified) {
+                setCurrentUser(await validateUserRole(user));
+            } else {
+                // Email is not verified, handle accordingly (e.g., show a notification or redirect to a verification page)
+                console.log("Email not verified");
+            }
         } catch (error) {
             showNotification({
                 title: "Oh no! Login problems!?",
                 message:
                     "Pleas try again later. If problem continues, contact us via insert_email_here",
             });
-            console.error(error);
         }
     };
 
@@ -103,14 +108,16 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 email,
                 password
             );
-            setCurrentUser(await validateUserRole(user));
+            await sendEmailVerification(user);
+            console.log("Verification email has been sent");
+            // Email is not verified yet, handle accordingly (e.g., show a notification or redirect to a verification page)
+            console.log("Email not verified");
         } catch (error) {
             showNotification({
                 title: "Account not created",
                 message:
                     "Pleas try again later. If problem continues, contact us via insert_email_here",
             });
-            console.error(error);
         }
     };
 
@@ -150,7 +157,12 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     useEffect(() => {
         const unsub = auth.onAuthStateChanged(async (user) => {
             if (user) {
-                setCurrentUser(await validateUserRole(user));
+                const userWithRole = await validateUserRole(user);
+                if (userWithRole.emailVerified) {
+                    setCurrentUser(userWithRole);
+                } else {
+                    console.log("Email not verified");
+                }
             } else {
                 logout();
             }
