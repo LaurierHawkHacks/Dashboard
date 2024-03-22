@@ -1,24 +1,20 @@
 import { createContext, useState, useContext } from "react";
-import Notification from "../components/Notification/Notification";
+import {
+    Notification,
+    type NotificationData,
+} from "../components/Notification/Notification";
 import { createPortal } from "react-dom";
 
-export type NotificationOptions = {
-    id?: string;
-    title: string;
-    message: string;
-};
-
-export type NotificationData = {
-    id: string;
-    title: string;
-    message: string;
-};
+export interface NotificationOptions
+    extends Omit<NotificationData, "id" | "show"> {
+    id?: number;
+}
 
 /**
  * Shows a notifcation with given options
  * @returns {string} - the notification id
  */
-export type ShowNofiticationFn = (options: NotificationOptions) => string;
+export type ShowNofiticationFn = (options: NotificationOptions) => number;
 
 export type NotificationProviderContextValue = {
     showNotification: ShowNofiticationFn;
@@ -26,7 +22,7 @@ export type NotificationProviderContextValue = {
 
 const NotificationProviderContext =
     createContext<NotificationProviderContextValue>({
-        showNotification: () => "",
+        showNotification: () => -1,
     });
 
 export const NotificationProvider = ({
@@ -40,25 +36,36 @@ export const NotificationProvider = ({
 
     const showNotification = (options: NotificationOptions) => {
         const notification: NotificationData = {
-            id: options.id ?? Math.random().toString(32),
+            id: options.id ?? new Date().getTime(),
             title: options.title,
             message: options.message,
+            show: false,
         };
         setVisibleNotifications((prev) => [...prev, notification]);
+        setTimeout(
+            () =>
+                setVisibleNotifications((prev) =>
+                    prev.map((n) => {
+                        if (n.id === notification.id) n.show = true;
+                        return n;
+                    })
+                ),
+            100
+        );
         return notification.id;
     };
 
-    const closeNotification = (id: string) => {
-        setVisibleNotifications((prev) => prev.filter((n) => n.id != id));
+    const closeNotification = (id: number) => {
+        setVisibleNotifications((prev) =>
+            prev.map((n) => {
+                if (n.id === id) n.show = false;
+                return n;
+            })
+        );
     };
 
     const notifications = visibleNotiications.map((data) => (
-        <Notification
-            key={data.id}
-            title={data.title}
-            message={data.message}
-            onClose={() => closeNotification(data.id)}
-        />
+        <Notification key={data.id} onClose={closeNotification} {...data} />
     ));
 
     return (
@@ -66,7 +73,7 @@ export const NotificationProvider = ({
             {children}
             {notifications.length > 0 &&
                 createPortal(
-                    <div className="z-50 fixed bottom-4 md:bottom-auto md:top-4 right-4 w-80">
+                    <div className="z-50 fixed bottom-4 md:bottom-auto md:top-4 md:right-4 w-full px-4 md:w-80">
                         <div className="space-y-4">{notifications}</div>
                     </div>,
                     document.getElementById("notifications")!
