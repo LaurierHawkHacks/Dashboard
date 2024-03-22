@@ -9,7 +9,7 @@ export interface NotificationData {
     show: boolean;
 }
 
-export interface NotificationProps extends NotificationData {
+export interface NotificationProps extends Omit<NotificationData, "show"> {
     onClose: (id: number) => void;
 }
 
