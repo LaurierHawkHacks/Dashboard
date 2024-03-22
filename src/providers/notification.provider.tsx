@@ -1,8 +1,5 @@
 import { createContext, useState, useContext } from "react";
-import {
-    Notification,
-    type NotificationData,
-} from "../components/Notification/Notification";
+import { Notification, type NotificationData } from "@components";
 import { createPortal } from "react-dom";
 import { Transition } from "@headlessui/react";
 import { Fragment } from "react";
