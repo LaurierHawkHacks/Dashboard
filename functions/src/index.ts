@@ -25,6 +25,20 @@ export const addDefaultClaims = functions.auth.user().onCreate(async (user) => {
     }
 });
 
+export const addUserDocument = functions.auth.user().onCreate(async (user) => {
+    const { uid } = user;
+    try {
+        const usersCollection = admin.firestore().collection("users");
+        const docRef = usersCollection.doc(uid);
+        await docRef.set({
+            id: uid,
+        });
+        console.log(`New document created for user: ${uid}`);
+    } catch (error) {
+        console.error(`Error creating document for user ${uid}:`, error);
+    }
+});
+
 // onCall Function to be called from Frontend for making user Admin
 export const addAdminRole = functions.https.onCall((data, context) => {
     if (!context.auth) return { error: "Unauthorized" };
