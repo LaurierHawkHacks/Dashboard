@@ -13,8 +13,8 @@ export interface ProtectedRoutesProps {
 export const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
     adminOnly = false,
 }) => {
-    const session = useAuth();
     const location = useLocation();
+    const session = useAuth();
 
     if (!session.currentUser) {
         return <Navigate to={adminOnly ? routes.notFound : routes.login} />;
@@ -32,6 +32,10 @@ export const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
     if (adminOnly && !session.currentUser.hawkAdmin) {
         // redirect to not found page if user is not authorized to view
         return <Navigate to={routes.notFound} />;
+    }
+
+    if (!session.userProfile && location.pathname !== routes.completeProfile) {
+        return <Navigate to={routes.completeProfile} />;
     }
 
     return <Outlet />;
