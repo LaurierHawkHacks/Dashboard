@@ -27,10 +27,13 @@ export const addDefaultClaims = functions.auth.user().onCreate(async (user) => {
 
 // onCall Function to be called from Frontend for making user Admin
 export const addAdminRole = functions.https.onCall((data, context) => {
+    if (!context.auth) return { error: "Unauthorized" };
+
     // If user is not an Admin, decline request
-    if (context.auth?.token.admin !== true) {
+    if (context.auth.token.admin !== true) {
         return { error: "Only admins can add other admins" };
     }
+
     // Get USER and ADD custom claim (admin) based on Email
     return admin
         .auth()
