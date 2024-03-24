@@ -1,4 +1,5 @@
 import { createContext, useState, useContext, useEffect } from "react";
+import { flushSync } from "react-dom";
 import {
     signOut,
     signInWithEmailAndPassword,
@@ -14,8 +15,11 @@ import {
     useNotification,
     type NotificationOptions,
 } from "./notification.provider";
+import { type UserProfile, getUserProfile } from "@services/utils";
 
-export type UserWithRole = User & { hawkAdmin: boolean };
+export interface UserWithRole extends User {
+    hawkAdmin: boolean;
+}
 
 export type ProviderName = "github" | "google";
 
@@ -23,6 +27,7 @@ export type AuthMethod = "none" | "credentials" | ProviderName;
 
 export type AuthContextValue = {
     currentUser: UserWithRole | null;
+    userProfile: UserProfile | null;
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
     createAccount: (email: string, password: string) => Promise<void>;
@@ -32,6 +37,7 @@ export type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue>({
     currentUser: null,
+    userProfile: null,
     login: async () => {},
     logout: async () => {},
     createAccount: async () => {},
@@ -83,13 +89,31 @@ function getNotificationByAuthErrCode(code: string): NotificationOptions {
 
 export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<UserWithRole | null>(null);
+    const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     const { showNotification } = useNotification();
+
+    const completeLoginProcess = async (user: User) => {
+        // check if user has a profile in firestore
+        const profile = await getUserProfile(user.uid);
+        const userWithRole = await validateUserRole(user);
+        // make one ui update instead of two due to async function
+        flushSync(() => {
+            setCurrentUser(userWithRole);
+            setUserProfile(profile);
+        });
+    };
 
     const login = async (email: string, password: string) => {
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const { user } = await signInWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
+            await completeLoginProcess(user);
             /* eslint-disable-next-line */
         } catch (error: any) {
+            // TODO: should use notification system to show an error message to user
             showNotification(getNotificationByAuthErrCode(error.code));
         }
     };
@@ -127,7 +151,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
             if (!provider) throw new Error("Invalid provider name");
 
             const { user } = await signInWithPopup(auth, provider);
-            setCurrentUser(await validateUserRole(user));
+            await completeLoginProcess(user);
             /* eslint-disable-next-line */
         } catch (error: any) {
             if (
@@ -167,10 +191,10 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     useEffect(() => {
         const unsub = auth.onAuthStateChanged(async (user) => {
             if (user) {
-                const userWithRole = await validateUserRole(user);
-                setCurrentUser(userWithRole);
+                await completeLoginProcess(user);
             } else {
                 setCurrentUser(null);
+                setUserProfile(null);
             }
         });
 
@@ -181,6 +205,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
         <AuthContext.Provider
             value={{
                 currentUser,
+                userProfile,
                 login,
                 logout,
                 createAccount,
