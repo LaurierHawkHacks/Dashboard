@@ -15,3 +15,14 @@ export {
  *
  */
 export { TextInput } from "./TextInput/TextInput";
+
+/*
+ *
+ * @component Notification
+ *
+ */
+export { Notification } from "./Notification/Notification";
+export type {
+    NotificationProps,
+    NotificationData,
+} from "./Notification/Notification";
