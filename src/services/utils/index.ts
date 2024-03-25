@@ -1,7 +1,8 @@
-import { addDoc, collection, doc, getDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, setDoc } from "firebase/firestore";
 import { firestore } from "@services";
 
-const TICKETS_COLLECTION = "tickets";
+export const TICKETS_COLLECTION = "tickets";
+export const USERS_COLLECTION = "users";
 
 export interface UserTicketData {
     userId: string;
@@ -48,4 +49,14 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
     }
 
     return null;
+}
+
+/**
+ * Tries to create a new document in the users collection.
+ * IMPORTANT: It will overwrite any document with the same uid provided.
+ *
+ */
+export async function createUserProfile(uid: string, data: UserProfile) {
+    const docRef = doc(firestore, USERS_COLLECTION, uid);
+    await setDoc(docRef, data);
 }
