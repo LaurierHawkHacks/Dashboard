@@ -33,6 +33,7 @@ export type AuthContextValue = {
     createAccount: (email: string, password: string) => Promise<void>;
     loginWithProvider: (name: ProviderName) => Promise<void>;
     reloadUser: () => Promise<void>;
+    refreshProfile: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue>({
@@ -43,6 +44,7 @@ const AuthContext = createContext<AuthContextValue>({
     createAccount: async () => {},
     loginWithProvider: async () => {},
     reloadUser: async () => {},
+    refreshProfile: async () => {},
 });
 
 /**
@@ -101,6 +103,13 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
             setCurrentUser(userWithRole);
             setUserProfile(profile);
         });
+    };
+
+    const refreshProfile = async () => {
+        if (!currentUser) return;
+
+        const profile = await getUserProfile(currentUser.uid);
+        setUserProfile(profile);
     };
 
     const login = async (email: string, password: string) => {
@@ -211,6 +220,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 createAccount,
                 loginWithProvider,
                 reloadUser,
+                refreshProfile,
             }}
         >
             {children}
