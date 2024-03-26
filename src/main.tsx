@@ -8,10 +8,10 @@ import { NotificationProvider } from "./providers/notification.provider";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
-        <AuthProvider>
-            <NotificationProvider>
+        <NotificationProvider>
+            <AuthProvider>
                 <Router />
-            </NotificationProvider>
-        </AuthProvider>
+            </AuthProvider>
+        </NotificationProvider>
     </React.StrictMode>
 );
