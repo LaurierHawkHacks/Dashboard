@@ -26,7 +26,7 @@ const Router = () => (
 
             {/* User Routes */}
             <Route path={routes.portal} element={<ProtectedRoutes />}>
-                <Route path={routes.profile} element={<UserPage />} />
+                <Route index path={routes.profile} element={<UserPage />} />
                 <Route
                     path={routes.verifyEmail}
                     element={<VerifyEmailPage />}
