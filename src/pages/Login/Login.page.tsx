@@ -6,6 +6,7 @@ import { useAuth } from "@providers";
 import { routes } from "@utils";
 import { GithubLogo, GoogleLogo } from "@assets";
 import { ProviderName } from "../../providers/auth.provider";
+import { flushSync } from "react-dom";
 
 // email validation with zod, double guard just in case someone changes the input type in html
 const emailParser = z.string().email();
@@ -33,7 +34,7 @@ export const LoginPage = () => {
 
     const { login, createAccount, loginWithProvider, currentUser } = useAuth();
 
-    const handlerSubmit: FormEventHandler = (e) => {
+    const handlerSubmit: FormEventHandler = async (e) => {
         // prevent page refresh when form is submitted
         e.preventDefault();
 
@@ -72,8 +73,15 @@ export const LoginPage = () => {
             setIsInvalidPassword(false);
         }
 
-        if (isLogin) login(email, password);
-        else createAccount(email, password);
+        if (isLogin) await login(email, password);
+        else {
+            await createAccount(email, password);
+            flushSync(() => {
+                setIsLogin(true);
+                setPassword("");
+                setConfirmPass("");
+            });
+        }
     };
 
     const toggleForm = () => {
