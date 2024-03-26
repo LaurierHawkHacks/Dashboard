@@ -18,8 +18,6 @@ export const analytics = getAnalytics(app);
 export const firestore = getFirestore(app);
 export const auth = getAuth(app);
 
-console.log(import.meta.env.VITE_FIREBASE_AUTH_DOMAIN);
-
 if (!import.meta.env.PROD && import.meta.env.VITE_CONNECT_AUTH_EMU === "true") {
     connectAuthEmulator(auth, "http://127.0.0.1:9099");
 }
