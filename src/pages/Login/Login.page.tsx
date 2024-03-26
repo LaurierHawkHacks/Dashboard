@@ -7,8 +7,6 @@ import { routes } from "@utils";
 import { GithubLogo, GoogleLogo } from "@assets";
 import { ProviderName } from "../../providers/auth.provider";
 
-// TODO: add providers, not just basic email/password
-
 // email validation with zod, double guard just in case someone changes the input type in html
 const emailParser = z.string().email();
 
