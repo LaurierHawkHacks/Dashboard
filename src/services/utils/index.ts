@@ -15,7 +15,7 @@ export interface UserProfile {
     firstName: string;
     lastName: string;
     email: string;
-    isVerified: boolean;
+    emailVerified: boolean;
     phone: string;
     school: string;
     levelOfStudy: string;
@@ -53,10 +53,10 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
 
 /**
  * Tries to create a new document in the users collection.
- * IMPORTANT: It will overwrite any document with the same uid provided.
+ * IMPORTANT: It will overwrite any document with the same id provided.
  *
  */
-export async function createUserProfile(uid: string, data: UserProfile) {
-    const docRef = doc(firestore, USERS_COLLECTION, uid);
+export async function createUserProfile(data: UserProfile) {
+    const docRef = doc(firestore, USERS_COLLECTION, data.id);
     await setDoc(docRef, data);
 }
