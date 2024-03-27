@@ -26,3 +26,10 @@ export type {
     NotificationProps,
     NotificationData,
 } from "./Notification/Notification";
+
+/*
+ *
+ * @component Navbar
+ *
+ */
+export { Navbar } from "./Navbar";
