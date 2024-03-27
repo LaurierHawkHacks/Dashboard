@@ -103,19 +103,22 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
         try {
             const provider = getProvider(name);
             if (!provider) throw new Error("Invalid provider name");
-
+    
             const results = await signInWithPopup(auth, provider);
             if (results) {
                 // NOTE: just in case we want to use this for the future
                 // results.token // github access token to access github api
                 setCurrentUser(await validateUserRole(results.user));
             } else {
-                // TODO: handle situation that results returned as null
-                console.warn("login with github: results is null");
+                console.warn("login with provider: results is null");
             }
-        } catch (error) {
-            // TODO: should use notification system to show an error message to user
-            console.error(error);
+        } catch (error: any) {
+            if (error.code === 'auth/account-exists-with-different-credential') {
+                // TODO: should use notification system to show an error message to user ¯\_(ツ)_/¯ 
+                console.error("An account already exists with the same email address but different sign-in credentials. Sign in using a provider associated with this email address.");
+            } else {
+                console.error(error);
+            }
         }
     };
 
