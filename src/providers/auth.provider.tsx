@@ -1,20 +1,25 @@
 import { createContext, useState, useContext, useEffect } from "react";
-import { auth } from "@services";
 import {
-    User,
     signOut,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
+    signInWithPopup,
+    sendEmailVerification,
     GithubAuthProvider,
     GoogleAuthProvider,
-    signInWithPopup,
-    type AuthProvider as OAuthProvider,
 } from "firebase/auth";
-import { useNotification } from "./notification.provider";
+import type { User, AuthProvider as OAuthProvider } from "firebase/auth";
+import { auth } from "@services";
+import {
+    useNotification,
+    type NotificationOptions,
+} from "./notification.provider";
 
 export type UserWithRole = User & { hawkAdmin: boolean };
 
 export type ProviderName = "github" | "google";
+
+export type AuthMethod = "none" | "credentials" | ProviderName;
 
 export type AuthContextValue = {
     currentUser: UserWithRole | null;
@@ -22,6 +27,7 @@ export type AuthContextValue = {
     logout: () => Promise<void>;
     createAccount: (email: string, password: string) => Promise<void>;
     loginWithProvider: (name: ProviderName) => Promise<void>;
+    reloadUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue>({
@@ -30,6 +36,7 @@ const AuthContext = createContext<AuthContextValue>({
     logout: async () => {},
     createAccount: async () => {},
     loginWithProvider: async () => {},
+    reloadUser: async () => {},
 });
 
 /**
@@ -58,26 +65,32 @@ function getProvider(provider: ProviderName): OAuthProvider | undefined {
     if (provider === "github") return githubProvider;
 }
 
+function getNotificationByAuthErrCode(code: string): NotificationOptions {
+    if (code === "auth/email-already-in-use") {
+        return {
+            title: "Email In Use",
+            message:
+                "If you forgot your password, click on 'forgot password' to recover it!",
+        };
+    }
+
+    // default notification message
+    return {
+        title: "Oops! Something went wrong",
+        message: "Please try again later.",
+    };
+}
+
 export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<UserWithRole | null>(null);
-
     const { showNotification } = useNotification();
 
     const login = async (email: string, password: string) => {
         try {
-            const { user } = await signInWithEmailAndPassword(
-                auth,
-                email,
-                password
-            );
-            setCurrentUser(await validateUserRole(user));
-        } catch (error) {
-            showNotification({
-                title: "Oh no! Login problems!?",
-                message:
-                    "Pleas try again later. If problem continues, contact us via insert_email_here",
-            });
-            console.error(error);
+            await signInWithEmailAndPassword(auth, email, password);
+            /* eslint-disable-next-line */
+        } catch (error: any) {
+            showNotification(getNotificationByAuthErrCode(error.code));
         }
     };
 
@@ -91,8 +104,6 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                     "Pleas try again after refreshing the page. If problem continues just don't leave, pleas T.T",
             });
             console.error(error);
-        } finally {
-            setCurrentUser(null);
         }
     };
 
@@ -103,14 +114,10 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 email,
                 password
             );
-            setCurrentUser(await validateUserRole(user));
-        } catch (error) {
-            showNotification({
-                title: "Account not created",
-                message:
-                    "Pleas try again later. If problem continues, contact us via insert_email_here",
-            });
-            console.error(error);
+            await sendEmailVerification(user);
+            /* eslint-disable-next-line */
+        } catch (error: any) {
+            showNotification(getNotificationByAuthErrCode(error.code));
         }
     };
 
@@ -119,14 +126,8 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
             const provider = getProvider(name);
             if (!provider) throw new Error("Invalid provider name");
 
-            const results = await signInWithPopup(auth, provider);
-            if (results) {
-                // NOTE: just in case we want to use this for the future
-                // results.token // github access token to access github api
-                setCurrentUser(await validateUserRole(results.user));
-            } else {
-                console.warn("login with provider: results is null");
-            }
+            const { user } = await signInWithPopup(auth, provider);
+            setCurrentUser(await validateUserRole(user));
             /* eslint-disable-next-line */
         } catch (error: any) {
             if (
@@ -147,12 +148,29 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
         }
     };
 
+    const reloadUser = async () => {
+        if (auth.currentUser) {
+            await auth.currentUser.reload();
+            if (auth.currentUser.emailVerified) {
+                const userWithRole = await validateUserRole(auth.currentUser);
+                setCurrentUser(userWithRole);
+            } else {
+                showNotification({
+                    title: "Email Not Verified",
+                    message:
+                        "It seems that the email has not been verified yet. If you already did, please wait to resend the email.",
+                });
+            }
+        }
+    };
+
     useEffect(() => {
         const unsub = auth.onAuthStateChanged(async (user) => {
             if (user) {
-                setCurrentUser(await validateUserRole(user));
+                const userWithRole = await validateUserRole(user);
+                setCurrentUser(userWithRole);
             } else {
-                logout();
+                setCurrentUser(null);
             }
         });
 
@@ -167,6 +185,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 logout,
                 createAccount,
                 loginWithProvider,
+                reloadUser,
             }}
         >
             {children}
