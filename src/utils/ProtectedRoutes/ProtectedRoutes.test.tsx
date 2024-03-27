@@ -7,7 +7,9 @@ vi.mock("@providers");
 
 describe("ProctectedRoutes Component", () => {
     it("should render if user is authenticated and authorized", () => {
-        mockUseAuth.mockReturnValueOnce({ currentUser: {} });
+        mockUseAuth.mockReturnValueOnce({
+            currentUser: { emailVerified: true },
+        });
         renderWithRouter(
             <Routes>
                 <Route path="/" element={<ProtectedRoutes />}>
@@ -67,7 +69,9 @@ describe("ProctectedRoutes Component", () => {
     });
 
     it("should redirect to not found page if not authorized to view", async () => {
-        mockUseAuth.mockReturnValue({ currentUser: { isAdmin: false } });
+        mockUseAuth.mockReturnValue({
+            currentUser: { isAdmin: false, emailVerified: true },
+        });
         const { user } = renderWithRouter(
             <Routes>
                 <Route path="/" element={<ProtectedRoutes />}>
@@ -112,5 +116,24 @@ describe("ProctectedRoutes Component", () => {
         expect(screen.queryByTestId("not-found")).toBeInTheDocument();
 
         mockUseAuth.mockClear();
+    });
+
+    it("should redirect user to verify email page if email is not verified", () => {
+        mockUseAuth.mockReturnValueOnce({
+            currentUser: { emailVerified: false },
+        });
+        renderWithRouter(
+            <Routes>
+                <Route path="/" element={<ProtectedRoutes />}>
+                    <Route path="" element={<div></div>} />
+                </Route>
+                <Route
+                    path={routes.verifyEmail}
+                    element={<div data-testid="verify-email"></div>}
+                />
+            </Routes>
+        );
+
+        expect(screen.getByTestId("verify-email")).toBeInTheDocument();
     });
 });
