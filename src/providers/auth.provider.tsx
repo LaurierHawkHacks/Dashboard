@@ -10,6 +10,7 @@ import {
     signInWithPopup,
     type AuthProvider as OAuthProvider,
 } from "firebase/auth";
+import { useNotification } from "./notification.provider";
 
 export type UserWithRole = User & { hawkAdmin: boolean };
 
@@ -60,6 +61,8 @@ function getProvider(provider: ProviderName): OAuthProvider | undefined {
 export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<UserWithRole | null>(null);
 
+    const { showNotification } = useNotification();
+
     const login = async (email: string, password: string) => {
         try {
             const { user } = await signInWithEmailAndPassword(
@@ -69,7 +72,11 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
             );
             setCurrentUser(await validateUserRole(user));
         } catch (error) {
-            // TODO: should use notification system to show an error message to user
+            showNotification({
+                title: "Oh no! Login problems!?",
+                message:
+                    "Pleas try again later. If problem continues, contact us via insert_email_here",
+            });
             console.error(error);
         }
     };
@@ -78,7 +85,11 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
         try {
             await signOut(auth);
         } catch (error) {
-            // TODO: should use notification system to show an error message to user
+            showNotification({
+                title: "Oh no! Can't log out!",
+                message:
+                    "Pleas try again after refreshing the page. If problem continues just don't leave, pleas T.T",
+            });
             console.error(error);
         } finally {
             setCurrentUser(null);
@@ -94,7 +105,11 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
             );
             setCurrentUser(await validateUserRole(user));
         } catch (error) {
-            // TODO: should use notification system to show an error message to user
+            showNotification({
+                title: "Account not created",
+                message:
+                    "Pleas try again later. If problem continues, contact us via insert_email_here",
+            });
             console.error(error);
         }
     };
@@ -110,12 +125,25 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 // results.token // github access token to access github api
                 setCurrentUser(await validateUserRole(results.user));
             } else {
-                // TODO: handle situation that results returned as null
-                console.warn("login with github: results is null");
+                console.warn("login with provider: results is null");
             }
-        } catch (error) {
-            // TODO: should use notification system to show an error message to user
-            console.error(error);
+            /* eslint-disable-next-line */
+        } catch (error: any) {
+            if (
+                error.code === "auth/account-exists-with-different-credential"
+            ) {
+                showNotification({
+                    title: "Oops! Something went wrong.",
+                    message:
+                        "An account already exists with the same email address but different sign-in credentials. Sign in using a provider associated with this email address.",
+                });
+            } else {
+                showNotification({
+                    title: "Oops! Something went wrong.",
+                    message: "Please try again later.",
+                });
+                console.error(error);
+            }
         }
     };
 
