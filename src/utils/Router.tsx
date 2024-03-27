@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AdminPage, UserPage, LoginPage } from "@pages";
+import { AdminPage, UserPage, LoginPage, NotFoundPage } from "@pages";
 import { ProtectedRoutes } from "@utils";
 
 const routes = {
@@ -24,6 +24,9 @@ const Router = () => (
             <Route path={routes.admin} element={<ProtectedRoutes adminOnly />}>
                 <Route path="" element={<AdminPage />} />
             </Route>
+
+            {/* Catch-all route for 404 Page Not Found */}
+            <Route path="*" element={<NotFoundPage />} />
         </Routes>
     </BrowserRouter>
 );
