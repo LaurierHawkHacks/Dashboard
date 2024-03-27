@@ -29,6 +29,14 @@ export type {
 
 /*
  *
+ * @component ErrorAlert
+ *
+ */
+export { ErrorAlert } from "./ErrorAlert/ErrorAlert";
+export type { ErrorAlertProps } from "./ErrorAlert/ErrorAlert";
+
+/*
+ *
  * @component Navbar
  *
  */
