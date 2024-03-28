@@ -141,7 +141,8 @@ describe("ProctectedRoutes Component", () => {
 
     it("should redirect user to complete profile page if profile is not present", async () => {
         mockUseAuth.mockReturnValue({
-            currentUser: {},
+            currentUser: { emailVerified: true },
+            userProfile: null,
         });
         renderWithRouter(
             <Routes>
