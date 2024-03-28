@@ -1,12 +1,22 @@
 import { type FormEventHandler, useState } from "react";
 import { z } from "zod";
 import { Navigate } from "react-router-dom";
-import { Button, ErrorAlert, TextInput } from "@components";
+import { Button, ErrorAlert, TextInput, Select } from "@components";
 import { type UserProfile, createUserProfile } from "@services/utils";
 import { useAuth, useNotification } from "@providers";
 import { routes } from "@utils";
+import { Option } from "../../components/Select/Select";
 
-const countries = ["US", "CA"];
+const countries: Option[] = [
+    {
+        label: "US",
+        value: "us",
+    },
+    {
+        label: "CA",
+        value: "ca",
+    },
+];
 
 const formValidationSchema = z.object({
     id: z.string(),
@@ -31,12 +41,13 @@ export const CompleteProfilePage = () => {
 
     if (userProfile) return <Navigate to={routes.profile} />;
 
+    const [selectedCountry, setSelectedCountry] = useState(countries[1]);
     const [formValues, setFormValues] = useState<UserProfile>({
         id: currentUser.uid,
         firstName: "",
         lastName: "",
         email: currentUser.email ?? "",
-        countryOfResidence: "CA",
+        countryOfResidence: selectedCountry.value,
         emailVerified: currentUser.emailVerified,
         phone: "",
         school: "",
@@ -129,34 +140,19 @@ export const CompleteProfilePage = () => {
                             )}
 
                             <div className="sm:col-span-4">
-                                <label
-                                    htmlFor="country"
-                                    className="block text-sm font-medium leading-6 text-gray-900"
-                                >
-                                    Country
-                                </label>
                                 <div className="mt-2">
-                                    {/* TODO: update this select to the proper select component */}
-                                    <select
-                                        id="country"
-                                        name="country"
-                                        autoComplete="country-name"
-                                        value={formValues.countryOfResidence}
-                                        onChange={(e) =>
+                                    <Select
+                                        label="Country"
+                                        options={countries}
+                                        onChange={(opt) => {
                                             setFormValues((c) => ({
                                                 ...c,
-                                                countryOfResidence:
-                                                    e.target.value,
-                                            }))
-                                        }
-                                        required
-                                    >
-                                        {countries.map((c) => (
-                                            <option key={c} value={c}>
-                                                {c}
-                                            </option>
-                                        ))}
-                                    </select>
+                                                countryOfResidence: opt.value,
+                                            }));
+                                            setSelectedCountry(opt);
+                                        }}
+                                        value={selectedCountry}
+                                    />
                                 </div>
                             </div>
                         </div>
