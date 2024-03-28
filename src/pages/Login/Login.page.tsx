@@ -178,7 +178,7 @@ export const LoginPage = () => {
                             <Button
                                 key={provider.name}
                                 onClick={() => loginWithProvider(provider.name)}
-                                className="w-full bg-white capitalize text-gray-900 flex justify-center items-center gap-4 hover:bg-gray-100 active:bg-gray-200"
+                                className="w-full bg-peachWhite capitalize text-gray-900 flex justify-center items-center gap-4 hover:bg-gray-100 active:bg-gray-200"
                             >
                                 <img
                                     src={provider.logo}
