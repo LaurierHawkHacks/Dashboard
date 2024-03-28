@@ -93,9 +93,9 @@ export const LoginPage = () => {
     }
 
     return (
-        <div className="font-medium absolute inset-0 bg-gradient-to-r from-deepPurple/20 via-deepGold/20 via-50% to-stonePurple/20 flex justify-center items-center h-screen">
-            <div className="mx-auto max-w-2xl">
-                <h1 className="text-5xl text-charcoalBlack font-body font-bold">
+        <div className="font-medium absolute inset-0 bg-gradient-to-r from-deepPurple/20 via-deepGold/20 via-50% to-stonePurple/20 flex justify-center items-center min-h-screen">
+            <div className="mx-auto max-w-2xl px-4 sm:px-6 md:px-8">
+                <h1 className="text-3xl sm:text-5xl text-charcoalBlack font-body font-bold">
                     HawkHacks Hacker Portal
                 </h1>
                 <div className="h-6" />
@@ -104,7 +104,7 @@ export const LoginPage = () => {
                         {isLogin ? "Log In" : "Create Account"}
                     
                     </h2>
-                    <div className="w-11/12">
+                    <div className="w-full">
                         <form
                             onSubmit={handlerSubmit}
                             className="mt-6 space-y-6"
@@ -173,7 +173,7 @@ export const LoginPage = () => {
                 {/* just a separator line */}
                 <div className="h-0.5 bg-transparent my-6"></div>
                 <div>
-                    <div className="w-11/12 space-y-4">
+                    <div className="w-full space-y-4">
                         {authProviders.map((provider) => (
                             <Button
                                 key={provider.name}
