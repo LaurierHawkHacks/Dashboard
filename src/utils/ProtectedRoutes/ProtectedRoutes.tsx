@@ -20,13 +20,14 @@ export const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
         return <Navigate to={adminOnly ? routes.notFound : routes.login} />;
     }
 
-    if (
-        !session.currentUser.emailVerified &&
-        location.pathname !== routes.verifyEmail
-    ) {
-        // redirect user to complete email verification
-        // avoid spam users/bot or fake clients
-        return <Navigate to={routes.verifyEmail} />;
+    if (!session.currentUser.emailVerified) {
+        if (location.pathname !== routes.verifyEmail) {
+            // redirect user to complete email verification
+            // avoid spam users/bot or fake clients
+            return <Navigate to={routes.verifyEmail} />;
+        } else {
+            return <Outlet />;
+        }
     }
 
     if (adminOnly && !session.currentUser.hawkAdmin) {
