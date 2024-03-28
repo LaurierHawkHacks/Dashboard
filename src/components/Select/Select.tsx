@@ -1,19 +1,7 @@
+/* eslint-disable */
 import { FC, Fragment, useState } from "react";
-import { Listbox, Transition } from "@headlessui/react";
+import { Combobox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
-import { cva } from "class-variance-authority";
-import { twMerge } from "tailwind-merge";
-
-const optionStyles = cva(
-    ["relative cursor-default select-none py-2 pl-3 pr-9 text-gray-900"],
-    {
-        variants: {
-            active: {
-                true: "bg-tbrand text-white",
-            },
-        },
-    }
-);
 
 export interface Option {
     value: string;
@@ -23,61 +11,88 @@ export interface Option {
 export interface SelectProps {
     label: string;
     options: Option[];
+    initialValue: Option;
     onChange?: (opt: Option) => void;
 }
 
-export const Select: FC<SelectProps> = ({ label, options, onChange }) => {
-    const [value, setValue] = useState<Option | null>(null);
+export const Select: FC<SelectProps> = ({
+    label,
+    options,
+    initialValue,
+    onChange,
+}) => {
+    const [selected, setSelected] = useState<Option>(initialValue);
+    const [query, setQuery] = useState("");
 
     const handleChange = (opt: Option) => {
-        setValue(opt);
+        setSelected(opt);
         if (onChange) onChange(opt);
     };
 
-    return (
-        <Listbox value={value} onChange={handleChange}>
-            {({ open }) => (
-                <>
-                    <Listbox.Label className="block text-sm font-medium leading-6 text-gray-900">
-                        {label}
-                    </Listbox.Label>
-                    <div className="relative mt-2">
-                        <Listbox.Button className="relative w-full cursor-default bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-tbrand sm:text-sm sm:leading-6">
-                            <span className="block truncate">
-                                {value ? value.label : ""}
-                            </span>
-                            <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                                <ChevronUpDownIcon
-                                    className="h-5 w-5 text-gray-400"
-                                    aria-hidden="true"
-                                />
-                            </span>
-                        </Listbox.Button>
+    const filteredOptions =
+        query === ""
+            ? options
+            : options.filter((opt) => {
+                  return opt.label
+                      .toLowerCase()
+                      .trim()
+                      .includes(query.toLowerCase().trim());
+              });
 
-                        <Transition
-                            show={open}
-                            as={Fragment}
-                            leave="transition ease-in duration-100"
-                            leaveFrom="opacity-100"
-                            leaveTo="opacity-0"
-                        >
-                            <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                {options.map((opt) => (
-                                    <Listbox.Option
-                                        key={opt.value}
+    return (
+        <div className="">
+            <Combobox value={selected} onChange={handleChange}>
+                <div className="relative mt-1">
+                    <Combobox.Label>{label}</Combobox.Label>
+                    <div className="relative w-full cursor-default overflow-hidden bg-white text-left shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
+                        <Combobox.Input
+                            className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
+                            displayValue={(opt: Option) => opt?.label ?? ""}
+                            onChange={(event) => setQuery(event.target.value)}
+                        />
+                        <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                            <ChevronUpDownIcon
+                                className="h-5 w-5 text-gray-400"
+                                aria-hidden="true"
+                            />
+                        </Combobox.Button>
+                    </div>
+                    <Transition
+                        as={Fragment}
+                        leave="transition ease-in duration-100"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                        afterLeave={() => setQuery("")}
+                    >
+                        <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                            {filteredOptions.length === 0 && query !== "" ? (
+                                <div className="relative cursor-default select-none px-4 py-2 text-gray-700">
+                                    Nothing found.
+                                </div>
+                            ) : (
+                                filteredOptions.map((opt) => (
+                                    <Combobox.Option
+                                        key={opt.label}
                                         className={({ active }) =>
-                                            twMerge(optionStyles({ active }))
+                                            `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                                                active
+                                                    ? "bg-tbrand text-white"
+                                                    : "text-gray-900"
+                                            }`
                                         }
                                         value={opt}
                                     >
-                                        {({ selected }) => (
+                                        {({ selected, active }) => (
                                             <>
-                                                <span className="block truncate">
-                                                    {opt.label}
-                                                </span>
-
+                                                <span>{opt.label}</span>
                                                 {selected ? (
-                                                    <span className="absolute inset-y-0 right-0 flex items-center pr-4">
+                                                    <span
+                                                        className={`absolute inset-y-0 right-0 flex items-center pr-3 ${
+                                                            active
+                                                                ? "text-white"
+                                                                : "text-green-600"
+                                                        }`}
+                                                    >
                                                         <CheckIcon
                                                             className="h-5 w-5"
                                                             aria-hidden="true"
@@ -86,13 +101,13 @@ export const Select: FC<SelectProps> = ({ label, options, onChange }) => {
                                                 ) : null}
                                             </>
                                         )}
-                                    </Listbox.Option>
-                                ))}
-                            </Listbox.Options>
-                        </Transition>
-                    </div>
-                </>
-            )}
-        </Listbox>
+                                    </Combobox.Option>
+                                ))
+                            )}
+                        </Combobox.Options>
+                    </Transition>
+                </div>
+            </Combobox>
+        </div>
     );
 };
