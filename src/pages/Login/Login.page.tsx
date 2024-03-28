@@ -99,24 +99,24 @@ export const LoginPage = () => {
     }
 
     return (
-        <div className="font-medium mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-3xl">
-                <h1 className="text-5xl text-transparent bg-clip-text bg-gradient-to-b from-tbrand to-tbrand-highlight">
+        <div className="font-medium absolute inset-0 bg-gradient-to-r from-deepPurple/20 via-deepGold/20 via-50% to-stonePurple/20 flex justify-center items-center min-h-screen">
+            <div className="mx-auto max-w-2xl px-4 sm:px-6 md:px-8">
+                <h1 className="text-3xl sm:text-5xl text-charcoalBlack font-body font-bold">
                     HawkHacks Hacker Portal
                 </h1>
                 <div className="h-6" />
                 <div>
-                    <h2 className="font-bold text-3xl text-tbrand">
+                    <h2 className="font-normal text-xl text-charcoalBlack">
                         {isLogin ? "Log In" : "Create Account"}
                     </h2>
-                    <div className="max-w-sm m-auto">
+                    <div className="w-full">
                         <form
                             onSubmit={handlerSubmit}
                             className="mt-6 space-y-6"
                             aria-label="Authentication form"
                         >
                             <TextInput
-                                label="Email:"
+                                label="Email"
                                 id="email"
                                 type="email"
                                 placeholder="awesome@hawkhack.ca"
@@ -131,9 +131,10 @@ export const LoginPage = () => {
                                 required
                             />
                             <TextInput
-                                label="Password:"
+                                label="Password"
                                 id="password"
                                 type="password"
+                                placeholder="************"
                                 minLength={isLogin ? 0 : 8}
                                 value={password}
                                 invalid={!isLogin && isInvalidPassword}
@@ -157,14 +158,19 @@ export const LoginPage = () => {
                                     required
                                 />
                             )}
-                            <Button type="submit" className="w-full">
+                            {/* just a separator line */}
+                            <div className="bg-transparent"></div>
+                            <Button
+                                type="submit"
+                                className="w-full bg-gradient-to-b from-tbrand to-tbrand-hover"
+                            >
                                 {isLogin ? "Log In" : "Create Account"}
                             </Button>
                         </form>
-                        <p className="mt-6 text-[#32848C]">
-                            Does not have an account yet?{" "}
+                        <p className="mt-6 text-center text-charcoalBlack font-medium">
+                            Don&apos;t have an account?{" "}
                             <button
-                                className="text-tbrand underline hover:text-tbrand-hover"
+                                className="text-charcoalBlack font-bold underline hover:text-tbrand-hover"
                                 onClick={toggleForm}
                             >
                                 {isLogin ? "Create Account" : "Log In"}
@@ -173,14 +179,14 @@ export const LoginPage = () => {
                     </div>
                 </div>
                 {/* just a separator line */}
-                <div className="h-0.5 bg-tbrand my-6"></div>
+                <div className="h-0.5 bg-transparent my-6"></div>
                 <div>
-                    <div className="max-w-sm m-auto space-y-4">
+                    <div className="w-full space-y-4">
                         {authProviders.map((provider) => (
                             <Button
                                 key={provider.name}
                                 onClick={() => loginWithProvider(provider.name)}
-                                className="w-full bg-white capitalize text-gray-900 flex justify-center items-center gap-4 border-gray-900 hover:bg-gray-100 active:bg-gray-200"
+                                className="w-full bg-white capitalize text-gray-900 flex justify-center items-center gap-4 hover:bg-gray-100 active:bg-gray-200"
                             >
                                 <img
                                     src={provider.logo}

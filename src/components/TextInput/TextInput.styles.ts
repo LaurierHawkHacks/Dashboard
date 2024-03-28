@@ -4,7 +4,7 @@ import { twMerge } from "tailwind-merge";
 
 const textInputStyles = cva(
     [
-        "block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 ring-1 ring-inset ring-tbrand", // base
+        "block w-full py-4 px-5 bg-peachWhite text-gray-900 placeholder:text-sageGray font-light", // base
         "focus:ring-2 focus:ring-inset", // focus styles
     ],
     {
@@ -28,7 +28,7 @@ export function getTextInputStyles(
 }
 
 export const getTextInputLabelStyles = cva(
-    "block font-semibold leading-6 text-tbrand text-md",
+    "block font-regular leading-6 text-charcoalBlack text-md",
     {
         variants: {
             srLabel: {
