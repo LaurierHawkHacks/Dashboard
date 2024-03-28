@@ -1,4 +1,4 @@
-import { FC, Fragment } from "react";
+import { FC, Fragment, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { cva } from "class-variance-authority";
@@ -23,18 +23,19 @@ export interface Option {
 export interface SelectProps {
     label: string;
     options: Option[];
-    value: Option;
-    onChange: (opt: Option) => void;
+    onChange?: (opt: Option) => void;
 }
 
-export const Select: FC<SelectProps> = ({
-    label,
-    value,
-    options,
-    onChange,
-}) => {
+export const Select: FC<SelectProps> = ({ label, options, onChange }) => {
+    const [value, setValue] = useState<Option | null>(null);
+
+    const handleChange = (opt: Option) => {
+        setValue(opt);
+        if (onChange) onChange(opt);
+    };
+
     return (
-        <Listbox value={value} onChange={onChange}>
+        <Listbox value={value} onChange={handleChange}>
             {({ open }) => (
                 <>
                     <Listbox.Label className="block text-sm font-medium leading-6 text-gray-900">
@@ -43,7 +44,7 @@ export const Select: FC<SelectProps> = ({
                     <div className="relative mt-2">
                         <Listbox.Button className="relative w-full cursor-default bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-tbrand sm:text-sm sm:leading-6">
                             <span className="block truncate">
-                                {value.label}
+                                {value ? value.label : ""}
                             </span>
                             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                                 <ChevronUpDownIcon
