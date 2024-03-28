@@ -108,7 +108,6 @@ export const LoginPage = () => {
                 <div>
                     <h2 className="font-normal text-xl text-charcoalBlack">
                         {isLogin ? "Log In" : "Create Account"}
-                    
                     </h2>
                     <div className="w-full">
                         <form
@@ -161,7 +160,10 @@ export const LoginPage = () => {
                             )}
                             {/* just a separator line */}
                             <div className="bg-transparent"></div>
-                            <Button type="submit" className="w-full bg-gradient-to-b from-tbrand to-tbrand-hover">
+                            <Button
+                                type="submit"
+                                className="w-full bg-gradient-to-b from-tbrand to-tbrand-hover"
+                            >
                                 {isLogin ? "Log In" : "Create Account"}
                             </Button>
                         </form>
@@ -184,7 +186,7 @@ export const LoginPage = () => {
                             <Button
                                 key={provider.name}
                                 onClick={() => loginWithProvider(provider.name)}
-                                className="w-full bg-peachWhite capitalize text-gray-900 flex justify-center items-center gap-4 hover:bg-gray-100 active:bg-gray-200"
+                                className="w-full bg-white capitalize text-gray-900 flex justify-center items-center gap-4 hover:bg-gray-100 active:bg-gray-200"
                             >
                                 <img
                                     src={provider.logo}
