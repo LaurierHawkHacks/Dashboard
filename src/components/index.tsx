@@ -42,3 +42,11 @@ export type { ErrorAlertProps } from "./ErrorAlert/ErrorAlert";
  */
 export { Select } from "./Select/Select";
 export type { SelectProps } from "./Select/Select";
+
+/*
+ *
+ * @component MultiSelect
+ *
+ */
+export type { MultiSelectProps } from "./MultiSelect/MultiSelect";
+export { MultiSelect } from "./MultiSelect/MultiSelect";
