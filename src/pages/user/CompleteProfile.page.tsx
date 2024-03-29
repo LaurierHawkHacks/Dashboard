@@ -151,7 +151,7 @@ export const CompleteProfilePage = () => {
                                             }));
                                             setSelectedCountry(opt);
                                         }}
-                                        value={selectedCountry}
+                                        initialValue={selectedCountry}
                                     />
                                 </div>
                             </div>
