@@ -6,6 +6,7 @@ import {
     createUserWithEmailAndPassword,
     signInWithPopup,
     sendEmailVerification,
+    sendPasswordResetEmail,
     GithubAuthProvider,
     GoogleAuthProvider,
     OAuthProvider,
@@ -32,6 +33,7 @@ export type AuthContextValue = {
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
     createAccount: (email: string, password: string) => Promise<void>;
+    resetPassword: (email: string) => Promise<void>;
     loginWithProvider: (name: ProviderName) => Promise<void>;
     reloadUser: () => Promise<void>;
     refreshProfile: () => Promise<void>;
@@ -43,6 +45,7 @@ const AuthContext = createContext<AuthContextValue>({
     login: async () => {},
     logout: async () => {},
     createAccount: async () => {},
+    resetPassword: async () => {},
     loginWithProvider: async () => {},
     reloadUser: async () => {},
     refreshProfile: async () => {},
@@ -166,6 +169,22 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
         }
     };
 
+    const resetPassword = async (email: string) => {
+        try {
+            await sendPasswordResetEmail(auth, email);
+            showNotification({
+                title: "Password reset email sent",
+                message: "Please check your inbox for reset instructions.",
+            });
+        } catch (error: unknown) {
+            showNotification({
+                title: "Oops! Something went wrong",
+                message: "Password could not be reset.",
+            });
+            console.error(error);
+        }
+    };
+
     const loginWithProvider = async (name: ProviderName) => {
         try {
             const provider = getProvider(name);
@@ -229,6 +248,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 login,
                 logout,
                 createAccount,
+                resetPassword,
                 loginWithProvider,
                 reloadUser,
                 refreshProfile,
