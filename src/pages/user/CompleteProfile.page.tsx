@@ -77,9 +77,6 @@ export const CompleteProfilePage = () => {
     return (
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl">
-                <h1 className="text-4xl font-semibold leading-7 text-transparent bg-clip-text bg-gradient-to-b from-tbrand to-tbrand-highlight mt-10">
-                    Complete Your Profile
-                </h1>
                 {formErrors.length > 0 && <ErrorAlert errors={formErrors} />}
                 <form onSubmit={handleSubmit}>
                     <div className="px-4 py-6 sm:p-8">
@@ -158,7 +155,7 @@ export const CompleteProfilePage = () => {
                         </div>
                     </div>
                     {/* just a separator line */}
-                    <div className="h-0.5 bg-tbrand my-6"></div>
+                    <div className="h-0.5 bg-gray-300 my-6"></div>
                     <div className="flex items-center justify-end px-4 py-4 sm:px-8">
                         <Button type="submit">Save</Button>
                     </div>
