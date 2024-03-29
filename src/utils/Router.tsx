@@ -9,7 +9,7 @@ import {
 } from "@pages";
 import { ProtectedRoutes } from "@utils";
 
-const routes = {
+export const routes = {
     admin: "/admin",
     notFound: "/not-found",
     login: "/login",
@@ -23,7 +23,39 @@ const routes = {
     application: "/application",
 };
 
-const Router = () => (
+interface Title {
+    main: string;
+    sub: string;
+}
+
+export const titles: Record<string, Title> = {
+    [routes.profile]: {
+        main: "Home",
+        sub: "The dashboard for all your needs.",
+    },
+    [routes.schedule]: {
+        main: "Schedule",
+        sub: "View the schedule for the weekend!",
+    },
+    [routes.networking]: {
+        main: "Networking",
+        sub: "A quick way to connect with new people at HawkHacks!",
+    },
+    [routes.application]: {
+        main: "Application",
+        sub: "Apply to participate in the hackathon now!",
+    },
+    [routes.completeProfile]: {
+        main: "Complete Profile",
+        sub: "Enter your profile information.",
+    },
+    [routes.verifyEmail]: {
+        main: "Verify Your Email",
+        sub: "Please check your email inbox.",
+    },
+};
+
+export const Router = () => (
     <BrowserRouter>
         <Routes>
             <Route path={routes.login} element={<LoginPage />} />
@@ -51,5 +83,3 @@ const Router = () => (
         </Routes>
     </BrowserRouter>
 );
-
-export { Router, routes };

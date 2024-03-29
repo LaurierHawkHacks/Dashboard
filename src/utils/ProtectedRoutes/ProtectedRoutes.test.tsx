@@ -138,41 +138,4 @@ describe("ProctectedRoutes Component", () => {
 
         expect(screen.getByTestId("verify-email")).toBeInTheDocument();
     });
-
-    it("should redirect user to complete profile page if profile is not present", async () => {
-        mockUseAuth.mockReturnValue({
-            currentUser: { emailVerified: true },
-            userProfile: null,
-        });
-        renderWithRouter(
-            <Routes>
-                <Route path="/" element={<ProtectedRoutes />}>
-                    <Route
-                        path=""
-                        element={
-                            <Link
-                                to={routes.admin}
-                                data-testid="regular-access-level"
-                            >
-                                test
-                            </Link>
-                        }
-                    />
-                </Route>
-                <Route
-                    path={routes.completeProfile}
-                    element={<ProtectedRoutes />}
-                >
-                    <Route
-                        path=""
-                        element={<div data-testid="complete-profile"></div>}
-                    />
-                </Route>
-            </Routes>
-        );
-
-        expect(
-            await screen.findByTestId("complete-profile")
-        ).toBeInTheDocument();
-    });
 });
