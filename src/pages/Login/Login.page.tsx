@@ -1,12 +1,12 @@
 import { FormEventHandler, useState } from "react";
+import { flushSync } from "react-dom";
 import { z } from "zod";
 import { Navigate } from "react-router-dom";
 import { Button, TextInput } from "@components";
 import { useAuth } from "@providers";
+import type { ProviderName } from "@providers";
 import { routes } from "@utils";
 import { GithubLogo, GoogleLogo } from "@assets";
-import { ProviderName } from "../../providers/auth.provider";
-import { flushSync } from "react-dom";
 
 // email validation with zod, double guard just in case someone changes the input type in html
 const emailParser = z.string().email();
