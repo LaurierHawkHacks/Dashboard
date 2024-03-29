@@ -30,25 +30,30 @@ export const VerifyEmailPage = () => {
         return <Navigate to={routes.profile} />;
 
     return (
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-3xl pt-10">
-                <p className="text-2xl">
-                    Please check your email inbox from us to verify your
-                    account.
+        <div className="px-4 sm:px-6 lg:px-8">
+            <div className="">
+                <p className="text-2xl">One more step!</p>
+                <p className="mt-4 text-xl text-gray-700">
+                    Once you have verified your email, please click on the{" "}
+                    <span className="text-tbrand font-semibold">
+                        Check Email
+                    </span>{" "}
+                    button.
                 </p>
                 <p className="mt-4 text-xl text-gray-700">
-                    Current Account Email:
-                    <span className="ml-2">
+                    Account Email:
+                    <span className="ml-2 text-tbrand font-semibold">
                         {currentUser && currentUser.email
                             ? currentUser.email
                             : "N/A"}
                     </span>
                 </p>
+                {/* TODO: button is here for dev, should be taken away once side navbar is completed */}
                 <Button intent="secondary" className="mt-4" onClick={logout}>
                     Log Out
                 </Button>
             </div>
-            <div className="mt-12 sm:flex sm:justify-end gap-4">
+            <div className="mt-12 sm:flex gap-4">
                 <div className="space-x-4">
                     <Button
                         intent="secondary"
