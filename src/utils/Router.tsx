@@ -17,6 +17,10 @@ const routes = {
     profile: "/profile",
     verifyEmail: "/verify-email",
     completeProfile: "/complete-profile",
+    schedule: "/schedule",
+    networking: "/networking",
+    ticket: "/ticket",
+    application: "/application",
 };
 
 const Router = () => (
