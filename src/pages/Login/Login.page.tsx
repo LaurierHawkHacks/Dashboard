@@ -8,7 +8,6 @@ import type { ProviderName } from "@providers";
 import { routes } from "@utils";
 import { GithubLogo, GoogleLogo } from "@assets";
 
-// email validation with zod, double guard just in case someone changes the input type in html
 const emailParser = z.string().email();
 
 const authProviders: { name: ProviderName; logo: string }[] = [
@@ -17,64 +16,64 @@ const authProviders: { name: ProviderName; logo: string }[] = [
 ];
 
 export const LoginPage = () => {
-    // input elements value fields
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPass, setConfirmPass] = useState("");
-
-    // controls to set invalid styles for input fields
     const [isInvalidEmail, setIsInvalidEmail] = useState(false);
     const [isInvalidPassword, setIsInvalidPassword] = useState(false);
-
-    // custom password err msg, can also be done for email but it shouldn't really need any msgs.
     const [passwordErrMsg, setPasswordErrMsg] = useState("");
-
-    // control auth flow and form state to show correct title, toggle button
     const [isLogin, setIsLogin] = useState(true);
+    const [isResetPassword, setIsResetPassword] = useState(false);
 
-    const { login, createAccount, loginWithProvider, currentUser } = useAuth();
+    const { login, createAccount, loginWithProvider, currentUser, sendPasswordReset } = useAuth();
 
-    const [searchParams] = useSearchParams();
+    const toggleForm = () => {
+        setIsResetPassword(false);
+        setConfirmPass("");
+        setPassword("");
+        setIsLogin(!isLogin);
+    };
+
+    const toggleResetPassword = () => {
+        setIsResetPassword(!isResetPassword);
+    };
+
+    const handleForgotPassword = async () => {
+        if (email) {
+            await sendPasswordReset(email);
+            toggleResetPassword();
+        } else {
+            setIsInvalidEmail(true);
+        }
+    };
 
     const handlerSubmit: FormEventHandler = async (e) => {
-        // prevent page refresh when form is submitted
         e.preventDefault();
-
+        if (isResetPassword) {
+            handleForgotPassword();
+            return;
+        }
         const emailResult = emailParser.safeParse(email);
-
-        // email input validation
         if (!emailResult.success) {
             setIsInvalidEmail(true);
             return;
         } else if (isInvalidEmail) {
-            // upon revalidation, if success, reset to normal styles
             setIsInvalidEmail(false);
         }
-
-        // only check for matching password when creating a new account
         if (!isLogin) {
-            // perform password input validation
             if (password !== confirmPass) {
                 setIsInvalidPassword(true);
                 setPasswordErrMsg("The passwords do not match!");
                 return;
             }
-
-            // double safe guard if someone disables the min length attribute in html
-            const minPassLength = 8;
-            if (
-                password.length < minPassLength ||
-                confirmPass.length < minPassLength
-            ) {
+            if (password.length < 8 || confirmPass.length < 8) {
                 setIsInvalidPassword(true);
                 setPasswordErrMsg("Password must be longer than 8 characters!");
                 return;
             }
         } else if (isInvalidPassword) {
-            // if is not a new account, but we have set invalid styles then reset to normal styles
             setIsInvalidPassword(false);
         }
-
         if (isLogin) await login(email, password);
         else {
             await createAccount(email, password);
@@ -86,13 +85,6 @@ export const LoginPage = () => {
         }
     };
 
-    const toggleForm = () => {
-        setConfirmPass("");
-        setPassword("");
-        setIsLogin(!isLogin);
-    };
-
-    // leverage access to current user to decide whether we need to proceed rendering page
     if (currentUser !== null) {
         if (currentUser.hawkAdmin) {
             return <Navigate to={routes.admin} />;
@@ -110,13 +102,13 @@ export const LoginPage = () => {
                 <div className="h-6" />
                 <div>
                     <h2 className="font-normal text-xl text-charcoalBlack">
-                        {isLogin ? "Log In" : "Create Account"}
+                        {isResetPassword ? "Reset Password" : isLogin ? "Log In" : "Create Account"}
                     </h2>
                     <div className="w-full">
                         <form
                             onSubmit={handlerSubmit}
                             className="mt-6 space-y-6"
-                            aria-label="Authentication form"
+                            aria-label={isResetPassword ? "Reset password form" : "Authentication form"}
                         >
                             <TextInput
                                 label="Email"
@@ -126,82 +118,75 @@ export const LoginPage = () => {
                                 className="bg-peachWhite"
                                 value={email}
                                 invalid={isInvalidEmail}
-                                description={
-                                    isInvalidEmail ? "Invalid email!" : ""
-                                }
-                                onChange={({ target: { value } }) =>
-                                    setEmail(value)
-                                }
+                                description={isInvalidEmail ? "Invalid email!" : ""}
+                                onChange={({ target: { value } }) => setEmail(value)}
                                 required
                             />
-                            <TextInput
-                                label="Password"
-                                id="password"
-                                type="password"
-                                placeholder="************"
-                                className="bg-peachWhite"
-                                minLength={isLogin ? 0 : 8}
-                                value={password}
-                                invalid={!isLogin && isInvalidPassword}
-                                onChange={({ target: { value } }) =>
-                                    setPassword(value)
-                                }
-                                required
-                            />
-                            {!isLogin && (
-                                <TextInput
-                                    label="Confirm Password:"
-                                    id="confirmPassword"
-                                    type="password"
-                                    className="bg-peachWhite"
-                                    minLength={8}
-                                    value={confirmPass}
-                                    invalid={isInvalidPassword}
-                                    description={passwordErrMsg}
-                                    onChange={({ target: { value } }) =>
-                                        setConfirmPass(value)
-                                    }
-                                    required
-                                />
+                            {!isResetPassword && (
+                                <>
+                                    <TextInput
+                                        label="Password"
+                                        id="password"
+                                        type="password"
+                                        placeholder="************"
+                                        minLength={isLogin ? 0 : 8}
+                                        value={password}
+                                        invalid={!isLogin && isInvalidPassword}
+                                        onChange={({ target: { value } }) => setPassword(value)}
+                                        required
+                                    />
+                                    {!isLogin && (
+                                        <TextInput
+                                            label="Confirm Password:"
+                                            id="confirmPassword"
+                                            type="password"
+                                            minLength={8}
+                                            value={confirmPass}
+                                            invalid={isInvalidPassword}
+                                            description={passwordErrMsg}
+                                            onChange={({ target: { value } }) => setConfirmPass(value)}
+                                            required
+                                        />
+                                    )}
+                                </>
                             )}
-                            {/* just a separator line */}
-                            <div className="bg-transparent"></div>
                             <Button
                                 type="submit"
                                 className="w-full bg-gradient-to-b from-tbrand to-tbrand-hover"
                             >
-                                {isLogin ? "Log In" : "Create Account"}
+                                {isResetPassword ? "Send Reset Email" : isLogin ? "Log In" : "Create Account"}
                             </Button>
                         </form>
-                        <p className="mt-6 text-center text-charcoalBlack font-medium">
-                            Don&apos;t have an account?{" "}
-                            <button
-                                className="text-charcoalBlack font-bold underline hover:text-tbrand-hover"
-                                onClick={toggleForm}
-                            >
-                                {isLogin ? "Create Account" : "Log In"}
-                            </button>
-                        </p>
-                    </div>
-                </div>
-                {/* just a separator line */}
-                <div className="h-0.5 bg-transparent my-6"></div>
-                <div>
-                    <div className="w-full space-y-4">
-                        {authProviders.map((provider) => (
-                            <Button
-                                key={provider.name}
-                                onClick={() => loginWithProvider(provider.name)}
-                                className="w-full bg-white capitalize text-gray-900 flex justify-center items-center gap-4 hover:bg-gray-100 active:bg-gray-200"
-                            >
-                                <img
-                                    src={provider.logo}
-                                    aria-hidden="true"
-                                    className="w-8 h-8"
-                                />
-                                {`continue with ${provider.name}`}
-                            </Button>
-                        ))}
+                        {!isResetPassword && (
+                            <p className="mt-6 text-center text-charcoalBlack font-medium">
+                                {isLogin ? (
+                                    <>
+                                        Don't have an account?{" "}
+                                        <button
+                                            onClick={toggleForm}
+                                            className="text-charcoalBlack font-bold underline hover:text-tbrand-hover"
+                                        >
+                                            Create Account
+                                        </button>
+                                        <br />
+                                        Forgot your password?{" "}
+                                        <button
+                                            onClick={toggleResetPassword}
+                                            className="text-charcoalBlack font-bold underline hover:text-tbrand-hover"
+                                        >
+                                            Reset Password
+                                        </button>
+                                    </>
+                                ) : (
+                                    <button
+                                        onClick={toggleForm}
+                                        className="text-charcoalBlack font-bold underline hover:text-tbrand-hover"
+                                    >
+                                        Log In
+                                    </button>
+                                )}
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>

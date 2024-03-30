@@ -6,6 +6,7 @@ import {
     createUserWithEmailAndPassword,
     signInWithPopup,
     sendEmailVerification,
+    sendPasswordResetEmail,
     GithubAuthProvider,
     GoogleAuthProvider,
 } from "firebase/auth";
@@ -34,6 +35,7 @@ export type AuthContextValue = {
     loginWithProvider: (name: ProviderName) => Promise<void>;
     reloadUser: () => Promise<void>;
     refreshProfile: () => Promise<void>;
+    sendPasswordReset: (email: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue>({
@@ -45,6 +47,7 @@ const AuthContext = createContext<AuthContextValue>({
     loginWithProvider: async () => {},
     reloadUser: async () => {},
     refreshProfile: async () => {},
+    sendPasswordReset: async () => {},
 });
 
 /**
@@ -103,6 +106,21 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
             setCurrentUser(userWithRole);
             setUserProfile(profile);
         });
+    };
+
+    const sendPasswordReset = async (email: string) => {
+        try {
+            await sendPasswordResetEmail(auth, email);
+            showNotification({
+                title: "Reset Email Sent",
+                message: "Check your email to reset your password.",
+            });
+        } catch (error: any) {
+            showNotification({
+                title: "Error Sending Reset Email",
+                message: error.message || "Could not send reset email. Try again later.",
+            });
+        }
     };
 
     const refreshProfile = async () => {
@@ -221,6 +239,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 loginWithProvider,
                 reloadUser,
                 refreshProfile,
+                sendPasswordReset,
             }}
         >
             {children}
