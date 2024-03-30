@@ -5,17 +5,20 @@ import { Button, ErrorAlert, TextInput, Select } from "@components";
 import { type UserProfile, createUserProfile } from "@services/utils";
 import { useAuth, useNotification } from "@providers";
 import { routes } from "@utils";
-import { Option } from "../../components/Select/Select";
+import { schools, countryCodes } from "@data";
 
-const countries: Option[] = [
-    {
-        label: "US",
-        value: "us",
-    },
-    {
-        label: "CA",
-        value: "ca",
-    },
+const levelsOfStudy: string[] = [
+    "Undergraduate Univerity (3+ years)",
+    "Undergraduate University (2 year - community collecge or similar)",
+    "Graduate University (Masters, Professional, Doctoral, etc)",
+    "Less than Secondary / High School",
+    "Secondary / High School",
+    "Code School / Bootcamp",
+    "Other Vocational / Trade Programs or Apprenticeship",
+    "Post Doctorate",
+    "Other",
+    "I'm not currently a student",
+    "Prefer not to answer",
 ];
 
 const formValidationSchema = z.object({
@@ -27,11 +30,18 @@ const formValidationSchema = z.object({
         .string()
         .min(1, "Last name must contain at least 1 character(s)"),
     email: z.string().email(),
-    countryOfResidence: z.string().min(2),
+    countryOfResidence: z.string().length(2),
     emailVerified: z.boolean(),
-    phone: z.string(),
-    school: z.string(),
-    levelOfStudy: z.string(),
+    phone: z
+        .string()
+        .regex(
+            /^(\+?1-?)?(\([2-9]\d{2}\)|[2-9]\d{2})-?[2-9]\d{2}-?\d{4}$/,
+            "Invalid Phone Number"
+        ),
+    school: z.string().min(1),
+    levelOfStudy: z.string().min(1),
+    age: z.number().min(13, "Age must be 13+"),
+    discord: z.string().min(1),
 });
 
 export const CompleteProfilePage = () => {
@@ -41,17 +51,19 @@ export const CompleteProfilePage = () => {
 
     if (userProfile) return <Navigate to={routes.profile} />;
 
-    const [selectedCountry, setSelectedCountry] = useState(countries[1]);
+    const [selectedCountry, setSelectedCountry] = useState("CA");
     const [formValues, setFormValues] = useState<UserProfile>({
         id: currentUser.uid,
         firstName: "",
         lastName: "",
         email: currentUser.email ?? "",
-        countryOfResidence: selectedCountry.value,
+        countryOfResidence: selectedCountry,
         emailVerified: currentUser.emailVerified,
         phone: "",
         school: "",
         levelOfStudy: "",
+        age: 13,
+        discord: "",
     });
     const [formErrors, setFormErrors] = useState<string[]>([]);
 
@@ -77,10 +89,13 @@ export const CompleteProfilePage = () => {
     return (
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl">
+                <p className="text-xl font-semibold">
+                    All fields are required.
+                </p>
                 {formErrors.length > 0 && <ErrorAlert errors={formErrors} />}
                 <form onSubmit={handleSubmit}>
                     <div className="px-4 py-6 sm:p-8">
-                        <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                        <div className="sm:grid max-w-2xl sm:gap-x-6 sm:gap-y-8 sm:grid-cols-6">
                             <div className="sm:col-span-3">
                                 <TextInput
                                     label="First name"
@@ -88,6 +103,7 @@ export const CompleteProfilePage = () => {
                                     name="firstName"
                                     id="firstName"
                                     autoComplete="given-name"
+                                    placeholder="Steven"
                                     value={formValues.firstName}
                                     onChange={(e) =>
                                         setFormValues((c) => ({
@@ -106,6 +122,7 @@ export const CompleteProfilePage = () => {
                                     name="lastName"
                                     id="lastName"
                                     autoComplete="family-name"
+                                    placeholder="Wu"
                                     value={formValues.lastName}
                                     onChange={(e) =>
                                         setFormValues((c) => ({
@@ -117,40 +134,121 @@ export const CompleteProfilePage = () => {
                                 />
                             </div>
 
-                            {!currentUser.email && (
-                                <div className="sm:col-span-4">
-                                    <TextInput
-                                        label="Email address"
-                                        id="email"
-                                        name="email"
-                                        type="email"
-                                        value={formValues.email}
-                                        onChange={(e) =>
-                                            setFormValues((c) => ({
-                                                ...c,
-                                                email: e.target.value,
-                                            }))
-                                        }
-                                        required
-                                    />
-                                </div>
-                            )}
+                            <div className="sm:col-span-2">
+                                <TextInput
+                                    label="Age"
+                                    type="number"
+                                    name="age"
+                                    id="age"
+                                    placeholder="13"
+                                    min={13}
+                                    value={formValues.age}
+                                    onChange={(e) =>
+                                        setFormValues((c) => ({
+                                            ...c,
+                                            age: parseInt(e.target.value),
+                                        }))
+                                    }
+                                    required
+                                />
+                            </div>
 
                             <div className="sm:col-span-4">
-                                <div className="mt-2">
-                                    <Select
-                                        label="Country"
-                                        options={countries}
-                                        onChange={(opt) => {
-                                            setFormValues((c) => ({
-                                                ...c,
-                                                countryOfResidence: opt.value,
-                                            }));
-                                            setSelectedCountry(opt);
-                                        }}
-                                        initialValue={selectedCountry}
-                                    />
-                                </div>
+                                <TextInput
+                                    label="Email address"
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    value={formValues.email}
+                                    onChange={(e) =>
+                                        setFormValues((c) => ({
+                                            ...c,
+                                            email: e.target.value,
+                                        }))
+                                    }
+                                    disabled={!!currentUser.email}
+                                    required
+                                />
+                            </div>
+
+                            <div className="col-span-6">
+                                <TextInput
+                                    label="Phone Number"
+                                    id="phone-number"
+                                    placeholder="+1 (999) 999-9999"
+                                    name="phone"
+                                    value={formValues.phone}
+                                    type="tel"
+                                    onChange={(e) =>
+                                        setFormValues((c) => ({
+                                            ...c,
+                                            phone: e.target.value,
+                                        }))
+                                    }
+                                    required
+                                />
+                            </div>
+
+                            <div className="col-span-3">
+                                <Select
+                                    label="School"
+                                    options={schools}
+                                    initialValue={
+                                        schools.find(
+                                            (val) =>
+                                                val ===
+                                                "Wilfrid Laurier University"
+                                        )!
+                                    }
+                                    onChange={(school) =>
+                                        setFormValues((c) => ({
+                                            ...c,
+                                            school: school,
+                                        }))
+                                    }
+                                />
+                            </div>
+                            <div className="col-span-3">
+                                <Select
+                                    label="Level of Study"
+                                    options={levelsOfStudy}
+                                    initialValue={levelsOfStudy[0]}
+                                    onChange={(opt) =>
+                                        setFormValues((c) => ({
+                                            ...c,
+                                            levelOfStudy: opt,
+                                        }))
+                                    }
+                                />
+                            </div>
+
+                            <div className="sm:col-span-4">
+                                <Select
+                                    label="Country"
+                                    options={countryCodes}
+                                    onChange={(opt) => {
+                                        setFormValues((c) => ({
+                                            ...c,
+                                            countryOfResidence: opt,
+                                        }));
+                                        setSelectedCountry(opt);
+                                    }}
+                                    initialValue={selectedCountry}
+                                />
+                            </div>
+
+                            <div className="sm:col-span-full">
+                                <TextInput
+                                    label="Discord"
+                                    id="discord"
+                                    placeholder="@username or username#1234"
+                                    onChange={(e) =>
+                                        setFormValues((c) => ({
+                                            ...c,
+                                            discord: e.target.value,
+                                        }))
+                                    }
+                                />
                             </div>
                         </div>
                     </div>

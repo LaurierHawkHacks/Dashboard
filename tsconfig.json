@@ -2,7 +2,11 @@
     "compilerOptions": {
         "target": "ES2020",
         "useDefineForClassFields": true,
-        "lib": ["ES2020", "DOM", "DOM.Iterable"],
+        "lib": [
+            "ES2020",
+            "DOM",
+            "DOM.Iterable"
+        ],
         "module": "ESNext",
         "skipLibCheck": true,
         /* Bundler mode */
@@ -17,20 +21,46 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
-        "types": ["vitest/globals", "@testing-library/jest-dom"],
+        "types": [
+            "vitest/globals",
+            "@testing-library/jest-dom"
+        ],
         "paths": {
-            "@": ["./src/index"],
-            "@assets": ["./src/assets/index"],
-            "@components": ["./src/components/index"],
-            "@pages": ["./src/pages/index"],
-            "@services": ["./src/services/index"],
-            "@services/utils": ["./src/services/utils/index"],
-            "@providers": ["./src/providers/index"],
-            "@utils": ["./src/utils/index"],
-            "@mocks/providers": ["./src/providers/__mocks__"]
+            "@": [
+                "./src/index"
+            ],
+            "@assets": [
+                "./src/assets/index"
+            ],
+            "@components": [
+                "./src/components/index"
+            ],
+            "@pages": [
+                "./src/pages/index"
+            ],
+            "@services": [
+                "./src/services/index"
+            ],
+            "@services/utils": [
+                "./src/services/utils/index"
+            ],
+            "@providers": [
+                "./src/providers/index"
+            ],
+            "@utils": [
+                "./src/utils/index"
+            ],
+            "@data": [
+                "./src/data/index"
+            ],
+            "@mocks/providers": [
+                "./src/providers/__mocks__"
+            ]
         }
     },
-    "include": ["src"],
+    "include": [
+        "src"
+    ],
     "references": [
         {
             "path": "./tsconfig.node.json"
