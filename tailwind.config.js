@@ -39,7 +39,7 @@ export default {
                 deepGold: "#F8D579",
                 mutedYellow: "#FFE976",
                 stonePurple: "#D49DFF",
-                tbrand: "#2B6469",
+                tbrand: "#32848C",
                 "tbrand-hover": "#0FA3B1",
                 "tbrand-mouse-down": "#1D7882",
                 "tbrand-highlight": "#00CEDB",

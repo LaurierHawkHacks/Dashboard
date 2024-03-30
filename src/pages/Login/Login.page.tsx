@@ -99,7 +99,7 @@ export const LoginPage = () => {
     }
 
     return (
-        <div className="font-medium absolute inset-0 bg-gradient-to-r from-deepPurple/20 via-deepGold/20 via-50% to-stonePurple/20 flex justify-center items-center min-h-screen">
+        <div className="font-medium absolute inset-0 bg-gradient-to-r from-deepPurple/20 via-deepGold/20 via-50% to-stonePurple/20 flex justify-center items-center min-h-screen before:absolute before:inset-0 before:bg-[#EBCACC] before:-z-10">
             <div className="mx-auto max-w-2xl px-4 sm:px-6 md:px-8">
                 <h1 className="text-3xl sm:text-5xl text-charcoalBlack font-body font-bold">
                     HawkHacks Hacker Portal

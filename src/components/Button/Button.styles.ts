@@ -14,7 +14,7 @@ const buttonStyles = cva(
                 primary:
                     "bg-tbrand text-white hover:bg-[#3f9098] disabled:hover:bg-tbrand active:bg-[#214b4f]",
                 secondary:
-                    "bg-white text-tbrand hover:bg-[#ebebeb] disabled:hover:bg-white active:bg-[#d9d9d9]",
+                    "bg-white text-tbrand border border-gray-400 hover:bg-[#ebebeb] disabled:hover:bg-white active:bg-[#d9d9d9]",
             },
         },
         defaultVariants: {

@@ -3,7 +3,7 @@
  * @utility Router
  *
  */
-export { Router, routes } from "./Router";
+export { Router, routes, titles } from "./Router";
 export { ProtectedRoutes } from "./ProtectedRoutes/ProtectedRoutes";
 
 /*

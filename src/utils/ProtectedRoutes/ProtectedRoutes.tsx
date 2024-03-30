@@ -1,6 +1,7 @@
-import { useAuth } from "@providers";
 import { Outlet, Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "@providers";
 import { routes } from "@utils";
+import { PageWrapper } from "@components";
 
 export interface ProtectedRoutesProps {
     /**
@@ -26,7 +27,11 @@ export const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
             // avoid spam users/bot or fake clients
             return <Navigate to={routes.verifyEmail} />;
         } else {
-            return <Outlet />;
+            return (
+                <PageWrapper>
+                    <Outlet />
+                </PageWrapper>
+            );
         }
     }
 
@@ -35,9 +40,9 @@ export const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
         return <Navigate to={routes.notFound} />;
     }
 
-    if (!session.userProfile && location.pathname !== routes.completeProfile) {
-        return <Navigate to={routes.completeProfile} />;
-    }
-
-    return <Outlet />;
+    return (
+        <PageWrapper>
+            <Outlet />
+        </PageWrapper>
+    );
 };

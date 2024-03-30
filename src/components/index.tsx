@@ -50,3 +50,17 @@ export type { SelectProps } from "./Select/Select";
  */
 export type { MultiSelectProps } from "./MultiSelect/MultiSelect";
 export { MultiSelect } from "./MultiSelect/MultiSelect";
+
+/*
+ *
+ * @component PageWrapper
+ *
+ */
+export { PageWrapper } from "./PageWrapper/PageWrapper";
+
+/*
+ *
+ * @component common values such as common props
+ *
+ */
+export type { ComponentProps } from "./common";
