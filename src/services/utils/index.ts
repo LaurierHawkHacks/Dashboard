@@ -20,6 +20,8 @@ export interface UserProfile {
     school: string;
     levelOfStudy: string;
     countryOfResidence: string;
+    age: number;
+    discord: string;
 }
 
 /**

@@ -1,7 +1,7 @@
 import { FormEventHandler, useState } from "react";
 import { flushSync } from "react-dom";
 import { z } from "zod";
-import { Navigate } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import { Button, TextInput } from "@components";
 import { useAuth } from "@providers";
 import type { ProviderName } from "@providers";
@@ -33,6 +33,8 @@ export const LoginPage = () => {
     const [isLogin, setIsLogin] = useState(true);
 
     const { login, createAccount, loginWithProvider, currentUser } = useAuth();
+
+    const [searchParams] = useSearchParams();
 
     const handlerSubmit: FormEventHandler = async (e) => {
         // prevent page refresh when form is submitted
@@ -95,7 +97,8 @@ export const LoginPage = () => {
         if (currentUser.hawkAdmin) {
             return <Navigate to={routes.admin} />;
         }
-        return <Navigate to={routes.profile} />;
+        const from = searchParams.get("from");
+        return <Navigate to={from ?? routes.profile} />;
     }
 
     return (
@@ -120,6 +123,7 @@ export const LoginPage = () => {
                                 id="email"
                                 type="email"
                                 placeholder="awesome@hawkhack.ca"
+                                className="bg-peachWhite"
                                 value={email}
                                 invalid={isInvalidEmail}
                                 description={
@@ -135,6 +139,7 @@ export const LoginPage = () => {
                                 id="password"
                                 type="password"
                                 placeholder="************"
+                                className="bg-peachWhite"
                                 minLength={isLogin ? 0 : 8}
                                 value={password}
                                 invalid={!isLogin && isInvalidPassword}
@@ -148,6 +153,7 @@ export const LoginPage = () => {
                                     label="Confirm Password:"
                                     id="confirmPassword"
                                     type="password"
+                                    className="bg-peachWhite"
                                     minLength={8}
                                     value={confirmPass}
                                     invalid={isInvalidPassword}
