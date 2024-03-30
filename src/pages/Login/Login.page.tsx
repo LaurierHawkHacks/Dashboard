@@ -6,7 +6,7 @@ import { Button, TextInput } from "@components";
 import { useAuth } from "@providers";
 import type { ProviderName } from "@providers";
 import { routes } from "@utils";
-import { GithubLogo, GoogleLogo } from "@assets";
+import { GithubLogo, GoogleLogo, AppleLogo } from "@assets";
 
 // email validation with zod, double guard just in case someone changes the input type in html
 const emailParser = z.string().email();
@@ -14,6 +14,7 @@ const emailParser = z.string().email();
 const authProviders: { name: ProviderName; logo: string }[] = [
     { name: "github", logo: GithubLogo },
     { name: "google", logo: GoogleLogo },
+    { name: "apple", logo: AppleLogo },
 ];
 
 export const LoginPage = () => {
