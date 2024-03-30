@@ -2,6 +2,7 @@ import { FC } from "react";
 import type { ComponentProps } from "@components";
 import { useLocation } from "react-router-dom";
 import { titles } from "@utils";
+import { Navbar } from "c:/Users/abdul/Coding/Dashboard/src/components/Navbar";
 
 export const PageWrapper: FC<ComponentProps> = ({ children }) => {
     const location = useLocation();
@@ -10,7 +11,9 @@ export const PageWrapper: FC<ComponentProps> = ({ children }) => {
     return (
         <div>
             <div className="">
-                <div className="hidden lg:block lg:fixed lg:inset-y-0 lg:z-50 lg:w-72 border-r-2 border-r-gray-300"></div>
+                <div className="hidden lg:block lg:fixed lg:inset-y-0 lg:z-50 lg:w-72 border-r-2 border-r-gray-300">
+                    <Navbar />
+                </div>
 
                 {/* right hand side */}
                 <div className="lg:pl-72">

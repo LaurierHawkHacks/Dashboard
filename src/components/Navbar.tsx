@@ -5,28 +5,30 @@ import { PiIdentificationBadgeFill } from "react-icons/pi";
 import { FiLogOut } from "react-icons/fi";
 import { useState } from "react";
 import { GoHomeFill } from "react-icons/go";
+import { useAuth } from "@providers";
 
 export const Navbar = () => {
-    const [open, setOpen] = useState(true);
-
+    const { logout } = useAuth();
     return (
         <div
-            className={`h-screen bg-white transition-all duration-300 gap-12 flex flex-col md:w-[200px] w-[60px]`}
+            className={`h-screen p-4 bg-white transition-all duration-300 gap-12 flex flex-col md:w-full w-[60px] font-medium text-cadetBlue`}
         >
-            <div>
-                <a className="flex gap-4 items-center justify-center" href="/">
+            <div className="flex items-start justify-start p-4">
+                <a className="flex gap-4 items-center justify-start" href="/">
                     <img
-                        className="h-12 w-12 mt-6"
+                        className="h-12 w-12"
                         src="./src/assets/hh-dashboard-logo.svg"
                         alt="HawkHacks Logo"
                     />
-                    <span className="hidden md:flex">HawkHacks</span>
+                    <span className="hidden md:flex text-2xl font-bold text-black">
+                        HawkHacks
+                    </span>
                 </a>
             </div>
 
-            <aside className="flex flex-col items-center justify-between h-full">
-                <ul className="flex flex-col items-start justify-start gap-4">
-                    <li className="flex">
+            <aside className="flex flex-col items-start justify-between h-full">
+                <ul className="flex flex-col items-start justify-start gap-4 w-full">
+                    <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full">
                         <a
                             href="/"
                             className="flex items-center justify-start gap-2"
@@ -35,39 +37,43 @@ export const Navbar = () => {
                             <span className="hidden md:flex">Home</span>
                         </a>
                     </li>
-                    <li className="flex">
+                    <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full">
                         <a
                             href="/"
-                            className="flex items-center justify-center gap-2"
+                            className="flex items-center justify-start gap-2"
                         >
                             <PiCalendarCheckFill size={32} />
-                            <span className="hidden md:flex">Home</span>
+                            <span className="hidden md:flex">Schedule</span>
                         </a>
                     </li>{" "}
-                    <li className="flex">
+                    <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full">
                         <a
                             href="/"
-                            className="flex items-center justify-center gap-2"
+                            className="flex items-center justify-start gap-2"
                         >
                             <TiGroup size={32} />
-                            <span className="hidden md:flex">Home</span>
+                            <span className="hidden md:flex">Networking</span>
                         </a>
                     </li>{" "}
-                    <li className="flex">
+                    <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full">
                         <a
                             href="/"
-                            className="flex items-center justify-center gap-2"
+                            className="flex items-center justify-start gap-2"
                         >
                             <PiIdentificationBadgeFill size={32} />
-                            <span className="hidden md:flex">Home</span>
+                            <span className="hidden md:flex">Ticket</span>
                         </a>
                     </li>
                 </ul>
 
-                <div className="flex items-center justify-center gap-2 mb-8">
+                <button
+                    className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full flex items-center justify-start gap-2"
+                    type="button"
+                    onClick={logout}
+                >
                     <FiLogOut size={32} />
                     <span className="hidden md:flex">Sign out</span>
-                </div>
+                </button>
             </aside>
         </div>
     );
