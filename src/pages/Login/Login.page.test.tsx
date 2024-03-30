@@ -1,138 +1,95 @@
-import { createContext, useState, useContext, useEffect } from "react";
-import { auth } from "@services";
-import {
-    User,
-    signOut,
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    GithubAuthProvider,
-    OAuthProvider,
-    signInWithPopup,
-} from "firebase/auth";
+import { render, screen, within } from "@testing-library/react";
+import { LoginPage } from "./Login.page";
+import { mockUseAuth } from "@mocks/providers";
+import userEvent from "@testing-library/user-event";
 
-export type UserWithRole = User & { hawkAdmin: boolean };
+vi.mock("@providers");
 
-type AuthContextValue = {
-    currentUser: UserWithRole | null;
-    login: (email: string, password: string) => Promise<void>;
-    logout: () => Promise<void>;
-    createAccount: (email: string, password: string) => Promise<void>;
-    loginWithGithub: () => Promise<void>;
-    loginWithApple: () => Promise<void>;
-};
-
-const AuthContext = createContext<AuthContextValue>({
-    currentUser: null,
-    login: async () => {},
-    logout: async () => {},
-    createAccount: async () => {},
-    loginWithGithub: async () => {},
-    loginWithApple: async () => {},
-});
-
-async function validateUserRole(user: User): Promise<UserWithRole> {
-    const { claims } = await user.getIdTokenResult();
-    return {
-        ...user,
-        hawkAdmin: Boolean(claims.admin),
-    };
-}
-
-const githubProvider = new GithubAuthProvider();
-githubProvider.addScope("read:user");
-githubProvider.addScope("user:email");
-
-export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
-    const [currentUser, setCurrentUser] = useState<UserWithRole | null>(null);
-
-    const login = async (email: string, password: string) => {
-        try {
-            const { user } = await signInWithEmailAndPassword(
-                auth,
-                email,
-                password
-            );
-            setCurrentUser(await validateUserRole(user));
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const logout = async () => {
-        try {
-            await signOut(auth);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setCurrentUser(null);
-        }
-    };
-
-    const createAccount = async (email: string, password: string) => {
-        try {
-            const { user } = await createUserWithEmailAndPassword(
-                auth,
-                email,
-                password
-            );
-            setCurrentUser(await validateUserRole(user));
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const loginWithGithub = async () => {
-        try {
-            const results = await signInWithPopup(auth, githubProvider);
-            if (results) {
-                setCurrentUser(await validateUserRole(results.user));
-            } else {
-                console.warn("login with github: results is null");
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const loginWithApple = async () => {
-        try {
-            console.error("test");
-            const appleProvider = new OAuthProvider("apple.com");
-            const result = await signInWithPopup(auth, appleProvider);
-            setCurrentUser(await validateUserRole(result.user));
-        } catch (error) {
-            console.error("Error logging in with Apple:", error);
-        }
-    };
-
-    useEffect(() => {
-        const unsub = auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                setCurrentUser(await validateUserRole(user));
-            } else {
-                logout();
-            }
+describe("Login Page", () => {
+    it("should render HawkHacks Hacker Portal Heading", () => {
+        mockUseAuth.mockReturnValue({
+            login: vi.fn(),
+            createaAccount: vi.fn(),
+            currentUser: null,
         });
+        render(<LoginPage />);
+        expect(
+            screen.getByRole("heading", {
+                level: 1,
+                name: /hawkhacks hacker portal/i,
+            })
+        ).toBeInTheDocument();
+    });
 
-        return unsub;
-    }, []);
+    it("should render a form with email, password, and submit button", () => {
+        mockUseAuth.mockReturnValue({
+            login: vi.fn(),
+            createaAccount: vi.fn(),
+            currentUser: null,
+        });
+        render(<LoginPage />);
 
-    return (
-        <AuthContext.Provider
-            value={{
-                currentUser,
-                login,
-                logout,
-                createAccount,
-                loginWithGithub,
-                loginWithApple,
-            }}
-        >
-            {children}
-        </AuthContext.Provider>
-    );
-};
+        const form = screen.getByRole("form");
 
-export const useAuth = () => {
-    return useContext(AuthContext);
-};
+        expect(within(form).getByLabelText(/email/i)).toBeInTheDocument();
+        expect(within(form).getByLabelText(/email/i)).toBeEnabled();
+        expect(within(form).getByLabelText(/password/i)).toBeInTheDocument();
+        expect(within(form).getByLabelText(/password/i)).toBeEnabled();
+        expect(
+            within(form).getByRole("button", { name: /log in/i })
+        ).toBeInTheDocument();
+        expect(
+            within(form).getByRole("button", { name: /log in/i })
+        ).toBeEnabled();
+    });
+
+    it("should switch log in form to create account form", async () => {
+        const user = userEvent.setup();
+        render(<LoginPage />);
+
+        const switchBtn = screen.getByRole("button", {
+            name: /create account/i,
+        });
+        await user.click(switchBtn);
+
+        const form = screen.getByRole("form");
+
+        expect(within(form).getByLabelText(/email/i)).toBeInTheDocument();
+        expect(within(form).getByLabelText(/email/i)).toBeEnabled();
+        const passwordFields = within(form).getAllByLabelText(/password/i);
+        expect(passwordFields).toHaveLength(2);
+        passwordFields.forEach((field) => {
+            expect(field).toBeInTheDocument();
+            expect(field).toBeEnabled();
+            expect(field.getAttribute("minLength")).toBe("8");
+        });
+        expect(
+            within(form).getByRole("button", { name: /create account/i })
+        ).toBeInTheDocument();
+        expect(
+            within(form).getByRole("button", { name: /create account/i })
+        ).toBeEnabled();
+    });
+
+    it("should render continue with GitHub button", () => {
+        render(<LoginPage />);
+
+        expect(
+            screen.getByRole("button", { name: "continue with github" })
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: "continue with github" })
+        ).toBeEnabled();
+    });
+
+    it("should render continue with Google button", () => {
+        render(<LoginPage />);
+
+        expect(
+            screen.getByRole("button", { name: "continue with google" })
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: "continue with google" })
+        ).toBeEnabled();
+    });
+});

@@ -4,11 +4,9 @@ import { twMerge } from "tailwind-merge";
 
 const buttonStyles = cva(
     [
-        "rounded-lg px-5 py-2 text-sm font-semibold transition border-[#22565b] border relative",
+        "px-5 py-4 text-sm font-regular transition relative",
         "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tbrand",
         "disabled:cursor-not-allowed disabled:after:hidden",
-        "after:absolute after:bg-black after:top-0 after:left-0 after:-z-10 after:rounded-lg after:w-full after:h-full", // "solid shadow" shape
-        "after:translate-x-0.75 after:translate-y-0.75", // "solid shadow" positioning
     ],
     {
         variants: {

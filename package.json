@@ -15,6 +15,8 @@
     },
     "dependencies": {
         "@google-cloud/functions-framework": "^3.3.0",
+        "@headlessui/react": "^1.7.18",
+        "@heroicons/react": "^2.1.1",
         "@types/node": "^20.6.0",
         "class-variance-authority": "^0.7.0",
         "firebase": "^10.5.2",
@@ -25,11 +27,13 @@
         "zod": "^3.22.4"
     },
     "devDependencies": {
+        "@tailwindcss/forms": "^0.5.7",
         "@testing-library/jest-dom": "^6.1.4",
         "@testing-library/react": "^14.0.0",
         "@testing-library/user-event": "^14.5.1",
         "@types/react": "^18.2.15",
         "@types/react-dom": "^18.2.7",
+        "@types/react-transition-group": "^4.4.10",
         "@typescript-eslint/eslint-plugin": "^6.7.0",
         "@typescript-eslint/parser": "^6.7.0",
         "@vitejs/plugin-react": "^4.0.3",

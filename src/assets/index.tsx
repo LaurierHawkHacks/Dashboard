@@ -1,5 +1,5 @@
 import Logo from "./logo.svg";
 import GithubLogo from "./github-mark.svg";
-import AppleLogo from "./apple.svg";
+import GoogleLogo from "./google-logo.svg";
 
-export { Logo, GithubLogo, AppleLogo };
+export { Logo, GithubLogo, GoogleLogo };

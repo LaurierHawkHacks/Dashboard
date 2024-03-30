@@ -6,8 +6,11 @@ import { mockUseAuth } from "@mocks/providers";
 vi.mock("@providers");
 
 describe("ProctectedRoutes Component", () => {
-    it("should render if user is authenticated and authorized", () => {
-        mockUseAuth.mockReturnValueOnce({ currentUser: {} });
+    it("should render if user is authenticated, authorized and has a profile", () => {
+        mockUseAuth.mockReturnValueOnce({
+            currentUser: { emailVerified: true },
+            userProfile: {},
+        });
         renderWithRouter(
             <Routes>
                 <Route path="/" element={<ProtectedRoutes />}>
@@ -67,7 +70,10 @@ describe("ProctectedRoutes Component", () => {
     });
 
     it("should redirect to not found page if not authorized to view", async () => {
-        mockUseAuth.mockReturnValue({ currentUser: { isAdmin: false } });
+        mockUseAuth.mockReturnValue({
+            currentUser: { isAdmin: false, emailVerified: true },
+            userProfile: {},
+        });
         const { user } = renderWithRouter(
             <Routes>
                 <Route path="/" element={<ProtectedRoutes />}>
@@ -112,5 +118,61 @@ describe("ProctectedRoutes Component", () => {
         expect(screen.queryByTestId("not-found")).toBeInTheDocument();
 
         mockUseAuth.mockClear();
+    });
+
+    it("should redirect user to verify email page if email is not verified", () => {
+        mockUseAuth.mockReturnValueOnce({
+            currentUser: { emailVerified: false },
+        });
+        renderWithRouter(
+            <Routes>
+                <Route path="/" element={<ProtectedRoutes />}>
+                    <Route path="" element={<div></div>} />
+                </Route>
+                <Route
+                    path={routes.verifyEmail}
+                    element={<div data-testid="verify-email"></div>}
+                />
+            </Routes>
+        );
+
+        expect(screen.getByTestId("verify-email")).toBeInTheDocument();
+    });
+
+    it("should redirect user to complete profile page if profile is not present", async () => {
+        mockUseAuth.mockReturnValue({
+            currentUser: { emailVerified: true },
+            userProfile: null,
+        });
+        renderWithRouter(
+            <Routes>
+                <Route path="/" element={<ProtectedRoutes />}>
+                    <Route
+                        path=""
+                        element={
+                            <Link
+                                to={routes.admin}
+                                data-testid="regular-access-level"
+                            >
+                                test
+                            </Link>
+                        }
+                    />
+                </Route>
+                <Route
+                    path={routes.completeProfile}
+                    element={<ProtectedRoutes />}
+                >
+                    <Route
+                        path=""
+                        element={<div data-testid="complete-profile"></div>}
+                    />
+                </Route>
+            </Routes>
+        );
+
+        expect(
+            await screen.findByTestId("complete-profile")
+        ).toBeInTheDocument();
     });
 });
