@@ -21,6 +21,47 @@ const levelsOfStudy: string[] = [
     "Prefer not to answer",
 ];
 
+const ages: string[] = [
+    "13",
+    "14",
+    "15",
+    "16",
+    "17",
+    "18",
+    "19",
+    "20",
+    "21",
+    "22",
+    "23",
+    "24",
+    "25",
+    "26",
+    "27",
+    "28",
+    "29",
+    "30",
+    "31",
+    "32",
+    "33",
+    "34",
+    "35",
+    "36",
+    "37",
+    "38",
+    "39",
+    "40",
+    "41",
+    "42",
+    "43",
+    "44",
+    "45",
+    "46",
+    "47",
+    "48",
+    "49",
+    "50+",
+];
+
 const formValidationSchema = z.object({
     id: z.string(),
     firstName: z
@@ -135,22 +176,17 @@ export const CompleteProfilePage = () => {
                             </div>
 
                             <div className="sm:col-span-2">
-                                <TextInput
+                                <Select
                                     label="Age"
-                                    type="number"
-                                    name="age"
-                                    id="age"
-                                    placeholder="13"
-                                    min={13}
-                                    value={formValues.age}
-                                    onChange={(e) =>
+                                    options={ages}
+                                    initialValue="18"
+                                    onChange={(opt) => {
+                                        if (opt === "50+") opt = "50";
                                         setFormValues((c) => ({
                                             ...c,
-                                            age: parseInt(e.target.value),
-                                        }))
-                                    }
-                                    description="Participants must be 13+"
-                                    required
+                                            age: parseInt(opt),
+                                        }));
+                                    }}
                                 />
                             </div>
 
