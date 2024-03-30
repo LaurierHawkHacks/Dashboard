@@ -39,18 +39,15 @@ export const Select: FC<SelectProps> = ({
         <Combobox value={selected} onChange={handleChange}>
             <div className="relative">
                 <Combobox.Label
-                    className={
-                        "block font-medium leading-6 text-charcoalBlack text-md" +
-                        srLabelOnly
-                            ? " sr-only"
-                            : ""
-                    }
+                    className={`block font-medium leading-6 text-charcoalBlack text-md${
+                        srLabelOnly ? " sr-only" : ""
+                    }`}
                 >
                     {label}
                 </Combobox.Label>
-                <div className="relative w-full mt-2 cursor-default overflow-hidden bg-white text-left border border-charcoalBlack focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
+                <div className="relative w-full mt-2 cursor-default overflow-hidden bg-gray-50 text-left border border-charcoalBlack focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
                     <Combobox.Input
-                        className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
+                        className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 bg-gray-50 focus:ring-0"
                         displayValue={(opt: string) => opt}
                         onChange={(event) => setQuery(event.target.value)}
                     />
@@ -68,7 +65,7 @@ export const Select: FC<SelectProps> = ({
                     leaveTo="opacity-0"
                     afterLeave={() => setQuery("")}
                 >
-                    <Combobox.Options className="absolute mt-1 max-h-60 z-50 w-full overflow-auto bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                    <Combobox.Options className="absolute mt-1 max-h-60 z-50 w-full overflow-auto bg-gray-50 py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
                         {filteredOptions.length === 0 && query !== "" ? (
                             <div className="relative cursor-default select-none px-4 py-2 text-gray-700">
                                 Nothing found.

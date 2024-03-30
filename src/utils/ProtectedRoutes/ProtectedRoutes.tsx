@@ -18,7 +18,15 @@ export const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
     const session = useAuth();
 
     if (!session.currentUser) {
-        return <Navigate to={adminOnly ? routes.notFound : routes.login} />;
+        return (
+            <Navigate
+                to={
+                    adminOnly
+                        ? routes.notFound
+                        : routes.login + `?from=${location.pathname}`
+                }
+            />
+        );
     }
 
     if (!session.currentUser.emailVerified) {

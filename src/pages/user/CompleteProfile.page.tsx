@@ -149,6 +149,7 @@ export const CompleteProfilePage = () => {
                                             age: parseInt(e.target.value),
                                         }))
                                     }
+                                    description="Participants must be 13+"
                                     required
                                 />
                             </div>
