@@ -136,7 +136,7 @@ export const CompleteProfilePage = () => {
                 {formErrors.length > 0 && <ErrorAlert errors={formErrors} />}
                 <form onSubmit={handleSubmit}>
                     <div className="px-4 py-6 sm:p-8">
-                        <div className="sm:grid max-w-2xl sm:gap-x-6 sm:gap-y-8 sm:grid-cols-6">
+                        <div className="sm:grid max-w-2xl space-y-8 sm:gap-x-6 sm:gap-y-8 sm:space-y-0 sm:grid-cols-6">
                             <div className="sm:col-span-3">
                                 <TextInput
                                     label="First name"
