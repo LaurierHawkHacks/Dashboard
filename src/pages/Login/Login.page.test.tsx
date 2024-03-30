@@ -6,12 +6,16 @@ import userEvent from "@testing-library/user-event";
 vi.mock("@providers");
 
 describe("Login Page", () => {
-    it("should render HawkHacks Hacker Portal Heading", () => {
+    beforeEach(() => {
         mockUseAuth.mockReturnValue({
             login: vi.fn(),
-            createaAccount: vi.fn(),
+            createAccount: vi.fn(),
+            loginWithProvider: vi.fn(),
             currentUser: null,
         });
+    });
+
+    it("should render HawkHacks Hacker Portal Heading", () => {
         render(<LoginPage />);
         expect(
             screen.getByRole("heading", {
@@ -22,11 +26,6 @@ describe("Login Page", () => {
     });
 
     it("should render a form with email, password, and submit button", () => {
-        mockUseAuth.mockReturnValue({
-            login: vi.fn(),
-            createaAccount: vi.fn(),
-            currentUser: null,
-        });
         render(<LoginPage />);
 
         const form = screen.getByRole("form");
@@ -75,10 +74,10 @@ describe("Login Page", () => {
         render(<LoginPage />);
 
         expect(
-            screen.getByRole("button", { name: "continue with github" })
+            screen.getByRole("button", { name: /continue with github/i })
         ).toBeInTheDocument();
         expect(
-            screen.getByRole("button", { name: "continue with github" })
+            screen.getByRole("button", { name: /continue with github/i })
         ).toBeEnabled();
     });
 
@@ -86,10 +85,21 @@ describe("Login Page", () => {
         render(<LoginPage />);
 
         expect(
-            screen.getByRole("button", { name: "continue with google" })
+            screen.getByRole("button", { name: /continue with google/i })
         ).toBeInTheDocument();
         expect(
-            screen.getByRole("button", { name: "continue with google" })
+            screen.getByRole("button", { name: /continue with google/i })
+        ).toBeEnabled();
+    });
+
+    it("should render continue with Apple button", () => {
+        render(<LoginPage />);
+
+        expect(
+            screen.getByRole("button", { name: /continue with apple/i })
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: /continue with apple/i })
         ).toBeEnabled();
     });
 });

@@ -8,8 +8,9 @@ import {
     sendEmailVerification,
     GithubAuthProvider,
     GoogleAuthProvider,
+    OAuthProvider,
 } from "firebase/auth";
-import type { User, AuthProvider as OAuthProvider } from "firebase/auth";
+import type { User, AuthProvider as FirebaseAuthProvider } from "firebase/auth";
 import { auth } from "@services";
 import {
     useNotification,
@@ -21,7 +22,7 @@ export interface UserWithRole extends User {
     hawkAdmin: boolean;
 }
 
-export type ProviderName = "github" | "google";
+export type ProviderName = "github" | "google" | "apple";
 
 export type AuthMethod = "none" | "credentials" | ProviderName;
 
@@ -68,25 +69,37 @@ const googleProvider = new GoogleAuthProvider();
 googleProvider.addScope("profile");
 googleProvider.addScope("email");
 
-function getProvider(provider: ProviderName): OAuthProvider | undefined {
-    if (provider === "google") return googleProvider;
-    if (provider === "github") return githubProvider;
+const appleProvider = new OAuthProvider("apple.com");
+appleProvider.addScope("email");
+appleProvider.addScope("name");
+
+function getProvider(provider: ProviderName): FirebaseAuthProvider {
+    switch (provider) {
+        case "google":
+            return new GoogleAuthProvider();
+        case "github":
+            return new GithubAuthProvider();
+        case "apple":
+            return new OAuthProvider("apple.com");
+        default:
+            throw new Error("Unsupported provider");
+    }
 }
 
 function getNotificationByAuthErrCode(code: string): NotificationOptions {
-    if (code === "auth/email-already-in-use") {
-        return {
-            title: "Email In Use",
-            message:
-                "If you forgot your password, click on 'forgot password' to recover it!",
-        };
+    switch (code) {
+        case "auth/email-already-in-use":
+            return {
+                title: "Email In Use",
+                message:
+                    "If you forgot your password, click on 'forgot password' to recover it!",
+            };
+        default:
+            return {
+                title: "Oops! Something went wrong",
+                message: "Please try again later.",
+            };
     }
-
-    // default notification message
-    return {
-        title: "Oops! Something went wrong",
-        message: "Please try again later.",
-    };
 }
 
 export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
@@ -122,7 +135,6 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
             await completeLoginProcess(user);
             /* eslint-disable-next-line */
         } catch (error: any) {
-            // TODO: should use notification system to show an error message to user
             showNotification(getNotificationByAuthErrCode(error.code));
         }
     };
@@ -134,9 +146,8 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
             showNotification({
                 title: "Oh no! Can't log out!",
                 message:
-                    "Pleas try again after refreshing the page. If problem continues just don't leave, pleas T.T",
+                    "Please try again after refreshing the page. If problem continues just don't leave, please T.T",
             });
-            console.error(error);
         }
     };
 
@@ -148,6 +159,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 password
             );
             await sendEmailVerification(user);
+            await completeLoginProcess(user);
             /* eslint-disable-next-line */
         } catch (error: any) {
             showNotification(getNotificationByAuthErrCode(error.code));
@@ -158,7 +170,6 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
         try {
             const provider = getProvider(name);
             if (!provider) throw new Error("Invalid provider name");
-
             const { user } = await signInWithPopup(auth, provider);
             await completeLoginProcess(user);
             /* eslint-disable-next-line */
@@ -228,6 +239,4 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     );
 };
 
-export const useAuth = () => {
-    return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);
