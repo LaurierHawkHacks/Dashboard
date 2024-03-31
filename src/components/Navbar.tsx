@@ -6,6 +6,7 @@ import { FiLogOut } from "react-icons/fi";
 import { useState, useEffect } from "react";
 import { useAuth } from "@providers";
 import Hamburger from "hamburger-react";
+import { Link } from "react-router-dom";
 
 const navItems = [
     { path: "/profile", label: "Home", Icon: GoHome },
@@ -37,8 +38,8 @@ export const Navbar = () => {
                 key={label}
                 className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black"
             >
-                <a
-                    href={path}
+                <Link
+                    to={path}
                     className="flex items-center justify-start gap-2"
                 >
                     {isMobile ? (
@@ -49,7 +50,7 @@ export const Navbar = () => {
                             <span className="hidden md:flex">{label}</span>
                         </>
                     )}
-                </a>
+                </Link>
             </li>
         ));
 
@@ -59,16 +60,16 @@ export const Navbar = () => {
                 <>
                     <nav className="flex items-center justify-between p-4 text-white border-b-2 border-b-gray-300">
                         <div className="flex items-center justify-start">
-                            <a
+                            <Link
                                 className="flex gap-4 items-center z-50"
-                                href="/"
+                                to="/profile"
                             >
                                 <img
                                     className="h-12 w-12"
                                     src="./src/assets/hh-dashboard-logo.svg"
                                     alt="HawkHacks Logo"
                                 />
-                            </a>
+                            </Link>
                         </div>
                         <div className="z-50">
                             <Hamburger
@@ -77,7 +78,6 @@ export const Navbar = () => {
                                 size={24}
                                 color="black"
                                 label="Show navigation menu"
-                                className="z-50"
                             />
                         </div>
                     </nav>
@@ -103,12 +103,14 @@ export const Navbar = () => {
                 </>
             ) : (
                 <nav
-                    className={"h-screen p-4 bg-white transition-all duration-300 gap-12 flex-col w-[60px] font-medium text-cadetBlue hidden md:block md:fixed md:inset-y-0 md:z-50 md:w-72 border-r-2 border-r-gray-300"}
+                    className={
+                        "h-screen p-4 bg-white transition-all duration-300 gap-12 flex-col w-[60px] font-medium text-cadetBlue hidden md:block md:fixed md:inset-y-0 md:z-50 md:w-72 border-r-2 border-r-gray-300"
+                    }
                 >
                     <div className="flex items-start justify-start p-4">
-                        <a
+                        <Link
                             className="flex gap-4 items-center justify-start"
-                            href="/"
+                            to="/profile"
                         >
                             <img
                                 className="h-12 w-12"
@@ -118,7 +120,7 @@ export const Navbar = () => {
                             <span className="hidden md:flex text-2xl font-bold text-black">
                                 HawkHacks
                             </span>
-                        </a>
+                        </Link>
                     </div>
 
                     <aside className="flex flex-col items-start justify-between h-[90%]">
