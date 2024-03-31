@@ -103,7 +103,7 @@ export const Navbar = () => {
                 </>
             ) : (
                 <nav
-                    className={`h-screen p-4 bg-white transition-all duration-300 gap-12 flex-col w-[60px] font-medium text-cadetBlue hidden md:block md:fixed md:inset-y-0 md:z-50 md:w-72 border-r-2 border-r-gray-300`}
+                    className={"h-screen p-4 bg-white transition-all duration-300 gap-12 flex-col w-[60px] font-medium text-cadetBlue hidden md:block md:fixed md:inset-y-0 md:z-50 md:w-72 border-r-2 border-r-gray-300"}
                 >
                     <div className="flex items-start justify-start p-4">
                         <a
