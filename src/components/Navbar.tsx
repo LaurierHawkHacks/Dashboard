@@ -9,9 +9,9 @@ import Hamburger from "hamburger-react";
 
 const navItems = [
     { path: "/profile", label: "Home", Icon: GoHome },
-    { path: "/", label: "Schedule", Icon: PiCalendarCheckFill },
-    { path: "/", label: "Networking", Icon: TiGroup },
-    { path: "/", label: "Ticket", Icon: PiIdentificationBadgeFill },
+    { path: "/schedule", label: "Schedule", Icon: PiCalendarCheckFill },
+    { path: "/networking", label: "Networking", Icon: TiGroup },
+    { path: "/ticket", label: "Ticket", Icon: PiIdentificationBadgeFill },
 ];
 
 export const Navbar = () => {
@@ -31,7 +31,7 @@ export const Navbar = () => {
         };
     }, []);
 
-    const renderNavItems = (isMobile: any) =>
+    const renderNavItems = (isMobile: boolean) =>
         navItems.map(({ path, label, Icon }) => (
             <li
                 key={label}
@@ -57,7 +57,7 @@ export const Navbar = () => {
         <>
             {isMobile ? (
                 <>
-                    <nav className="flex items-center justify-between p-4 text-white">
+                    <nav className="flex items-center justify-between p-4 text-white border-b-2 border-b-gray-300">
                         <div className="flex items-center justify-start">
                             <a
                                 className="flex gap-4 items-center z-50"
@@ -82,20 +82,24 @@ export const Navbar = () => {
                         </div>
                     </nav>
 
-                    {isMobileMenuOpen && (
-                        <div className="overflow-hidden fixed right-0 top-0 z-40 h-full w-full max-w-[65%] border px-10 py-24 backdrop-blur-xl">
-                            <ul className="flex flex-col items-start justify-start gap-4">
-                                {renderNavItems(true)}
-                            </ul>
-                            <button
-                                className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full flex items-center justify-start gap-2 hover:text-black"
-                                type="button"
-                                onClick={logout}
-                            >
-                                Sign out
-                            </button>
-                        </div>
-                    )}
+                    <div
+                        className={`fixed right-0 top-0 z-40 h-full w-full max-w-[65%] p-10 py-24 bg-gray-200 backdrop-blur-xl transition-transform duration-300 ease-in-out ${
+                            isMobileMenuOpen
+                                ? "translate-x-0 opacity-100"
+                                : "translate-x-full opacity-0"
+                        } `}
+                    >
+                        <ul className="flex flex-col items-start justify-start gap-4">
+                            {renderNavItems(true)}
+                        </ul>
+                        <button
+                            className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full flex items-center justify-start gap-2 hover:text-black"
+                            type="button"
+                            onClick={logout}
+                        >
+                            Sign out
+                        </button>
+                    </div>
                 </>
             ) : (
                 <nav
@@ -117,13 +121,13 @@ export const Navbar = () => {
                         </a>
                     </div>
 
-                    <aside className="flex flex-col items-start justify-between h-full">
+                    <aside className="flex flex-col items-start justify-between h-[90%]">
                         <ul className="flex flex-col items-start justify-start gap-4 w-full">
                             {renderNavItems(false)}
                         </ul>
 
                         <button
-                            className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full flex items-center justify-start gap-2"
+                            className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full flex items-center justify-start gap-2 hover:text-black"
                             type="button"
                             onClick={logout}
                         >

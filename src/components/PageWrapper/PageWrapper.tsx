@@ -14,11 +14,11 @@ export const PageWrapper: FC<ComponentProps> = ({ children }) => {
 
             {/* right hand side */}
             <div className="md:pl-72">
-                <div className="md:sticky top-0 z-40 shrink-0 px-6 py-8 border-b-2 border-b-gray-300 bg-white">
+                <div className="md:sticky top-0 z-40 shrink-0 px-6 md:py-8 py-2 border-b-2 border-b-gray-300 bg-white">
                     <h1 className="text-xl md:text-4xl text-gray-800 font-bold font-sans">
                         {title.main}
                     </h1>
-                    <p className="text-md md:text-2xl text-gray-500 mt-4 font-sans">
+                    <p className="text-md md:text-2xl text-gray-500 md:mt-4 font-sans">
                         {title.sub}
                     </p>
                 </div>
