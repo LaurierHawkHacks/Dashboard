@@ -27,13 +27,22 @@ export const LoginPage = () => {
     const [isInvalidEmail, setIsInvalidEmail] = useState(false);
     const [isInvalidPassword, setIsInvalidPassword] = useState(false);
 
+    // control for password reset form
+    const [showResetPasswordForm, setShowResetPasswordForm] = useState(false);
+
     // custom password err msg, can also be done for email but it shouldn't really need any msgs.
     const [passwordErrMsg, setPasswordErrMsg] = useState("");
 
     // control auth flow and form state to show correct title, toggle button
     const [isLogin, setIsLogin] = useState(true);
 
-    const { login, createAccount, loginWithProvider, currentUser } = useAuth();
+    const {
+        login,
+        createAccount,
+        resetPassword,
+        loginWithProvider,
+        currentUser,
+    } = useAuth();
 
     const [searchParams] = useSearchParams();
 
@@ -76,8 +85,14 @@ export const LoginPage = () => {
             setIsInvalidPassword(false);
         }
 
-        if (isLogin) await login(email, password);
-        else {
+        if (isLogin) {
+            if (showResetPasswordForm) {
+                await resetPassword(email);
+                setShowResetPasswordForm(false);
+                return;
+            }
+            await login(email, password);
+        } else {
             await createAccount(email, password);
             flushSync(() => {
                 setIsLogin(true);
@@ -91,6 +106,12 @@ export const LoginPage = () => {
         setConfirmPass("");
         setPassword("");
         setIsLogin(!isLogin);
+    };
+
+    const toggleResetPassword = () => {
+        setShowResetPasswordForm(!showResetPasswordForm);
+        setPassword("");
+        setConfirmPass("");
     };
 
     // leverage access to current user to decide whether we need to proceed rendering page
@@ -111,17 +132,123 @@ export const LoginPage = () => {
                 <div className="h-6" />
                 <div>
                     <h2 className="font-normal text-xl text-charcoalBlack">
-                        {isLogin ? "Log In" : "Create Account"}
+                        {showResetPasswordForm
+                            ? "Reset Password"
+                            : isLogin
+                            ? "Log In"
+                            : "Create Account"}
                     </h2>
-                    <div className="w-full">
-                        <form
-                            onSubmit={handlerSubmit}
-                            className="mt-6 space-y-6"
-                            aria-label="Authentication form"
-                        >
+                    {!showResetPasswordForm && (
+                        <>
+                            <div className="w-full">
+                                <form
+                                    onSubmit={handlerSubmit}
+                                    className="mt-6 space-y-6"
+                                    aria-label="Authentication form"
+                                >
+                                    <TextInput
+                                        label="Email"
+                                        id="email"
+                                        type="email"
+                                        placeholder="awesome@hawkhack.ca"
+                                        value={email}
+                                        invalid={isInvalidEmail}
+                                        description={
+                                            isInvalidEmail
+                                                ? "Invalid email!"
+                                                : ""
+                                        }
+                                        onChange={({ target: { value } }) =>
+                                            setEmail(value)
+                                        }
+                                        required
+                                    />
+                                    <TextInput
+                                        label="Password"
+                                        id="password"
+                                        type="password"
+                                        placeholder="************"
+                                        minLength={isLogin ? 0 : 8}
+                                        value={password}
+                                        invalid={!isLogin && isInvalidPassword}
+                                        onChange={({ target: { value } }) =>
+                                            setPassword(value)
+                                        }
+                                        required
+                                    />
+                                    {!isLogin && (
+                                        <TextInput
+                                            label="Confirm Password:"
+                                            id="confirmPassword"
+                                            type="password"
+                                            minLength={8}
+                                            value={confirmPass}
+                                            invalid={isInvalidPassword}
+                                            description={passwordErrMsg}
+                                            onChange={({ target: { value } }) =>
+                                                setConfirmPass(value)
+                                            }
+                                            required
+                                        />
+                                    )}
+                                    <div className="flex justify-end">
+                                        <button
+                                            className="text-charcoalBlack font-bold underline hover:text-tbrand-hover"
+                                            onClick={toggleResetPassword}
+                                        >
+                                            {showResetPasswordForm
+                                                ? "Cancel"
+                                                : "Forgot Password?"}
+                                        </button>
+                                    </div>
+                                    {/* just a separator line */}
+                                    <div className="bg-transparent"></div>
+                                    <Button
+                                        type="submit"
+                                        className="w-full bg-gradient-to-b from-tbrand to-tbrand-hover"
+                                    >
+                                        {isLogin ? "Log In" : "Create Account"}
+                                    </Button>
+                                </form>
+                                <p className="mt-6 text-center text-charcoalBlack font-medium">
+                                    Don&apos;t have an account?{" "}
+                                    <button
+                                        className="text-charcoalBlack font-bold underline hover:text-tbrand-hover"
+                                        onClick={toggleForm}
+                                    >
+                                        {isLogin ? "Create Account" : "Log In"}
+                                    </button>
+                                </p>
+                            </div>
+                            {/* just a separator line */}
+                            <div className="h-0.5 bg-transparent my-6"></div>
+                            <div>
+                                <div className="w-full space-y-4">
+                                    {authProviders.map((provider) => (
+                                        <Button
+                                            key={provider.name}
+                                            onClick={() =>
+                                                loginWithProvider(provider.name)
+                                            }
+                                            className="w-full bg-white capitalize text-gray-900 flex justify-center items-center gap-4 hover:bg-gray-100 active:bg-gray-200"
+                                        >
+                                            <img
+                                                src={provider.logo}
+                                                aria-hidden="true"
+                                                className="w-8 h-8"
+                                            />
+                                            {`continue with ${provider.name}`}
+                                        </Button>
+                                    ))}
+                                </div>
+                            </div>
+                        </>
+                    )}
+                    {showResetPasswordForm && (
+                        <div className="w-full">
                             <TextInput
                                 label="Email"
-                                id="email"
+                                id="resetEmail"
                                 type="email"
                                 placeholder="awesome@hawkhack.ca"
                                 className="bg-peachWhite"
@@ -168,44 +295,20 @@ export const LoginPage = () => {
                             {/* just a separator line */}
                             <div className="bg-transparent"></div>
                             <Button
-                                type="submit"
-                                className="w-full bg-gradient-to-b from-tbrand to-tbrand-hover"
+                                type="button"
+                                className="w-full bg-gradient-to-b from-tbrand to-tbrand-hover mt-2 my-8"
+                                onClick={() => {
+                                    resetPassword(email);
+                                    setShowResetPasswordForm(false);
+                                }}
                             >
-                                {isLogin ? "Log In" : "Create Account"}
+                                Reset Password
                             </Button>
-                        </form>
-                        <p className="mt-6 text-center text-charcoalBlack font-medium">
-                            Don&apos;t have an account?{" "}
-                            <button
-                                className="text-charcoalBlack font-bold underline hover:text-tbrand-hover"
-                                onClick={toggleForm}
-                            >
-                                {isLogin ? "Create Account" : "Log In"}
-                            </button>
-                        </p>
-                    </div>
-                </div>
-                {/* just a separator line */}
-                <div className="h-0.5 bg-transparent my-6"></div>
-                <div>
-                    <div className="w-full space-y-4">
-                        {authProviders.map((provider) => (
-                            <Button
-                                key={provider.name}
-                                onClick={() => loginWithProvider(provider.name)}
-                                className="w-full bg-white capitalize text-gray-900 flex justify-center items-center gap-4 hover:bg-gray-100 active:bg-gray-200"
-                            >
-                                <img
-                                    src={provider.logo}
-                                    aria-hidden="true"
-                                    className="w-8 h-8"
-                                />
-                                {`continue with ${provider.name}`}
-                            </Button>
-                        ))}
-                    </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
     );
 };
+
