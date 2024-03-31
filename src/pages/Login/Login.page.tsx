@@ -191,16 +191,18 @@ export const LoginPage = () => {
                                             required
                                         />
                                     )}
-                                    <div className="flex justify-end">
-                                        <button
-                                            className="text-charcoalBlack font-bold underline hover:text-tbrand-hover"
-                                            onClick={toggleResetPassword}
-                                        >
-                                            {showResetPasswordForm
-                                                ? "Cancel"
-                                                : "Forgot Password?"}
-                                        </button>
-                                    </div>
+                                    {isLogin && (
+                                        <div className="flex justify-end">
+                                            <button
+                                                className="text-charcoalBlack font-bold underline hover:text-tbrand-hover"
+                                                onClick={toggleResetPassword}
+                                            >
+                                                {showResetPasswordForm
+                                                    ? "Cancel"
+                                                    : "Forgot Password?"}
+                                            </button>
+                                        </div>
+                                    )}
                                     {/* just a separator line */}
                                     <div className="bg-transparent"></div>
                                     <Button
