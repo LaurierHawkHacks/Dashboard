@@ -213,7 +213,9 @@ export const LoginPage = () => {
                                     </Button>
                                 </form>
                                 <p className="mt-6 text-center text-charcoalBlack font-medium">
-                                    Don&apos;t have an account?{" "}
+                                    <span>
+                                        {isLogin ? "Don't have an account? " : "Already have an account? "}
+                                    </span>
                                     <button
                                         className="text-charcoalBlack font-bold underline hover:text-tbrand-hover"
                                         onClick={toggleForm}
