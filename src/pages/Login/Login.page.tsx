@@ -268,36 +268,6 @@ export const LoginPage = () => {
                                 }
                                 required
                             />
-                            <TextInput
-                                label="Password"
-                                id="password"
-                                type="password"
-                                placeholder="************"
-                                className="bg-peachWhite"
-                                minLength={isLogin ? 0 : 8}
-                                value={password}
-                                invalid={!isLogin && isInvalidPassword}
-                                onChange={({ target: { value } }) =>
-                                    setPassword(value)
-                                }
-                                required
-                            />
-                            {!isLogin && (
-                                <TextInput
-                                    label="Confirm Password:"
-                                    id="confirmPassword"
-                                    type="password"
-                                    className="bg-peachWhite"
-                                    minLength={8}
-                                    value={confirmPass}
-                                    invalid={isInvalidPassword}
-                                    description={passwordErrMsg}
-                                    onChange={({ target: { value } }) =>
-                                        setConfirmPass(value)
-                                    }
-                                    required
-                                />
-                            )}
                             {/* just a separator line */}
                             <div className="bg-transparent"></div>
                             <Button
