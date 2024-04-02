@@ -5,7 +5,10 @@ import { titles } from "@utils";
 
 export const PageWrapper: FC<ComponentProps> = ({ children }) => {
     const location = useLocation();
-    const title = titles[location.pathname];
+    const title = titles[location.pathname] ?? {
+        main: "Wow!",
+        sub: "How did you end up here?",
+    };
 
     return (
         <div>
