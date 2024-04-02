@@ -5,62 +5,7 @@ import { Button, ErrorAlert, TextInput, Select } from "@components";
 import { type UserProfile, createUserProfile } from "@services/utils";
 import { useAuth, useNotification } from "@providers";
 import { routes } from "@utils";
-import { schools, countryCodes } from "@data";
-
-const levelsOfStudy: string[] = [
-    "Undergraduate Univerity (3+ years)",
-    "Undergraduate University (2 year - community collecge or similar)",
-    "Graduate University (Masters, Professional, Doctoral, etc)",
-    "Less than Secondary / High School",
-    "Secondary / High School",
-    "Code School / Bootcamp",
-    "Other Vocational / Trade Programs or Apprenticeship",
-    "Post Doctorate",
-    "Other",
-    "I'm not currently a student",
-    "Prefer not to answer",
-];
-
-const ages: string[] = [
-    "13",
-    "14",
-    "15",
-    "16",
-    "17",
-    "18",
-    "19",
-    "20",
-    "21",
-    "22",
-    "23",
-    "24",
-    "25",
-    "26",
-    "27",
-    "28",
-    "29",
-    "30",
-    "31",
-    "32",
-    "33",
-    "34",
-    "35",
-    "36",
-    "37",
-    "38",
-    "39",
-    "40",
-    "41",
-    "42",
-    "43",
-    "44",
-    "45",
-    "46",
-    "47",
-    "48",
-    "49",
-    "50+",
-];
+import { levelsOfStudy, ages, schools, countryCodes } from "@data";
 
 const formValidationSchema = z.object({
     id: z.string(),

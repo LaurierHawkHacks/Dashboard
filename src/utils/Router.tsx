@@ -6,6 +6,7 @@ import {
     NotFoundPage,
     VerifyEmailPage,
     CompleteProfilePage,
+    ApplicationPage,
 } from "@pages";
 import { ProtectedRoutes } from "@utils";
 
@@ -75,6 +76,10 @@ export const Router = () => (
                 <Route
                     path={routes.completeProfile}
                     element={<CompleteProfilePage />}
+                />
+                <Route
+                    path={routes.application}
+                    element={<ApplicationPage />}
                 />
             </Route>
 

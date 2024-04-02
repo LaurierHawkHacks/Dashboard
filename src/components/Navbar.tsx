@@ -13,6 +13,7 @@ const navItems = [
     { path: "/schedule", label: "Schedule", Icon: PiCalendarCheckFill },
     { path: "/networking", label: "Networking", Icon: TiGroup },
     { path: "/ticket", label: "Ticket", Icon: PiIdentificationBadgeFill },
+    { path: "/application", label: "Application", Icon: GoHome },
 ];
 
 export const Navbar = () => {
