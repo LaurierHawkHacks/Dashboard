@@ -59,6 +59,12 @@ export { MultiSelect } from "./MultiSelect/MultiSelect";
 export { PageWrapper } from "./PageWrapper/PageWrapper";
 
 /*
+ * @component Navbar
+ *
+ */
+export { Navbar } from "./Navbar";
+
+/*
  *
  * @component common values such as common props
  *
