@@ -70,3 +70,9 @@ export { Navbar } from "./Navbar";
  *
  */
 export type { ComponentProps } from "./common";
+
+/*
+ * @component Forms
+ *
+ */
+export { ProfileForm } from "./forms/ProfileForm";
