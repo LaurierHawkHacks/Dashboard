@@ -127,7 +127,7 @@ export const LoginPage = () => {
         <div className="bg-dustStorm font-medium">
             <div className="py-4 flex justify-center items-center bg-gradient-to-r from-deepPurple/20 via-deepGold/20 via-50% to-stonePurple/20 min-h-screen">
                 <div className="mx-auto max-w-2xl px-4 sm:px-6 md:px-8">
-                    <h1 className="text-3xl sm:text-5xl text-charcoalBlack font-body font-bold">
+                    <h1 className="text-center sm:text-left text-3xl sm:text-5xl text-charcoalBlack font-body font-bold">
                         HawkHacks Hacker Portal
                     </h1>
                     <div className="h-6" />
