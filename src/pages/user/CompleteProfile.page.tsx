@@ -1,27 +1,48 @@
-import { useState } from "react";
+import { FormEventHandler, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { ProfileForm, ErrorAlert } from "@components";
+import { ErrorAlert } from "@components";
 import { type UserProfile, createUserProfile } from "@services/utils";
 import { useAuth, useNotification } from "@providers";
 import { routes } from "@utils";
+import { Profile, formValidationSchema } from "../../components/forms/Profile";
+import { defaultProfile } from "../../components/forms/defaults";
+
+// TODO: refactor imports
 
 export const CompleteProfilePage = () => {
     const { currentUser, userProfile, refreshProfile } = useAuth();
     const [errors, setErrors] = useState<string[]>([]);
+    const { showNotification } = useNotification();
+    const [controlledProfile, setControlledProfile] =
+        useState<UserProfile>(defaultProfile);
 
     if (!currentUser) return null;
 
     if (userProfile) return <Navigate to={routes.profile} />;
 
-    const { showNotification } = useNotification();
-
-    const handleSubmit = async (profile: UserProfile) => {
-        await createUserProfile(profile);
-        showNotification({
-            title: "Profile Completed!",
-            message: "You will be redirect to your portal now!",
+    const handleChange = (name: keyof UserProfile, data: string | string[]) => {
+        // @ts-ignore
+        controlledProfile[name] = data;
+        setControlledProfile({
+            ...controlledProfile,
         });
-        await refreshProfile();
+    };
+
+    const handleSubmit: FormEventHandler = async (e) => {
+        e.preventDefault();
+        if (!controlledProfile.id) return;
+        const results = await formValidationSchema.spa(controlledProfile);
+
+        if (results.success) {
+            await createUserProfile(controlledProfile);
+            showNotification({
+                title: "Profile Completed!",
+                message: "You will be redirect to your portal now!",
+            });
+            await refreshProfile();
+        } else {
+            setErrors(results.error.issues.map((i) => i.message));
+        }
     };
 
     return (
@@ -35,13 +56,16 @@ export const CompleteProfilePage = () => {
                         <ErrorAlert errors={errors} />
                     </div>
                 )}
-                <ProfileForm
-                    submitText="Save Profile"
-                    onSubmit={handleSubmit}
-                    onError={(err) => {
-                        setErrors(err.issues.map((i) => i.message));
-                    }}
-                />
+                <form onSubmit={handleSubmit}>
+                    <div className="sm:grid max-w-2xl space-y-8 sm:gap-x-6 sm:gap-y-8 sm:space-y-0 sm:grid-cols-6">
+                        <Profile
+                            profile={controlledProfile}
+                            handler={(name, data) =>
+                                handleChange(name as keyof UserProfile, data)
+                            }
+                        />
+                    </div>
+                </form>
             </div>
         </div>
     );

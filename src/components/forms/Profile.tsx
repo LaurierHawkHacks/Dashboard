@@ -1,7 +1,25 @@
+import { z } from "zod";
 import { UserProfile } from "@services/utils";
 import { ApplicationInputKeys } from "./types";
 import { TextInput, Select } from "@components";
 import { ages, countryCodes, schools, levelsOfStudy } from "@data";
+
+export const formValidationSchema = z.object({
+    firstName: z
+        .string()
+        .min(1, "First name must contain at least 1 character(s)"),
+    lastName: z
+        .string()
+        .min(1, "Last name must contain at least 1 character(s)"),
+    email: z.string().email(),
+    countryOfResidence: z.string().length(2),
+    emailVerified: z.boolean(),
+    phone: z.string().min(1, "Phone number is empty"),
+    school: z.string().min(1, "School is empty"),
+    levelOfStudy: z.string().min(1, "Level of study is empty"),
+    age: z.number().min(13, "Age must be 13+"),
+    discord: z.string().min(1, "Discord username is empty"),
+});
 
 export const Profile = ({
     profile,
