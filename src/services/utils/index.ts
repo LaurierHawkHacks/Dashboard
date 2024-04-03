@@ -5,6 +5,7 @@ import {
     doc,
     getDoc,
     getDocs,
+    orderBy,
     query,
     setDoc,
     where,
@@ -72,7 +73,11 @@ export async function submitApplication(data: ApplicationData) {
  */
 export async function getUserApplications(uid: string) {
     const colRef = collection(firestore, APPLICATIONS_COLLECTION);
-    const q = query(colRef, where("applicantId", "==", uid));
+    const q = query(
+        colRef,
+        where("applicantId", "==", uid),
+        orderBy("timestamp", "desc")
+    );
     const snap = await getDocs(q);
     const apps: ApplicationData[] = [];
     snap.forEach((doc) => apps.push(doc.data() as ApplicationData));

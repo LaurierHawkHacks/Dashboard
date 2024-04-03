@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { z } from "zod";
 import { useAuth, useNotification } from "@/providers/hooks";
 import { routes } from "@/navigation/constants";
@@ -50,8 +50,8 @@ export const ApplicationPage = () => {
     const { currentUser, userProfile } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [hasApplied, setHasApplied] = useState(true); // default to true to prevent showing the form at first load
     const { showNotification } = useNotification();
-    const navigate = useNavigate();
 
     if (!currentUser) return <Navigate to={routes.login} />;
 
@@ -144,8 +144,7 @@ export const ApplicationPage = () => {
                 message:
                     "Thank you for applying! You'll received an update from us in your email shortly!",
             });
-            // redirect to application status mode
-            navigate(routes.applicationStatus);
+            setHasApplied(true);
         } catch (e) {
             showNotification({
                 title: "Error Submitting Application",
@@ -160,13 +159,25 @@ export const ApplicationPage = () => {
     useEffect(() => {
         const checkApp = async () => {
             const apps = await getUserApplications(currentUser.uid);
-            if (apps.length) navigate(routes.applicationStatus);
-            else setIsLoading(false);
+            if (apps.length) setHasApplied(true);
+            else setHasApplied(false);
+            setIsLoading(false);
         };
         checkApp();
     }, []);
 
     if (isLoading) return <p>is loading...</p>;
+
+    if (hasApplied)
+        return (
+            <div>
+                <p>Thank you for applying!</p>
+                <p>
+                    We will send you an email once your application has been
+                    processed! Thank you for your patience.
+                </p>
+            </div>
+        );
 
     return (
         <div>
