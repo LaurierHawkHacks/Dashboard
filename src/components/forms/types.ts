@@ -6,7 +6,7 @@ import type {
 } from "@/components/types";
 
 export interface HackerApplicationData {
-    major: string;
+    major: string[];
     gender: string;
     pronouns: string[];
     sexuality: string;
@@ -18,6 +18,12 @@ export interface HackerApplicationData {
     hackathonExperience: string;
     programmingLanguages: string[];
     participatingAs: "Hacker" | "Mentor" | "Volunteer";
+    applicantId: string;
+    agreedToHawkHacksCoC: boolean;
+    agreedToWLUCoC: boolean;
+    agreedToMLHCoC: boolean;
+    agreetToMLHToCAndPrivacyPolicy: boolean;
+    agreedToReceiveEmailsFromMLH: boolean;
 }
 
 export type ApplicationData = UserProfile & HackerApplicationData;

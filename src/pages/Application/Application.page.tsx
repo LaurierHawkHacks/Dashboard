@@ -1,6 +1,7 @@
-import { FormEventHandler, useState } from "react";
-import { Navigate } from "react-router-dom";
-import { useAuth } from "@/providers/hooks";
+import { useEffect, useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
+import { z } from "zod";
+import { useAuth, useNotification } from "@/providers/hooks";
 import { routes } from "@/navigation/constants";
 import {
     TextInput,
@@ -18,12 +19,27 @@ import type {
 } from "@/components/forms/types";
 import type { Step } from "@/components/types";
 import { defaultApplication } from "@/components/forms/defaults";
+import {
+    hackerAppFormValidation,
+    profileFormValidation,
+} from "@/components/forms/validations";
+import { getUserApplications, submitApplication } from "@/services/utils";
 
 const defaultSteps: Step[] = [
-    { position: 1, name: "Basic profile", status: "current" },
-    { position: 2, name: "I want to participate as a...", status: "upcoming" },
-    { position: 3, name: "Application", status: "upcoming" },
-    { position: 4, name: "Final checks", status: "upcoming" },
+    { position: 0, name: "Basic profile", status: "current" },
+    { position: 1, name: "I want to participate as a...", status: "upcoming" },
+    { position: 2, name: "Application", status: "upcoming" },
+    { position: 3, name: "Final checks", status: "upcoming" },
+];
+
+const stepValidations = [
+    profileFormValidation,
+    z.object({
+        participatingAs: z
+            .string()
+            .refine((val) => ["Hacker", "Mentor", "Volunteer"].includes(val)),
+    }),
+    hackerAppFormValidation,
 ];
 
 export const ApplicationPage = () => {
@@ -32,19 +48,24 @@ export const ApplicationPage = () => {
     const [activeStep, setActiveStep] = useState(0); // index
     const [errors, setErrors] = useState<string[]>([]);
     const { currentUser, userProfile } = useAuth();
-    // we start with the default user profile
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const { showNotification } = useNotification();
+    const navigate = useNavigate();
 
     if (!currentUser) return <Navigate to={routes.login} />;
 
+    // we start with the default user profile
     const [application, setApplication] = useState<ApplicationData>(() => {
         let app = defaultApplication;
-        if (userProfile) app = { ...app, ...userProfile };
+        if (userProfile)
+            app = { ...app, ...userProfile, applicantId: userProfile.id };
         return app;
     });
 
     const handleChange = (
         name: ApplicationInputKeys,
-        data: string | string[]
+        data: string | string[] | boolean
     ) => {
         // @ts-ignore the "name" key is controlled by the keyof typing, restricts having undefined keys, so disable is ok
         application[name] = data;
@@ -53,11 +74,28 @@ export const ApplicationPage = () => {
 
     const clearErrors = () => setErrors([]);
 
-    const nextStep = () => {
+    const validate = () => {
         clearErrors();
 
+        // allow going back in the final checks step
+        if (activeStep === steps.length - 1) return true;
+
+        // validate step form
+        const validateFn = stepValidations[activeStep];
+
+        const results = validateFn.safeParse(application);
+
+        if (!results.success) {
+            setErrors(results.error.issues.map((i) => i.message));
+            return false;
+        }
+
+        return true;
+    };
+
+    const nextStep = () => {
         if (activeStep < steps.length) {
-            // validate step form
+            if (!validate()) return;
             setSteps((s) => {
                 s[activeStep].status = "complete";
                 s[activeStep + 1].status = "current";
@@ -68,42 +106,89 @@ export const ApplicationPage = () => {
     };
 
     const prevStep = () => {
-        clearErrors();
-
         if (activeStep > 0) {
-            setSteps((s) => {
-                s[activeStep].status = "upcoming";
-                s[activeStep - 1].status = "current";
-                return s;
-            });
+            if (!validate()) return;
             setActiveStep((s) => s - 1);
         }
     };
 
-    const submitApp: FormEventHandler = (e) => {
-        e.preventDefault();
+    const jumpTo = (step: number) => {
+        if (step > -1 && step < steps.length) {
+            if (!validate()) return;
+            setActiveStep(step);
+        }
     };
+
+    const submitApp = async () => {
+        clearErrors();
+
+        const allRequiredChecked =
+            application.agreedToHawkHacksCoC &&
+            application.agreedToWLUCoC &&
+            application.agreedToMLHCoC &&
+            application.agreetToMLHToCAndPrivacyPolicy;
+
+        if (!allRequiredChecked) {
+            setErrors([
+                "Please read and check all the required boxes to proceed.",
+            ]);
+            return;
+        }
+
+        try {
+            setIsSubmitting(true);
+            const id = await submitApplication(application);
+            console.log(id);
+            showNotification({
+                title: "Application Submitted!",
+                message:
+                    "Thank you for applying! You'll received an update from us in your email shortly!",
+            });
+            // redirect to application status mode
+            navigate(routes.applicationStatus);
+        } catch (e) {
+            showNotification({
+                title: "Error Submitting Application",
+                message: "Please retry later.",
+            });
+            console.error(e);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    useEffect(() => {
+        const checkApp = async () => {
+            const apps = await getUserApplications(currentUser.uid);
+            if (apps.length) navigate(routes.applicationStatus);
+            else setIsLoading(false);
+        };
+        checkApp();
+    }, []);
+
+    if (isLoading) return <p>is loading...</p>;
 
     return (
         <div>
             <nav aria-label="Application progress">
-                <Steps steps={steps} />
+                <Steps steps={steps} onClick={jumpTo} />
             </nav>
             {errors.length > 0 ? (
                 <div className="my-8">
                     <ErrorAlert errors={errors} />
                 </div>
             ) : null}
-            <form onSubmit={submitApp} className="mt-12">
+            <h3 className="text-center my-8">
+                All fields with an <span className="font-bold">asterisk</span>{" "}
+                are <span className="font-bold">required</span>.
+            </h3>
+            <form className="mt-12">
                 <div className="">
                     <div
                         className={`mx-auto sm:grid max-w-2xl space-y-8 sm:gap-x-6 sm:gap-y-8 sm:space-y-0 sm:grid-cols-6${
                             activeStep !== 0 ? " hidden sm:hidden" : ""
                         }`}
                     >
-                        <p className="sm:col-span-full">
-                            Make sure the information is correct.
-                        </p>
                         <Profile profile={application} handler={handleChange} />
                     </div>
                     <div
@@ -119,6 +204,7 @@ export const ApplicationPage = () => {
                                 onChange={(opt) =>
                                     handleChange("participatingAs", opt)
                                 }
+                                required
                             />
                         </div>
                     </div>
@@ -168,15 +254,17 @@ export const ApplicationPage = () => {
                             activeStep !== 3 ? " hidden sm:hidden" : ""
                         }`}
                     >
-                        <div className="sm:col-span-full">
-                            <h3>
-                                All checkboxes with an{" "}
-                                <span className="font-bold">asterisk</span> are{" "}
-                                <span className="font-bold">required</span>.
-                            </h3>
-                        </div>
                         <div className="sm:col-span-full flex items-start gap-x-2">
-                            <input type="checkbox" required name="check-1" />
+                            <input
+                                type="checkbox"
+                                checked={application.agreedToHawkHacksCoC}
+                                onChange={(e) =>
+                                    handleChange(
+                                        "agreedToHawkHacksCoC",
+                                        e.target.checked
+                                    )
+                                }
+                            />
                             <p>
                                 {
                                     "* I have read and agree to the HawkHacks Code of Conduct."
@@ -187,7 +275,16 @@ export const ApplicationPage = () => {
                             </p>
                         </div>
                         <div className="sm:col-span-full flex items-start gap-x-2">
-                            <input type="checkbox" required name="check-2" />
+                            <input
+                                type="checkbox"
+                                checked={application.agreedToWLUCoC}
+                                onChange={(e) =>
+                                    handleChange(
+                                        "agreedToWLUCoC",
+                                        e.target.checked
+                                    )
+                                }
+                            />
                             <p>
                                 {
                                     "* I have read and agree to abide by the Wilfrid Laurier University Code of Conduct during the hackathon."
@@ -198,7 +295,16 @@ export const ApplicationPage = () => {
                             </p>
                         </div>
                         <div className="sm:col-span-full flex items-start gap-x-2">
-                            <input type="checkbox" required name="check-3" />
+                            <input
+                                type="checkbox"
+                                checked={application.agreedToMLHCoC}
+                                onChange={(e) =>
+                                    handleChange(
+                                        "agreedToMLHCoC",
+                                        e.target.checked
+                                    )
+                                }
+                            />
                             <p>
                                 * I have read and agree to the
                                 <a
@@ -212,7 +318,18 @@ export const ApplicationPage = () => {
                             </p>
                         </div>
                         <div className="sm:col-span-full flex items-start gap-x-2">
-                            <input type="checkbox" required name="check-4" />
+                            <input
+                                type="checkbox"
+                                checked={
+                                    application.agreetToMLHToCAndPrivacyPolicy
+                                }
+                                onChange={(e) =>
+                                    handleChange(
+                                        "agreetToMLHToCAndPrivacyPolicy",
+                                        e.target.checked
+                                    )
+                                }
+                            />
                             <p>
                                 * I authorize you to share my
                                 application/registration information with Major
@@ -237,7 +354,18 @@ export const ApplicationPage = () => {
                             </p>
                         </div>
                         <div className="sm:col-span-full flex items-start gap-x-2">
-                            <input type="checkbox" name="check-5" />
+                            <input
+                                type="checkbox"
+                                checked={
+                                    application.agreedToReceiveEmailsFromMLH
+                                }
+                                onChange={(e) =>
+                                    handleChange(
+                                        "agreedToReceiveEmailsFromMLH",
+                                        e.target.checked
+                                    )
+                                }
+                            />
                             <p>
                                 I authorize MLH to send me occasional emails
                                 about relevant events, career opportunities, and
@@ -249,20 +377,21 @@ export const ApplicationPage = () => {
                 {/* just a separator line */}
                 <div className="h-0.5 bg-gray-300 my-6"></div>
                 <div className="flex items-center justify-between px-4 py-4 sm:px-8">
-                    <Button disabled={activeStep === 0} onClick={prevStep}>
+                    <Button
+                        disabled={activeStep === 0 || isSubmitting}
+                        onClick={prevStep}
+                        type="button"
+                    >
                         Back
                     </Button>
                     <Button
-                        type={
-                            activeStep === steps.length - 1
-                                ? "submit"
-                                : "button"
-                        }
+                        type="button"
                         onClick={
                             activeStep === steps.length - 1
-                                ? console.log
+                                ? submitApp
                                 : nextStep
                         }
+                        disabled={isSubmitting}
                     >
                         {activeStep === steps.length - 1 ? "Submit" : "Next"}
                     </Button>

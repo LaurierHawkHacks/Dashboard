@@ -1,26 +1,8 @@
-import { z } from "zod";
 import { TextInput, Select } from "@components";
 import { ages, countryCodes, schools, levelsOfStudy } from "@data";
 
 import type { UserProfile } from "@/services/utils/types";
 import type { ApplicationInputKeys } from "@/components/forms/types";
-
-export const formValidationSchema = z.object({
-    firstName: z
-        .string()
-        .min(1, "First name must contain at least 1 character(s)"),
-    lastName: z
-        .string()
-        .min(1, "Last name must contain at least 1 character(s)"),
-    email: z.string().email(),
-    countryOfResidence: z.string().length(2),
-    emailVerified: z.boolean(),
-    phone: z.string().min(1, "Phone number is empty"),
-    school: z.string().min(1, "School is empty"),
-    levelOfStudy: z.string().min(1, "Level of study is empty"),
-    age: z.number().min(13, "Age must be 13+"),
-    discord: z.string().min(1, "Discord username is empty"),
-});
 
 export const Profile = ({
     profile,
@@ -63,7 +45,7 @@ export const Profile = ({
                     options={ages}
                     initialValue={profile.age}
                     onChange={(opt) => handler("age", opt)}
-                    name="age"
+                    required
                 />
             </div>
 
@@ -73,7 +55,7 @@ export const Profile = ({
                     options={countryCodes}
                     initialValue={profile.countryOfResidence}
                     onChange={(opt) => handler("countryOfResidence", opt)}
-                    name="country"
+                    required
                 />
             </div>
 
@@ -107,6 +89,7 @@ export const Profile = ({
                     options={schools}
                     initialValue={profile.school}
                     onChange={(opt) => handler("school", opt)}
+                    required
                 />
             </div>
             <div className="col-span-3">
@@ -115,6 +98,7 @@ export const Profile = ({
                     options={levelsOfStudy}
                     initialValue={profile.levelOfStudy}
                     onChange={(opt) => handler("levelOfStudy", opt)}
+                    required
                 />
             </div>
 
@@ -125,6 +109,7 @@ export const Profile = ({
                     placeholder="@username or username#1234"
                     value={profile.discord}
                     onChange={(e) => handler("discord", e.target.value)}
+                    required
                 />
             </div>
         </>

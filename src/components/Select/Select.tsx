@@ -10,6 +10,8 @@ export interface SelectProps {
     name?: string;
     srLabelOnly?: boolean;
     allowCustomValue?: boolean;
+    disabled?: boolean;
+    required?: boolean;
     onChange?: (opt: string) => void;
 }
 
@@ -19,7 +21,9 @@ export const Select: FC<SelectProps> = ({
     initialValue,
     srLabelOnly = false,
     allowCustomValue = false,
+    disabled,
     name,
+    required,
     onChange,
 }) => {
     const [selected, setSelected] = useState<string>(initialValue);
@@ -45,6 +49,7 @@ export const Select: FC<SelectProps> = ({
             name={name}
             value={selected}
             onChange={onChange ? handleChange : undefined}
+            disabled={disabled}
         >
             <div className="relative">
                 <Combobox.Label
@@ -53,6 +58,9 @@ export const Select: FC<SelectProps> = ({
                     }`}
                 >
                     {label}
+                    {required ? (
+                        <span className="text-red-600 ml-1">*</span>
+                    ) : null}
                 </Combobox.Label>
                 <div className="relative w-full mt-2 cursor-default overflow-hidden bg-gray-50 text-left border border-charcoalBlack">
                     <Combobox.Input

@@ -55,6 +55,7 @@ export const diets = [
 ];
 
 export const allergies = [
+    "None",
     "Milk",
     "Egg",
     "Peanuts",

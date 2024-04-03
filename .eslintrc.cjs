@@ -33,7 +33,7 @@ module.exports = {
     rules: {
         indent: "off",
         "linebreak-style": ["error", "unix"],
-        quotes: ["error", "double"],
+        quotes: ["off"],
         semi: ["error", "always"],
         "react/react-in-jsx-scope": "off",
         "react/prop-types": "off",

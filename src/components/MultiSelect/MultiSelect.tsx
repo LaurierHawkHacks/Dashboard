@@ -61,6 +61,7 @@ export interface MultiSelectProps {
     allowCustomValue?: boolean;
     name?: string;
     disabled?: boolean;
+    required?: boolean;
     onChange?: (opts: string[]) => void;
 }
 
@@ -72,6 +73,7 @@ export const MultiSelect: FC<MultiSelectProps> = ({
     allowCustomValue = false,
     name,
     disabled,
+    required,
     onChange,
 }) => {
     const [selected, setSelected] = useState<string[]>(initialValues);
@@ -107,6 +109,9 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                     }`}
                 >
                     {label}
+                    {required ? (
+                        <span className="text-red-600 ml-1">*</span>
+                    ) : null}
                 </Combobox.Label>
                 {selected.length > 0 && (
                     <SelectedList

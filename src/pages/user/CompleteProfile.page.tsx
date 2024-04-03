@@ -4,7 +4,8 @@ import { ErrorAlert } from "@components";
 import { createUserProfile } from "@/services/utils";
 import { useAuth, useNotification } from "@/providers/hooks";
 import { routes } from "@/navigation/constants";
-import { Profile, formValidationSchema } from "@/components/forms/Profile";
+import { Profile } from "@/components/forms/Profile";
+import { profileFormValidation } from "@/components/forms/validations";
 import { defaultProfile } from "@/components/forms/defaults";
 import type { UserProfile } from "@/services/utils/types";
 
@@ -32,7 +33,7 @@ export const CompleteProfilePage = () => {
     const handleSubmit: FormEventHandler = async (e) => {
         e.preventDefault();
         if (!controlledProfile.id) return;
-        const results = await formValidationSchema.spa(controlledProfile);
+        const results = await profileFormValidation.spa(controlledProfile);
 
         if (results.success) {
             await createUserProfile(controlledProfile);

@@ -7,6 +7,7 @@ import {
     VerifyEmailPage,
     CompleteProfilePage,
     ApplicationPage,
+    ApplicationStatusPage,
 } from "@pages";
 import { ProtectedRoutes } from "@/navigation";
 
@@ -22,6 +23,7 @@ export const routes = {
     networking: "/networking",
     ticket: "/ticket",
     application: "/application",
+    applicationStatus: "/application-status",
 };
 
 interface Title {
@@ -58,6 +60,10 @@ export const titles: Record<string, Title> = {
         main: "Verify Your Email",
         sub: "Please check your email inbox.",
     },
+    [routes.applicationStatus]: {
+        main: "Application Status",
+        sub: "Here you can check your application status",
+    },
 };
 
 export const Router = () => (
@@ -80,6 +86,10 @@ export const Router = () => (
                 <Route
                     path={routes.application}
                     element={<ApplicationPage />}
+                />
+                <Route
+                    path={routes.applicationStatus}
+                    element={<ApplicationStatusPage />}
                 />
             </Route>
 

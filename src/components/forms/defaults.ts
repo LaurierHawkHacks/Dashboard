@@ -19,11 +19,11 @@ export const defaultProfile: UserProfile = {
 };
 
 export const defaultHackerApp: HackerApplicationData = {
-    major: "",
-    gender: "",
+    major: [],
+    gender: "Prefer not to answer",
     pronouns: [],
-    sexuality: "",
-    race: "",
+    sexuality: "Prefer not to answer",
+    race: "Prefer not to answer",
     diets: [],
     allergies: [],
     shirtSizes: [],
@@ -31,6 +31,12 @@ export const defaultHackerApp: HackerApplicationData = {
     hackathonExperience: "1",
     programmingLanguages: [],
     participatingAs: "Hacker",
+    applicantId: "",
+    agreedToMLHCoC: false,
+    agreedToWLUCoC: false,
+    agreedToHawkHacksCoC: false,
+    agreedToReceiveEmailsFromMLH: false,
+    agreetToMLHToCAndPrivacyPolicy: false,
 };
 
 export const defaultApplication: ApplicationData = {
