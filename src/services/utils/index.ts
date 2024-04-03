@@ -1,28 +1,9 @@
 import { addDoc, collection, doc, getDoc, setDoc } from "firebase/firestore";
-import { firestore } from "@services";
+import { firestore } from "@/services/firebase";
+import type { UserTicketData, UserProfile } from "@/services/utils/types";
 
 export const TICKETS_COLLECTION = "tickets";
 export const USERS_COLLECTION = "users";
-
-export interface UserTicketData {
-    userId: string;
-    firstName: string;
-    lastName: string;
-}
-
-export interface UserProfile {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    emailVerified: boolean;
-    phone: string;
-    school: string;
-    levelOfStudy: string;
-    countryOfResidence: string;
-    age: string;
-    discord: string;
-}
 
 /**
  * Creates a new ticket entry in the collection 'tickets'.

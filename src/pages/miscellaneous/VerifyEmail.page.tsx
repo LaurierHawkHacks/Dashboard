@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { sendEmailVerification } from "firebase/auth";
 import { Navigate } from "react-router-dom";
-import { auth } from "@services";
+import { auth } from "@/services/firebase";
 import { useAuth } from "@providers";
 import { Button } from "@components";
 import { routes } from "@/navigation/constants";

@@ -1,7 +1,9 @@
-import type { UserProfile } from "@services/utils";
-import type { TextInputProps } from "../TextInput/TextInput";
-import type { SelectProps } from "../Select/Select";
-import type { MultiSelectProps } from "../MultiSelect/MultiSelect";
+import type { UserProfile } from "@/services/utils/types";
+import type {
+    TextInputProps,
+    SelectProps,
+    MultiSelectProps,
+} from "@/components/types";
 
 export interface HackerApplicationData {
     major: string;

@@ -1,5 +1,8 @@
-import type { UserProfile } from "@services/utils";
-import type { HackerApplicationData, ApplicationData } from "./types";
+import type { UserProfile } from "@/services/utils/types";
+import type {
+    HackerApplicationData,
+    ApplicationData,
+} from "@/components/forms/types";
 
 export const defaultProfile: UserProfile = {
     id: "",

@@ -11,13 +11,13 @@ import {
     GoogleAuthProvider,
     OAuthProvider,
 } from "firebase/auth";
+import { auth } from "@/services/firebase";
+import { useNotification } from "@/providers/notification.provider";
+import { getUserProfile } from "@/services/utils";
+
 import type { User, AuthProvider as FirebaseAuthProvider } from "firebase/auth";
-import { auth } from "@services";
-import {
-    useNotification,
-    type NotificationOptions,
-} from "./notification.provider";
-import { type UserProfile, getUserProfile } from "@services/utils";
+import type { UserProfile } from "@/services/utils/types";
+import type { NotificationOptions } from "@/providers/types";
 
 export interface UserWithRole extends User {
     hawkAdmin: boolean;

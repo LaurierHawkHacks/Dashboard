@@ -1,8 +1,9 @@
 import { z } from "zod";
-import { UserProfile } from "@services/utils";
-import { ApplicationInputKeys } from "./types";
 import { TextInput, Select } from "@components";
 import { ages, countryCodes, schools, levelsOfStudy } from "@data";
+
+import type { UserProfile } from "@/services/utils/types";
+import type { ApplicationInputKeys } from "@/components/forms/types";
 
 export const formValidationSchema = z.object({
     firstName: z
