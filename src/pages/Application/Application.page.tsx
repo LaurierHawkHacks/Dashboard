@@ -1,6 +1,6 @@
 import { FormEventHandler, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { useAuth } from "@providers";
+import { useAuth } from "@/providers/hooks";
 import { routes } from "@/navigation/constants";
 import {
     TextInput,
@@ -8,15 +8,16 @@ import {
     Button,
     ErrorAlert,
     MultiSelect,
+    Steps,
 } from "@components";
-import { Steps, Step } from "../../components/Steps/Steps";
-import { Profile } from "../../components/forms/Profile";
-import { hackerAppFormInputs } from "../../components/forms/hackerApplication";
+import { Profile } from "@/components/forms/Profile";
+import { hackerAppFormInputs } from "@/components/forms/hackerApplication";
 import type {
     ApplicationInputKeys,
     ApplicationData,
-} from "../../components/forms/types";
-import { defaultApplication } from "../../components/forms/defaults";
+} from "@/components/forms/types";
+import type { Step } from "@/components/types";
+import { defaultApplication } from "@/components/forms/defaults";
 
 const defaultSteps: Step[] = [
     { position: 1, name: "Basic profile", status: "current" },

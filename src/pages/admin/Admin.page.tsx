@@ -1,5 +1,5 @@
 import { Button } from "@components";
-import { useAuth } from "@providers";
+import { useAuth } from "@/providers/hooks";
 
 export const AdminPage = () => {
     const { logout } = useAuth();

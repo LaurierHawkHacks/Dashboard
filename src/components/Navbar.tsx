@@ -4,7 +4,7 @@ import { TiGroup } from "react-icons/ti";
 import { PiIdentificationBadgeFill } from "react-icons/pi";
 import { FiLogOut } from "react-icons/fi";
 import { useState, useEffect } from "react";
-import { useAuth } from "@providers";
+import { useAuth } from "@/providers/hooks";
 import Hamburger from "hamburger-react";
 import { Link } from "react-router-dom";
 
@@ -83,11 +83,13 @@ export const Navbar = () => {
                         </div>
                     </nav>
 
-                        <div
-                            className={`fixed right-0 top-0 z-40 h-full w-full max-w-[12.5rem] p-10 py-24 bg-gray-200 backdrop-blur-xl transition-all duration-300 ease-in-out ${
-                                isMobileMenuOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
-                            }`}
-                        >
+                    <div
+                        className={`fixed right-0 top-0 z-40 h-full w-full max-w-[12.5rem] p-10 py-24 bg-gray-200 backdrop-blur-xl transition-all duration-300 ease-in-out ${
+                            isMobileMenuOpen
+                                ? "translate-x-0 opacity-100"
+                                : "translate-x-full opacity-0"
+                        }`}
+                    >
                         <ul className="flex flex-col items-start justify-start gap-4">
                             {renderNavItems(true)}
                         </ul>

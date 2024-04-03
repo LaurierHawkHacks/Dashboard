@@ -1,5 +1,5 @@
 import { Outlet, Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "@providers";
+import { useAuth } from "@/providers/hooks";
 import { routes } from "@/navigation/constants";
 import { PageWrapper } from "@components";
 

@@ -52,3 +52,10 @@ export { PageWrapper } from "./PageWrapper/PageWrapper";
  *
  */
 export { Navbar } from "./Navbar";
+
+/*
+ *
+ * @component Steps
+ *
+ */
+export { Steps } from "./Steps/Steps";

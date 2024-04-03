@@ -2,7 +2,7 @@ import { FormEventHandler, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { ErrorAlert } from "@components";
 import { createUserProfile } from "@/services/utils";
-import { useAuth, useNotification } from "@providers";
+import { useAuth, useNotification } from "@/providers/hooks";
 import { routes } from "@/navigation/constants";
 import { Profile, formValidationSchema } from "@/components/forms/Profile";
 import { defaultProfile } from "@/components/forms/defaults";

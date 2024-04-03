@@ -11,3 +11,4 @@ export type {
 export type { ErrorAlertProps } from "./ErrorAlert/ErrorAlert";
 export type { SelectProps } from "./Select/Select";
 export type { MultiSelectProps } from "./MultiSelect/MultiSelect";
+export type { Step, StepProps } from "./Steps/Steps";

@@ -4,11 +4,11 @@
  *
  */
 
-export { AuthProvider, useAuth } from "./auth.provider";
+export { AuthProvider } from "./auth.provider";
 
 /*
  *
  * @provider NotificationProvider
  *
  */
-export { NotificationProvider, useNotification } from "./notification.provider";
+export { NotificationProvider } from "./notification.provider";

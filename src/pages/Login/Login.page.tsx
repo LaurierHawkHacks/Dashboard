@@ -3,7 +3,7 @@ import { flushSync } from "react-dom";
 import { z } from "zod";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { Button, TextInput } from "@components";
-import { useAuth } from "@providers";
+import { useAuth } from "@/providers/hooks";
 import type { ProviderName } from "@/providers/types";
 import { routes } from "@/navigation/constants";
 import { GithubLogo, GoogleLogo, AppleLogo } from "@assets";
