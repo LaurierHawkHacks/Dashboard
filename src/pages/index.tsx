@@ -5,4 +5,3 @@ export { LoginPage } from "./Login/Login.page";
 export { NotFoundPage } from "./NotFound/NotFound.page";
 export { VerifyEmailPage } from "./miscellaneous/VerifyEmail.page";
 export { ApplicationPage } from "./Application/Application.page";
-export { ApplicationStatusPage } from "./Application/ApplicationStatus.page";

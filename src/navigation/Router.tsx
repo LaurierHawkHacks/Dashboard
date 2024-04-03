@@ -7,7 +7,6 @@ import {
     VerifyEmailPage,
     CompleteProfilePage,
     ApplicationPage,
-    ApplicationStatusPage,
 } from "@pages";
 import { ProtectedRoutes } from "@/navigation";
 
