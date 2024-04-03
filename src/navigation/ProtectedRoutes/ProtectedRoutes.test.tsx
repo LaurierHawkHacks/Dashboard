@@ -1,6 +1,8 @@
 import { screen } from "@testing-library/react";
 import { Routes, Route, Link } from "react-router-dom";
-import { ProtectedRoutes, renderWithRouter, routes } from "@utils";
+import { ProtectedRoutes } from "@/navigation";
+import { routes } from "@/navigation/constants";
+import { renderWithRouter } from "@/utils/testUtils";
 import { mockUseAuth } from "@mocks/providers";
 
 vi.mock("@providers");

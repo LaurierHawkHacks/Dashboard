@@ -1,6 +1,6 @@
 import { Outlet, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@providers";
-import { routes } from "@utils";
+import { routes } from "@/navigation/constants";
 import { PageWrapper } from "@components";
 
 export interface ProtectedRoutesProps {

@@ -5,7 +5,6 @@
  */
 
 export { AuthProvider, useAuth } from "./auth.provider";
-export type { ProviderName } from "./auth.provider";
 
 /*
  *

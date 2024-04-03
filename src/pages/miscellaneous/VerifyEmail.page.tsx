@@ -4,7 +4,7 @@ import { Navigate } from "react-router-dom";
 import { auth } from "@services";
 import { useAuth } from "@providers";
 import { Button } from "@components";
-import { routes } from "@utils";
+import { routes } from "@/navigation/constants";
 
 export const VerifyEmailPage = () => {
     // 60 seconds timeout before the user can send the next email verification

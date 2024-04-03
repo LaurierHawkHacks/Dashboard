@@ -4,10 +4,6 @@
  *
  */
 export { Button } from "./Button/Button";
-export {
-    getButtonStyles,
-    type ButtonStylesProps,
-} from "./Button/Button.styles";
 
 /*
  *
@@ -22,10 +18,6 @@ export { TextInput } from "./TextInput/TextInput";
  *
  */
 export { Notification } from "./Notification/Notification";
-export type {
-    NotificationProps,
-    NotificationData,
-} from "./Notification/Notification";
 
 /*
  *
@@ -33,7 +25,6 @@ export type {
  *
  */
 export { ErrorAlert } from "./ErrorAlert/ErrorAlert";
-export type { ErrorAlertProps } from "./ErrorAlert/ErrorAlert";
 
 /*
  *
@@ -41,14 +32,12 @@ export type { ErrorAlertProps } from "./ErrorAlert/ErrorAlert";
  *
  */
 export { Select } from "./Select/Select";
-export type { SelectProps } from "./Select/Select";
 
 /*
  *
  * @component MultiSelect
  *
  */
-export type { MultiSelectProps } from "./MultiSelect/MultiSelect";
 export { MultiSelect } from "./MultiSelect/MultiSelect";
 
 /*
@@ -63,10 +52,3 @@ export { PageWrapper } from "./PageWrapper/PageWrapper";
  *
  */
 export { Navbar } from "./Navbar";
-
-/*
- *
- * @component common values such as common props
- *
- */
-export type { ComponentProps } from "./types";

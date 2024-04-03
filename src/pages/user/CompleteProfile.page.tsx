@@ -3,7 +3,7 @@ import { Navigate } from "react-router-dom";
 import { ErrorAlert } from "@components";
 import { type UserProfile, createUserProfile } from "@services/utils";
 import { useAuth, useNotification } from "@providers";
-import { routes } from "@utils";
+import { routes } from "@/navigation/constants";
 import { Profile, formValidationSchema } from "../../components/forms/Profile";
 import { defaultProfile } from "../../components/forms/defaults";
 

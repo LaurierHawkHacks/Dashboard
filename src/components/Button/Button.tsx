@@ -1,9 +1,5 @@
-import { getButtonStyles } from "@components";
-
-import type { ButtonStylesProps } from "@components";
-
-type ButtonProps = ButtonStylesProps &
-    React.ButtonHTMLAttributes<HTMLButtonElement>;
+import { getButtonStyles } from "./Button.styles";
+import type { ButtonProps } from "./Button.type";
 
 export const Button: React.FC<ButtonProps> = ({
     children,

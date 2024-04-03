@@ -4,8 +4,8 @@ import { z } from "zod";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { Button, TextInput } from "@components";
 import { useAuth } from "@providers";
-import type { ProviderName } from "@providers";
-import { routes } from "@utils";
+import type { ProviderName } from "@/providers/types";
+import { routes } from "@/navigation/constants";
 import { GithubLogo, GoogleLogo, AppleLogo } from "@assets";
 
 // email validation with zod, double guard just in case someone changes the input type in html
@@ -214,7 +214,9 @@ export const LoginPage = () => {
                                 </form>
                                 <p className="mt-6 text-center text-charcoalBlack font-medium">
                                     <span>
-                                        {isLogin ? "Don't have an account? " : "Already have an account? "}
+                                        {isLogin
+                                            ? "Don't have an account? "
+                                            : "Already have an account? "}
                                     </span>
                                     <button
                                         className="text-charcoalBlack font-bold underline hover:text-tbrand-hover"

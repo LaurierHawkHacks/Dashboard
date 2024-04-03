@@ -1,7 +1,7 @@
 import { FormEventHandler, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@providers";
-import { routes } from "@utils";
+import { routes } from "@/navigation/constants";
 import {
     TextInput,
     Select,

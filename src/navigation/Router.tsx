@@ -8,7 +8,7 @@ import {
     CompleteProfilePage,
     ApplicationPage,
 } from "@pages";
-import { ProtectedRoutes } from "@utils";
+import { ProtectedRoutes } from "@/navigation";
 
 export const routes = {
     admin: "/admin",
