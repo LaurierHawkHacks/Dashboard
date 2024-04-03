@@ -41,7 +41,11 @@ export const Select: FC<SelectProps> = ({
               });
 
     return (
-        <Combobox name={name} value={selected} onChange={handleChange}>
+        <Combobox
+            name={name}
+            value={selected}
+            onChange={onChange ? handleChange : undefined}
+        >
             <div className="relative">
                 <Combobox.Label
                     className={`block font-medium leading-6 text-charcoalBlack text-md${

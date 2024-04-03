@@ -14,12 +14,12 @@ const SelectedList: FC<{
     onDelete: (option: string) => void;
 }> = ({ options, onDelete }) => {
     return (
-        <div className="my-4 space-x-2">
+        <div className="my-4 space-x-2 space-y-2">
             {options.length > 0 &&
                 options.map((sel) => (
                     <span
                         key={`${sel}-selected`}
-                        className="inline-flex bg-gray-50 gap-2 px-2 py-2 border border-charcoalBlack"
+                        className="inline-flex bg-gray-50 first:ml-2 gap-2 px-2 py-2 border border-charcoalBlack"
                     >
                         {sel}
                         <button
@@ -60,6 +60,7 @@ export interface MultiSelectProps {
     srLabelOnly?: boolean;
     allowCustomValue?: boolean;
     name?: string;
+    disabled?: boolean;
     onChange?: (opts: string[]) => void;
 }
 
@@ -70,6 +71,7 @@ export const MultiSelect: FC<MultiSelectProps> = ({
     srLabelOnly = false,
     allowCustomValue = false,
     name,
+    disabled,
     onChange,
 }) => {
     const [selected, setSelected] = useState<string[]>(initialValues);
@@ -91,7 +93,13 @@ export const MultiSelect: FC<MultiSelectProps> = ({
               });
 
     return (
-        <Combobox name={name} value={selected} onChange={handleChange} multiple>
+        <Combobox
+            disabled={disabled}
+            name={name}
+            value={selected}
+            onChange={handleChange}
+            multiple
+        >
             <div className="relative">
                 <Combobox.Label
                     className={`block font-medium leading-6 text-charcoalBlack text-md${

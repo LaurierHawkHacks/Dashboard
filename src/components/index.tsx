@@ -69,10 +69,4 @@ export { Navbar } from "./Navbar";
  * @component common values such as common props
  *
  */
-export type { ComponentProps } from "./common";
-
-/*
- * @component Forms
- *
- */
-export { ProfileForm } from "./forms/ProfileForm";
+export type { ComponentProps } from "./types";
