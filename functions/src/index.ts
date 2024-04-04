@@ -59,9 +59,10 @@ export const addAdminRole = functions.https.onCall((data, context) => {
  * Calls the REST API with octokit to get all the emails the user
  * has with github and match it with the email we have with firebase auth
  *
- * Sends back the email payload that was matched,
  * refer the link below for more information
  * https://docs.github.com/en/rest/users/emails?apiVersion=2022-11-28#list-email-addresses-for-the-authenticated-user
+ *
+ * Sends back true/false of verification status
  */
 export const verifyGitHubEmail = functions.https.onCall(
     async (data, context) => {
