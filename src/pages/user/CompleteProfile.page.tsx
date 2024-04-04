@@ -1,6 +1,6 @@
 import { FormEventHandler, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { ErrorAlert } from "@components";
+import { ErrorAlert, Button } from "@components";
 import { createUserProfile } from "@/services/utils";
 import { useAuth, useNotification } from "@/providers/hooks";
 import { routes } from "@/navigation/constants";
@@ -13,14 +13,18 @@ import type { UserProfile } from "@/services/utils/types";
 
 export const CompleteProfilePage = () => {
     const { currentUser, userProfile, refreshProfile } = useAuth();
-    const [errors, setErrors] = useState<string[]>([]);
-    const { showNotification } = useNotification();
-    const [controlledProfile, setControlledProfile] =
-        useState<UserProfile>(defaultProfile);
 
     if (!currentUser) return null;
 
     if (userProfile) return <Navigate to={routes.profile} />;
+
+    const [errors, setErrors] = useState<string[]>([]);
+    const { showNotification } = useNotification();
+    const [controlledProfile, setControlledProfile] = useState<UserProfile>({
+        ...defaultProfile,
+        id: currentUser.uid,
+        email: currentUser.email ?? "",
+    });
 
     const handleChange = (name: keyof UserProfile, data: string | string[]) => {
         // @ts-ignore
@@ -59,13 +63,18 @@ export const CompleteProfilePage = () => {
                     </div>
                 )}
                 <form onSubmit={handleSubmit}>
-                    <div className="sm:grid max-w-2xl space-y-8 sm:gap-x-6 sm:gap-y-8 sm:space-y-0 sm:grid-cols-6">
+                    <div className="sm:grid space-y-8 sm:gap-x-6 sm:gap-y-8 sm:space-y-0 sm:grid-cols-6">
                         <Profile
                             profile={controlledProfile}
                             handler={(name, data) =>
                                 handleChange(name as keyof UserProfile, data)
                             }
                         />
+                    </div>
+                    {/* just a separator line */}
+                    <div className="h-0.5 bg-gray-300 my-6"></div>
+                    <div className="flex items-center justify-end">
+                        <Button type="submit">Save</Button>
                     </div>
                 </form>
             </div>

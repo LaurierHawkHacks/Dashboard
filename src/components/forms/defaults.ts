@@ -9,7 +9,7 @@ export const defaultProfile: UserProfile = {
     firstName: "",
     lastName: "",
     email: "",
-    emailVerified: false,
+    emailVerified: true,
     phone: "",
     school: "Wilfrid Laurier University",
     levelOfStudy: "Undergraduate University (3+ years)",
