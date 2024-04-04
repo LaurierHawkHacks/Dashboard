@@ -39,7 +39,7 @@ export const Steps: FC<StepProps> = ({ steps, onClick }) => {
                             className="w-full flex flex-col border-l-4 border-gray-200 py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4"
                         >
                             <span className="text-left text-sm font-medium text-gray-500">
-                                {`Step ${step.position}`}
+                                {`Step ${step.position + 1}`}
                             </span>
                             <span className="text-left text-sm font-medium">
                                 {step.name}
