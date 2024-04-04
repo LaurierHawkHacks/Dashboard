@@ -7,7 +7,6 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/providers/hooks";
 import Hamburger from "hamburger-react";
 import { Link } from "react-router-dom";
-import { getUserApplications } from "@/services/utils";
 
 const navItems = [
     { path: "/profile", label: "Home", Icon: GoHome },
@@ -23,7 +22,7 @@ export const Navbar = () => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [showAllNavItems, setShowAllNavItems] = useState(false);
-    const { currentUser } = useAuth();
+    const { userApp } = useAuth();
 
     const updateNavbarState = () => {
         setIsMobile(window.innerWidth <= 768);
@@ -37,19 +36,9 @@ export const Navbar = () => {
     }, []);
 
     useEffect(() => {
-        const checkApp = async () => {
-            if (!currentUser) return;
-
-            const apps = await getUserApplications(currentUser.uid);
-
-            const currentApp = apps[0];
-
-            if (currentApp && currentApp.applicationStatus === "accpeted") {
-                setShowAllNavItems(true);
-            }
-        };
-        checkApp();
-    });
+        if (userApp && userApp.applicationStatus === "accepted")
+            setShowAllNavItems(true);
+    }, [userApp]);
 
     const renderNavItems = (isMobile: boolean) => {
         if (showAllNavItems) {

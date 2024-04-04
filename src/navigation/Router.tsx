@@ -9,6 +9,9 @@ import {
     ApplicationPage,
 } from "@pages";
 import { ProtectedRoutes } from "@/navigation";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/providers/auth.provider";
+import { LoadingAnimation } from "@/components";
 
 export const routes = {
     admin: "/admin",
@@ -60,36 +63,63 @@ export const titles: Record<string, Title> = {
     },
 };
 
-export const Router = () => (
-    <BrowserRouter>
-        <Routes>
-            <Route path={routes.login} element={<LoginPage />} />
+export const Router = () => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [availableRoutes, setAvailableRoutes] = useState<
+        { path: string; element: JSX.Element }[]
+    >([
+        { path: routes.application, element: <ApplicationPage /> },
+        { path: routes.verifyEmail, element: <VerifyEmailPage /> },
+        { path: routes.completeProfile, element: <CompleteProfilePage /> },
+    ]);
+    const { userApp } = useAuth();
 
-            {/* User Routes */}
-            <Route path={routes.portal} element={<ProtectedRoutes />}>
-                <Route index path={routes.portal} element={<UserPage />} />
-                <Route index path={routes.profile} element={<UserPage />} />
-                <Route
-                    path={routes.verifyEmail}
-                    element={<VerifyEmailPage />}
-                />
-                <Route
-                    path={routes.completeProfile}
-                    element={<CompleteProfilePage />}
-                />
-                <Route
-                    path={routes.application}
-                    element={<ApplicationPage />}
-                />
-            </Route>
+    useEffect(() => {
+        if (userApp === undefined) return;
 
-            {/* Admin Routes */}
-            <Route path={routes.admin} element={<ProtectedRoutes adminOnly />}>
-                <Route path="" element={<AdminPage />} />
-            </Route>
+        if (userApp && userApp.applicationStatus === "accepted") {
+            setAvailableRoutes([
+                {
+                    path: routes.networking,
+                    element: <div>network</div>,
+                },
+                {
+                    path: routes.schedule,
+                    element: <div>schedule</div>,
+                },
+            ]);
+        }
 
-            {/* Catch-all route for 404 Page Not Found */}
-            <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-    </BrowserRouter>
-);
+        setTimeout(() => setIsLoading(false), 1500);
+    }, [userApp]);
+
+    if (isLoading) return <LoadingAnimation />;
+
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route path={routes.login} element={<LoginPage />} />
+
+                {/* User Routes */}
+                <Route path={routes.portal} element={<ProtectedRoutes />}>
+                    <Route index path={routes.portal} element={<UserPage />} />
+                    <Route index path={routes.profile} element={<UserPage />} />
+                    {availableRoutes.map((r) => (
+                        <Route key={r.path} path={r.path} element={r.element} />
+                    ))}
+                </Route>
+
+                {/* Admin Routes */}
+                <Route
+                    path={routes.admin}
+                    element={<ProtectedRoutes adminOnly />}
+                >
+                    <Route path="" element={<AdminPage />} />
+                </Route>
+
+                {/* Catch-all route for 404 Page Not Found */}
+                <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+        </BrowserRouter>
+    );
+};

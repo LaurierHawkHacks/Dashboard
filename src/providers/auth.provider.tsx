@@ -13,11 +13,12 @@ import {
 } from "firebase/auth";
 import { auth } from "@/services/firebase";
 import { useNotification } from "@/providers/notification.provider";
-import { getUserProfile } from "@/services/utils";
+import { getUserApplications, getUserProfile } from "@/services/utils";
 
 import type { User, AuthProvider as FirebaseAuthProvider } from "firebase/auth";
 import type { UserProfile } from "@/services/utils/types";
 import type { NotificationOptions } from "@/providers/types";
+import type { ApplicationData } from "@/components/forms/types";
 
 export interface UserWithRole extends User {
     hawkAdmin: boolean;
@@ -30,6 +31,7 @@ export type AuthMethod = "none" | "credentials" | ProviderName;
 export type AuthContextValue = {
     currentUser: UserWithRole | null;
     userProfile: UserProfile | null;
+    userApp: ApplicationData | null | undefined;
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
     createAccount: (email: string, password: string) => Promise<void>;
@@ -42,6 +44,7 @@ export type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue>({
     currentUser: null,
     userProfile: null,
+    userApp: null,
     login: async () => {},
     logout: async () => {},
     createAccount: async () => {},
@@ -108,16 +111,22 @@ function getNotificationByAuthErrCode(code: string): NotificationOptions {
 export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<UserWithRole | null>(null);
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+    // use undefined to know its at initial state (just mounted) and null if there is no application
+    const [userApp, setUserApp] = useState<ApplicationData | null | undefined>(
+        undefined
+    );
     const { showNotification } = useNotification();
 
     const completeLoginProcess = async (user: User) => {
         // check if user has a profile in firestore
         const profile = await getUserProfile(user.uid);
         const userWithRole = await validateUserRole(user);
+        const app = (await getUserApplications(user.uid))[0] ?? null;
         // make one ui update instead of two due to async function
         flushSync(() => {
             setCurrentUser(userWithRole);
             setUserProfile(profile);
+            setUserApp(app);
         });
     };
 
@@ -245,6 +254,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
             value={{
                 currentUser,
                 userProfile,
+                userApp,
                 login,
                 logout,
                 createAccount,
