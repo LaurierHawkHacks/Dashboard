@@ -5,6 +5,7 @@ import {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
     signInWithRedirect,
+    signInWithPopup,
     sendEmailVerification,
     sendPasswordResetEmail,
     getRedirectResult,
@@ -106,6 +107,11 @@ function getNotificationByAuthErrCode(code: string): NotificationOptions {
     }
 }
 
+function isMobile() {
+    const regex = /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+    return regex.test(navigator.userAgent);
+}
+
 export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<UserWithRole | null>(null);
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -190,7 +196,15 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
         try {
             const provider = getProvider(name);
             if (!provider) throw new Error("Invalid provider name");
-            await signInWithRedirect(auth, provider);
+
+            if (isMobile()) {
+                // Use redirect sign-in for mobile devices
+                await signInWithRedirect(auth, provider);
+            } else {
+                // Use popup sign-in for PCs
+                const { user } = await signInWithPopup(auth, provider);
+                await completeLoginProcess(user);
+            }
             /* eslint-disable-next-line */
         } catch (error: any) {
             if (
