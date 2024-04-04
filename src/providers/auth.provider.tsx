@@ -15,7 +15,11 @@ import {
 } from "firebase/auth";
 import { auth } from "@/services/firebase";
 import { useNotification } from "@/providers/notification.provider";
-import { getUserApplications, getUserProfile } from "@/services/utils";
+import {
+    getUserApplications,
+    getUserProfile,
+    verifyGitHubEmail,
+} from "@/services/utils";
 
 import type { User, AuthProvider as FirebaseAuthProvider } from "firebase/auth";
 import type { UserProfile } from "@/services/utils/types";
@@ -123,6 +127,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     const [userApp, setUserApp] = useState<ApplicationData | null | undefined>(
         undefined
     );
+    const [isLoading, setIsLoading] = useState(false);
     const { showNotification } = useNotification();
 
     const completeLoginProcess = async (user: User) => {
@@ -212,11 +217,52 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 await signInWithRedirect(auth, provider);
             } else {
                 // Use popup sign-in for PCs
-                const { user } = await signInWithPopup(auth, provider);
-                await completeLoginProcess(user);
+                // @ts-ignore _tokenResponse is being used as a work around for bug github signin but email shows unverified.
+                const { user, providerId, _tokenResponse } =
+                    await signInWithPopup(auth, provider);
+
+                if (
+                    providerId &&
+                    /github/i.test(providerId) &&
+                    !user.emailVerified
+                ) {
+                    setIsLoading(true);
+                    const { oauthAccessToken } = _tokenResponse as {
+                        oauthAccessToken: string;
+                    };
+                    const verified = await verifyGitHubEmail(
+                        oauthAccessToken,
+                        user.email as string
+                    );
+
+                    if (verified) {
+                        // interval set to wait email metadata gets properly updated in our user metadata after manual verification
+                        // takes about 1s
+                        let interval = 0;
+                        interval = window.setInterval(async () => {
+                            if (!auth.currentUser) {
+                                window.clearInterval(interval);
+                                setIsLoading(false);
+                            }
+                            if (!auth.currentUser?.emailVerified) {
+                                await reloadUser();
+                            } else {
+                                window.clearInterval(interval);
+                                setIsLoading(false);
+                            }
+                        }, 1000);
+                    } else {
+                        showNotification({
+                            title: "Error Verifying Email",
+                            message:
+                                "Please log out and log in again. If problem persists, please contact us via email: 'development@hawkhacks.ca'",
+                        });
+                    }
+                }
             }
             /* eslint-disable-next-line */
         } catch (error: any) {
+            console.error(error);
             if (
                 error.code === "auth/account-exists-with-different-credential"
             ) {
@@ -270,7 +316,9 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
             }
         };
 
-        handleRedirectResult();
+        if (isMobile()) {
+            handleRedirectResult();
+        }
 
         return unsub;
     }, []);
@@ -290,7 +338,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 refreshProfile,
             }}
         >
-            {children}
+            {isLoading ? <LoadingAnimation /> : children}
         </AuthContext.Provider>
     );
 };

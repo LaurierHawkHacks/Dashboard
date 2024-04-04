@@ -10,9 +10,10 @@ import {
     setDoc,
     where,
 } from "firebase/firestore";
-import { firestore } from "@/services/firebase";
+import { firestore, functions } from "@/services/firebase";
 import type { UserTicketData, UserProfile } from "@/services/utils/types";
 import { ApplicationData } from "@/components/forms/types";
+import { httpsCallable } from "firebase/functions";
 
 export const TICKETS_COLLECTION = "tickets";
 export const USERS_COLLECTION = "users";
@@ -82,4 +83,16 @@ export async function getUserApplications(uid: string) {
     const apps: ApplicationData[] = [];
     snap.forEach((doc) => apps.push(doc.data() as ApplicationData));
     return apps;
+}
+
+export async function verifyGitHubEmail(token: string, email: string) {
+    const verifyFn = httpsCallable(functions, "verifyGitHubEmail");
+    try {
+        await verifyFn({ token, email });
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
+
+    return true;
 }
