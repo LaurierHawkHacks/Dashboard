@@ -1,12 +1,17 @@
 import { FC, Fragment, useState } from "react";
 import { Combobox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
+import { getOptionStyles } from "../MultiSelect/MultiSelect";
 
 export interface SelectProps {
     label: string;
     options: string[];
     initialValue: string;
+    name?: string;
     srLabelOnly?: boolean;
+    allowCustomValue?: boolean;
+    disabled?: boolean;
+    required?: boolean;
     onChange?: (opt: string) => void;
 }
 
@@ -15,6 +20,10 @@ export const Select: FC<SelectProps> = ({
     options,
     initialValue,
     srLabelOnly = false,
+    allowCustomValue = false,
+    disabled,
+    name,
+    required,
     onChange,
 }) => {
     const [selected, setSelected] = useState<string>(initialValue);
@@ -36,7 +45,12 @@ export const Select: FC<SelectProps> = ({
               });
 
     return (
-        <Combobox value={selected} onChange={handleChange}>
+        <Combobox
+            name={name}
+            value={selected}
+            onChange={onChange ? handleChange : undefined}
+            disabled={disabled}
+        >
             <div className="relative">
                 <Combobox.Label
                     className={`block font-medium leading-6 text-charcoalBlack text-md${
@@ -44,8 +58,11 @@ export const Select: FC<SelectProps> = ({
                     }`}
                 >
                     {label}
+                    {required ? (
+                        <span className="text-red-600 ml-1">*</span>
+                    ) : null}
                 </Combobox.Label>
-                <div className="relative w-full mt-2 cursor-default overflow-hidden bg-gray-50 text-left border border-charcoalBlack focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
+                <div className="relative w-full mt-2 cursor-default overflow-hidden bg-gray-50 text-left border border-charcoalBlack">
                     <Combobox.Input
                         className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 bg-gray-50 focus:ring-0"
                         displayValue={(opt: string) => opt}
@@ -65,7 +82,13 @@ export const Select: FC<SelectProps> = ({
                     leaveTo="opacity-0"
                     afterLeave={() => setQuery("")}
                 >
-                    <Combobox.Options className="absolute mt-1 max-h-60 z-50 w-full overflow-auto bg-gray-50 py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                    <Combobox.Options className="absolute border border-charcoalBlack mt-1 max-h-60 z-50 w-full overflow-auto bg-gray-50 py-1 text-base">
+                        {allowCustomValue && query.length > 0 ? (
+                            <Combobox.Option
+                                className={getOptionStyles}
+                                value={query}
+                            >{`Self-described as "${query}"`}</Combobox.Option>
+                        ) : null}
                         {filteredOptions.length === 0 && query !== "" ? (
                             <div className="relative cursor-default select-none px-4 py-2 text-gray-700">
                                 Nothing found.
@@ -74,13 +97,7 @@ export const Select: FC<SelectProps> = ({
                             filteredOptions.map((opt) => (
                                 <Combobox.Option
                                     key={opt}
-                                    className={({ active }) =>
-                                        `relative cursor-default select-none py-2 pl-10 pr-4 ${
-                                            active
-                                                ? "bg-tbrand text-white"
-                                                : "text-gray-900"
-                                        }`
-                                    }
+                                    className={getOptionStyles}
                                     value={opt}
                                 >
                                     {({ selected, active }) => (
@@ -107,6 +124,11 @@ export const Select: FC<SelectProps> = ({
                         )}
                     </Combobox.Options>
                 </Transition>
+                {allowCustomValue ? (
+                    <p className="mt-2 text-sageGray">
+                        {`Not in the options? Type your ${label} in the input field.`}
+                    </p>
+                ) : null}
             </div>
         </Combobox>
     );

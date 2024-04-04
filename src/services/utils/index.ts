@@ -1,28 +1,22 @@
-import { addDoc, collection, doc, getDoc, setDoc } from "firebase/firestore";
-import { firestore } from "@services";
+import {
+    Timestamp,
+    addDoc,
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    orderBy,
+    query,
+    setDoc,
+    where,
+} from "firebase/firestore";
+import { firestore } from "@/services/firebase";
+import type { UserTicketData, UserProfile } from "@/services/utils/types";
+import { ApplicationData } from "@/components/forms/types";
 
 export const TICKETS_COLLECTION = "tickets";
 export const USERS_COLLECTION = "users";
-
-export interface UserTicketData {
-    userId: string;
-    firstName: string;
-    lastName: string;
-}
-
-export interface UserProfile {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    emailVerified: boolean;
-    phone: string;
-    school: string;
-    levelOfStudy: string;
-    countryOfResidence: string;
-    age: number;
-    discord: string;
-}
+export const APPLICATIONS_COLLECTION = "applications";
 
 /**
  * Creates a new ticket entry in the collection 'tickets'.
@@ -61,4 +55,31 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
 export async function createUserProfile(data: UserProfile) {
     const docRef = doc(firestore, USERS_COLLECTION, data.id);
     await setDoc(docRef, data);
+}
+
+/**
+ * Submits an application to firebase
+ */
+export async function submitApplication(data: ApplicationData) {
+    const docRef = await addDoc(
+        collection(firestore, APPLICATIONS_COLLECTION),
+        { ...data, applicationStatus: "pending", timestamp: Timestamp.now() }
+    );
+    return docRef.id;
+}
+
+/**
+ * Gets all the applications from a given user
+ */
+export async function getUserApplications(uid: string) {
+    const colRef = collection(firestore, APPLICATIONS_COLLECTION);
+    const q = query(
+        colRef,
+        where("applicantId", "==", uid),
+        orderBy("timestamp", "desc")
+    );
+    const snap = await getDocs(q);
+    const apps: ApplicationData[] = [];
+    snap.forEach((doc) => apps.push(doc.data() as ApplicationData));
+    return apps;
 }

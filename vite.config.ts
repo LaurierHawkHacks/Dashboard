@@ -1,27 +1,10 @@
 /// <reference types="vitest" />
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import * as path from "path";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-    plugins: [react()],
-    resolve: {
-        alias: {
-            "@": path.resolve(__dirname, "src/"),
-            "@assets": path.resolve(__dirname, "./src/assets/"),
-            "@components": path.resolve(__dirname, "./src/components/"),
-            "@pages": path.resolve(__dirname, "./src/pages/"),
-            "@services": path.resolve(__dirname, "./src/services/"),
-            "@services/utils": path.resolve(__dirname, "./src/services/utils/"),
-            "@utils": path.resolve(__dirname, "./src/utils/"),
-            "@providers": path.resolve(__dirname, "./src/providers/"),
-            "@data": path.resolve(__dirname, "./src/data/"),
-            "@mocks/providers": path.resolve(
-                __dirname,
-                "./src/providers/__mocks__/"
-            ),
-        },
-    },
+    plugins: [react(), tsconfigPaths()],
     test: {
         globals: true,
         environment: "jsdom",

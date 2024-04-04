@@ -6,7 +6,7 @@
     "scripts": {
         "dev": "vite",
         "build": "tsc && vite build",
-        "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+        "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
         "preview": "vite preview",
         "format": "prettier . --write",
         "format:check": "prettier . --check",
@@ -14,10 +14,8 @@
         "test:dev": "vitest"
     },
     "dependencies": {
-        "@google-cloud/functions-framework": "^3.3.0",
         "@headlessui/react": "^1.7.18",
         "@heroicons/react": "^2.1.1",
-        "@types/node": "^20.6.0",
         "class-variance-authority": "^0.7.0",
         "firebase": "^10.5.2",
         "hamburger-react": "^2.5.0",
@@ -33,6 +31,7 @@
         "@testing-library/jest-dom": "^6.1.4",
         "@testing-library/react": "^14.0.0",
         "@testing-library/user-event": "^14.5.1",
+        "@types/node": "^20.6.0",
         "@types/react": "^18.2.15",
         "@types/react-dom": "^18.2.7",
         "@types/react-transition-group": "^4.4.10",
@@ -52,6 +51,7 @@
         "tailwindcss": "^3.3.3",
         "typescript": "^5.0.2",
         "vite": "^4.4.5",
+        "vite-tsconfig-paths": "^4.3.2",
         "vitest": "^0.34.6"
     }
 }

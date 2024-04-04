@@ -26,8 +26,8 @@
             "@testing-library/jest-dom"
         ],
         "paths": {
-            "@": [
-                "./src/index"
+            "@/*": [
+                "./src/*"
             ],
             "@assets": [
                 "./src/assets/index"
@@ -37,12 +37,6 @@
             ],
             "@pages": [
                 "./src/pages/index"
-            ],
-            "@services": [
-                "./src/services/index"
-            ],
-            "@services/utils": [
-                "./src/services/utils/index"
             ],
             "@providers": [
                 "./src/providers/index"

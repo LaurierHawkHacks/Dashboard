@@ -36,6 +36,7 @@ export const TextInput: React.FC<TextInputProps> = ({
     invalid,
     description,
     srLabel = false,
+    required,
     ...inputProps
 }) => {
     const describedby = `text-input-description-${inputProps.id}`;
@@ -46,6 +47,7 @@ export const TextInput: React.FC<TextInputProps> = ({
                 className={getTextInputLabelStyles({ srLabel })}
             >
                 {label}
+                {required ? <span className="text-red-600 ml-1">*</span> : null}
             </label>
             <div className="mt-2">
                 <input

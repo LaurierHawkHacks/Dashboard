@@ -23,7 +23,8 @@ service cloud.firestore {
     // Allow read/write access to the user owns documents
     // Allow read/write access to ALL user documents if the user is Admin
     match /users/{userId} {
-      allow read, write: if request.auth != null && (request.auth.token.admin == true || request.auth.uid == userId);
+      allow read: if isAuthenticated() && (isAdmin() || isOwner(userId));
+      allow write: if isAuthenticated() || isAdmin();
     }
 
     // Allow read/write access to the entire database for admin users
@@ -37,6 +38,13 @@ service cloud.firestore {
         allow read: if isAuthenticated() && (isAdmin() || isOwner(resource.data.userId));
         // Only grant write perms to admin
         allow write: if isAuthenticated() && isAdmin();
+    }
+
+    // Applications Collection Rules
+    match /applications/{applicationId} {
+        // Only grant read access if you are owner/admin
+        allow read: if isAuthenticated() && (isAdmin() || isOwner(resource.data.applicantId));
+        allow write: if isAuthenticated() || isAdmin();
     }
   }
 }

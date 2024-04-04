@@ -1,6 +1,6 @@
 import { Outlet, Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "@providers";
-import { routes } from "@utils";
+import { useAuth } from "@/providers/hooks";
+import { routes } from "@/navigation/constants";
 import { PageWrapper } from "@components";
 
 export interface ProtectedRoutesProps {
@@ -41,6 +41,18 @@ export const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
                 </PageWrapper>
             );
         }
+    }
+
+    if (!session.userProfile) {
+        if (location.pathname !== routes.completeProfile) {
+            return <Navigate to={routes.completeProfile} />;
+        }
+
+        return (
+            <PageWrapper>
+                <Outlet />
+            </PageWrapper>
+        );
     }
 
     if (adminOnly && !session.currentUser.hawkAdmin) {

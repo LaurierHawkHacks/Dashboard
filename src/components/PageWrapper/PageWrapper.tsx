@@ -1,8 +1,8 @@
 import { FC } from "react";
-import type { ComponentProps } from "@components";
 import { useLocation } from "react-router-dom";
-import { titles } from "@utils";
+import { titles } from "@/navigation/constants";
 import { Navbar } from "@components";
+import type { ComponentProps } from "@/components/types";
 
 export const PageWrapper: FC<ComponentProps> = ({ children }) => {
     const location = useLocation();

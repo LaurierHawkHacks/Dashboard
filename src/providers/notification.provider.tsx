@@ -1,5 +1,6 @@
 import { createContext, useState, useContext } from "react";
-import { Notification, type NotificationData } from "@components";
+import { Notification } from "@components";
+import type { NotificationData } from "@/components/types";
 import { createPortal } from "react-dom";
 import { Transition } from "@headlessui/react";
 import { Fragment } from "react";

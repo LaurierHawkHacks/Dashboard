@@ -4,7 +4,7 @@ import { TiGroup } from "react-icons/ti";
 import { PiIdentificationBadgeFill } from "react-icons/pi";
 import { FiLogOut } from "react-icons/fi";
 import { useState, useEffect } from "react";
-import { useAuth } from "@providers";
+import { useAuth } from "@/providers/hooks";
 import Hamburger from "hamburger-react";
 import { Link } from "react-router-dom";
 
@@ -13,6 +13,7 @@ const navItems = [
     { path: "/schedule", label: "Schedule", Icon: PiCalendarCheckFill },
     { path: "/networking", label: "Networking", Icon: TiGroup },
     { path: "/ticket", label: "Ticket", Icon: PiIdentificationBadgeFill },
+    { path: "/application", label: "Application", Icon: GoHome },
 ];
 
 export const Navbar = () => {
@@ -20,6 +21,8 @@ export const Navbar = () => {
 
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [showAllNavItems, setShowAllNavItems] = useState(false);
+    const { userApp } = useAuth();
 
     const updateNavbarState = () => {
         setIsMobile(window.innerWidth <= 768);
@@ -32,27 +35,53 @@ export const Navbar = () => {
         };
     }, []);
 
-    const renderNavItems = (isMobile: boolean) =>
-        navItems.map(({ path, label, Icon }) => (
-            <li
-                key={label}
-                className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black"
-            >
+    useEffect(() => {
+        if (userApp && userApp.applicationStatus === "accepted")
+            setShowAllNavItems(true);
+    }, [userApp]);
+
+    const renderNavItems = (isMobile: boolean) => {
+        if (showAllNavItems) {
+            return navItems.map(({ path, label, Icon }) => (
+                <li
+                    key={label}
+                    className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black"
+                >
+                    <Link
+                        to={path}
+                        className="flex items-center justify-start gap-2"
+                    >
+                        {isMobile ? (
+                            label
+                        ) : (
+                            <>
+                                <Icon size={32} />
+                                <span className="hidden md:flex">{label}</span>
+                            </>
+                        )}
+                    </Link>
+                </li>
+            ));
+        }
+
+        return (
+            <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black">
                 <Link
-                    to={path}
+                    to="/application"
                     className="flex items-center justify-start gap-2"
                 >
                     {isMobile ? (
-                        label
+                        "Application"
                     ) : (
                         <>
-                            <Icon size={32} />
-                            <span className="hidden md:flex">{label}</span>
+                            <GoHome size={32} />
+                            <span className="hidden md:flex">Application</span>
                         </>
                     )}
                 </Link>
             </li>
-        ));
+        );
+    };
 
     return (
         <>
@@ -82,11 +111,13 @@ export const Navbar = () => {
                         </div>
                     </nav>
 
-                        <div
-                            className={`fixed right-0 top-0 z-40 h-full w-full max-w-[12.5rem] p-10 py-24 bg-gray-200 backdrop-blur-xl transition-all duration-300 ease-in-out ${
-                                isMobileMenuOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
-                            }`}
-                        >
+                    <div
+                        className={`fixed right-0 top-0 z-40 h-full w-full max-w-[12.5rem] p-10 py-24 bg-gray-200 backdrop-blur-xl transition-all duration-300 ease-in-out ${
+                            isMobileMenuOpen
+                                ? "translate-x-0 opacity-100"
+                                : "translate-x-full opacity-0"
+                        }`}
+                    >
                         <ul className="flex flex-col items-start justify-start gap-4">
                             {renderNavItems(true)}
                         </ul>

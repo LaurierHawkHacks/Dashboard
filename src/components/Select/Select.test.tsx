@@ -1,13 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Select } from "@components";
-import { type Option } from "./Select";
 
 describe("Select Component", () => {
-    const options: Option[] = [
-        { value: "1", label: "first option" },
-        { value: "2", label: "first next option" },
-        { value: "3", label: "third option" },
+    const options: string[] = [
+        "first option",
+        "first next option",
+        "third option",
     ];
 
     it("should render basic structure select component", () => {
@@ -52,7 +51,7 @@ describe("Select Component", () => {
         );
         const select = screen.getByRole("button");
         await user.click(select);
-        const opt = screen.getByRole("option", { name: options[0].label });
+        const opt = screen.getByRole("option", { name: options[0] });
         await user.click(opt);
         expect(onChange).toHaveBeenCalledWith(options[0]);
     });

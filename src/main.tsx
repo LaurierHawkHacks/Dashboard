@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 
-import { Router } from "@utils";
+import { Router } from "@/navigation";
 import { AuthProvider } from "@providers";
 import { NotificationProvider } from "./providers/notification.provider";
 

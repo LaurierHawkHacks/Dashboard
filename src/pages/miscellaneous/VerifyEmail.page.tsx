@@ -1,10 +1,10 @@
 import { useState, useRef } from "react";
 import { sendEmailVerification } from "firebase/auth";
 import { Navigate } from "react-router-dom";
-import { auth } from "@services";
-import { useAuth } from "@providers";
+import { auth } from "@/services/firebase";
+import { useAuth } from "@/providers/hooks";
 import { Button } from "@components";
-import { routes } from "@utils";
+import { routes } from "@/navigation/constants";
 
 export const VerifyEmailPage = () => {
     // 60 seconds timeout before the user can send the next email verification
