@@ -1,58 +1,60 @@
 {
-  "firestore": {
-    "rules": "./config/firestore.rules",
-    "indexes": "./config/firestore.indexes"
-  },
-  "functions": [
-    {
-      "source": "functions",
-      "codebase": "default",
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log"
-      ],
-      "predeploy": [
-        "npm --prefix \"$RESOURCE_DIR\" run lint",
-        "npm --prefix \"$RESOURCE_DIR\" run build"
-      ]
-    }
-  ],
-  "hosting": {
-    "public": "dist",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ]
-  },
-  "storage": {
-    "rules": "./config/storage.rules"
-  },
-  "emulators": {
-    "auth": {
-      "port": 9099
-    },
-    "functions": {
-      "port": 5001
-    },
     "firestore": {
-      "port": 8080
+        "rules": "./config/firestore.rules",
+        "indexes": "./config/firestore.indexes"
     },
+    "functions": [
+        {
+            "source": "functions",
+            "codebase": "default",
+            "ignore": [
+                "node_modules",
+                ".git",
+                "firebase-debug.log",
+                "firebase-debug.*.log"
+            ],
+            "predeploy": [
+                "npm --prefix \"$RESOURCE_DIR\" run lint",
+                "npm --prefix \"$RESOURCE_DIR\" run build"
+            ]
+        }
+    ],
     "hosting": {
-      "port": 5000
-    },
-    "pubsub": {
-      "port": 8085
+        "public": "dist",
+        "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+        "rewrites": [
+            {
+                "source": "**",
+                "destination": "/index.html"
+            }
+        ]
     },
     "storage": {
-      "port": 9199
+        "rules": "./config/storage.rules"
     },
-    "ui": {
-      "enabled": true,
-      "port": 8000
-    },
-    "singleProjectMode": true
-  }
+    "emulators": {
+        "auth": {
+            "port": 9099
+        },
+        "functions": {
+            "port": 5001
+        },
+        "firestore": {
+            "port": 8080
+        },
+        "hosting": {
+            "port": 5000
+        },
+        "pubsub": {
+            "port": 8085
+        },
+        "storage": {
+            "port": 9199
+        },
+        "ui": {
+            "enabled": true,
+            "port": 8000
+        },
+        "singleProjectMode": true
+    }
 }
