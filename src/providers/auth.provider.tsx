@@ -20,6 +20,7 @@ import {
     getUserProfile,
     verifyGitHubEmail,
 } from "@/services/utils";
+import { LoadingAnimation } from "@/components";
 
 import type { User, AuthProvider as FirebaseAuthProvider } from "firebase/auth";
 import type { UserProfile } from "@/services/utils/types";
