@@ -385,6 +385,8 @@ export const ApplicationPage = () => {
                         </div>
                     </div>
                 </div>
+                {/* adding some more white space between the last input field and the buttons */}
+                <div className="h-12"></div>
                 {/* just a separator line */}
                 <div className="h-0.5 bg-gray-300 my-6"></div>
                 <div className="flex items-center justify-between px-4 py-4 sm:px-8">
