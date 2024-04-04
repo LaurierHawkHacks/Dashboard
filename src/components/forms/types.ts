@@ -24,6 +24,7 @@ export interface HackerApplicationData {
     agreedToMLHCoC: boolean;
     agreetToMLHToCAndPrivacyPolicy: boolean;
     agreedToReceiveEmailsFromMLH: boolean;
+    applicationStatus?: "pending" | "rejected" | "accepted";
 }
 
 export type ApplicationData = UserProfile & HackerApplicationData;

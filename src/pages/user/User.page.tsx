@@ -1,14 +1,17 @@
-import { Button } from "@components";
-import { useAuth } from "@/providers/hooks";
+import { getButtonStyles } from "@/components/Button/Button.styles";
+import { routes } from "@/navigation/constants";
+import { Link } from "react-router-dom";
 
 const UserPage = () => {
-    const { logout } = useAuth();
-
     return (
         <>
             <div>
-                <h1>Welcome to user page!!!</h1>
-                <Button onClick={logout}>Sign out</Button>
+                <Link
+                    to={routes.application}
+                    className={getButtonStyles({ intent: "primary" })}
+                >
+                    Apply To Hackathon!
+                </Link>
             </div>
         </>
     );

@@ -59,3 +59,10 @@ export { Navbar } from "./Navbar";
  *
  */
 export { Steps } from "./Steps/Steps";
+
+/*
+ *
+ * @component LoadingAnimation
+ *
+ */
+export { LoadingAnimation } from "./LoadingAnimation";

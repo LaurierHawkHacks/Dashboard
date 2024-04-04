@@ -21,6 +21,8 @@ export const Navbar = () => {
 
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [showAllNavItems, setShowAllNavItems] = useState(false);
+    const { userApp } = useAuth();
 
     const updateNavbarState = () => {
         setIsMobile(window.innerWidth <= 768);
@@ -33,27 +35,53 @@ export const Navbar = () => {
         };
     }, []);
 
-    const renderNavItems = (isMobile: boolean) =>
-        navItems.map(({ path, label, Icon }) => (
-            <li
-                key={label}
-                className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black"
-            >
+    useEffect(() => {
+        if (userApp && userApp.applicationStatus === "accepted")
+            setShowAllNavItems(true);
+    }, [userApp]);
+
+    const renderNavItems = (isMobile: boolean) => {
+        if (showAllNavItems) {
+            return navItems.map(({ path, label, Icon }) => (
+                <li
+                    key={label}
+                    className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black"
+                >
+                    <Link
+                        to={path}
+                        className="flex items-center justify-start gap-2"
+                    >
+                        {isMobile ? (
+                            label
+                        ) : (
+                            <>
+                                <Icon size={32} />
+                                <span className="hidden md:flex">{label}</span>
+                            </>
+                        )}
+                    </Link>
+                </li>
+            ));
+        }
+
+        return (
+            <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black">
                 <Link
-                    to={path}
+                    to="/application"
                     className="flex items-center justify-start gap-2"
                 >
                     {isMobile ? (
-                        label
+                        "Application"
                     ) : (
                         <>
-                            <Icon size={32} />
-                            <span className="hidden md:flex">{label}</span>
+                            <GoHome size={32} />
+                            <span className="hidden md:flex">Application</span>
                         </>
                     )}
                 </Link>
             </li>
-        ));
+        );
+    };
 
     return (
         <>
