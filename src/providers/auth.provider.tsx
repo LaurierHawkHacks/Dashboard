@@ -111,7 +111,8 @@ function getNotificationByAuthErrCode(code: string): NotificationOptions {
 }
 
 function isMobile() {
-    const regex = /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+    const regex =
+        /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
     return regex.test(navigator.userAgent);
 }
 
@@ -257,6 +258,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
             } else {
                 setCurrentUser(null);
                 setUserProfile(null);
+                setUserApp(null);
             }
         });
 
@@ -294,3 +296,4 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+
