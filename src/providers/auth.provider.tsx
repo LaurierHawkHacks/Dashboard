@@ -4,9 +4,10 @@ import {
     signOut,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
-    signInWithPopup,
+    signInWithRedirect,
     sendEmailVerification,
     sendPasswordResetEmail,
+    getRedirectResult,
     GithubAuthProvider,
     GoogleAuthProvider,
     OAuthProvider,
@@ -189,8 +190,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
         try {
             const provider = getProvider(name);
             if (!provider) throw new Error("Invalid provider name");
-            const { user } = await signInWithPopup(auth, provider);
-            await completeLoginProcess(user);
+            await signInWithRedirect(auth, provider);
             /* eslint-disable-next-line */
         } catch (error: any) {
             if (
@@ -236,6 +236,16 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 setUserProfile(null);
             }
         });
+
+        // Handle redirect result
+        const handleRedirectResult = async () => {
+            const result = await getRedirectResult(auth);
+            if (result) {
+                await completeLoginProcess(result.user);
+            }
+        };
+
+        handleRedirectResult();
 
         return unsub;
     }, []);
