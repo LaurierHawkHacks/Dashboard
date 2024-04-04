@@ -10,6 +10,7 @@ import {
     ErrorAlert,
     MultiSelect,
     Steps,
+    LoadingAnimation,
 } from "@components";
 import { Profile } from "@/components/forms/Profile";
 import { hackerAppFormInputs } from "@/components/forms/hackerApplication";
@@ -161,12 +162,12 @@ export const ApplicationPage = () => {
             const apps = await getUserApplications(currentUser.uid);
             if (apps.length) setHasApplied(true);
             else setHasApplied(false);
-            setIsLoading(false);
+            setTimeout(() => setIsLoading(false), 1000);
         };
         checkApp();
     }, []);
 
-    if (isLoading) return <p>is loading...</p>;
+    if (isLoading) return <LoadingAnimation />;
 
     if (hasApplied)
         return (
