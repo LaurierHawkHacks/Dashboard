@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/providers/hooks";
 import Hamburger from "hamburger-react";
 import { Link } from "react-router-dom";
+import { Logo } from "@/assets";
 
 const navItems = [
     { path: "/profile", label: "Home", Icon: GoHome },
@@ -95,7 +96,7 @@ export const Navbar = () => {
                             >
                                 <img
                                     className="h-12 w-12"
-                                    src="./src/assets/hh-dashboard-logo.svg"
+                                    src={Logo}
                                     alt="HawkHacks Logo"
                                 />
                             </Link>
@@ -143,7 +144,7 @@ export const Navbar = () => {
                         >
                             <img
                                 className="h-12 w-12"
-                                src="./src/assets/hh-dashboard-logo.svg"
+                                src={Logo}
                                 alt="HawkHacks Logo"
                             />
                             <span className="hidden md:flex text-2xl font-bold text-black">
