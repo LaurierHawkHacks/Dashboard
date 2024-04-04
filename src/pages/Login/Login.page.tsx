@@ -124,164 +124,176 @@ export const LoginPage = () => {
     }
 
     return (
-        <div className="font-medium absolute inset-0 bg-gradient-to-r from-deepPurple/20 via-deepGold/20 via-50% to-stonePurple/20 flex justify-center items-center min-h-screen before:absolute before:inset-0 before:bg-[#EBCACC] before:-z-10">
-            <div className="mx-auto max-w-2xl px-4 sm:px-6 md:px-8">
-                <h1 className="text-3xl sm:text-5xl text-charcoalBlack font-body font-bold">
-                    HawkHacks Hacker Portal
-                </h1>
-                <div className="h-6" />
-                <div>
-                    <h2 className="font-normal text-xl text-charcoalBlack">
-                        {showResetPasswordForm
-                            ? "Reset Password"
-                            : isLogin
-                            ? "Log In"
-                            : "Create Account"}
-                    </h2>
-                    {!showResetPasswordForm && (
-                        <>
-                            <div className="w-full">
-                                <form
-                                    onSubmit={handlerSubmit}
-                                    className="mt-6 space-y-6"
-                                    aria-label="Authentication form"
-                                >
-                                    <TextInput
-                                        label="Email"
-                                        id="email"
-                                        type="email"
-                                        placeholder="awesome@hawkhack.ca"
-                                        value={email}
-                                        invalid={isInvalidEmail}
-                                        description={
-                                            isInvalidEmail
-                                                ? "Invalid email!"
-                                                : ""
-                                        }
-                                        onChange={({ target: { value } }) =>
-                                            setEmail(value)
-                                        }
-                                        required
-                                    />
-                                    <TextInput
-                                        label="Password"
-                                        id="password"
-                                        type="password"
-                                        placeholder="************"
-                                        minLength={isLogin ? 0 : 8}
-                                        value={password}
-                                        invalid={!isLogin && isInvalidPassword}
-                                        onChange={({ target: { value } }) =>
-                                            setPassword(value)
-                                        }
-                                        required
-                                    />
-                                    {!isLogin && (
+        <div className="bg-dustStorm font-medium">
+            <div className="py-4 flex justify-center items-center bg-gradient-to-r from-deepPurple/20 via-deepGold/20 via-50% to-stonePurple/20 min-h-screen">
+                <div className="mx-auto max-w-2xl px-4 sm:px-6 md:px-8">
+                    <h1 className="text-center sm:text-left text-3xl sm:text-5xl text-charcoalBlack font-body font-bold">
+                        HawkHacks Hacker Portal
+                    </h1>
+                    <div className="h-6" />
+                    <div>
+                        <h2 className="font-normal text-xl text-charcoalBlack">
+                            {showResetPasswordForm
+                                ? "Reset Password"
+                                : isLogin
+                                ? "Log In"
+                                : "Create Account"}
+                        </h2>
+                        {!showResetPasswordForm && (
+                            <>
+                                <div className="w-full">
+                                    <form
+                                        onSubmit={handlerSubmit}
+                                        className="mt-6 space-y-6"
+                                        aria-label="Authentication form"
+                                    >
                                         <TextInput
-                                            label="Confirm Password:"
-                                            id="confirmPassword"
-                                            type="password"
-                                            minLength={8}
-                                            value={confirmPass}
-                                            invalid={isInvalidPassword}
-                                            description={passwordErrMsg}
+                                            label="Email"
+                                            id="email"
+                                            type="email"
+                                            placeholder="awesome@hawkhack.ca"
+                                            value={email}
+                                            invalid={isInvalidEmail}
+                                            description={
+                                                isInvalidEmail
+                                                    ? "Invalid email!"
+                                                    : ""
+                                            }
                                             onChange={({ target: { value } }) =>
-                                                setConfirmPass(value)
+                                                setEmail(value)
                                             }
                                             required
                                         />
-                                    )}
-                                    {isLogin && (
-                                        <div className="flex justify-end">
-                                            <button
-                                                className="text-charcoalBlack font-bold underline hover:text-tbrand-hover"
-                                                onClick={toggleResetPassword}
-                                            >
-                                                {showResetPasswordForm
-                                                    ? "Cancel"
-                                                    : "Forgot Password?"}
-                                            </button>
-                                        </div>
-                                    )}
-                                    {/* just a separator line */}
-                                    <div className="bg-transparent"></div>
-                                    <Button
-                                        type="submit"
-                                        className="w-full bg-gradient-to-b from-tbrand to-tbrand-hover"
-                                    >
-                                        {isLogin ? "Log In" : "Create Account"}
-                                    </Button>
-                                </form>
-                                <p className="mt-6 text-center text-charcoalBlack font-medium">
-                                    <span>
-                                        {isLogin
-                                            ? "Don't have an account? "
-                                            : "Already have an account? "}
-                                    </span>
-                                    <button
-                                        className="text-charcoalBlack font-bold underline hover:text-tbrand-hover"
-                                        onClick={toggleForm}
-                                    >
-                                        {isLogin ? "Create Account" : "Log In"}
-                                    </button>
-                                </p>
-                            </div>
-                            {/* just a separator line */}
-                            <div className="h-0.5 bg-transparent my-6"></div>
-                            <div>
-                                <div className="w-full space-y-4">
-                                    {authProviders.map((provider) => (
-                                        <Button
-                                            key={provider.name}
-                                            onClick={() =>
-                                                loginWithProvider(provider.name)
+                                        <TextInput
+                                            label="Password"
+                                            id="password"
+                                            type="password"
+                                            placeholder="************"
+                                            minLength={isLogin ? 0 : 8}
+                                            value={password}
+                                            invalid={
+                                                !isLogin && isInvalidPassword
                                             }
-                                            className="w-full bg-white capitalize text-gray-900 flex justify-center items-center gap-4 hover:bg-gray-100 active:bg-gray-200"
-                                        >
-                                            <img
-                                                src={provider.logo}
-                                                aria-hidden="true"
-                                                className="w-8 h-8"
+                                            onChange={({ target: { value } }) =>
+                                                setPassword(value)
+                                            }
+                                            required
+                                        />
+                                        {!isLogin && (
+                                            <TextInput
+                                                label="Confirm Password:"
+                                                id="confirmPassword"
+                                                type="password"
+                                                minLength={8}
+                                                value={confirmPass}
+                                                invalid={isInvalidPassword}
+                                                description={passwordErrMsg}
+                                                onChange={({
+                                                    target: { value },
+                                                }) => setConfirmPass(value)}
+                                                required
                                             />
-                                            {`continue with ${provider.name}`}
+                                        )}
+                                        {isLogin && (
+                                            <div className="flex justify-end">
+                                                <button
+                                                    className="text-charcoalBlack font-bold underline hover:text-tbrand-hover"
+                                                    onClick={
+                                                        toggleResetPassword
+                                                    }
+                                                >
+                                                    {showResetPasswordForm
+                                                        ? "Cancel"
+                                                        : "Forgot Password?"}
+                                                </button>
+                                            </div>
+                                        )}
+                                        {/* just a separator line */}
+                                        <div className="bg-transparent"></div>
+                                        <Button
+                                            type="submit"
+                                            className="w-full bg-gradient-to-b from-tbrand to-tbrand-hover"
+                                        >
+                                            {isLogin
+                                                ? "Log In"
+                                                : "Create Account"}
                                         </Button>
-                                    ))}
+                                    </form>
+                                    <p className="mt-6 text-center text-charcoalBlack font-medium">
+                                        <span>
+                                            {isLogin
+                                                ? "Don't have an account? "
+                                                : "Already have an account? "}
+                                        </span>
+                                        <button
+                                            className="text-charcoalBlack font-bold underline hover:text-tbrand-hover"
+                                            onClick={toggleForm}
+                                        >
+                                            {isLogin
+                                                ? "Create Account"
+                                                : "Log In"}
+                                        </button>
+                                    </p>
                                 </div>
+                                {/* just a separator line */}
+                                <div className="h-0.5 bg-transparent my-6"></div>
+                                <div>
+                                    <div className="w-full space-y-4">
+                                        {authProviders.map((provider) => (
+                                            <Button
+                                                key={provider.name}
+                                                onClick={() =>
+                                                    loginWithProvider(
+                                                        provider.name
+                                                    )
+                                                }
+                                                className="w-full bg-white capitalize text-gray-900 flex justify-center items-center gap-4 hover:bg-gray-100 active:bg-gray-200"
+                                            >
+                                                <img
+                                                    src={provider.logo}
+                                                    aria-hidden="true"
+                                                    className="w-8 h-8"
+                                                />
+                                                {`continue with ${provider.name}`}
+                                            </Button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                        {showResetPasswordForm && (
+                            <div className="w-full">
+                                <TextInput
+                                    label="Email"
+                                    id="resetEmail"
+                                    type="email"
+                                    placeholder="awesome@hawkhack.ca"
+                                    className="bg-peachWhite"
+                                    value={email}
+                                    invalid={isInvalidEmail}
+                                    description={
+                                        isInvalidEmail ? "Invalid email!" : ""
+                                    }
+                                    onChange={({ target: { value } }) =>
+                                        setEmail(value)
+                                    }
+                                    required
+                                />
+                                {/* just a separator line */}
+                                <div className="bg-transparent"></div>
+                                <Button
+                                    type="button"
+                                    className="w-full bg-gradient-to-b from-tbrand to-tbrand-hover mt-2 my-8"
+                                    onClick={() => {
+                                        resetPassword(email);
+                                        setShowResetPasswordForm(false);
+                                    }}
+                                >
+                                    Reset Password
+                                </Button>
                             </div>
-                        </>
-                    )}
-                    {showResetPasswordForm && (
-                        <div className="w-full">
-                            <TextInput
-                                label="Email"
-                                id="resetEmail"
-                                type="email"
-                                placeholder="awesome@hawkhack.ca"
-                                className="bg-peachWhite"
-                                value={email}
-                                invalid={isInvalidEmail}
-                                description={
-                                    isInvalidEmail ? "Invalid email!" : ""
-                                }
-                                onChange={({ target: { value } }) =>
-                                    setEmail(value)
-                                }
-                                required
-                            />
-                            {/* just a separator line */}
-                            <div className="bg-transparent"></div>
-                            <Button
-                                type="button"
-                                className="w-full bg-gradient-to-b from-tbrand to-tbrand-hover mt-2 my-8"
-                                onClick={() => {
-                                    resetPassword(email);
-                                    setShowResetPasswordForm(false);
-                                }}
-                            >
-                                Reset Password
-                            </Button>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
