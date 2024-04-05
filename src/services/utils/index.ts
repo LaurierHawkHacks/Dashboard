@@ -1,5 +1,4 @@
 import {
-    Timestamp,
     addDoc,
     collection,
     getDocs,
@@ -63,11 +62,8 @@ export async function createUserProfile(data: UserProfile) {
  * Submits an application to firebase
  */
 export async function submitApplication(data: ApplicationData) {
-    const docRef = await addDoc(
-        collection(firestore, APPLICATIONS_COLLECTION),
-        { ...data, applicationStatus: "pending", timestamp: Timestamp.now() }
-    );
-    return docRef.id;
+    const cloudFn = httpsCallable(functions, "submitApplication");
+    await cloudFn(data);
 }
 
 /**

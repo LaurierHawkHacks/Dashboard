@@ -144,8 +144,7 @@ export const ApplicationPage = () => {
 
         try {
             setIsSubmitting(true);
-            const id = await submitApplication(application);
-            console.log(id);
+            await submitApplication(application);
             showNotification({
                 title: "Application Submitted!",
                 message:

@@ -37,12 +37,21 @@ export const CompleteProfilePage = () => {
         const results = await profileFormValidation.spa(controlledProfile);
 
         if (results.success) {
-            await createUserProfile(controlledProfile);
-            showNotification({
-                title: "Profile Completed!",
-                message: "You will be redirect to your portal now!",
-            });
-            await refreshProfile();
+            try {
+                await createUserProfile(controlledProfile);
+                showNotification({
+                    title: "Profile Completed!",
+                    message: "You will be redirect to your portal now!",
+                });
+                await refreshProfile();
+            } catch (e) {
+                console.error(e);
+                showNotification({
+                    title: "Error Saving Profile",
+                    message:
+                        "Please try again later. If problem persist please contact us via email 'development@hawkhacks.ca'.",
+                });
+            }
         } else {
             setErrors(results.error.issues.map((i) => i.message));
         }
