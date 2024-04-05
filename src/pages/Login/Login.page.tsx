@@ -110,8 +110,15 @@ export const LoginPage = () => {
 
     const toggleResetPassword = () => {
         setShowResetPasswordForm(!showResetPasswordForm);
+        setIsLogin(true);
         setPassword("");
         setConfirmPass("");
+    };
+
+    const handleReset: FormEventHandler = (e) => {
+        e.preventDefault();
+        resetPassword(email);
+        toggleResetPassword();
     };
 
     // leverage access to current user to decide whether we need to proceed rendering page
@@ -158,7 +165,7 @@ export const LoginPage = () => {
                                             id="email"
                                             type="email"
                                             placeholder="awesome@hawkhack.ca"
-                                            className="rounded-lg"
+                                            className="py-4 px-5 rounded-lg"
                                             value={email}
                                             invalid={isInvalidEmail}
                                             description={
@@ -175,8 +182,8 @@ export const LoginPage = () => {
                                             label="Password"
                                             id="password"
                                             type="password"
-                                            placeholder="************"
-                                            className="rounded-lg"
+                                            placeholder="your very awesome and secure password"
+                                            className="py-4 px-5 rounded-lg"
                                             minLength={isLogin ? 0 : 8}
                                             value={password}
                                             invalid={
@@ -192,7 +199,7 @@ export const LoginPage = () => {
                                                 label="Confirm Password:"
                                                 id="confirmPassword"
                                                 type="password"
-                                                className="rounded-lg"
+                                                className="py-4 px-5 rounded-lg"
                                                 minLength={8}
                                                 value={confirmPass}
                                                 invalid={isInvalidPassword}
@@ -212,9 +219,7 @@ export const LoginPage = () => {
                                                         toggleResetPassword
                                                     }
                                                 >
-                                                    {showResetPasswordForm
-                                                        ? "Cancel"
-                                                        : "Forgot Password?"}
+                                                    Forgot Password
                                                 </button>
                                             </div>
                                         )}
@@ -269,34 +274,39 @@ export const LoginPage = () => {
                         )}
                         {showResetPasswordForm && (
                             <div className="w-full">
-                                <TextInput
-                                    label="Email"
-                                    id="resetEmail"
-                                    type="email"
-                                    placeholder="awesome@hawkhack.ca"
-                                    className="bg-peachWhite"
-                                    value={email}
-                                    invalid={isInvalidEmail}
-                                    description={
-                                        isInvalidEmail ? "Invalid email!" : ""
-                                    }
-                                    onChange={({ target: { value } }) =>
-                                        setEmail(value)
-                                    }
-                                    required
-                                />
-                                {/* just a separator line */}
-                                <div className="bg-transparent"></div>
-                                <Button
+                                <form onSubmit={handleReset}>
+                                    <TextInput
+                                        label="Email"
+                                        id="resetEmail"
+                                        type="email"
+                                        placeholder="awesome@hawkhack.ca"
+                                        className="py-4 px-5 rounded-lg"
+                                        value={email}
+                                        invalid={isInvalidEmail}
+                                        description={
+                                            isInvalidEmail
+                                                ? "Invalid email!"
+                                                : ""
+                                        }
+                                        onChange={({ target: { value } }) =>
+                                            setEmail(value)
+                                        }
+                                        required
+                                    />
+                                    <Button
+                                        type="submit"
+                                        className="rounded-lg w-full bg-gradient-to-b from-tbrand to-tbrand-hover mt-2 my-8"
+                                    >
+                                        Reset Password
+                                    </Button>
+                                </form>
+                                <button
+                                    className="text-charcoalBlack font-bold underline hover:text-tbrand-hover"
                                     type="button"
-                                    className="w-full bg-gradient-to-b from-tbrand to-tbrand-hover mt-2 my-8"
-                                    onClick={() => {
-                                        resetPassword(email);
-                                        setShowResetPasswordForm(false);
-                                    }}
+                                    onClick={toggleResetPassword}
                                 >
-                                    Reset Password
-                                </Button>
+                                    Go Back
+                                </button>
                             </div>
                         )}
                     </div>

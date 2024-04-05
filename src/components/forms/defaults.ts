@@ -5,11 +5,8 @@ import type {
 } from "@/components/forms/types";
 
 export const defaultProfile: UserProfile = {
-    id: "",
     firstName: "",
     lastName: "",
-    email: "",
-    emailVerified: true,
     phone: "",
     school: "Wilfrid Laurier University",
     levelOfStudy: "Undergraduate University (3+ years)",

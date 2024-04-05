@@ -22,8 +22,6 @@ export const CompleteProfilePage = () => {
     const { showNotification } = useNotification();
     const [controlledProfile, setControlledProfile] = useState<UserProfile>({
         ...defaultProfile,
-        id: currentUser.uid,
-        email: currentUser.email ?? "",
     });
 
     const handleChange = (name: keyof UserProfile, data: string | string[]) => {
@@ -36,16 +34,24 @@ export const CompleteProfilePage = () => {
 
     const handleSubmit: FormEventHandler = async (e) => {
         e.preventDefault();
-        if (!controlledProfile.id) return;
         const results = await profileFormValidation.spa(controlledProfile);
 
         if (results.success) {
-            await createUserProfile(controlledProfile);
-            showNotification({
-                title: "Profile Completed!",
-                message: "You will be redirect to your portal now!",
-            });
-            await refreshProfile();
+            try {
+                await createUserProfile(controlledProfile);
+                showNotification({
+                    title: "Profile Completed!",
+                    message: "You will be redirect to your portal now!",
+                });
+                await refreshProfile();
+            } catch (e) {
+                console.error(e);
+                showNotification({
+                    title: "Error Saving Profile",
+                    message:
+                        "Please try again later. If problem persist please contact us via email 'development@hawkhacks.ca'.",
+                });
+            }
         } else {
             setErrors(results.error.issues.map((i) => i.message));
         }

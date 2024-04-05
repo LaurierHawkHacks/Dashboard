@@ -59,19 +59,6 @@ export const Profile = ({
                 />
             </div>
 
-            <div className="sm:col-span-full">
-                <TextInput
-                    label="Email address"
-                    id="email"
-                    type="email"
-                    placeholder="awesome@mail.com"
-                    value={profile.email}
-                    onChange={(e) => handler("email", e.target.value)}
-                    disabled={!!profile.email}
-                    required
-                />
-            </div>
-
             <div className="col-span-6">
                 <TextInput
                     label="Phone Number"

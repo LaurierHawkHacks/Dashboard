@@ -59,8 +59,7 @@ export const ApplicationPage = () => {
     // we start with the default user profile
     const [application, setApplication] = useState<ApplicationData>(() => {
         let app = defaultApplication;
-        if (userProfile)
-            app = { ...app, ...userProfile, applicantId: userProfile.id };
+        if (userProfile) app = { ...app, ...userProfile };
         return app;
     });
 
@@ -131,7 +130,8 @@ export const ApplicationPage = () => {
         }
 
         const allRequiredChecked =
-            application.agreedToHawkHacksCoC &&
+            // don't have the CoC for HH yet so we don't have to make it required for now
+            // application.agreedToHawkHacksCoC &&
             application.agreedToWLUCoC &&
             application.agreedToMLHCoC &&
             application.agreetToMLHToCAndPrivacyPolicy;
@@ -145,8 +145,7 @@ export const ApplicationPage = () => {
 
         try {
             setIsSubmitting(true);
-            const id = await submitApplication(application);
-            console.log(id);
+            await submitApplication(application);
             showNotification({
                 title: "Application Submitted!",
                 message:
@@ -169,7 +168,7 @@ export const ApplicationPage = () => {
             const apps = await getUserApplications(currentUser.uid);
             if (apps.length) setHasApplied(true);
             else setHasApplied(false);
-            setTimeout(() => setIsLoading(false), 1000);
+            setIsLoading(false);
         };
         checkApp();
     }, []);
@@ -273,26 +272,27 @@ export const ApplicationPage = () => {
                             activeStep !== 3 ? " hidden sm:hidden" : ""
                         }`}
                     >
-                        <div className="sm:col-span-full flex items-start gap-x-2">
-                            <input
-                                type="checkbox"
-                                checked={application.agreedToHawkHacksCoC}
-                                onChange={(e) =>
-                                    handleChange(
-                                        "agreedToHawkHacksCoC",
-                                        e.target.checked
-                                    )
-                                }
-                            />
-                            <p>
-                                {
-                                    "* I have read and agree to the HawkHacks Code of Conduct."
-                                }
-                                <a className="ml-2 text-sky-600 underline">
-                                    (TBD)
-                                </a>
-                            </p>
-                        </div>
+                        {/* dont have the CoC yet */}
+                        {/* <div className="sm:col-span-full flex items-start gap-x-2"> */}
+                        {/*     <input */}
+                        {/*         type="checkbox" */}
+                        {/*         checked={application.agreedToHawkHacksCoC} */}
+                        {/*         onChange={(e) => */}
+                        {/*             handleChange( */}
+                        {/*                 "agreedToHawkHacksCoC", */}
+                        {/*                 e.target.checked */}
+                        {/*             ) */}
+                        {/*         } */}
+                        {/*     /> */}
+                        {/*     <p> */}
+                        {/*         { */}
+                        {/*             "* I have read and agree to the HawkHacks Code of Conduct." */}
+                        {/*         } */}
+                        {/*         <a className="ml-2 text-sky-600 underline"> */}
+                        {/*             (TBD) */}
+                        {/*         </a> */}
+                        {/*     </p> */}
+                        {/* </div> */}
                         <div className="sm:col-span-full flex items-start gap-x-2">
                             <input
                                 type="checkbox"
@@ -305,12 +305,14 @@ export const ApplicationPage = () => {
                                 }
                             />
                             <p>
-                                {
-                                    "* I have read and agree to abide by the Wilfrid Laurier University Code of Conduct during the hackathon."
-                                }
-                                <a className="ml-2 text-sky-600 underline">
-                                    (TBD)
-                                </a>
+                                * I have read and agree to abide by the
+                                <a
+                                    href="https://www.wlu.ca/about/governance/assets/resources/12.3-non-academic-student-code-of-conduct.html"
+                                    className="ml-2 text-sky-600 underline"
+                                >
+                                    Wilfrid Laurier University Code of Conduct
+                                </a>{" "}
+                                during the hackathon.
                             </p>
                         </div>
                         <div className="sm:col-span-full flex items-start gap-x-2">
@@ -412,8 +414,17 @@ export const ApplicationPage = () => {
                     >
                         Back
                     </Button>
-                    <Button type="submit" disabled={isSubmitting}>
-                        {activeStep === steps.length - 1 ? "Submit" : "Next"}
+                    <Button
+                        type="submit"
+                        disabled={isSubmitting}
+                        // I mean.... why not? for funsies
+                        className={isSubmitting ? "animate-spin" : ""}
+                    >
+                        {isSubmitting
+                            ? "Submitting..."
+                            : activeStep === steps.length - 1
+                            ? "Submit"
+                            : "Next"}
                     </Button>
                 </div>
             </form>

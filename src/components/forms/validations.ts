@@ -8,9 +8,7 @@ export const profileFormValidation = z.object({
     lastName: z
         .string()
         .min(1, "Last name must contain at least 1 character(s)"),
-    email: z.string().email(),
     countryOfResidence: z.string().length(2),
-    emailVerified: z.boolean(),
     phone: z
         .string()
         .min(1, "Phone number is empty")
