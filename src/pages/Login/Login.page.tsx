@@ -127,18 +127,24 @@ export const LoginPage = () => {
         <div className="bg-dustStorm font-medium">
             <div className="py-4 flex justify-center items-center bg-gradient-to-r from-deepPurple/20 via-deepGold/20 via-50% to-stonePurple/20 min-h-screen">
                 <div className="mx-auto max-w-2xl px-4 sm:px-6 md:px-8">
-                    <h1 className="text-center sm:text-left text-3xl sm:text-5xl text-charcoalBlack font-body font-bold">
-                        HawkHacks Hacker Portal
-                    </h1>
-                    <div className="h-6" />
                     <div>
-                        <h2 className="font-normal text-xl text-charcoalBlack">
+                        <h1 className="text-center sm:text-left text-2xl sm:text-4xl text-charcoalBlack font-body font-bold">
                             {showResetPasswordForm
                                 ? "Reset Password"
                                 : isLogin
-                                ? "Log In"
-                                : "Create Account"}
-                        </h2>
+                                ? "Log into your account"
+                                : "Create your account"}
+                        </h1>
+                        {!showResetPasswordForm ? (
+                            <p className="text-charcoalBlack mt-2">
+                                Join hundreds of students across Canada in a 36
+                                hour period of exploration, creativity, and
+                                learning!
+                            </p>
+                        ) : null}
+                    </div>
+                    <div className="h-8" />
+                    <div>
                         {!showResetPasswordForm && (
                             <>
                                 <div className="w-full">
