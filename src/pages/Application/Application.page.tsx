@@ -59,8 +59,7 @@ export const ApplicationPage = () => {
     // we start with the default user profile
     const [application, setApplication] = useState<ApplicationData>(() => {
         let app = defaultApplication;
-        if (userProfile)
-            app = { ...app, ...userProfile, applicantId: userProfile.id };
+        if (userProfile) app = { ...app, ...userProfile };
         return app;
     });
 

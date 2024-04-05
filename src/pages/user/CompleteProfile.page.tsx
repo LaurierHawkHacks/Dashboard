@@ -22,8 +22,6 @@ export const CompleteProfilePage = () => {
     const { showNotification } = useNotification();
     const [controlledProfile, setControlledProfile] = useState<UserProfile>({
         ...defaultProfile,
-        id: currentUser.uid,
-        email: currentUser.email ?? "",
     });
 
     const handleChange = (name: keyof UserProfile, data: string | string[]) => {
@@ -36,7 +34,6 @@ export const CompleteProfilePage = () => {
 
     const handleSubmit: FormEventHandler = async (e) => {
         e.preventDefault();
-        if (!controlledProfile.id) return;
         const results = await profileFormValidation.spa(controlledProfile);
 
         if (results.success) {

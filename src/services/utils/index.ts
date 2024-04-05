@@ -2,12 +2,10 @@ import {
     Timestamp,
     addDoc,
     collection,
-    doc,
-    getDoc,
     getDocs,
+    limit,
     orderBy,
     query,
-    setDoc,
     where,
 } from "firebase/firestore";
 import { firestore, functions } from "@/services/firebase";
@@ -38,11 +36,14 @@ export async function createTicket(data: UserTicketData): Promise<string> {
  * @returns {Promise<UserProfile | null>} if profile does not exists, returns null
  */
 export async function getUserProfile(uid: string): Promise<UserProfile | null> {
-    const docRef = doc(firestore, "users", uid);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-        return docSnap.data() as UserProfile;
+    try {
+        const colRef = collection(firestore, USERS_COLLECTION);
+        const q = query(colRef, where("id", "==", uid), limit(1));
+        const snap = await getDocs(q);
+        if (snap.size < 1) return null;
+        return snap.docs[0].data() as UserProfile;
+    } catch (e) {
+        console.error("Error: getUserProfile");
     }
 
     return null;
@@ -54,8 +55,8 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
  *
  */
 export async function createUserProfile(data: UserProfile) {
-    const docRef = doc(firestore, USERS_COLLECTION, data.id);
-    await setDoc(docRef, data);
+    const cloudFn = httpsCallable(functions, "createUserProfile");
+    await cloudFn(data);
 }
 
 /**
@@ -73,16 +74,22 @@ export async function submitApplication(data: ApplicationData) {
  * Gets all the applications from a given user
  */
 export async function getUserApplications(uid: string) {
-    const colRef = collection(firestore, APPLICATIONS_COLLECTION);
-    const q = query(
-        colRef,
-        where("applicantId", "==", uid),
-        orderBy("timestamp", "desc")
-    );
-    const snap = await getDocs(q);
-    const apps: ApplicationData[] = [];
-    snap.forEach((doc) => apps.push(doc.data() as ApplicationData));
-    return apps;
+    try {
+        const colRef = collection(firestore, APPLICATIONS_COLLECTION);
+        const q = query(
+            colRef,
+            where("applicantId", "==", uid),
+            orderBy("timestamp", "desc")
+        );
+        const snap = await getDocs(q);
+        const apps: ApplicationData[] = [];
+        snap.forEach((doc) => apps.push(doc.data() as ApplicationData));
+        return apps;
+    } catch (e) {
+        console.error("Error: getUserApplications");
+    }
+
+    return [];
 }
 
 export async function verifyGitHubEmail(token: string, email: string) {
