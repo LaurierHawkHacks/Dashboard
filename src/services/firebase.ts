@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 import { connectAuthEmulator, getAuth } from "firebase/auth";
+import { getFunctions } from "firebase/functions";
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -17,6 +18,7 @@ export const app = initializeApp(firebaseConfig);
 export const analytics = getAnalytics(app);
 export const firestore = getFirestore(app);
 export const auth = getAuth(app);
+export const functions = getFunctions(app);
 
 if (!import.meta.env.PROD && import.meta.env.VITE_CONNECT_AUTH_EMU === "true") {
     connectAuthEmulator(auth, "http://127.0.0.1:9099");
