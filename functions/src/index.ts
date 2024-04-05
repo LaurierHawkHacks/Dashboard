@@ -12,11 +12,17 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { Octokit } from "octokit";
 import { z } from "zod";
+import axios from 'axios';
 
 // data imports
 import { ages } from "./data";
 
 admin.initializeApp();
+
+const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || '';
+const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || '';
+const TWILIO_SERVICE_SID = process.env.TWILIO_SERVICE_SID || '';
+
 // Default on-sign-up Claims function
 export const addDefaultClaims = functions.auth.user().onCreate(async (user) => {
     const { uid } = user;
@@ -360,3 +366,73 @@ export const submitApplication = functions.https.onCall(
         return { status: 200 };
     }
 );
+
+export const sendVerificationSms = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
+    }
+
+    const { phoneNumber } = data;
+    const fullPhoneNumber = `+1${phoneNumber}`; // Adjust the country code as necessary
+
+    const url = `https://verify.twilio.com/v2/Services/${TWILIO_SERVICE_SID}/Verifications`;
+
+    try {
+        const response = await axios.post(
+            url,
+            new URLSearchParams({
+                To: fullPhoneNumber,
+                Channel: 'sms',
+            }).toString(),
+            {
+                auth: {
+                    username: TWILIO_ACCOUNT_SID,
+                    password: TWILIO_AUTH_TOKEN,
+                },
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            }
+        );
+
+        return { success: true, sid: response.data.sid };
+    } catch (error) {
+        console.error('Error sending verification SMS:', error);
+        throw new functions.https.HttpsError('internal', 'Failed to send verification SMS');
+    }
+});
+
+export const verifySmsCode = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
+    }
+
+    const { phoneNumber, code } = data;
+    const fullPhoneNumber = `+1${phoneNumber}`; // Adjust the country code as necessary
+
+    const url = `https://verify.twilio.com/v2/Services/${TWILIO_SERVICE_SID}/VerificationCheck`;
+
+    try {
+        const response = await axios.post(
+            url,
+            new URLSearchParams({
+                To: fullPhoneNumber,
+                Code: code,
+            }).toString(),
+            {
+                auth: {
+                    username: TWILIO_ACCOUNT_SID,
+                    password: TWILIO_AUTH_TOKEN,
+                },
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            }
+        );
+
+        return { success: response.data.status === 'approved', status: response.data.status };
+    } catch (error) {
+        console.error('Error verifying SMS code:', error);
+        throw new functions.https.HttpsError('internal', 'Failed to verify SMS code');
+    }
+});
