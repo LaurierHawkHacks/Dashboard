@@ -417,6 +417,8 @@ export const ApplicationPage = () => {
                     <Button
                         type="submit"
                         disabled={isSubmitting}
+                        // I mean.... why not? for funsies
+                        className={isSubmitting ? "animate-spin" : ""}
                     >
                         {isSubmitting
                             ? "Submitting..."
