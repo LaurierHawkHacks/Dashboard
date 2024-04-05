@@ -9,4 +9,5 @@ interface ImportMetaEnv {
     VITE_FIREBASE_MEASUREMENT_ID: string;
     VITE_CONNECT_AUTH_EMU: string;
     VITE_GOOGLE_CLIENT_ID: string;
+    VITE_APP_VERSION: string;
 }
