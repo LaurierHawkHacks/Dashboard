@@ -397,6 +397,13 @@ export const ApplicationPage = () => {
                 <div className="h-12"></div>
                 {/* just a separator line */}
                 <div className="h-0.5 bg-gray-300 my-6"></div>
+                <div>
+                    {errors.length > 0 ? (
+                        <p className="text-center text-red-600">
+                            Oh no! It appears that the are errors in the form.
+                        </p>
+                    ) : null}
+                </div>
                 <div className="flex items-center justify-between px-4 py-4 sm:px-8">
                     <Button
                         disabled={activeStep === 0 || isSubmitting}
