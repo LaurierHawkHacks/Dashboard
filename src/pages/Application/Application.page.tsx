@@ -1,4 +1,9 @@
-import { FormEventHandler, useEffect, useState } from "react";
+import {
+    FormEventHandler,
+    MouseEventHandler,
+    useEffect,
+    useState,
+} from "react";
 import { Navigate } from "react-router-dom";
 import { z } from "zod";
 import { useAuth, useNotification } from "@/providers/hooks";
@@ -24,10 +29,18 @@ import {
     hackerAppFormValidation,
     profileFormValidation,
 } from "@/components/forms/validations";
-import { getUserApplications, submitApplication } from "@/services/utils";
+import {
+    getUserApplications,
+    submitApplication,
+    sendVerificationCode,
+    verifyCode,
+} from "@/services/utils";
 
 const stepValidations = [
     profileFormValidation,
+    z.object({
+        verificationCode: z.string().optional(),
+    }),
     z.object({
         participatingAs: z
             .string()
@@ -55,6 +68,8 @@ export const ApplicationPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [hasApplied, setHasApplied] = useState(true); // default to true to prevent showing the form at first load
     const { showNotification } = useNotification();
+    const [verificationCode, setVerificationCode] = useState("");
+    const [isVerified, setIsVerified] = useState(false);
 
     if (!currentUser) return <Navigate to={routes.login} />;
 
@@ -98,17 +113,25 @@ export const ApplicationPage = () => {
     const nextStep = () => {
         if (activeStep < steps.length) {
             if (!validate()) return;
+            if (activeStep === 1 && !isVerified) {
+                setErrors([
+                    "Please verify your phone number before proceeding.",
+                ]);
+                return;
+            }
             setSteps((s) => {
                 s[activeStep].status = "complete";
-                s[activeStep + 1].status = "current";
-                return s;
+                s[Math.min(activeStep + 1, steps.length - 1)].status =
+                    "current";
+                return [...s];
             });
-            setActiveStep((s) => s + 1);
+            setActiveStep((s) => Math.min(s + 1, steps.length - 1));
         }
     };
 
     const prevStep = () => {
         if (activeStep > 0) {
+            if (!validate()) return;
             setActiveStep((s) => s - 1);
         }
     };
@@ -164,6 +187,54 @@ export const ApplicationPage = () => {
         }
     };
 
+    const sendCode: MouseEventHandler = async (e) => {
+        e.preventDefault();
+        try {
+            await sendVerificationCode(application.phone);
+            showNotification({
+                title: "Verification Code Sent",
+                message: "Please check your phone for the verification code.",
+            });
+        } catch (error) {
+            console.error("Error sending verification code:", error);
+            showNotification({
+                title: "Error Sending Verification Code",
+                message: "Please try again later.",
+            });
+        }
+    };
+
+    const verifyPhone: MouseEventHandler = async (e) => {
+        e.preventDefault();
+        try {
+            const result = await verifyCode(
+                application.phone,
+                verificationCode
+            );
+            if (result) {
+                setIsVerified(true);
+                setApplication((prevApplication) => ({
+                    ...prevApplication,
+                    phoneVerified: true,
+                }));
+                setIsVerified(true);
+                showNotification({
+                    title: "Phone Verified",
+                    message:
+                        "Your phone number has been successfully verified.",
+                });
+            } else {
+                setErrors(["Invalid verification code. Please try again."]);
+            }
+        } catch (error) {
+            console.error("Error verifying code:", error);
+            showNotification({
+                title: "Error Verifying Code",
+                message: "Please try again later.",
+            });
+        }
+    };
+
     useEffect(() => {
         const checkApp = async () => {
             const apps = await getUserApplications(currentUser.uid);
@@ -215,6 +286,55 @@ export const ApplicationPage = () => {
                             activeStep !== 1 ? " hidden sm:hidden" : ""
                         }`}
                     >
+                        <div className="sm:col-span-full space-y-2">
+                            {" "}
+                            {/* Add space-y-2 for vertical spacing */}
+                            <TextInput
+                                label="Phone Number"
+                                id="phone"
+                                type="tel"
+                                placeholder="Enter your phone number"
+                                value={application.phone}
+                                onChange={(e) =>
+                                    handleChange("phone", e.target.value)
+                                }
+                                required
+                            />
+                            <Button
+                                onClick={sendCode}
+                                disabled={!application.phone}
+                            >
+                                Send Verification Code
+                            </Button>
+                        </div>
+
+                        <div className="sm:col-span-full space-y-2">
+                            {" "}
+                            {/* Add space-y-2 for vertical spacing */}
+                            <TextInput
+                                label="Verification Code"
+                                id="verificationCode"
+                                type="text"
+                                placeholder="Enter the verification code"
+                                value={verificationCode}
+                                onChange={(e) =>
+                                    setVerificationCode(e.target.value)
+                                }
+                                required
+                            />
+                            <Button
+                                onClick={verifyPhone}
+                                disabled={!verificationCode || isVerified}
+                            >
+                                Verify Code
+                            </Button>
+                        </div>
+                    </div>
+                    <div
+                        className={`mx-auto sm:grid max-w-2xl space-y-8 sm:gap-x-6 sm:gap-y-8 sm:space-y-0 sm:grid-cols-6${
+                            activeStep !== 2 ? " hidden sm:hidden" : ""
+                        }`}
+                    >
                         <div className="sm:col-span-full">
                             <Select
                                 label="Role"
@@ -229,10 +349,10 @@ export const ApplicationPage = () => {
                     </div>
                     <div
                         className={`mx-auto sm:grid max-w-2xl space-y-8 sm:gap-x-6 sm:gap-y-8 sm:space-y-0 sm:grid-cols-6${
-                            activeStep !== 2 ? " hidden sm:hidden" : ""
+                            activeStep !== 3 ? " hidden sm:hidden" : ""
                         }`}
                     >
-                        {hackerAppFormInputs?.map((input) => (
+                        {hackerAppFormInputs.map((input) => (
                             <div
                                 key={input.props.label}
                                 className="sm:col-span-full"
@@ -270,7 +390,7 @@ export const ApplicationPage = () => {
                     </div>
                     <div
                         className={`mx-auto sm:grid max-w-2xl space-y-8 sm:gap-x-6 sm:gap-y-8 sm:space-y-0 sm:grid-cols-6${
-                            activeStep !== 3 ? " hidden sm:hidden" : ""
+                            activeStep !== 4 ? " hidden sm:hidden" : ""
                         }`}
                     >
                         {/* dont have the CoC yet */}
@@ -396,9 +516,9 @@ export const ApplicationPage = () => {
                         </div>
                     </div>
                 </div>
-                {/* adding some more white space between the last input field and the buttons */}
-                <div className="h-12"></div>
-                {/* just a separator line */}
+                {/* adding some more white space between the last input field and the buttons /}
+                                        <div className="h-12"></div>
+                                        {/ just a separator line */}
                 <div className="h-0.5 bg-gray-300 my-6"></div>
                 <div>
                     {errors.length > 0 ? (
@@ -417,8 +537,9 @@ export const ApplicationPage = () => {
                     </Button>
                     <Button
                         type="submit"
-                        disabled={isSubmitting}
-                        // I mean.... why not? for funsies
+                        disabled={
+                            isSubmitting || (activeStep === 1 && !isVerified)
+                        }
                         className={isSubmitting ? "animate-spin" : ""}
                     >
                         {isSubmitting

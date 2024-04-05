@@ -11,6 +11,7 @@ import { firestore, functions } from "@/services/firebase";
 import type { UserTicketData, UserProfile } from "@/services/utils/types";
 import { ApplicationData } from "@/components/forms/types";
 import { httpsCallable } from "firebase/functions";
+import axios from 'axios';
 
 export const TICKETS_COLLECTION = "tickets";
 export const USERS_COLLECTION = "users";
@@ -98,4 +99,73 @@ export async function verifyGitHubEmail(token: string, email: string) {
     }
 
     return true;
+}
+
+
+const accountSid = import.meta.env.VITE_TWILIO_ACCOUNT_SID;
+const authToken = import.meta.env.VITE_TWILIO_AUTH_TOKEN;
+const serviceSid = import.meta.env.VITE_TWILIO_SERVICE_SID
+
+const baseURL = 'https://verify.twilio.com/v2';
+
+export async function sendVerificationCode(phoneNumber: string) {
+    console.log(accountSid);
+    if (!serviceSid) {
+        throw new Error('Twilio service SID is not defined.');
+    }
+    phoneNumber = '+1' + phoneNumber;
+    try {
+        const response = await axios.post(
+            `${baseURL}/Services/${serviceSid}/Verifications`,
+            new URLSearchParams({
+                To: phoneNumber,
+                Channel: 'sms',
+            }),
+            {
+                auth: {
+                    username: accountSid,
+                    password: authToken,
+                },
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            }
+        );
+
+        return response.data.sid;
+    } catch (error) {
+        console.error('Error sending verification code:', error);
+        throw error;
+    }
+}
+
+export async function verifyCode(phoneNumber: string, code: string) {
+    phoneNumber = '+1' + phoneNumber;
+    if (!serviceSid) {
+        throw new Error('Twilio service SID is not defined.');
+    }
+
+    try {
+        const response = await axios.post(
+            `${baseURL}/Services/${serviceSid}/VerificationCheck`,
+            new URLSearchParams({
+                To: phoneNumber,
+                Code: code,
+            }),
+            {
+                auth: {
+                    username: accountSid,
+                    password: authToken,
+                },
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            }
+        );
+        console.log(response.data.status === 'approved');
+        return response.data.status === 'approved';
+    } catch (error) {
+        console.error('Error verifying code:', error);
+        throw error;
+    }
 }
