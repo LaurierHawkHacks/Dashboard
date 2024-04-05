@@ -95,7 +95,7 @@ export const Navbar = () => {
                                 to="/profile"
                             >
                                 <img
-                                    className="h-12 w-12"
+                                    className="h-10 w-10"
                                     src={Logo}
                                     alt="HawkHacks Logo"
                                 />
@@ -143,7 +143,7 @@ export const Navbar = () => {
                             to="/profile"
                         >
                             <img
-                                className="h-12 w-12"
+                                className="h-10 w-10"
                                 src={Logo}
                                 alt="HawkHacks Logo"
                             />
