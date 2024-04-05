@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { FormEventHandler, useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { z } from "zod";
 import { useAuth, useNotification } from "@/providers/hooks";
@@ -120,8 +120,15 @@ export const ApplicationPage = () => {
         }
     };
 
-    const submitApp = async () => {
+    const submitApp: FormEventHandler = async (e) => {
+        e.preventDefault();
+
         clearErrors();
+
+        if (activeStep !== steps.length - 1) {
+            nextStep();
+            return;
+        }
 
         const allRequiredChecked =
             application.agreedToHawkHacksCoC &&
@@ -194,7 +201,7 @@ export const ApplicationPage = () => {
                 All fields with an <span className="font-bold">asterisk</span>{" "}
                 are <span className="font-bold">required</span>.
             </h3>
-            <form className="mt-12">
+            <form onSubmit={submitApp} className="mt-12">
                 <div className="">
                     <div
                         className={`mx-auto sm:grid max-w-2xl space-y-8 sm:gap-x-6 sm:gap-y-8 sm:space-y-0 sm:grid-cols-6${
@@ -398,15 +405,7 @@ export const ApplicationPage = () => {
                     >
                         Back
                     </Button>
-                    <Button
-                        type="button"
-                        onClick={
-                            activeStep === steps.length - 1
-                                ? submitApp
-                                : nextStep
-                        }
-                        disabled={isSubmitting}
-                    >
+                    <Button type="submit" disabled={isSubmitting}>
                         {activeStep === steps.length - 1 ? "Submit" : "Next"}
                     </Button>
                 </div>
