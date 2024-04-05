@@ -11,11 +11,23 @@ export const profileFormValidation = z.object({
     email: z.string().email(),
     countryOfResidence: z.string().length(2),
     emailVerified: z.boolean(),
-    phone: z.string().min(1, "Phone number is empty"),
+    phone: z
+        .string()
+        .min(1, "Phone number is empty")
+        .regex(
+            /^\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$/,
+            "Invalid phone number"
+        ),
     school: z.string().min(1, "School is empty"),
     levelOfStudy: z.string().min(1, "Level of study is empty"),
     age: z.string().refine((val) => ages.includes(val)),
-    discord: z.string().min(1, "Discord username is empty"),
+    discord: z.string().refine((val) => {
+        if (val.length < 1) return false;
+
+        if (val[0] === "@" && val.length === 1) return false;
+
+        return true;
+    }, "Invalid Discord username"),
 });
 
 export const hackerAppFormValidation = z.object({

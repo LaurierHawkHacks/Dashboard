@@ -1,4 +1,4 @@
-import { FC, Fragment, useState } from "react";
+import { FC, Fragment, useRef, useState } from "react";
 import { Combobox, Transition } from "@headlessui/react";
 import {
     CheckIcon,
@@ -8,6 +8,7 @@ import {
 import { VariantProps, cva } from "class-variance-authority";
 import { ClassProp } from "class-variance-authority/types";
 import { twMerge } from "tailwind-merge";
+import { getTextInputDescriptionStyles } from "../TextInput/TextInput.styles";
 
 const SelectedList: FC<{
     options: string[];
@@ -62,6 +63,7 @@ export interface MultiSelectProps {
     name?: string;
     disabled?: boolean;
     required?: boolean;
+    description?: string;
     onChange?: (opts: string[]) => void;
 }
 
@@ -74,10 +76,12 @@ export const MultiSelect: FC<MultiSelectProps> = ({
     name,
     disabled,
     required,
+    description,
     onChange,
 }) => {
     const [selected, setSelected] = useState<string[]>(initialValues);
     const [query, setQuery] = useState("");
+    const randomId = useRef(Math.random().toString(32));
 
     const handleChange = (opts: string[]) => {
         setSelected(opts);
@@ -94,6 +98,8 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                       .includes(query.toLowerCase().trim());
               });
 
+    const describedby = `multiselect-description-${randomId}`;
+
     return (
         <Combobox
             disabled={disabled}
@@ -108,7 +114,7 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                         srLabelOnly ? " sr-only" : ""
                     }`}
                 >
-                    {label}
+                    {`${label} (one or more)`}
                     {required ? (
                         <span className="text-red-600 ml-1">*</span>
                     ) : null}
@@ -127,8 +133,10 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                 )}
                 <div className="relative w-full mt-2 cursor-default overflow-hidden bg-gray-50 text-left border border-charcoalBlack">
                     <Combobox.Input
+                        id={randomId.current}
                         className="w-full border-none py-2 pl-3 pr-10 leading-5 text-gray-900 bg-gray-50 focus:ring-0"
                         onChange={(event) => setQuery(event.target.value)}
+                        aria-describedby={describedby}
                     />
                     <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
                         <ChevronUpDownIcon
@@ -137,6 +145,16 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                         />
                     </Combobox.Button>
                 </div>
+                {description && (
+                    <p
+                        className={getTextInputDescriptionStyles({
+                            invalid: false,
+                        })}
+                        id={describedby}
+                    >
+                        {description}
+                    </p>
+                )}
                 <Transition
                     as={Fragment}
                     leave="transition ease-in duration-100"
@@ -187,7 +205,6 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                     </Combobox.Options>
                 </Transition>
                 <p className="mt-2 text-sageGray">
-                    Choose everything that applies.
                     {allowCustomValue ? (
                         <span className="block mt-2">
                             {`Not in the options? Type your ${label} in the input field.`}

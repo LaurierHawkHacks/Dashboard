@@ -76,9 +76,10 @@ export const Profile = ({
                 <TextInput
                     label="Phone Number"
                     id="phone-number"
-                    placeholder="+1 (999) 999-9999"
+                    placeholder="(999) 999-9999"
                     value={profile.phone}
                     onChange={(e) => handler("phone", e.target.value)}
+                    description="US/CA numbers only"
                     required
                 />
             </div>

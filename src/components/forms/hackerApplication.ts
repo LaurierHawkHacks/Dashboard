@@ -40,7 +40,6 @@ export const hackerAppFormInputs: FormInput[] = [
         props: {
             label: "Pronouns",
             options: pronouns,
-            initialValues: ["Prefer not to answer"],
             allowCustomValue: true,
             required: true,
         },
@@ -96,6 +95,7 @@ export const hackerAppFormInputs: FormInput[] = [
             label: "T-Shirt Size",
             options: shirtSizes,
             required: true,
+            description: "Unisex sizes",
         },
         name: "shirtSizes",
     },
