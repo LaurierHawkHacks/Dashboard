@@ -198,6 +198,7 @@ export const LoginPage = () => {
                                             <div className="flex justify-end">
                                                 <button
                                                     className="text-charcoalBlack font-bold underline hover:text-tbrand-hover"
+                                                    type="button"
                                                     onClick={
                                                         toggleResetPassword
                                                     }
