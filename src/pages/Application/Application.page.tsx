@@ -45,7 +45,7 @@ const stepValidations = [
 
 export const ApplicationPage = () => {
     // TODO: save steps in firebase to save progress
-    const [steps, setSteps] = useState(defaultSteps);
+    const [steps, setSteps] = useState({ ...defaultSteps });
     const [activeStep, setActiveStep] = useState(0); // index
     const [errors, setErrors] = useState<string[]>([]);
     const { currentUser, userProfile } = useAuth();
