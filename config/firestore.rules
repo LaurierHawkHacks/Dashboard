@@ -26,7 +26,7 @@ service cloud.firestore {
     // 2. document is not new and user is owner
     match /users/{documentId} {
       allow read: if isAuthenticated() && (isAdmin() || isOwner(resource.data.id));
-      allow write: if isAuthenticated() && (isAdmin() || !exists(/users/{documentId}) || (exists(/users/{documentId}) && isOwner(resource.data.id)));
+      allow write: if isAuthenticated() && isAdmin();
     }
 
     // Allow read/write access to the entire database for admin users
