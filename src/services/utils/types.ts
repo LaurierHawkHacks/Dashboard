@@ -14,4 +14,5 @@ export interface UserProfile {
     city: string;
     age: string;
     discord: string;
+    major: string[];
 }
