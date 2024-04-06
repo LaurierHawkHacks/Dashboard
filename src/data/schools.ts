@@ -1,4 +1,6 @@
 export const schools: string[] = [
+    "Wilfrid Laurier University",
+    "The University of Waterloo",
     "21st Century Cyber Charter School",
     "Aalto University",
     "Aarhus University",
@@ -1906,7 +1908,6 @@ export const schools: string[] = [
     "The University of Warwick",
     "The University of Washington",
     "The University of Washington Bothell",
-    "The University of Waterloo",
     "The University of West Georgia",
     "The University of Western Ontario",
     "The University of Westminster",
@@ -2174,7 +2175,6 @@ export const schools: string[] = [
     "Wichita State University",
     "Widener University",
     "Wilbert Tucker Woodson High School",
-    "Wilfrid Laurier University",
     "Wilkes University",
     "William & Mary",
     "William L. Sayre High School",
