@@ -410,6 +410,8 @@ export const ApplicationPage = () => {
                                 * I have read and agree to abide by the
                                 <a
                                     href="https://www.wlu.ca/about/governance/assets/resources/12.3-non-academic-student-code-of-conduct.html"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     className="ml-2 text-sky-600 underline"
                                 >
                                     Wilfrid Laurier University Code of Conduct
@@ -433,6 +435,8 @@ export const ApplicationPage = () => {
                                 <a
                                     className="ml-2 text-sky-600 underline"
                                     href="https://static.mlh.io/docs/mlh-code-of-conduct.pdf"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                 >
                                     {" "}
                                     MLH Code of Conduct
@@ -461,6 +465,8 @@ export const ApplicationPage = () => {
                                 <a
                                     className="text-sky-600 underline"
                                     href="https://mlh.io/privacy"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                 >
                                     {" "}
                                     MLH Privacy Policy
@@ -469,6 +475,8 @@ export const ApplicationPage = () => {
                                 <a
                                     className="text-sky-600 underline"
                                     href="https://github.com/MLH/mlh-policies/blob/main/contest-terms.md)and"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                 >
                                     {" "}
                                     MLH Contest Terms and Conditions
