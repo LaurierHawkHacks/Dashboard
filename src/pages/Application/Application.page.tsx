@@ -13,18 +13,30 @@ import {
     LoadingAnimation,
 } from "@components";
 import { Profile } from "@/components/forms/Profile";
-import { hackerAppFormInputs } from "@/components/forms/hackerApplication";
+import {
+    hackerAppFormInputs,
+    hackerSpecificForm,
+    mentorSpecificForm,
+    volunteerSpecificForm,
+} from "@/components/forms/hackerApplication";
 import type {
     ApplicationInputKeys,
     ApplicationData,
+    FormInput,
 } from "@/components/forms/types";
 import type { Step } from "@/components/types";
 import { defaultApplication } from "@/components/forms/defaults";
 import {
+    finalChecksValidation,
     hackerAppFormValidation,
+    hackerSpecificValidation,
+    mentorSpecificValidation,
     profileFormValidation,
+    volunteerSpecificValidation,
 } from "@/components/forms/validations";
 import { getUserApplications, submitApplication } from "@/services/utils";
+import { TextArea } from "@/components/TextArea/TextArea";
+import { referralSources } from "@/data";
 
 const stepValidations = [
     profileFormValidation,
@@ -34,6 +46,7 @@ const stepValidations = [
             .refine((val) => ["Hacker", "Mentor", "Volunteer"].includes(val)),
     }),
     hackerAppFormValidation,
+    finalChecksValidation,
 ];
 
 export const ApplicationPage = () => {
@@ -72,15 +85,13 @@ export const ApplicationPage = () => {
         // @ts-ignore the "name" key is controlled by the keyof typing, restricts having undefined keys, so disable is ok
         application[name] = data;
         setApplication({ ...application });
+        console.log(application);
     };
 
     const clearErrors = () => setErrors([]);
 
     const validate = () => {
         clearErrors();
-
-        // allow going back in the final checks step
-        if (activeStep === steps.length - 1) return true;
 
         // validate step form
         const validateFn = stepValidations[activeStep];
@@ -92,12 +103,25 @@ export const ApplicationPage = () => {
             return false;
         }
 
+        if (activeStep === 1) {
+            const validateFn =
+                application.participatingAs === "Hacker"
+                    ? hackerSpecificValidation
+                    : application.participatingAs === "Mentor"
+                    ? mentorSpecificValidation
+                    : volunteerSpecificValidation;
+            const results = validateFn.safeParse(application);
+            if (!results.success) {
+                setErrors(results.error.issues.map((i) => i.message));
+                return false;
+            }
+        }
+
         return true;
     };
 
     const nextStep = () => {
         if (activeStep < steps.length) {
-            if (!validate()) return;
             setSteps((s) => {
                 s[activeStep].status = "complete";
                 s[activeStep + 1].status = "current";
@@ -124,6 +148,7 @@ export const ApplicationPage = () => {
         e.preventDefault();
 
         clearErrors();
+        if (!validate()) return;
 
         if (activeStep !== steps.length - 1) {
             nextStep();
@@ -174,6 +199,13 @@ export const ApplicationPage = () => {
         checkApp();
     }, []);
 
+    const specificQuestions: FormInput[] =
+        application.participatingAs === "Hacker"
+            ? hackerSpecificForm
+            : application.participatingAs === "Mentor"
+            ? mentorSpecificForm
+            : volunteerSpecificForm;
+
     if (isLoading) return <LoadingAnimation />;
 
     if (hasApplied)
@@ -204,8 +236,8 @@ export const ApplicationPage = () => {
             <form onSubmit={submitApp} className="mt-12">
                 <div className="">
                     <div
-                        className={`mx-auto sm:grid max-w-2xl space-y-8 sm:gap-x-6 sm:gap-y-8 sm:space-y-0 sm:grid-cols-6${
-                            activeStep !== 0 ? " hidden sm:hidden" : ""
+                        className={`mx-auto lg:grid max-w-4xl space-y-8 lg:gap-x-6 lg:gap-y-8 lg:space-y-0 lg:grid-cols-6${
+                            activeStep !== 0 ? " hidden lg:hidden" : ""
                         }`}
                     >
                         <Profile profile={application} handler={handleChange} />
@@ -226,6 +258,52 @@ export const ApplicationPage = () => {
                                 required
                             />
                         </div>
+                        {/* render role specific questions */}
+                        {specificQuestions.map((input) => (
+                            <div
+                                key={input.props.label}
+                                className="sm:col-span-full"
+                            >
+                                {input.type === "text" ? (
+                                    <TextInput
+                                        {...input.props}
+                                        value={
+                                            application[input.name] as string
+                                        }
+                                        onChange={(e) =>
+                                            handleChange(
+                                                input.name,
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+                                ) : input.type === "select" ? (
+                                    <Select
+                                        {...input.props}
+                                        onChange={(opt) =>
+                                            handleChange(input.name, opt)
+                                        }
+                                    />
+                                ) : input.type === "multiselect" ? (
+                                    <MultiSelect
+                                        {...input.props}
+                                        onChange={(opts) =>
+                                            handleChange(input.name, opts)
+                                        }
+                                    />
+                                ) : input.type === "textarea" ? (
+                                    <TextArea
+                                        {...input.props}
+                                        onChange={(e) =>
+                                            handleChange(
+                                                input.name,
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+                                ) : null}
+                            </div>
+                        ))}
                     </div>
                     <div
                         className={`mx-auto sm:grid max-w-2xl space-y-8 sm:gap-x-6 sm:gap-y-8 sm:space-y-0 sm:grid-cols-6${
@@ -273,6 +351,27 @@ export const ApplicationPage = () => {
                             activeStep !== 3 ? " hidden sm:hidden" : ""
                         }`}
                     >
+                        <div className="sm:col-span-full">
+                            <MultiSelect
+                                label="How did you hear about us?"
+                                options={referralSources}
+                                onChange={(opts) =>
+                                    handleChange("referralSources", opts)
+                                }
+                                allowCustomValue
+                                required
+                            />
+                        </div>
+                        <div className="sm:col-span-full">
+                            <TextInput
+                                label="How would you describe the taste of salt to someone who hasn't tasted it, and can't ever taste it?"
+                                id="funsie-1"
+                                onChange={(e) =>
+                                    handleChange("describeSalt", e.target.value)
+                                }
+                                required
+                            />
+                        </div>
                         {/* dont have the CoC yet */}
                         {/* <div className="sm:col-span-full flex items-start gap-x-2"> */}
                         {/*     <input */}
@@ -294,6 +393,8 @@ export const ApplicationPage = () => {
                         {/*         </a> */}
                         {/*     </p> */}
                         {/* </div> */}
+                        {/* create some empty space between inputs and checkboxes */}
+                        <div className="sm:col-span-full h-12"></div>
                         <div className="sm:col-span-full flex items-start gap-x-2">
                             <input
                                 type="checkbox"

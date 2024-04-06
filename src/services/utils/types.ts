@@ -11,6 +11,7 @@ export interface UserProfile {
     school: string;
     levelOfStudy: string;
     countryOfResidence: string;
+    city: string;
     age: string;
     discord: string;
 }
