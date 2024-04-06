@@ -1,4 +1,4 @@
-import { TextInput, Select, MultiSelect } from "@components";
+import { TextInput, Select, MultiSelect, PhoneInput } from "@components";
 import {
     ages,
     countryNames,
@@ -100,6 +100,10 @@ export const Profile = ({
                     onChange={(opt) => handler("city", opt)}
                     required
                 />
+            </div>
+
+            <div className="col-span-6">
+                <PhoneInput onChange={(phone) => handler("phone", phone)} />
             </div>
 
             <div className="sm:col-span-3">
