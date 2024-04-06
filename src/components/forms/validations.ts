@@ -34,7 +34,7 @@ export const profileFormValidation = z.object({
 
 export const hackerAppFormValidation = z.object({
     gender: z.string().transform((val) => val ?? "Prefer not to answer"),
-    pronouns: z.string().array(),
+    pronouns: z.string().min(1, "Please select your pronouns."),
     sexuality: z.string(),
     race: z.string(),
     diets: z.string().array(),
