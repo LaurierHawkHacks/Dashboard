@@ -162,7 +162,7 @@ export const mentorSpecificForm: FormInput[] = [
     {
         type: "text",
         props: {
-            label: "Do you have a personal or other website you would like to include? If so, please provide a link to your profile.",
+            label: "Do you have a personal or other website you would like to include? If so, please provide a link.",
             required: false,
         },
         name: "personalWebsiteUrl",
