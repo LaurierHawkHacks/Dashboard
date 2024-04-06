@@ -2,13 +2,12 @@ import {
     addDoc,
     collection,
     getDocs,
-    limit,
     orderBy,
     query,
     where,
 } from "firebase/firestore";
 import { firestore, functions } from "@/services/firebase";
-import type { UserTicketData, UserProfile } from "@/services/utils/types";
+import type { UserTicketData } from "@/services/utils/types";
 import { ApplicationData } from "@/components/forms/types";
 import { httpsCallable } from "firebase/functions";
 
@@ -27,35 +26,6 @@ export async function createTicket(data: UserTicketData): Promise<string> {
         data
     );
     return docRef.id;
-}
-
-/**
- * Get user profile stored in firestore.
- *
- * @returns {Promise<UserProfile | null>} if profile does not exists, returns null
- */
-export async function getUserProfile(uid: string): Promise<UserProfile | null> {
-    try {
-        const colRef = collection(firestore, USERS_COLLECTION);
-        const q = query(colRef, where("id", "==", uid), limit(1));
-        const snap = await getDocs(q);
-        if (snap.size < 1) return null;
-        return snap.docs[0].data() as UserProfile;
-    } catch (e) {
-        console.error("Error: getUserProfile");
-    }
-
-    return null;
-}
-
-/**
- * Tries to create a new document in the users collection.
- * IMPORTANT: It will overwrite any document with the same id provided.
- *
- */
-export async function createUserProfile(data: UserProfile) {
-    const cloudFn = httpsCallable(functions, "createUserProfile");
-    await cloudFn(data);
 }
 
 /**

@@ -1,4 +1,3 @@
-import type { UserProfile } from "@/services/utils/types";
 import type {
     TextInputProps,
     SelectProps,
@@ -7,6 +6,15 @@ import type {
 import { TextAreaProps } from "../TextArea/TextArea";
 
 export interface HackerApplicationData {
+    firstName: string;
+    lastName: string;
+    phone: string;
+    school: string;
+    levelOfStudy: string;
+    countryOfResidence: string;
+    city: string;
+    age: string;
+    discord: string;
     major: string[];
     gender: string;
     pronouns: string[];
@@ -46,8 +54,7 @@ export interface VolunteerSpecificAppData {
     excitedToVolunteerFor: string;
 }
 
-export type ApplicationData = UserProfile &
-    HackerApplicationData &
+export type ApplicationData = HackerApplicationData &
     HackerSpecificAppData &
     MentorSpecificAppData &
     VolunteerSpecificAppData;

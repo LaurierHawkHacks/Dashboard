@@ -8,14 +8,16 @@ import {
     majorsList,
 } from "@data";
 
-import type { UserProfile } from "@/services/utils/types";
-import type { ApplicationInputKeys } from "@/components/forms/types";
+import type {
+    ApplicationData,
+    ApplicationInputKeys,
+} from "@/components/forms/types";
 
 export const Profile = ({
     profile,
     handler,
 }: {
-    profile: UserProfile;
+    profile: ApplicationData;
     handler: (name: ApplicationInputKeys, data: string | string[]) => void;
 }) => {
     return (

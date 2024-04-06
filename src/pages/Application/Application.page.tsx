@@ -61,9 +61,9 @@ export const ApplicationPage = () => {
         { position: 2, name: "Application", status: "upcoming" },
         { position: 3, name: "Final checks", status: "upcoming" },
     ]);
-    const [activeStep, setActiveStep] = useState(3); // index
+    const [activeStep, setActiveStep] = useState(0); // index
     const [errors, setErrors] = useState<string[]>([]);
-    const { currentUser, userProfile } = useAuth();
+    const { currentUser } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [hasApplied, setHasApplied] = useState(true); // default to true to prevent showing the form at first load
@@ -73,10 +73,9 @@ export const ApplicationPage = () => {
 
     // we start with the default user profile
     const [application, setApplication] = useState<ApplicationData>(() => {
-        let app: ApplicationData = {
+        const app: ApplicationData = {
             ...defaultApplication,
         };
-        if (userProfile) app = { ...app, ...userProfile };
         return app;
     });
 
@@ -464,8 +463,7 @@ export const ApplicationPage = () => {
                                 * I authorize you to share my
                                 application/registration information with Major
                                 League Hacking for event administration,
-                                ranking, and MLH administration in line with the
-                                {" "}
+                                ranking, and MLH administration in line with the{" "}
                                 <a
                                     className="text-sky-600 underline"
                                     href="https://mlh.io/privacy"

@@ -1,7 +1,6 @@
-import type { UserProfile } from "@/services/utils/types";
 import type { ApplicationData } from "@/components/forms/types";
 
-export const defaultProfile: UserProfile = {
+export const defaultApplication: ApplicationData = {
     firstName: "",
     lastName: "",
     phone: "",
@@ -12,12 +11,7 @@ export const defaultProfile: UserProfile = {
     countryOfResidence: "",
     city: "",
     major: [],
-};
 
-export const defaultApplication: ApplicationData = {
-    ...defaultProfile,
-
-    major: [],
     gender: "",
     pronouns: [],
     sexuality: "",
