@@ -76,7 +76,7 @@ export const interests = [
     "Frontend Engineering",
     "Backend Engineering",
     "Full-stack Engineering",
-    "Data Sciene",
+    "Data Science",
     "Robotics",
     "AR/VR Technology",
     "Embedded Systems",
