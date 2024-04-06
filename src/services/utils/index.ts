@@ -11,7 +11,6 @@ import { firestore, functions } from "@/services/firebase";
 import type { UserTicketData, UserProfile } from "@/services/utils/types";
 import { ApplicationData } from "@/components/forms/types";
 import { httpsCallable } from "firebase/functions";
-import axios from 'axios';
 
 export const TICKETS_COLLECTION = "tickets";
 export const USERS_COLLECTION = "users";
@@ -109,5 +108,6 @@ export async function sendVerificationCode(phoneNumber: string) {
 export async function verifyCode(phoneNumber: string, code: string) {
     const verifySmsFn = httpsCallable(functions, "verifySmsCode");
     const result = await verifySmsFn({ phoneNumber, code });
-    return result.data === 'approved';
+    return result.data === "approved";
 }
+

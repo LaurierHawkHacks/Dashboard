@@ -16,7 +16,6 @@
     "dependencies": {
         "@headlessui/react": "^1.7.18",
         "@heroicons/react": "^2.1.1",
-        "axios": "^1.6.8",
         "class-variance-authority": "^0.7.0",
         "firebase": "^10.5.2",
         "hamburger-react": "^2.5.0",
