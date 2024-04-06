@@ -1,4 +1,5 @@
 import { TextInput, Select } from "@components";
+import { PhoneInput } from "@/components/PhoneInput/PhoneInput";
 import { ages, countryNames, schools, levelsOfStudy } from "@data";
 
 import type { UserProfile } from "@/services/utils/types";
@@ -60,13 +61,8 @@ export const Profile = ({
             </div>
 
             <div className="col-span-6">
-                <TextInput
-                    label="Phone Number"
-                    id="phone-number"
-                    placeholder="(999) 999-9999"
-                    value={profile.phone}
-                    onChange={(e) => handler("phone", e.target.value)}
-                    description="US/CA numbers only"
+                <PhoneInput
+                    onChange={(phone) => handler("phone", phone)}
                     required
                 />
             </div>
