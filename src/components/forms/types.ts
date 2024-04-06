@@ -35,8 +35,11 @@ export interface HackerSpecificAppData {
 }
 
 export interface MentorSpecificAppData {
-    mentorResumeUrl: string;
     mentorExperience: string;
+    linkedinUrl: string;
+    githubUrl: string;
+    personalWebsiteUrl: string;
+    mentorResumeUrl: string;
     reasonToBeMentor: string;
 }
 
