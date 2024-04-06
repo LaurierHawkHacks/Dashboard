@@ -61,7 +61,7 @@ export const ApplicationPage = () => {
         { position: 2, name: "Application", status: "upcoming" },
         { position: 3, name: "Final checks", status: "upcoming" },
     ]);
-    const [activeStep, setActiveStep] = useState(0); // index
+    const [activeStep, setActiveStep] = useState(3); // index
     const [errors, setErrors] = useState<string[]>([]);
     const { currentUser, userProfile } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -407,12 +407,12 @@ export const ApplicationPage = () => {
                                 }
                             />
                             <p>
-                                * I have read and agree to abide by the
+                                * I have read and agree to abide by the{" "}
                                 <a
                                     href="https://www.wlu.ca/about/governance/assets/resources/12.3-non-academic-student-code-of-conduct.html"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="ml-2 text-sky-600 underline"
+                                    className="text-sky-600 underline"
                                 >
                                     Wilfrid Laurier University Code of Conduct
                                 </a>{" "}
@@ -433,7 +433,7 @@ export const ApplicationPage = () => {
                             <p>
                                 * I have read and agree to the
                                 <a
-                                    className="ml-2 text-sky-600 underline"
+                                    className="text-sky-600 underline"
                                     href="https://static.mlh.io/docs/mlh-code-of-conduct.pdf"
                                     target="_blank"
                                     rel="noopener noreferrer"
