@@ -1,4 +1,4 @@
-import { FC, Fragment, useRef, useState } from "react";
+import { FC, Fragment, useRef, useState, useEffect } from "react";
 import { Combobox, Transition } from "@headlessui/react";
 import {
     CheckIcon,
@@ -82,11 +82,30 @@ export const MultiSelect: FC<MultiSelectProps> = ({
     const [selected, setSelected] = useState<string[]>(initialValues);
     const [query, setQuery] = useState("");
     const randomId = useRef(Math.random().toString(32));
+    const inputRef = useRef<HTMLInputElement | null>(null);
+    const comboboxButtonRef = useRef<HTMLButtonElement | null>(null); // Added ref for Combobox.Button
 
     const handleChange = (opts: string[]) => {
         setSelected(opts);
         if (onChange) onChange(opts);
     };
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (
+                event.key === "ArrowDown" &&
+                inputRef.current === document.activeElement
+            ) {
+                setQuery("");
+            }
+        };
+
+        document.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+        };
+    }, []);
 
     const filteredOptions =
         query === ""
@@ -137,8 +156,14 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                         className="w-full border-none py-2 pl-3 pr-10 leading-5 text-gray-900 bg-gray-50 focus:ring-0"
                         onChange={(event) => setQuery(event.target.value)}
                         aria-describedby={describedby}
+                        onFocus={() => setQuery("")}
+                        ref={inputRef}
+                        onClick={() => comboboxButtonRef.current?.click()} // Added to handle click and focus event to open the combobox
                     />
-                    <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                    <Combobox.Button
+                        ref={comboboxButtonRef}
+                        className="absolute inset-y-0 right-0 flex items-center pr-2"
+                    >
                         <ChevronUpDownIcon
                             className="h-5 w-5 text-gray-400"
                             aria-hidden="true"
@@ -182,10 +207,18 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                                 >
                                     {({ selected, active }) => (
                                         <>
-                                            <span>{opt}</span>
+                                            <span
+                                                className={`block truncate ${
+                                                    selected
+                                                        ? "font-medium"
+                                                        : "font-normal"
+                                                }`}
+                                            >
+                                                {opt}
+                                            </span>
                                             {selected ? (
                                                 <span
-                                                    className={`absolute inset-y-0 right-0 flex items-center pr-3 ${
+                                                    className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
                                                         active
                                                             ? "text-white"
                                                             : "text-green-600"
