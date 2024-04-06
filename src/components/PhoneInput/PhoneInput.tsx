@@ -61,10 +61,6 @@ export const PhoneInput: FC<PhoneInputProps> = ({ onChange, required }) => {
                                     setQuery(event.target.value)
                                 }
                                 id={`country-code-${randomId}`}
-                                onFocus={() => {
-                                    setQuery("");
-                                    setCountry("");
-                                }}
                                 onClick={() =>
                                     countryCodeBtnRef.current?.click()
                                 }
