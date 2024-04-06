@@ -8,10 +8,10 @@ export interface UserProfile {
     firstName: string;
     lastName: string;
     phone: string;
-    phoneVerified: boolean;
     school: string;
     levelOfStudy: string;
     countryOfResidence: string;
     age: string;
     discord: string;
 }
+

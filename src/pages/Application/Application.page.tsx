@@ -63,7 +63,7 @@ export const ApplicationPage = () => {
     ]);
     const [activeStep, setActiveStep] = useState(0); // index
     const [errors, setErrors] = useState<string[]>([]);
-    const { currentUser, userProfile } = useAuth();
+    const { currentUser, userProfile, reloadUser } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [hasApplied, setHasApplied] = useState(true); // default to true to prevent showing the form at first load
@@ -213,11 +213,7 @@ export const ApplicationPage = () => {
             );
             if (result) {
                 setIsVerified(true);
-                setApplication((prevApplication) => ({
-                    ...prevApplication,
-                    phoneVerified: true,
-                }));
-                setIsVerified(true);
+                await reloadUser();
                 showNotification({
                     title: "Phone Verified",
                     message:
@@ -302,7 +298,10 @@ export const ApplicationPage = () => {
                             />
                             <Button
                                 onClick={sendCode}
-                                disabled={!application.phone}
+                                disabled={
+                                    currentUser.phoneVerified ||
+                                    !application.phone
+                                }
                             >
                                 Send Verification Code
                             </Button>
@@ -324,7 +323,11 @@ export const ApplicationPage = () => {
                             />
                             <Button
                                 onClick={verifyPhone}
-                                disabled={!verificationCode || isVerified}
+                                disabled={
+                                    currentUser.phoneVerified ||
+                                    !verificationCode ||
+                                    isVerified
+                                }
                             >
                                 Verify Code
                             </Button>

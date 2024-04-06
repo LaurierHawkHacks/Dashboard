@@ -12,16 +12,16 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { Octokit } from "octokit";
 import { z } from "zod";
-import axios from 'axios';
+import axios from "axios";
 
 // data imports
 import { ages } from "./data";
 
 admin.initializeApp();
 
-const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || '';
-const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || '';
-const TWILIO_SERVICE_SID = process.env.TWILIO_SERVICE_SID || '';
+const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || "";
+const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || "";
+const TWILIO_SERVICE_SID = process.env.TWILIO_SERVICE_SID || "";
 
 // Default on-sign-up Claims function
 export const addDefaultClaims = functions.auth.user().onCreate(async (user) => {
@@ -30,6 +30,7 @@ export const addDefaultClaims = functions.auth.user().onCreate(async (user) => {
         await admin.auth().setCustomUserClaims(uid, {
             // Default Claims
             admin: false, // Example: set to true for admin users
+            phoneVerified: false,
         });
         console.log(`Custom claims added for user: ${uid}`);
     } catch (error) {
@@ -367,44 +368,55 @@ export const submitApplication = functions.https.onCall(
     }
 );
 
-export const sendVerificationSms = functions.https.onCall(async (data, context) => {
-    if (!context.auth) {
-        throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
+export const sendVerificationSms = functions.https.onCall(
+    async (data, context) => {
+        if (!context.auth) {
+            throw new functions.https.HttpsError(
+                "unauthenticated",
+                "The function must be called while authenticated."
+            );
+        }
+
+        const { phoneNumber } = data;
+        const fullPhoneNumber = `+1${phoneNumber}`; // Adjust the country code as necessary
+
+        const url = `https://verify.twilio.com/v2/Services/${TWILIO_SERVICE_SID}/Verifications`;
+
+        try {
+            const response = await axios.post(
+                url,
+                new URLSearchParams({
+                    To: fullPhoneNumber,
+                    Channel: "sms",
+                }).toString(),
+                {
+                    auth: {
+                        username: TWILIO_ACCOUNT_SID,
+                        password: TWILIO_AUTH_TOKEN,
+                    },
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                }
+            );
+
+            return { success: true, sid: response.data.sid };
+        } catch (error) {
+            console.error("Error sending verification SMS:", error);
+            throw new functions.https.HttpsError(
+                "internal",
+                "Failed to send verification SMS"
+            );
+        }
     }
-
-    const { phoneNumber } = data;
-    const fullPhoneNumber = `+1${phoneNumber}`; // Adjust the country code as necessary
-
-    const url = `https://verify.twilio.com/v2/Services/${TWILIO_SERVICE_SID}/Verifications`;
-
-    try {
-        const response = await axios.post(
-            url,
-            new URLSearchParams({
-                To: fullPhoneNumber,
-                Channel: 'sms',
-            }).toString(),
-            {
-                auth: {
-                    username: TWILIO_ACCOUNT_SID,
-                    password: TWILIO_AUTH_TOKEN,
-                },
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-            }
-        );
-
-        return { success: true, sid: response.data.sid };
-    } catch (error) {
-        console.error('Error sending verification SMS:', error);
-        throw new functions.https.HttpsError('internal', 'Failed to send verification SMS');
-    }
-});
+);
 
 export const verifySmsCode = functions.https.onCall(async (data, context) => {
     if (!context.auth) {
-        throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
+        throw new functions.https.HttpsError(
+            "unauthenticated",
+            "The function must be called while authenticated."
+        );
     }
 
     const { phoneNumber, code } = data;
@@ -425,14 +437,34 @@ export const verifySmsCode = functions.https.onCall(async (data, context) => {
                     password: TWILIO_AUTH_TOKEN,
                 },
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    "Content-Type": "application/x-www-form-urlencoded",
                 },
             }
         );
 
-        return { success: response.data.status === 'approved', status: response.data.status };
+        if (response.data.status === "approved") {
+            // add claim to user token, cannot be modified by user
+            const existingClaims = await admin
+                .auth()
+                .getUser(context.auth.uid)
+                .then((records) => records.customClaims);
+            const newClaims = {
+                ...existingClaims,
+                phoneVerified: true,
+            };
+            await admin.auth().setCustomUserClaims(context.auth.uid, newClaims);
+        }
+
+        return {
+            success: response.data.status === "approved",
+            status: response.data.status,
+        };
     } catch (error) {
-        console.error('Error verifying SMS code:', error);
-        throw new functions.https.HttpsError('internal', 'Failed to verify SMS code');
+        console.error("Error verifying SMS code:", error);
+        throw new functions.https.HttpsError(
+            "internal",
+            "Failed to verify SMS code"
+        );
     }
 });
+
