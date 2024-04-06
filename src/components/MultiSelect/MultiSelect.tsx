@@ -207,7 +207,8 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                 <p className="mt-2 text-sageGray">
                     {allowCustomValue ? (
                         <span className="block mt-2">
-                            {`Not in the options? Type your ${label} in the input field.`}
+                            Not in the options? Type your answer in the input
+                            field.
                         </span>
                     ) : null}
                 </p>
