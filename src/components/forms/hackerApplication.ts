@@ -154,6 +154,8 @@ export const mentorSpecificForm: FormInput[] = [
         },
         name: "reasonToBeMentor",
     },
+
+    // TODO: add resume upload
 ];
 
 export const volunteerSpecificForm: FormInput[] = [
