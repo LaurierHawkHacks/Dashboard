@@ -27,7 +27,7 @@ export const defaultApplication: ApplicationData = {
     interests: [],
     hackathonExperience: "",
     programmingLanguages: [],
-    participatingAs: "",
+    participatingAs: "Hacker",
     applicantId: "",
     agreedToMLHCoC: false,
     agreedToWLUCoC: false,

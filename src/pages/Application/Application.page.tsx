@@ -75,7 +75,6 @@ export const ApplicationPage = () => {
     const [application, setApplication] = useState<ApplicationData>(() => {
         let app: ApplicationData = {
             ...defaultApplication,
-            participatingAs: "Hacker",
         };
         if (userProfile) app = { ...app, ...userProfile };
         return app;
