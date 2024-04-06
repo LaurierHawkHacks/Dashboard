@@ -17,7 +17,7 @@ export interface HackerApplicationData {
     interests: string[];
     hackathonExperience: string;
     programmingLanguages: string[];
-    participatingAs: "Hacker" | "Mentor" | "Volunteer";
+    participatingAs: "Hacker" | "Mentor" | "Volunteer" | "";
     applicantId: string;
     agreedToHawkHacksCoC: boolean;
     agreedToWLUCoC: boolean;
