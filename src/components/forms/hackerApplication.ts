@@ -26,9 +26,10 @@ export const hackerAppFormInputs: FormInput[] = [
         name: "gender",
     },
     {
-        type: "multiselect",
+        type: "select",
         props: {
             label: "What are your pronouns?",
+            initialValue: "",
             options: pronouns,
             allowCustomValue: true,
             required: true,
