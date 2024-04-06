@@ -99,8 +99,8 @@ export const programmingLanguages = [
     "JavaScript",
     "TypeScript",
     "Ruby",
-    "New to programming",
-    "Not sure",
+    "I'm new to programming",
+    "I'm not sure",
 ];
 
 export const hackathonExps = [
