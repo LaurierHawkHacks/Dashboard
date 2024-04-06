@@ -105,7 +105,7 @@ export const programmingLanguages = [
 
 export const hackathonExps = [
     "This is my first hackathon",
-    "I've only been to a single hackahton before this.",
+    "I've only been to a single hackathon before this.",
     "I've been to 2 hackathons before, so I'm a bit familiar with how a hackathon works.",
     "I've been to 3-4 hackathons, I'm pretty comfortable.",
     "I love hackathons - I've been to more than 4.",

@@ -60,7 +60,7 @@ export const hackerAppFormInputs: FormInput[] = [
     {
         type: "multiselect",
         props: {
-            label: "Do you have any dietry restrictions?",
+            label: "Do you have any dietary restrictions?",
             options: diets,
             allowCustomValue: true,
             required: true,
@@ -113,7 +113,7 @@ export const hackerSpecificForm: FormInput[] = [
         type: "textarea",
         props: {
             id: "hacker-specific-q1",
-            label: "Why do you want to particiapte at HawkHacks?",
+            label: "Why do you want to participate at HawkHacks?",
             rows: 4,
             required: true,
         },
