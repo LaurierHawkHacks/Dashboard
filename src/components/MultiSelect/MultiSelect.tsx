@@ -2,7 +2,7 @@ import { FC, Fragment, useRef, useState } from "react";
 import { Combobox, Transition } from "@headlessui/react";
 import {
     CheckIcon,
-    ChevronUpDownIcon,
+    ChevronDownIcon,
     XMarkIcon,
 } from "@heroicons/react/20/solid";
 import { VariantProps, cva } from "class-variance-authority";
@@ -139,7 +139,7 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                         aria-describedby={describedby}
                     />
                     <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
-                        <ChevronUpDownIcon
+                        <ChevronDownIcon
                             className="h-5 w-5 text-gray-400"
                             aria-hidden="true"
                         />
