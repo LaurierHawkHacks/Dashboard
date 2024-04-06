@@ -1,6 +1,6 @@
 import { FC, Fragment, useState, useRef, useCallback } from "react";
 import { Combobox, Transition } from "@headlessui/react";
-import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
+import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { getOptionStyles } from "../MultiSelect/MultiSelect";
 import { useDebounce } from "@/hooks/use-debounce";
 
@@ -111,7 +111,7 @@ export const Select: FC<SelectProps> = ({
                         className="absolute inset-y-0 right-0 flex items-center pr-2"
                         ref={comboboxButtonRef}
                     >
-                        <ChevronUpDownIcon
+                        <ChevronDownIcon
                             className="w-5 h-5 text-gray-400"
                             aria-hidden="true"
                         />
@@ -177,11 +177,11 @@ export const Select: FC<SelectProps> = ({
                         )}
                     </Combobox.Options>
                 </Transition>
-                {allowCustomValue && (
-                    <p className="mt-2 text-sageGray">
-                        {`Not in the options? Type your ${label} in the input field.`}
-                    </p>
-                )}
+                {allowCustomValue ? (
+                    <span className="block mt-2">
+                        Not in the options? Type your answer in the input field.
+                    </span>
+                ) : null}
             </div>
         </Combobox>
     );

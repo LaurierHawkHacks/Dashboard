@@ -1,5 +1,12 @@
-import { TextInput, Select } from "@components";
-import { ages, countryNames, schools, levelsOfStudy } from "@data";
+import { TextInput, Select, MultiSelect } from "@components";
+import {
+    ages,
+    countryNames,
+    schools,
+    levelsOfStudy,
+    cityNames,
+    majorsList,
+} from "@data";
 
 import type { UserProfile } from "@/services/utils/types";
 import type { ApplicationInputKeys } from "@/components/forms/types";
@@ -15,7 +22,7 @@ export const Profile = ({
         <>
             <div className="sm:col-span-3">
                 <TextInput
-                    label="First name"
+                    label="What is your first name?"
                     type="text"
                     id="firstName"
                     autoComplete="given-name"
@@ -28,7 +35,7 @@ export const Profile = ({
 
             <div className="sm:col-span-3">
                 <TextInput
-                    label="Last name"
+                    label="What is your last name?"
                     type="text"
                     id="lastName"
                     autoComplete="family-name"
@@ -39,64 +46,85 @@ export const Profile = ({
                 />
             </div>
 
-            <div className="sm:col-span-3">
+            <div className="sm:col-span-2">
                 <Select
-                    label="Age"
+                    label="How old are you?"
                     options={ages}
-                    initialValue={profile.age}
+                    initialValue=""
                     onChange={(opt) => handler("age", opt)}
+                    required
+                />
+            </div>
+            <div className="sm:col-span-5"></div>
+            <div className="col-span-3">
+                <TextInput
+                    label="What is your phone number?"
+                    id="phone-number"
+                    placeholder="(999) 999-9999"
+                    value={profile.phone}
+                    onChange={(e) => handler("phone", e.target.value)}
+                    description="Please add the country dialing code. I.E: +1"
+                    required
+                />
+            </div>
+
+            <div className="sm:col-span-3">
+                <TextInput
+                    label="What is your Discord username?"
+                    id="discord"
+                    placeholder="@username or username#1234"
+                    value={profile.discord}
+                    onChange={(e) => handler("discord", e.target.value)}
+                    description="Discord will be our primary form of communication."
                     required
                 />
             </div>
 
             <div className="sm:col-span-3">
                 <Select
-                    label="Country"
+                    label="Which country do you currently reside in?"
                     options={countryNames}
-                    initialValue={profile.countryOfResidence}
+                    initialValue=""
                     onChange={(opt) => handler("countryOfResidence", opt)}
                     required
                 />
             </div>
 
-            <div className="col-span-6">
-                <TextInput
-                    label="Phone Number"
-                    id="phone-number"
-                    placeholder="(999) 999-9999"
-                    value={profile.phone}
-                    onChange={(e) => handler("phone", e.target.value)}
-                    description="US/CA numbers only"
+            <div className="sm:col-span-3">
+                <Select
+                    label="Which city do you live in?"
+                    options={cityNames}
+                    initialValue=""
+                    onChange={(opt) => handler("city", opt)}
                     required
                 />
             </div>
 
-            <div className="col-span-3">
+            <div className="sm:col-span-3">
                 <Select
-                    label="School"
+                    label="Which school are you currently attending?"
                     options={schools}
-                    initialValue={profile.school}
+                    initialValue=""
                     onChange={(opt) => handler("school", opt)}
                     required
                 />
             </div>
-            <div className="col-span-3">
+            <div className="sm:col-span-3">
                 <Select
-                    label="Level of Study"
+                    label="What is your current level of study?"
                     options={levelsOfStudy}
-                    initialValue={profile.levelOfStudy}
+                    initialValue=""
                     onChange={(opt) => handler("levelOfStudy", opt)}
                     required
                 />
             </div>
 
             <div className="sm:col-span-full">
-                <TextInput
-                    label="Discord username"
-                    id="discord"
-                    placeholder="@username or username#1234"
-                    value={profile.discord}
-                    onChange={(e) => handler("discord", e.target.value)}
+                <MultiSelect
+                    label="What is your major/field of study?"
+                    options={majorsList}
+                    onChange={(opts) => handler("major", opts)}
+                    allowCustomValue
                     required
                 />
             </div>
