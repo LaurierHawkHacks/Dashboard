@@ -148,6 +148,8 @@ export const mentorSpecificForm: FormInput[] = [
         props: {
             label: "Do you have a LinkedIn profile? If so, please provide a link to your profile.",
             required: false,
+            id: "linkedin-url",
+            placeholder: "https://www.linkedin.com/in/john-smith",
         },
         name: "linkedinUrl",
     },
@@ -156,6 +158,8 @@ export const mentorSpecificForm: FormInput[] = [
         props: {
             label: "Do you have a GitHub account? If so, please provide a link to your profile.",
             required: false,
+            id: "github-url",
+            placeholder: "https://github.com/SherRao",
         },
         name: "githubUrl",
     },
@@ -164,6 +168,8 @@ export const mentorSpecificForm: FormInput[] = [
         props: {
             label: "Do you have a personal or other website you would like to include? If so, please provide a link.",
             required: false,
+            id: "personal-website-url",
+            placeholder: "https://hawkhacks.ca",
         },
         name: "personalWebsiteUrl",
     },
