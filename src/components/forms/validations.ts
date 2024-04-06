@@ -12,13 +12,7 @@ export const profileFormValidation = z.object({
         .string()
         .min(1, "Please select the country you currently reside in."),
     city: z.string().min(1, "Please select the city you currently live in."),
-    phone: z
-        .string()
-        .min(1, "Phone number is empty")
-        .regex(
-            /^\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$/,
-            "Invalid phone number"
-        ),
+    phone: z.string().min(1, "Phone number is empty"),
     school: z.string().min(1, "School is empty"),
     levelOfStudy: z.string().min(1, "Level of study is empty"),
     age: z.string().refine((val) => ages.includes(val)),
