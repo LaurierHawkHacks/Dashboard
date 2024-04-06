@@ -431,14 +431,13 @@ export const ApplicationPage = () => {
                                 }
                             />
                             <p>
-                                * I have read and agree to the
+                                * I have read and agree to the{" "}
                                 <a
                                     className="text-sky-600 underline"
                                     href="https://static.mlh.io/docs/mlh-code-of-conduct.pdf"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
-                                    {" "}
                                     MLH Code of Conduct
                                 </a>
                                 .
@@ -462,23 +461,22 @@ export const ApplicationPage = () => {
                                 application/registration information with Major
                                 League Hacking for event administration,
                                 ranking, and MLH administration in line with the
+                                {" "}
                                 <a
                                     className="text-sky-600 underline"
                                     href="https://mlh.io/privacy"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
-                                    {" "}
                                     MLH Privacy Policy
                                 </a>
-                                . I further agree to the terms of both the
+                                . I further agree to the terms of both the{" "}
                                 <a
                                     className="text-sky-600 underline"
                                     href="https://github.com/MLH/mlh-policies/blob/main/contest-terms.md)and"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
-                                    {" "}
                                     MLH Contest Terms and Conditions
                                 </a>
                                 .
