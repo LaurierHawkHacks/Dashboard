@@ -18,7 +18,7 @@ export const hackerAppFormInputs: FormInput[] = [
         type: "select",
         props: {
             label: "What gender do you identify as?",
-            initialValue: "Prefer not to answer",
+            initialValue: "",
             options: genders,
             allowCustomValue: true,
             required: true,
@@ -39,7 +39,7 @@ export const hackerAppFormInputs: FormInput[] = [
         type: "select",
         props: {
             label: "Please select any of the following that resonates with you:",
-            initialValue: "Prefer not to answer",
+            initialValue: "",
             options: sexualityList,
             allowCustomValue: true,
             required: true,
@@ -50,7 +50,7 @@ export const hackerAppFormInputs: FormInput[] = [
         type: "select",
         props: {
             label: "Which of the following best describes your racial or ethnic background?",
-            initialValue: "Prefer not to answer",
+            initialValue: "",
             options: races,
             allowCustomValue: true,
             required: true,
@@ -61,7 +61,6 @@ export const hackerAppFormInputs: FormInput[] = [
         type: "multiselect",
         props: {
             label: "Do you have any dietry restrictions?",
-            initialValues: ["None"],
             options: diets,
             allowCustomValue: true,
             required: true,
@@ -72,7 +71,6 @@ export const hackerAppFormInputs: FormInput[] = [
         type: "multiselect",
         props: {
             label: "Are there any allergens you have that we should be aware of?",
-            initialValues: ["None"],
             options: allergies,
             allowCustomValue: true,
             required: true,
@@ -93,7 +91,7 @@ export const hackerAppFormInputs: FormInput[] = [
         type: "select",
         props: {
             label: "How many Hackathons have you attended as a participant in the past?",
-            initialValue: hackathonExps[0],
+            initialValue: "",
             options: hackathonExps,
             required: true,
         },
@@ -139,7 +137,7 @@ export const mentorSpecificForm: FormInput[] = [
         props: {
             label: "Have you mentored at previous hackathons before?",
             options: mentorSpecificOptions,
-            initialValue: mentorSpecificOptions[0],
+            initialValue: "",
             required: true,
         },
         name: "mentorExperience",
@@ -164,7 +162,7 @@ export const volunteerSpecificForm: FormInput[] = [
         props: {
             label: "Have you volunteered at large-scale events before?",
             options: volunteerSpecificOptions,
-            initialValue: volunteerSpecificOptions[0],
+            initialValue: "",
             required: true,
         },
         name: "volunteerExperience",
