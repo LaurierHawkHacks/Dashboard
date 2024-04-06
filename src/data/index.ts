@@ -89,6 +89,8 @@ export const interests = [
 ];
 
 export const programmingLanguages = [
+    "I'm new to programming",
+    "I'm not sure",
     "C",
     "C++",
     "C#",
@@ -99,8 +101,6 @@ export const programmingLanguages = [
     "JavaScript",
     "TypeScript",
     "Ruby",
-    "I'm new to programming",
-    "I'm not sure",
 ];
 
 export const hackathonExps = [
