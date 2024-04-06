@@ -8,6 +8,6 @@ export const levelsOfStudy: string[] = [
     "Other Vocational / Trade Programs or Apprenticeship",
     "Post Doctorate",
     "Other",
-    "I'm not currently a student",
+    "I graduated recently",
     "Prefer not to answer",
 ];

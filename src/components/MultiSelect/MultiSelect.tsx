@@ -2,7 +2,7 @@ import { FC, Fragment, useRef, useState, useEffect } from "react";
 import { Combobox, Transition } from "@headlessui/react";
 import {
     CheckIcon,
-    ChevronUpDownIcon,
+    ChevronDownIcon,
     XMarkIcon,
 } from "@heroicons/react/20/solid";
 import { VariantProps, cva } from "class-variance-authority";
@@ -38,7 +38,9 @@ const SelectedList: FC<{
 };
 
 const optionStyles = cva(
-    ["text-gray-900 relative cursor-default select-none py-2 pl-10 pr-4"],
+    [
+        "text-gray-900 relative cursor-default select-none py-2 pl-10 pr-4 hover:cursor-pointer",
+    ],
     {
         variants: {
             active: {
@@ -164,7 +166,7 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                         ref={comboboxButtonRef}
                         className="absolute inset-y-0 right-0 flex items-center pr-2"
                     >
-                        <ChevronUpDownIcon
+                        <ChevronDownIcon
                             className="h-5 w-5 text-gray-400"
                             aria-hidden="true"
                         />
@@ -240,7 +242,8 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                 <p className="mt-2 text-sageGray">
                     {allowCustomValue ? (
                         <span className="block mt-2">
-                            {`Not in the options? Type your ${label} in the input field.`}
+                            Not in the options? Type your answer in the input
+                            field.
                         </span>
                     ) : null}
                 </p>
