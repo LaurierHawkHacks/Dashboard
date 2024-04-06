@@ -30,9 +30,11 @@ export const Select: FC<SelectProps> = ({
     const [selected, setSelected] = useState<string>(initialValue);
     const [query, setQuery] = useState("");
     const [controlledOptions, setControlledOptions] = useState(
-        options.slice(0, 50)
+        options.slice(0, 100)
     );
     const comboboxButtonRef = useRef<HTMLButtonElement | null>(null);
+    const lastOptionRef = useRef<HTMLLIElement | null>(null);
+    const optionsRef = useRef<HTMLUListElement | null>(null);
 
     const handleChange = useCallback(
         (opt: string) => {
@@ -44,9 +46,9 @@ export const Select: FC<SelectProps> = ({
 
     const filterQuery = (value: string) => {
         const transformedValue = value.toLowerCase().trim();
-        setControlledOptions((opts) =>
+        setControlledOptions(() =>
             value === ""
-                ? opts
+                ? options.slice(0, 50)
                 : options
                       .filter((opt) =>
                           opt.toLowerCase().trim().includes(transformedValue)
@@ -55,7 +57,27 @@ export const Select: FC<SelectProps> = ({
         );
     };
 
-    const debounce = useDebounce<typeof filterQuery, string>(filterQuery, 200);
+    const debounce = useDebounce<typeof filterQuery, string>(filterQuery, 400);
+
+    const handleScroll = useCallback(() => {
+        // alreay render the entire list
+        if (controlledOptions.length === options.length) return;
+        if (!optionsRef.current) return;
+        const rect = optionsRef.current.getBoundingClientRect();
+        const a = rect.top; // parent container top
+        const b = rect.bottom; // parent container bottom
+        if (lastOptionRef.current) {
+            const rect = lastOptionRef.current.getBoundingClientRect();
+            const x = rect.top; // last option top corner
+
+            if (x >= a && x <= b) {
+                // if in view load more options
+                setControlledOptions((opts) =>
+                    options.slice(0, opts.length + 50)
+                );
+            }
+        }
+    }, [optionsRef.current, lastOptionRef.current]);
 
     return (
         <Combobox
@@ -102,17 +124,26 @@ export const Select: FC<SelectProps> = ({
                     leaveTo="opacity-0"
                     afterLeave={() => setQuery("")}
                 >
-                    <Combobox.Options className="absolute border border-charcoalBlack mt-1 max-h-60 z-50 w-full overflow-auto bg-gray-50 py-1 text-base">
+                    <Combobox.Options
+                        ref={optionsRef}
+                        onScroll={handleScroll}
+                        className="absolute border border-charcoalBlack mt-1 max-h-60 z-50 w-full overflow-auto bg-gray-50 py-1 text-base"
+                    >
                         {controlledOptions.length === 0 && query !== "" ? (
                             <div className="cursor-default select-none relative py-2 px-4 text-gray-700">
                                 Nothing found.
                             </div>
                         ) : (
-                            controlledOptions.map((option) => (
+                            controlledOptions.map((option, i) => (
                                 <Combobox.Option
                                     key={option}
                                     className={getOptionStyles}
                                     value={option}
+                                    ref={
+                                        i === controlledOptions.length - 1
+                                            ? lastOptionRef
+                                            : undefined
+                                    }
                                 >
                                     {({ selected, active }) => (
                                         <>
