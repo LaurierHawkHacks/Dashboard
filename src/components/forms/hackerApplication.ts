@@ -149,7 +149,7 @@ export const mentorSpecificForm: FormInput[] = [
             label: "Do you have a LinkedIn profile? If so, please provide a link to your profile.",
             required: false,
             id: "linkedin-url",
-            placeholder: "https://www.linkedin.com/in/john-smith",
+            placeholder: "https://linkedin.com/in/john-smith",
         },
         name: "linkedinUrl",
     },
@@ -166,7 +166,7 @@ export const mentorSpecificForm: FormInput[] = [
     {
         type: "text",
         props: {
-            label: "Do you have a personal or other website you would like to include? If so, please provide a link.",
+            label: "Do you have a personal or other website you'd like to include? If so, please provide a link.",
             required: false,
             id: "personal-website-url",
             placeholder: "https://hawkhacks.ca",
