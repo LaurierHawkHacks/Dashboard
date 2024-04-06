@@ -179,6 +179,7 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                                     key={opt}
                                     className={getOptionStyles}
                                     value={opt}
+                                    style={{ cursor: "pointer" }}
                                 >
                                     {({ selected, active }) => (
                                         <>
