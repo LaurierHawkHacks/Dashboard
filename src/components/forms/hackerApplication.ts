@@ -53,7 +53,7 @@ export const hackerAppFormInputs: FormInput[] = [
             label: "Which of the following best describes your racial or ethnic background?",
             initialValue: "",
             options: races,
-            allowCustomValue: true,
+            allowCustomValue: false,
             required: true,
         },
         name: "race",
