@@ -63,7 +63,7 @@ export const ApplicationPage = () => {
     ]);
     const [activeStep, setActiveStep] = useState(0); // index
     const [errors, setErrors] = useState<string[]>([]);
-    const { currentUser, userProfile } = useAuth();
+    const { currentUser } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [hasApplied, setHasApplied] = useState(true); // default to true to prevent showing the form at first load
@@ -73,10 +73,9 @@ export const ApplicationPage = () => {
 
     // we start with the default user profile
     const [application, setApplication] = useState<ApplicationData>(() => {
-        let app: ApplicationData = {
+        const app: ApplicationData = {
             ...defaultApplication,
         };
-        if (userProfile) app = { ...app, ...userProfile };
         return app;
     });
 
