@@ -63,7 +63,7 @@ export const Profile = ({
                     placeholder="(999) 999-9999"
                     value={profile.phone}
                     onChange={(e) => handler("phone", e.target.value)}
-                    description="US/CA numbers only"
+                    description="Please add the country dialing code. I.E: +1"
                     required
                 />
             </div>
