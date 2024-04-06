@@ -109,7 +109,6 @@ export const ApplicationPage = () => {
 
     const prevStep = () => {
         if (activeStep > 0) {
-            if (!validate()) return;
             setActiveStep((s) => s - 1);
         }
     };

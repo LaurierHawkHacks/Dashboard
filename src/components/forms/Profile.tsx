@@ -1,5 +1,5 @@
 import { TextInput, Select } from "@components";
-import { ages, countryCodes, schools, levelsOfStudy } from "@data";
+import { ages, countryNames, schools, levelsOfStudy } from "@data";
 
 import type { UserProfile } from "@/services/utils/types";
 import type { ApplicationInputKeys } from "@/components/forms/types";
@@ -52,7 +52,7 @@ export const Profile = ({
             <div className="sm:col-span-3">
                 <Select
                     label="Country"
-                    options={countryCodes}
+                    options={countryNames}
                     initialValue={profile.countryOfResidence}
                     onChange={(opt) => handler("countryOfResidence", opt)}
                     required

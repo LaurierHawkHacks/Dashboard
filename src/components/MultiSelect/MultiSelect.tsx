@@ -185,7 +185,7 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                             debounce(e.target.value);
                         }}
                         onFocus={() => setQuery("")}
-                        onClick={() => comboboxButtonRef.current?.click()}
+                        onClick={() => comboboxButtonRef.current?.click()} // Added to handle click and focus event to open the combobox
                         aria-describedby={describedby}
                     />
                     <Combobox.Button
@@ -244,10 +244,18 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                                 >
                                     {({ selected, active }) => (
                                         <>
-                                            <span>{opt}</span>
+                                            <span
+                                                className={`block truncate ${
+                                                    selected
+                                                        ? "font-medium"
+                                                        : "font-normal"
+                                                }`}
+                                            >
+                                                {opt}
+                                            </span>
                                             {selected ? (
                                                 <span
-                                                    className={`absolute inset-y-0 right-0 flex items-center pr-3 ${
+                                                    className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
                                                         active
                                                             ? "text-white"
                                                             : "text-green-600"

@@ -105,7 +105,7 @@ export const Select: FC<SelectProps> = ({
                             debounce(e.target.value);
                         }}
                         onFocus={() => setQuery("")}
-                        onClick={() => comboboxButtonRef.current?.click()}
+                        onClick={() => comboboxButtonRef.current?.click()} // Added to handle click and focus event to open the combobox
                     />
                     <Combobox.Button
                         className="absolute inset-y-0 right-0 flex items-center pr-2"
