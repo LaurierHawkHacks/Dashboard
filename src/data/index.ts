@@ -29,7 +29,6 @@ export const sexualityList = [
 ];
 
 export const races = [
-    "Asian Indian",
     "Black or African",
     "Chinese",
     "Filipino",
@@ -41,6 +40,7 @@ export const races = [
     "Native America or Alaskan Native",
     "Native Hawaiian",
     "Samoan",
+    "South Asian / Asian Indian",
     "Vietnamese",
     "White",
     "Prefer not to answer",

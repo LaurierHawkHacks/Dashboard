@@ -1,4 +1,6 @@
 const countryNames = [
+    'Canada',
+    'United States',
     'Afghanistan',
     'Åland Islands',
     'Albania',
@@ -37,7 +39,6 @@ const countryNames = [
     'Burundi',
     'Cambodia',
     'Cameroon',
-    'Canada',
     'Cape Verde',
     'Cayman Islands',
     'Central African Republic',
@@ -228,7 +229,6 @@ const countryNames = [
     'Ukraine',
     'United Arab Emirates',
     'United Kingdom',
-    'United States',
     'United States Minor Outlying Islands',
     'Uruguay',
     'Uzbekistan',
