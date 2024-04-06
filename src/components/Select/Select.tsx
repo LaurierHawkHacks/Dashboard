@@ -1,7 +1,8 @@
-import { FC, Fragment, useState } from "react";
+import { FC, Fragment, useState, useRef, useCallback } from "react";
 import { Combobox, Transition } from "@headlessui/react";
-import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
+import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { getOptionStyles } from "../MultiSelect/MultiSelect";
+import { useDebounce } from "@/hooks/use-debounce";
 
 export interface SelectProps {
     label: string;
@@ -28,49 +29,90 @@ export const Select: FC<SelectProps> = ({
 }) => {
     const [selected, setSelected] = useState<string>(initialValue);
     const [query, setQuery] = useState("");
+    const [controlledOptions, setControlledOptions] = useState(
+        options.slice(0, 100)
+    );
+    const comboboxButtonRef = useRef<HTMLButtonElement | null>(null);
+    const lastOptionRef = useRef<HTMLLIElement | null>(null);
+    const optionsRef = useRef<HTMLUListElement | null>(null);
 
-    const handleChange = (opt: string) => {
-        setSelected(opt);
-        if (onChange) onChange(opt);
+    const handleChange = useCallback(
+        (opt: string) => {
+            setSelected(opt);
+            if (onChange) onChange(opt);
+        },
+        [onChange]
+    );
+
+    const filterQuery = (value: string) => {
+        const transformedValue = value.toLowerCase().trim();
+        setControlledOptions(() =>
+            value === ""
+                ? options.slice(0, 50)
+                : options
+                      .filter((opt) =>
+                          opt.toLowerCase().trim().includes(transformedValue)
+                      )
+                      .slice(0, 50)
+        );
     };
 
-    const filteredOptions =
-        query === ""
-            ? options
-            : options.filter((opt) => {
-                  return opt
-                      .toLowerCase()
-                      .trim()
-                      .includes(query.toLowerCase().trim());
-              });
+    const debounce = useDebounce<typeof filterQuery, string>(filterQuery, 400);
+
+    const handleScroll = useCallback(() => {
+        // alreay render the entire list
+        if (controlledOptions.length === options.length) return;
+        if (!optionsRef.current) return;
+        const rect = optionsRef.current.getBoundingClientRect();
+        const a = rect.top; // parent container top
+        const b = rect.bottom; // parent container bottom
+        if (lastOptionRef.current) {
+            const rect = lastOptionRef.current.getBoundingClientRect();
+            const x = rect.top; // last option top corner
+
+            if (x >= a && x <= b) {
+                // if in view load more options
+                setControlledOptions((opts) =>
+                    options.slice(0, opts.length + 50)
+                );
+            }
+        }
+    }, [optionsRef.current, lastOptionRef.current]);
 
     return (
         <Combobox
-            name={name}
+            as="div"
             value={selected}
-            onChange={onChange ? handleChange : undefined}
+            onChange={handleChange}
             disabled={disabled}
+            name={name}
         >
             <div className="relative">
                 <Combobox.Label
-                    className={`block font-medium leading-6 text-charcoalBlack text-md${
-                        srLabelOnly ? " sr-only" : ""
+                    className={`block text-sm font-medium ${
+                        srLabelOnly ? "sr-only" : ""
                     }`}
                 >
                     {label}
-                    {required ? (
-                        <span className="text-red-600 ml-1">*</span>
-                    ) : null}
+                    {required && <span className="text-red-500">*</span>}
                 </Combobox.Label>
                 <div className="relative w-full mt-2 cursor-default overflow-hidden bg-gray-50 text-left border border-charcoalBlack">
                     <Combobox.Input
                         className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 bg-gray-50 focus:ring-0"
-                        displayValue={(opt: string) => opt}
-                        onChange={(event) => setQuery(event.target.value)}
+                        displayValue={(option: string) => option}
+                        onChange={(e) => {
+                            setQuery(e.target.value);
+                            debounce(e.target.value);
+                        }}
+                        onFocus={() => setQuery("")}
+                        onClick={() => comboboxButtonRef.current?.click()} // Added to handle click and focus event to open the combobox
                     />
-                    <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
-                        <ChevronUpDownIcon
-                            className="h-5 w-5 text-gray-400"
+                    <Combobox.Button
+                        className="absolute inset-y-0 right-0 flex items-center pr-2"
+                        ref={comboboxButtonRef}
+                    >
+                        <ChevronDownIcon
+                            className="w-5 h-5 text-gray-400"
                             aria-hidden="true"
                         />
                     </Combobox.Button>
@@ -82,41 +124,52 @@ export const Select: FC<SelectProps> = ({
                     leaveTo="opacity-0"
                     afterLeave={() => setQuery("")}
                 >
-                    <Combobox.Options className="absolute border border-charcoalBlack mt-1 max-h-60 z-50 w-full overflow-auto bg-gray-50 py-1 text-base">
-                        {allowCustomValue && query.length > 0 ? (
-                            <Combobox.Option
-                                className={getOptionStyles}
-                                value={query}
-                            >{`Self-described as "${query}"`}</Combobox.Option>
-                        ) : null}
-                        {filteredOptions.length === 0 && query !== "" ? (
-                            <div className="relative cursor-default select-none px-4 py-2 text-gray-700">
+                    <Combobox.Options
+                        ref={optionsRef}
+                        onScroll={handleScroll}
+                        className="absolute border border-charcoalBlack mt-1 max-h-60 z-50 w-full overflow-auto bg-gray-50 py-1 text-base"
+                    >
+                        {controlledOptions.length === 0 && query !== "" ? (
+                            <div className="cursor-default select-none relative py-2 px-4 text-gray-700">
                                 Nothing found.
                             </div>
                         ) : (
-                            filteredOptions.map((opt) => (
+                            controlledOptions.map((option, i) => (
                                 <Combobox.Option
-                                    key={opt}
+                                    key={option}
                                     className={getOptionStyles}
-                                    value={opt}
+                                    value={option}
+                                    ref={
+                                        i === controlledOptions.length - 1
+                                            ? lastOptionRef
+                                            : undefined
+                                    }
                                 >
                                     {({ selected, active }) => (
                                         <>
-                                            <span>{opt}</span>
-                                            {selected ? (
+                                            <span
+                                                className={`block truncate ${
+                                                    selected
+                                                        ? "font-medium"
+                                                        : "font-normal"
+                                                }`}
+                                            >
+                                                {option}
+                                            </span>
+                                            {selected && (
                                                 <span
-                                                    className={`absolute inset-y-0 right-0 flex items-center pr-3 ${
+                                                    className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
                                                         active
                                                             ? "text-white"
-                                                            : "text-green-600"
+                                                            : "text-teal-600"
                                                     }`}
                                                 >
                                                     <CheckIcon
-                                                        className="h-5 w-5"
+                                                        className="w-5 h-5"
                                                         aria-hidden="true"
                                                     />
                                                 </span>
-                                            ) : null}
+                                            )}
                                         </>
                                     )}
                                 </Combobox.Option>
@@ -125,9 +178,9 @@ export const Select: FC<SelectProps> = ({
                     </Combobox.Options>
                 </Transition>
                 {allowCustomValue ? (
-                    <p className="mt-2 text-sageGray">
-                        {`Not in the options? Type your ${label} in the input field.`}
-                    </p>
+                    <span className="block mt-2">
+                        Not in the options? Type your answer in the input field.
+                    </span>
                 ) : null}
             </div>
         </Combobox>

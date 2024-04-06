@@ -128,19 +128,38 @@ export const verifyGitHubEmail = functions.https.onCall(
     }
 );
 
-export const createUserProfile = functions.https.onCall(
+export const submitApplication = functions.https.onCall(
     async (data, context) => {
         if (!context.auth) {
-            return new functions.https.HttpsError(
+            throw new functions.https.HttpsError(
                 "permission-denied",
                 "Not authenticated"
             );
         }
 
-        const profileFormValidation = z.object({
+        // only allow user to apply if user has profile
+        try {
+            const usersRef = admin.firestore().collection("users");
+            const query = usersRef.where("id", "==", context.auth.uid).limit(1);
+            const snap = await query.get();
+            const resource = snap.docs[0];
+            if (!resource)
+                throw new functions.https.HttpsError(
+                    "invalid-argument",
+                    "User has no profile."
+                );
+        } catch (e) {
+            throw new functions.https.HttpsError(
+                "unavailable",
+                "Service down. 1100"
+            );
+        }
+
+        const hackerAppFormValidation = z.object({
             firstName: z.string().min(1),
             lastName: z.string().min(1),
-            countryOfResidence: z.string().length(2),
+            countryOfResidence: z.string().min(1),
+            city: z.string().min(1),
             phone: z
                 .string()
                 .min(1)
@@ -155,107 +174,9 @@ export const createUserProfile = functions.https.onCall(
 
                 return true;
             }),
-        });
-
-        const result = profileFormValidation.safeParse(data);
-
-        if (!result.success) {
-            return new functions.https.HttpsError(
-                "invalid-argument",
-                "Invalid argument"
-            );
-        }
-
-        // explicitly take the values that we want.
-        const {
-            firstName,
-            lastName,
-            phone,
-            school,
-            levelOfStudy,
-            countryOfResidence,
-            age,
-            discord,
-        } = result.data;
-
-        const payload = {
-            id: context.auth.uid,
-            firstName,
-            lastName,
-            phone,
-            school,
-            levelOfStudy,
-            countryOfResidence,
-            age,
-            discord,
-        };
-
-        // check if resource exists already
-        const usersRef = admin.firestore().collection("users");
-        const query = usersRef.where("id", "==", context.auth.uid).limit(1);
-        const snap = await query.get();
-        const resource = snap.docs[0];
-
-        try {
-            if (resource) {
-                await admin
-                    .firestore()
-                    .collection("users")
-                    .doc(resource.id)
-                    .update(payload);
-            } else {
-                // write if new document
-                await admin.firestore().collection("users").add(payload);
-            }
-        } catch {
-            return new functions.https.HttpsError(
-                "unavailable",
-                "Service down. 1100" // 1100 is a random number :)
-            );
-        }
-
-        return { status: 200 };
-    }
-);
-
-export const submitApplication = functions.https.onCall(
-    async (data, context) => {
-        if (!context.auth) {
-            return new functions.https.HttpsError(
-                "permission-denied",
-                "Not authenticated"
-            );
-        }
-
-        // only allow user to apply if user has profile
-        try {
-            const usersRef = admin.firestore().collection("users");
-            const query = usersRef.where("id", "==", context.auth.uid).limit(1);
-            const snap = await query.get();
-            const resource = snap.docs[0];
-            if (!resource)
-                return new functions.https.HttpsError(
-                    "invalid-argument",
-                    "User has no profile."
-                );
-        } catch (e) {
-            return new functions.https.HttpsError(
-                "unavailable",
-                "Service down. 1100"
-            );
-        }
-
-        const hackerAppFormValidation = z.object({
             major: z.string().array().min(1),
-            gender: z
-                .string()
-                .transform((val) => val ?? "Prefer not to answer"),
-            pronouns: z
-                .string()
-                .array()
-                .transform((val) =>
-                    val.length > 0 ? val : ["Prefer not to answer"]
-                ),
+            gender: z.string(),
+            pronouns: z.string(),
             sexuality: z
                 .string()
                 .transform((val) => val ?? "Prefer not to answer"),
@@ -265,7 +186,6 @@ export const submitApplication = functions.https.onCall(
                 .array()
                 .transform((val) => (val.length > 0 ? val : ["None"])),
             allergies: z.string().array(),
-            shirtSizes: z.string().array().min(1),
             interests: z.string().array().min(1),
             hackathonExperience: z.string(),
             programmingLanguages: z.string().array(),
@@ -280,12 +200,29 @@ export const submitApplication = functions.https.onCall(
             agreedToMLHCoC: z.boolean(),
             agreetToMLHToCAndPrivacyPolicy: z.boolean(),
             agreedToReceiveEmailsFromMLH: z.boolean(),
+
+            referralSources: z.string().array().min(1),
+            describeSalt: z.string().min(1),
+
+            // hacker only
+            reasonToBeInHawkHacks: z.string(),
+            revolutionizingTechnology: z.string(),
+
+            // mentor only
+            mentorResumeUrl: z.string(),
+            mentorExperience: z.string(),
+            reasonToBeMentor: z.string(),
+
+            // volunteer only
+            volunteerExperience: z.string(),
+            excitedToVolunteerFor: z.string(),
+            reasonToBeVolunteer: z.string(),
         });
 
         const result = hackerAppFormValidation.safeParse(data);
 
         if (!result.success) {
-            return new functions.https.HttpsError(
+            throw new functions.https.HttpsError(
                 "invalid-argument",
                 "Invalid argument"
             );
@@ -297,19 +234,42 @@ export const submitApplication = functions.https.onCall(
             gender,
             pronouns,
             sexuality,
+            city,
+            countryOfResidence,
+            discord,
+            phone,
+            age,
+            firstName,
+            lastName,
+            school,
+            levelOfStudy,
             race,
             diets,
             allergies,
-            shirtSizes,
             interests,
             hackathonExperience,
             programmingLanguages,
             participatingAs,
+
             agreedToMLHCoC,
             agreedToWLUCoC,
             agreedToHawkHacksCoC,
             agreetToMLHToCAndPrivacyPolicy,
             agreedToReceiveEmailsFromMLH,
+
+            mentorExperience,
+            mentorResumeUrl,
+            reasonToBeMentor,
+
+            reasonToBeInHawkHacks,
+            revolutionizingTechnology,
+
+            volunteerExperience,
+            excitedToVolunteerFor,
+            reasonToBeVolunteer,
+
+            referralSources,
+            describeSalt,
         } = result.data;
 
         // check if there is an application that exists already
@@ -323,7 +283,7 @@ export const submitApplication = functions.https.onCall(
             const resource = snap.docs[0];
             if (resource) {
                 // application exists already, do not proceed
-                return new functions.https.HttpsError(
+                throw new functions.https.HttpsError(
                     "aborted",
                     "duplicate application"
                 );
@@ -336,22 +296,45 @@ export const submitApplication = functions.https.onCall(
                 gender,
                 pronouns,
                 sexuality,
+                city,
+                countryOfResidence,
+                discord,
+                phone,
+                age,
+                firstName,
+                lastName,
+                school,
+                levelOfStudy,
                 race,
                 diets,
                 allergies,
-                shirtSizes,
                 interests,
                 hackathonExperience,
                 programmingLanguages,
                 participatingAs,
+
                 agreedToMLHCoC,
                 agreedToWLUCoC,
                 agreedToHawkHacksCoC,
                 agreetToMLHToCAndPrivacyPolicy,
                 agreedToReceiveEmailsFromMLH,
+
+                mentorResumeUrl,
+                mentorExperience,
+                reasonToBeMentor,
+
+                reasonToBeInHawkHacks,
+                revolutionizingTechnology,
+
+                volunteerExperience,
+                excitedToVolunteerFor,
+                reasonToBeVolunteer,
+
+                referralSources,
+                describeSalt,
             });
         } catch (e) {
-            return new functions.https.HttpsError(
+            throw new functions.https.HttpsError(
                 "unavailable",
                 "Service down. 1100" // 1100 is a random number :)
             );

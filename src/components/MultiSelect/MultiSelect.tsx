@@ -1,14 +1,15 @@
-import { FC, Fragment, useRef, useState } from "react";
+import { FC, Fragment, useRef, useState, useCallback } from "react";
 import { Combobox, Transition } from "@headlessui/react";
 import {
     CheckIcon,
-    ChevronUpDownIcon,
+    ChevronDownIcon,
     XMarkIcon,
 } from "@heroicons/react/20/solid";
 import { VariantProps, cva } from "class-variance-authority";
 import { ClassProp } from "class-variance-authority/types";
 import { twMerge } from "tailwind-merge";
 import { getTextInputDescriptionStyles } from "../TextInput/TextInput.styles";
+import { useDebounce } from "@/hooks/use-debounce";
 
 const SelectedList: FC<{
     options: string[];
@@ -38,7 +39,9 @@ const SelectedList: FC<{
 };
 
 const optionStyles = cva(
-    ["text-gray-900 relative cursor-default select-none py-2 pl-10 pr-4"],
+    [
+        "text-gray-900 relative cursor-default select-none py-2 pl-10 pr-4 hover:cursor-pointer",
+    ],
     {
         variants: {
             active: {
@@ -80,15 +83,59 @@ export const MultiSelect: FC<MultiSelectProps> = ({
     onChange,
 }) => {
     const [selected, setSelected] = useState<string[]>(initialValues);
+    const [controlledOptions, setControlledOptions] = useState(
+        options.slice(0, 50)
+    );
     const [query, setQuery] = useState("");
     const randomId = useRef(Math.random().toString(32));
+    const comboboxButtonRef = useRef<HTMLButtonElement | null>(null);
+    const lastOptionRef = useRef<HTMLLIElement | null>(null);
+    const optionsRef = useRef<HTMLUListElement | null>(null);
 
-    const handleChange = (opts: string[]) => {
-        setSelected(opts);
-        if (onChange) onChange(opts);
+    const handleChange = useCallback(
+        (opts: string[]) => {
+            setSelected(opts);
+            if (onChange) onChange(opts);
+        },
+        [onChange]
+    );
+
+    const filterQuery = (value: string) => {
+        const transformedValue = value.toLowerCase().trim();
+        setControlledOptions(() =>
+            value === ""
+                ? options.slice(0, 50)
+                : options
+                      .filter((opt) =>
+                          opt.toLowerCase().trim().includes(transformedValue)
+                      )
+                      .slice(0, 50)
+        );
     };
 
-    const filteredOptions =
+    const debounce = useDebounce<typeof filterQuery, string>(filterQuery, 400);
+
+    const handleScroll = useCallback(() => {
+        // alreay render the entire list
+        if (controlledOptions.length === options.length) return;
+        if (!optionsRef.current) return;
+        const rect = optionsRef.current.getBoundingClientRect();
+        const a = rect.top; // parent container top
+        const b = rect.bottom; // parent container bottom
+        if (lastOptionRef.current) {
+            const rect = lastOptionRef.current.getBoundingClientRect();
+            const x = rect.top; // last option top corner
+
+            if (x >= a && x <= b) {
+                // if in view load more options
+                setControlledOptions((opts) =>
+                    options.slice(0, opts.length + 50)
+                );
+            }
+        }
+    }, [optionsRef.current, lastOptionRef.current]);
+
+    const controlledoptions =
         query === ""
             ? options
             : options.filter((opt) => {
@@ -135,11 +182,19 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                     <Combobox.Input
                         id={randomId.current}
                         className="w-full border-none py-2 pl-3 pr-10 leading-5 text-gray-900 bg-gray-50 focus:ring-0"
-                        onChange={(event) => setQuery(event.target.value)}
+                        onChange={(e) => {
+                            setQuery(e.target.value);
+                            debounce(e.target.value);
+                        }}
+                        onFocus={() => setQuery("")}
+                        onClick={() => comboboxButtonRef.current?.click()} // Added to handle click and focus event to open the combobox
                         aria-describedby={describedby}
                     />
-                    <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
-                        <ChevronUpDownIcon
+                    <Combobox.Button
+                        ref={comboboxButtonRef}
+                        className="absolute inset-y-0 right-0 flex items-center pr-2"
+                    >
+                        <ChevronDownIcon
                             className="h-5 w-5 text-gray-400"
                             aria-hidden="true"
                         />
@@ -162,30 +217,47 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                     leaveTo="opacity-0"
                     afterLeave={() => setQuery("")}
                 >
-                    <Combobox.Options className="absolute border border-charcoalBlack mt-1 max-h-60 z-50 w-full overflow-auto bg-gray-50 py-1 text-base">
+                    <Combobox.Options
+                        ref={optionsRef}
+                        onScroll={handleScroll}
+                        className="absolute border border-charcoalBlack mt-1 max-h-60 z-50 w-full overflow-auto bg-gray-50 py-1 text-base"
+                    >
                         {allowCustomValue && query.length > 0 ? (
                             <Combobox.Option
                                 className={getOptionStyles}
                                 value={query}
                             >{`Create "${query}"`}</Combobox.Option>
                         ) : null}
-                        {filteredOptions.length === 0 && query !== "" ? (
+                        {controlledoptions.length === 0 && query !== "" ? (
                             <div className="relative cursor-default select-none px-4 py-2 text-gray-700">
                                 Nothing found.
                             </div>
                         ) : (
-                            filteredOptions.map((opt) => (
+                            controlledoptions.map((opt, i) => (
                                 <Combobox.Option
                                     key={opt}
                                     className={getOptionStyles}
                                     value={opt}
+                                    ref={
+                                        i === controlledOptions.length - 1
+                                            ? lastOptionRef
+                                            : undefined
+                                    }
                                 >
                                     {({ selected, active }) => (
                                         <>
-                                            <span>{opt}</span>
+                                            <span
+                                                className={`block truncate ${
+                                                    selected
+                                                        ? "font-medium"
+                                                        : "font-normal"
+                                                }`}
+                                            >
+                                                {opt}
+                                            </span>
                                             {selected ? (
                                                 <span
-                                                    className={`absolute inset-y-0 right-0 flex items-center pr-3 ${
+                                                    className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
                                                         active
                                                             ? "text-white"
                                                             : "text-green-600"
@@ -207,7 +279,8 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                 <p className="mt-2 text-sageGray">
                     {allowCustomValue ? (
                         <span className="block mt-2">
-                            {`Not in the options? Type your ${label} in the input field.`}
+                            Not in the options? Type your answer in the input
+                            field.
                         </span>
                     ) : null}
                 </p>

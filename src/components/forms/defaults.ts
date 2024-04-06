@@ -1,31 +1,25 @@
-import type { UserProfile } from "@/services/utils/types";
-import type {
-    HackerApplicationData,
-    ApplicationData,
-} from "@/components/forms/types";
+import type { ApplicationData } from "@/components/forms/types";
 
-export const defaultProfile: UserProfile = {
+export const defaultApplication: ApplicationData = {
     firstName: "",
     lastName: "",
     phone: "",
-    school: "Wilfrid Laurier University",
-    levelOfStudy: "Undergraduate University (3+ years)",
-    age: "18",
+    school: "",
+    levelOfStudy: "",
+    age: "",
     discord: "",
-    countryOfResidence: "CA",
-};
-
-export const defaultHackerApp: HackerApplicationData = {
+    countryOfResidence: "",
+    city: "",
     major: [],
-    gender: "Prefer not to answer",
+
+    gender: "",
     pronouns: [],
-    sexuality: "Prefer not to answer",
-    race: "Prefer not to answer",
+    sexuality: "",
+    race: "",
     diets: [],
     allergies: [],
-    shirtSizes: [],
     interests: [],
-    hackathonExperience: "1",
+    hackathonExperience: "",
     programmingLanguages: [],
     participatingAs: "Hacker",
     applicantId: "",
@@ -34,9 +28,20 @@ export const defaultHackerApp: HackerApplicationData = {
     agreedToHawkHacksCoC: false,
     agreedToReceiveEmailsFromMLH: false,
     agreetToMLHToCAndPrivacyPolicy: false,
-};
+    referralSources: [],
+    describeSalt: "",
 
-export const defaultApplication: ApplicationData = {
-    ...defaultProfile,
-    ...defaultHackerApp,
+    // hacker only
+    reasonToBeInHawkHacks: "",
+    revolutionizingTechnology: "",
+
+    // mentor only
+    mentorResumeUrl: "",
+    mentorExperience: "",
+    reasonToBeMentor: "",
+
+    // volunteer only
+    volunteerExperience: "",
+    excitedToVolunteerFor: "",
+    reasonToBeVolunteer: "",
 };
