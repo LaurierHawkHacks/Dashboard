@@ -139,8 +139,12 @@ export const ApplicationPage = () => {
 
     const jumpTo = (step: number) => {
         if (step > -1 && step < steps.length) {
-            if (!validate()) return;
-            setActiveStep(step);
+            if (step <= activeStep) {
+                setActiveStep(step);
+            } else {
+                if (!validate()) return;
+                setActiveStep(step);
+            }
         }
     };
 
@@ -435,8 +439,6 @@ export const ApplicationPage = () => {
                                 <a
                                     className="text-sky-600 underline"
                                     href="https://static.mlh.io/docs/mlh-code-of-conduct.pdf"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
                                 >
                                     MLH Code of Conduct
                                 </a>
@@ -465,8 +467,6 @@ export const ApplicationPage = () => {
                                 <a
                                     className="text-sky-600 underline"
                                     href="https://mlh.io/privacy"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
                                 >
                                     MLH Privacy Policy
                                 </a>
@@ -474,8 +474,6 @@ export const ApplicationPage = () => {
                                 <a
                                     className="text-sky-600 underline"
                                     href="https://github.com/MLH/mlh-policies/blob/main/contest-terms.md)and"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
                                 >
                                     MLH Contest Terms and Conditions
                                 </a>
