@@ -95,7 +95,7 @@ export const Profile = ({
                     label="Which city do you live in?"
                     options={cityNames}
                     initialValue=""
-                    onChange={(opt) => handler("countryOfResidence", opt)}
+                    onChange={(opt) => handler("city", opt)}
                     required
                 />
             </div>
