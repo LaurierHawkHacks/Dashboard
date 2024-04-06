@@ -1,6 +1,7 @@
 import { FC, Fragment, useState, useRef, useEffect } from "react";
 import { Combobox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
+import { getOptionStyles } from "../MultiSelect/MultiSelect";
 
 export interface SelectProps {
     label: string;
@@ -30,18 +31,18 @@ export const Select: FC<SelectProps> = ({
     const inputRef = useRef<HTMLInputElement | null>(null);
     const comboboxButtonRef = useRef<HTMLButtonElement | null>(null); // Added ref for Combobox.Button
 
-    useEffect(() => {
-        if (onChange) onChange(selected);
-    }, [selected, onChange]);
-
     const handleChange = (opt: string) => {
         setSelected(opt);
+        if (onChange) onChange(selected);
     };
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === "ArrowDown" && inputRef.current === document.activeElement) {
-                setQuery('');
+            if (
+                event.key === "ArrowDown" &&
+                inputRef.current === document.activeElement
+            ) {
+                setQuery("");
             }
         };
 
@@ -52,11 +53,12 @@ export const Select: FC<SelectProps> = ({
         };
     }, []);
 
-    const filteredOptions = query === ""
-        ? options
-        : options.filter((opt) => {
-              return opt.toLowerCase().includes(query.toLowerCase());
-          });
+    const filteredOptions =
+        query === ""
+            ? options
+            : options.filter((opt) => {
+                  return opt.toLowerCase().includes(query.toLowerCase());
+              });
 
     return (
         <Combobox
@@ -65,12 +67,13 @@ export const Select: FC<SelectProps> = ({
             onChange={handleChange}
             disabled={disabled}
             name={name}
-            onInputValueChange={({ inputValue }) => {
-                setQuery(inputValue || "");
-            }}
         >
             <div className="relative">
-                <Combobox.Label className={`block text-sm font-medium ${srLabelOnly ? " sr-only" : ""}`}>
+                <Combobox.Label
+                    className={`block text-sm font-medium ${
+                        srLabelOnly ? " sr-only" : ""
+                    }`}
+                >
                     {label}
                     {required && <span className="text-red-500">*</span>}
                 </Combobox.Label>
@@ -79,12 +82,18 @@ export const Select: FC<SelectProps> = ({
                         className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 bg-gray-50 focus:ring-0"
                         displayValue={(option: string) => option}
                         onChange={(event) => setQuery(event.target.value)}
-                        onFocus={() => setQuery('')}
+                        onFocus={() => setQuery("")}
                         ref={inputRef}
                         onClick={() => comboboxButtonRef.current?.click()} // Added to handle click and focus event to open the combobox
                     />
-                    <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2" ref={comboboxButtonRef}>
-                        <ChevronUpDownIcon className="w-5 h-5 text-gray-400" aria-hidden="true" />
+                    <Combobox.Button
+                        className="absolute inset-y-0 right-0 flex items-center pr-2"
+                        ref={comboboxButtonRef}
+                    >
+                        <ChevronUpDownIcon
+                            className="w-5 h-5 text-gray-400"
+                            aria-hidden="true"
+                        />
                     </Combobox.Button>
                 </div>
                 <Transition
@@ -94,7 +103,7 @@ export const Select: FC<SelectProps> = ({
                     leaveTo="opacity-0"
                     afterLeave={() => setQuery("")}
                 >
-                    <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+                    <Combobox.Options className="absolute border border-charcoalBlack mt-1 max-h-60 z-50 w-full overflow-auto bg-gray-50 py-1 text-base">
                         {filteredOptions.length === 0 && query !== "" ? (
                             <div className="cursor-default select-none relative py-2 px-4 text-gray-700">
                                 Nothing found.
@@ -103,19 +112,32 @@ export const Select: FC<SelectProps> = ({
                             filteredOptions.map((option) => (
                                 <Combobox.Option
                                     key={option}
-                                    className={({ active }) =>
-                                        `cursor-default select-none relative py-2 pl-10 pr-4 ${active ? "bg-blue-500 text-white" : "text-gray-900"}`
-                                    }
+                                    className={getOptionStyles}
                                     value={option}
                                 >
                                     {({ selected, active }) => (
                                         <>
-                                            <span className={`block truncate ${selected ? "font-medium" : "font-normal"}`}>
+                                            <span
+                                                className={`block truncate ${
+                                                    selected
+                                                        ? "font-medium"
+                                                        : "font-normal"
+                                                }`}
+                                            >
                                                 {option}
                                             </span>
                                             {selected && (
-                                                <span className={`absolute inset-y-0 left-0 flex items-center pl-3 ${active ? "text-white" : "text-teal-600"}`}>
-                                                    <CheckIcon className="w-5 h-5" aria-hidden="true" />
+                                                <span
+                                                    className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
+                                                        active
+                                                            ? "text-white"
+                                                            : "text-teal-600"
+                                                    }`}
+                                                >
+                                                    <CheckIcon
+                                                        className="w-5 h-5"
+                                                        aria-hidden="true"
+                                                    />
                                                 </span>
                                             )}
                                         </>
