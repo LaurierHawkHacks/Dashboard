@@ -38,7 +38,9 @@ const SelectedList: FC<{
 };
 
 const optionStyles = cva(
-    ["text-gray-900 relative cursor-default select-none py-2 pl-10 pr-4"],
+    [
+        "text-gray-900 relative cursor-default select-none py-2 pl-10 pr-4 hover:cursor-pointer",
+    ],
     {
         variants: {
             active: {
@@ -179,7 +181,6 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                                     key={opt}
                                     className={getOptionStyles}
                                     value={opt}
-                                    style={{ cursor: "pointer" }}
                                 >
                                     {({ selected, active }) => (
                                         <>
