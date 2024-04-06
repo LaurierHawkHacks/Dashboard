@@ -266,15 +266,8 @@ export const submitApplication = functions.https.onCall(
                 return true;
             }),
             major: z.string().array().min(1),
-            gender: z
-                .string()
-                .transform((val) => val ?? "Prefer not to answer"),
-            pronouns: z
-                .string()
-                .array()
-                .transform((val) =>
-                    val.length > 0 ? val : ["Prefer not to answer"]
-                ),
+            gender: z.string(),
+            pronouns: z.string(),
             sexuality: z
                 .string()
                 .transform((val) => val ?? "Prefer not to answer"),
