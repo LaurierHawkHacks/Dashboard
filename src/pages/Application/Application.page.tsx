@@ -122,6 +122,7 @@ export const ApplicationPage = () => {
                     : volunteerSpecificValidation;
             const results = validateFn.safeParse(application);
             if (!results.success) {
+                console.log(results.error.issues.map((i) => i.path));
                 setErrors(results.error.issues.map((i) => i.message));
                 return false;
             }
@@ -205,7 +206,6 @@ export const ApplicationPage = () => {
 
         try {
             if (generalResumeFile) {
-                console.log("resume");
                 application.generalResumeRef = await uploadGeneralResume(
                     generalResumeFile,
                     currentUser.uid
@@ -368,7 +368,6 @@ export const ApplicationPage = () => {
                                         "application/pdf",
                                     ]}
                                     onChange={(file) => {
-                                        console.log("here");
                                         file && setMentorResumeFile(file);
                                     }}
                                 />
@@ -431,7 +430,6 @@ export const ApplicationPage = () => {
                                     "application/pdf",
                                 ]}
                                 onChange={(file) => {
-                                    console.log("file");
                                     file && setGeneralResumeFile(file);
                                 }}
                             />
