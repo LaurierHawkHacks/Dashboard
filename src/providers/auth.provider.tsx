@@ -98,6 +98,12 @@ function getNotificationByAuthErrCode(code: string): NotificationOptions {
                 message:
                     "If you forgot your password, click on 'forgot password' to recover it!",
             };
+        case "auth/invalid-login-credentials":
+            return {
+                title: "Invalid Credentials",
+                message:
+                "Please make sure you have the correct credentials and try again.",
+            };
         default:
             return {
                 title: "Oops! Something went wrong",
