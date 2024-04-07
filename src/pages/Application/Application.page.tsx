@@ -422,8 +422,15 @@ export const ApplicationPage = () => {
                     >
                         <div className="sm:col-span-full">
                             <label className="text-gray-900 font-medium">
-                                Resume
+                                If you would like to share your resume with our
+                                sponsors, please do so now.
                             </label>
+                            <p className="text-sm italic">
+                                Sponsors will be conducting coffee
+                                chats/interviews during the hackathon, or might
+                                reach out via email for career or job
+                                opportunities.
+                            </p>
                             <FileBrowser
                                 allowedFileTypes={[
                                     "image/*", //png, jpg, jpeg, jfif, pjpeg, pjp, gif, webp, bmp, svg
@@ -440,13 +447,6 @@ export const ApplicationPage = () => {
                                     file && setGeneralResumeFile(file);
                                 }}
                             />
-                            <div>
-                                If you would like to share your resume with our
-                                sponsors for employment or career opportunities,
-                                please feel free to do so now. Sponsors will be
-                                conducting coffee chats/interviews during the
-                                hackathon, or might reach out via email.
-                            </div>
                         </div>
                         <div className="sm:col-span-full">
                             <MultiSelect
