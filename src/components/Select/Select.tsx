@@ -178,7 +178,7 @@ export const Select: FC<SelectProps> = ({
                     </Combobox.Options>
                 </Transition>
                 {allowCustomValue ? (
-                    <span className="block mt-2">
+                    <span className="block mt-2 text-sageGray">
                         Not in the options? Type your answer in the input field.
                     </span>
                 ) : null}

@@ -35,6 +35,7 @@ export interface HackerApplicationData {
     applicationStatus?: "pending" | "rejected" | "accepted";
     referralSources: string[];
     describeSalt: string;
+    generalResumeRef: string;
 }
 
 export interface HackerSpecificAppData {
@@ -47,7 +48,7 @@ export interface MentorSpecificAppData {
     linkedinUrl: string;
     githubUrl: string;
     personalWebsiteUrl: string;
-    mentorResumeUrl: string;
+    mentorResumeRef: string;
     reasonToBeMentor: string;
 }
 

@@ -30,15 +30,16 @@ export const defaultApplication: ApplicationData = {
     agreetToMLHToCAndPrivacyPolicy: false,
     referralSources: [],
     describeSalt: "",
+    generalResumeRef: "",
 
     // hacker only
     reasonToBeInHawkHacks: "",
     revolutionizingTechnology: "",
 
     // mentor only
-    mentorResumeUrl: "",
     mentorExperience: "",
     reasonToBeMentor: "",
+    mentorResumeRef: "",
 
     // volunteer only
     volunteerExperience: "",

@@ -7,7 +7,6 @@ import {
     cityNames,
     majorsList,
 } from "@data";
-import { FileBrowser } from "@/components/FileBrowse/FileBrowse";
 import type {
     ApplicationData,
     ApplicationInputKeys,
@@ -90,7 +89,7 @@ export const Profile = ({
             </div>
 
             <div className="col-span-6">
-                <PhoneInput onChange={(phone) => handler("phone", phone)} />
+                <PhoneInput onChange={(phone) => handler("phone", phone)} required />
             </div>
 
             <div className="sm:col-span-3">
@@ -101,6 +100,10 @@ export const Profile = ({
                     onChange={(opt) => handler("school", opt)}
                     required
                 />
+                <p className="mt-2 text-sageGray">
+                    If you recently graduated, pick the school you graduated
+                    from.
+                </p>
             </div>
             <div className="sm:col-span-3">
                 <Select
@@ -119,12 +122,6 @@ export const Profile = ({
                     onChange={(opts) => handler("major", opts)}
                     allowCustomValue
                     required
-                />
-            </div>
-            <div className="sm:col-span-full">
-                <label className="text-gray-900 font-medium">Resume</label>
-                <FileBrowser
-                    allowedFileTypes={["image/*", "application/pdf"]}
                 />
             </div>
         </>

@@ -658,7 +658,6 @@ export const cityNames: string[] = [
     "Warwick",
     "Hanwell",
     "Napierville",
-    "Waterloo",
     "Saint-Joseph-de-Beauce",
     "White City",
     "Lucan Biddulph",

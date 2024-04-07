@@ -81,25 +81,25 @@ export const hackerSpecificValidation = z.object({
 
 export const mentorSpecificValidation = z.object({
     // mentor only
-    mentorResumeUrl: z.string(), // we don't have an file upload yet, so this is not populated
+    mentorResumeRef: z.string(), // we don't have an file upload yet, so this is not populated
     mentorExperience: z
         .string()
         .min(1, "Please let us know your past hackathon experiences."),
     reasonToBeMentor: z
         .string()
         .min(1, "Please tell us why you want to be a mentor at HawkHacks."),
-    linkedinUrl: z
-        .string()
-        .url("Please input a valid url for your LinkedIn.")
-        .optional(),
-    githubUrl: z
-        .string()
-        .url("Please input a valid url for your GitHub.")
-        .optional(),
-    personalWebsiteUrl: z
-        .string()
-        .url("Please input a valid url for your personal website.")
-        .optional(),
+    // linkedinUrl: z
+    //     .string()
+    //     .url("Please input a valid url for your LinkedIn.")
+    //     .optional(),
+    // githubUrl: z
+    //     .string()
+    //     .url("Please input a valid url for your GitHub.")
+    //     .optional(),
+    // personalWebsiteUrl: z
+    //     .string()
+    //     .url("Please input a valid url for your personal website.")
+    //     .optional(),
 });
 
 export const volunteerSpecificValidation = z.object({

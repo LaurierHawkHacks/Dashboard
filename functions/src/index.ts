@@ -206,7 +206,6 @@ export const submitApplication = functions.https.onCall(
             revolutionizingTechnology: z.string(),
 
             // mentor only
-            mentorResumeUrl: z.string(),
             mentorExperience: z.string(),
             reasonToBeMentor: z.string(),
             linkedinUrl: z.string(),
@@ -262,7 +261,6 @@ export const submitApplication = functions.https.onCall(
             agreedToReceiveEmailsFromMLH,
 
             mentorExperience,
-            mentorResumeUrl,
             reasonToBeMentor,
 
             reasonToBeInHawkHacks,
@@ -330,7 +328,6 @@ export const submitApplication = functions.https.onCall(
                 agreetToMLHToCAndPrivacyPolicy,
                 agreedToReceiveEmailsFromMLH,
 
-                mentorResumeUrl,
                 mentorExperience,
                 reasonToBeMentor,
 
