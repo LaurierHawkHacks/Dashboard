@@ -470,6 +470,7 @@ export const verifySmsCode = functions.https.onCall(async (data, context) => {
             .verificationChecks.create({ to: fullPhoneNumber, code });
 
         if (verification.status === "approved") {
+            functions.logger.log("Phone verified.", { phone: fullPhoneNumber });
             // add claim to user token, cannot be modified by user
             const existingClaims = await admin
                 .auth()
@@ -480,12 +481,13 @@ export const verifySmsCode = functions.https.onCall(async (data, context) => {
                 phoneVerified: true,
             };
             await admin.auth().setCustomUserClaims(context.auth.uid, newClaims);
-        } else {
-            throw new Error("SMS verification not approved.");
+            functions.logger.log("User claims added phoneVerified", {
+                uid: context.auth.uid,
+            });
         }
 
         return {
-            success: true,
+            success: verification.status === "approved",
         };
     } catch (error) {
         functions.logger.error("Error verifying SMS code:", error);
