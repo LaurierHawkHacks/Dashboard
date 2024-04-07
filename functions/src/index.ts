@@ -363,6 +363,24 @@ exports.uploadFileToBucket = functions.https.onRequest(async (request, response)
         response.status(405).send('Method Not Allowed');
         return;
     }
+    
+    const token = request.headers.authorization?.split('Bearer ')[1];
+    if (!token) {
+        response.status(403).send('Unauthorized');
+        return;
+    }
+
+    try {
+        const decodedToken = await admin.auth().verifyIdToken(token);
+        if (decodedToken.admin !== true) {
+            response.status(403).send('Access denied. User is not an admin.');
+            return;
+        }
+    } catch (error) {
+        console.error('Authentication error:', error);
+        response.status(403).send('Unauthorized');
+        return;
+    }
 
     const bucket = admin.storage().bucket();
     const fileName = request.body.fileName;
