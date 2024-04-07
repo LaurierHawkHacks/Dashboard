@@ -12,7 +12,7 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { Octokit } from "octokit";
 import { z } from "zod";
-import axios from "axios";
+import * as twilio from "twilio";
 
 // data imports
 import { ages } from "./data";
@@ -377,32 +377,54 @@ export const sendVerificationSms = functions.https.onCall(
             );
         }
 
-        const { phoneNumber } = data;
-        const fullPhoneNumber = `+1${phoneNumber}`; // Adjust the country code as necessary
+        if (!TWILIO_SERVICE_SID || !TWILIO_AUTH_TOKEN || !TWILIO_ACCOUNT_SID) {
+            if (!TWILIO_SERVICE_SID)
+                functions.logger.error("Missing twilio service sid");
+            if (!TWILIO_AUTH_TOKEN)
+                functions.logger.error("Missing twilio auth token");
+            if (!TWILIO_ACCOUNT_SID)
+                functions.logger.error("Missing twilio account sid");
+            throw new functions.https.HttpsError(
+                "unavailable",
+                "Service unavailable"
+            );
+        }
 
-        const url = `https://verify.twilio.com/v2/Services/${TWILIO_SERVICE_SID}/Verifications`;
+        const payloadValidation = z.object({
+            phoneNumber: z.string().min(1),
+        });
+
+        const result = payloadValidation.safeParse(data);
+        if (!result.success) {
+            functions.logger.log("Invalid payload", { fn: "verifySmsCode" });
+            throw new functions.https.HttpsError(
+                "invalid-argument",
+                "Invalid payload"
+            );
+        }
+
+        const { phoneNumber } = result.data;
+        const fullPhoneNumber = "+" + phoneNumber.replace(/\D/g, ""); // remove all non digit
+
+        // twilio is a commonjs pacakge, so we need to use it with default. T.T
+        const client = twilio.default(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
         try {
-            const response = await axios.post(
-                url,
-                new URLSearchParams({
-                    To: fullPhoneNumber,
-                    Channel: "sms",
-                }).toString(),
-                {
-                    auth: {
-                        username: TWILIO_ACCOUNT_SID,
-                        password: TWILIO_AUTH_TOKEN,
-                    },
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                }
-            );
+            const verification = await client.verify.v2
+                .services(TWILIO_SERVICE_SID)
+                .verifications.create({ to: fullPhoneNumber, channel: "sms" });
 
-            return { success: true, sid: response.data.sid };
+            functions.logger.log("Verification SMS sent.", {
+                to: fullPhoneNumber,
+                verification,
+            });
+
+            return { success: true, verificationStatus: verification.status };
         } catch (error) {
-            console.error("Error sending verification SMS:", error);
+            functions.logger.error("Error sending verification SMS.", {
+                to: fullPhoneNumber,
+                cause: error,
+            });
             throw new functions.https.HttpsError(
                 "internal",
                 "Failed to send verification SMS"
@@ -419,30 +441,35 @@ export const verifySmsCode = functions.https.onCall(async (data, context) => {
         );
     }
 
-    const { phoneNumber, code } = data;
-    const fullPhoneNumber = `+1${phoneNumber}`; // Adjust the country code as necessary
+    const payloadValidation = z.object({
+        phoneNumber: z.string().min(1),
+        code: z.string().length(6),
+    });
 
-    const url = `https://verify.twilio.com/v2/Services/${TWILIO_SERVICE_SID}/VerificationCheck`;
+    const result = payloadValidation.safeParse(data);
+    if (!result.success) {
+        functions.logger.log("Invalid payload", { fn: "verifySmsCode" });
+        throw new functions.https.HttpsError(
+            "invalid-argument",
+            "Invalid payload"
+        );
+    }
+
+    const { phoneNumber, code } = result.data;
+    const fullPhoneNumber = "+" + phoneNumber.replace(/\D/g, ""); // remove all non digit
+
+    // twilio is a commonjs pacakge, so we need to use it with default. T.T
+    const client = twilio.default(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
     try {
-        const response = await axios.post(
-            url,
-            new URLSearchParams({
-                To: fullPhoneNumber,
-                Code: code,
-            }).toString(),
-            {
-                auth: {
-                    username: TWILIO_ACCOUNT_SID,
-                    password: TWILIO_AUTH_TOKEN,
-                },
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-            }
-        );
+        functions.logger.log("Verifying phone number.", {
+            phone: fullPhoneNumber,
+        });
+        const verification = await client.verify.v2
+            .services(TWILIO_SERVICE_SID)
+            .verificationChecks.create({ to: fullPhoneNumber, code });
 
-        if (response.data.status === "approved") {
+        if (verification.status === "approved") {
             // add claim to user token, cannot be modified by user
             const existingClaims = await admin
                 .auth()
@@ -453,18 +480,18 @@ export const verifySmsCode = functions.https.onCall(async (data, context) => {
                 phoneVerified: true,
             };
             await admin.auth().setCustomUserClaims(context.auth.uid, newClaims);
+        } else {
+            throw new Error("SMS verification not approved.");
         }
 
         return {
-            success: response.data.status === "approved",
-            status: response.data.status,
+            success: true,
         };
     } catch (error) {
-        console.error("Error verifying SMS code:", error);
+        functions.logger.error("Error verifying SMS code:", error);
         throw new functions.https.HttpsError(
             "internal",
             "Failed to verify SMS code"
         );
     }
 });
-
