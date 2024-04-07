@@ -86,7 +86,6 @@ export const ApplicationPage = () => {
         // @ts-ignore the "name" key is controlled by the keyof typing, restricts having undefined keys, so disable is ok
         application[name] = data;
         setApplication({ ...application });
-        console.log(application);
     };
 
     const clearErrors = () => setErrors([]);
