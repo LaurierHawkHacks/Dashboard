@@ -76,8 +76,10 @@ export async function sendVerificationCode(phoneNumber: string) {
 }
 
 export async function verifyCode(phoneNumber: string, code: string) {
-    const verifySmsFn = httpsCallable(functions, "verifySmsCode");
+    const verifySmsFn = httpsCallable<
+        { phoneNumber: string; code: string },
+        { success: boolean }
+    >(functions, "verifySmsCode");
     const result = await verifySmsFn({ phoneNumber, code });
-    return result.data === "approved";
+    return result.data.success;
 }
-
