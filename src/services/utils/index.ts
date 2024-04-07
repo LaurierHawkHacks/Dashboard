@@ -2,6 +2,7 @@ import {
     addDoc,
     collection,
     getDocs,
+    limit,
     orderBy,
     query,
     where,
@@ -32,9 +33,26 @@ export async function createTicket(data: UserTicketData): Promise<string> {
 /**
  * Submits an application to firebase
  */
-export async function submitApplication(data: ApplicationData) {
-    const cloudFn = httpsCallable(functions, "submitApplication");
-    await cloudFn(data);
+export async function submitApplication(data: ApplicationData, uid: string) {
+    // const cloudFn = httpsCallable(functions, "submitApplication");
+    // await cloudFn(data);
+    const payload = {
+        ...data,
+        applicantId: uid,
+    };
+
+    const appsRef = collection(firestore, "applications");
+    try {
+        const q = query(appsRef, where("applicantId", "==", uid), limit(1));
+        const snap = await getDocs(q);
+        if (snap.size > 0) return;
+    } catch (e) {
+        console.error(e);
+        console.log("Could not query app");
+    }
+
+        await addDoc(appsRef, payload);
+        console.log("app submitted!");
 }
 
 /**

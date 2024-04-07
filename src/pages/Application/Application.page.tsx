@@ -222,7 +222,7 @@ export const ApplicationPage = () => {
         }
 
         try {
-            await submitApplication(application);
+            await submitApplication(application, currentUser.uid);
             showNotification({
                 title: "Application Submitted!",
                 message:
