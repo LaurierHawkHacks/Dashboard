@@ -426,8 +426,15 @@ export const ApplicationPage = () => {
                             </label>
                             <FileBrowser
                                 allowedFileTypes={[
-                                    "image/*",
-                                    "application/pdf",
+                                    "image/*", //png, jpg, jpeg, jfif, pjpeg, pjp, gif, webp, bmp, svg
+                                    "application/pdf", //pdf
+                                    "application/msword", //doc, dot, wiz
+                                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document", //docx
+                                    "application/rtf", //rtf
+                                    "application/oda", //oda
+                                    "text/markdown", //md, markdown, mdown, markdn
+                                    "text/plain", //txt, text, conf, def, list, log, in, ini
+                                    "application/vnd.oasis.opendocument.text", //odt
                                 ]}
                                 onChange={(file) => {
                                     file && setGeneralResumeFile(file);
