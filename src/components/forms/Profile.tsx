@@ -7,7 +7,7 @@ import {
     cityNames,
     majorsList,
 } from "@data";
-
+import { FileBrowser } from "@/components/FileBrowse/FileBrowse";
 import type {
     ApplicationData,
     ApplicationInputKeys,
@@ -119,6 +119,12 @@ export const Profile = ({
                     onChange={(opts) => handler("major", opts)}
                     allowCustomValue
                     required
+                />
+            </div>
+            <div className="sm:col-span-full">
+                <label className="text-gray-900 font-medium">Resume</label>
+                <FileBrowser
+                    allowedFileTypes={["image/*", "application/pdf"]}
                 />
             </div>
         </>
