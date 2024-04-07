@@ -327,6 +327,7 @@ export const ApplicationPage = () => {
                                 required
                             />
                             <Button
+                                type="button"
                                 onClick={sendCode}
                                 disabled={
                                     currentUser.phoneVerified ||
@@ -352,6 +353,7 @@ export const ApplicationPage = () => {
                                 required
                             />
                             <Button
+                                type="button"
                                 onClick={verifyPhone}
                                 disabled={
                                     currentUser.phoneVerified ||
