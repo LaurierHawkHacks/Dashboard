@@ -3,6 +3,7 @@ import { ages, countryNames, schools, levelsOfStudy } from "@data";
 
 import type { UserProfile } from "@/services/utils/types";
 import type { ApplicationInputKeys } from "@/components/forms/types";
+import { FileBrowser } from "@/components/FileBrowse/FileBrowse";
 
 export const Profile = ({
     profile,
@@ -99,6 +100,14 @@ export const Profile = ({
                     onChange={(e) => handler("discord", e.target.value)}
                     required
                 />
+            </div>
+            <div className="sm:col-span-full">
+            <label className="text-gray-900 font-medium">
+                        Resume
+             </label>
+            <FileBrowser
+                allowedFileTypes={["image/*", "application/pdf"]}
+            />
             </div>
         </>
     );
