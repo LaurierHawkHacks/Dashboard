@@ -114,18 +114,3 @@ export async function uploadGeneralResume(file: File, uid: string) {
     });
     return snap.ref.toString();
 }
-
-export async function sendVerificationCode(phoneNumber: string): Promise<void> {
-    const sendCodeFn = httpsCallable(functions, "sendVerificationCode");
-    await sendCodeFn({ phoneNumber });
-}
-interface VerifySmsResponse {
-    success: boolean;
-}
-
-export async function verifySmsCode(userId: string, code: string): Promise<boolean> {
-    const verifyCodeFn = httpsCallable(functions, "verifySmsCode");
-    const result = await verifyCodeFn({ code, userId });
-    const data = result.data as VerifySmsResponse;
-    return data.success;
-}
