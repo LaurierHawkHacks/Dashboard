@@ -7,16 +7,9 @@
         "sourceMap": true,
         "strict": true,
         "target": "es2017",
-        "skipLibCheck": true,
-        "esModuleInterop": true
+        "skipLibCheck": true
     },
     "compileOnSave": true,
-    "include": [
-        "src",
-        "src/**/*.ts",
-        "src/*.ts"
-    ],
-    "exclude": [
-        "node_modules"
-    ]
+    "include": ["src", "src/**/*.ts", "src/*.ts"],
+    "exclude": ["node_modules"]
 }
