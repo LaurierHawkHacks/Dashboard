@@ -31,7 +31,7 @@ export const PhoneInput: FC<PhoneInputProps> = ({ onChange, required }) => {
     useEffect(() => {
         const code = country.replace(/\D/g, ""); // remove all non digit
         if (onChange) onChange(`+${code}${phone}`);
-    }, [country, phone, onChange]);
+    }, [country, phone]);
 
     return (
         <div className="grid grid-cols-6 space-y-2">
@@ -44,7 +44,7 @@ export const PhoneInput: FC<PhoneInputProps> = ({ onChange, required }) => {
                 Phone Number
                 {required && <span className="text-red-600 ml-1">*</span>}
             </label>
-            <div className="col-span-1">
+            <div className="col-span-full sm:col-span-1">
                 <label className="sr-only" htmlFor={`country-code-${randomId}`}>
                     Country Code
                 </label>
@@ -103,7 +103,7 @@ export const PhoneInput: FC<PhoneInputProps> = ({ onChange, required }) => {
                     </div>
                 </Combobox>
             </div>
-            <div className="col-span-5 ml-2">
+            <div className="col-span-full sm:ml-2 sm:col-span-5">
                 <input
                     id={`phone-${randomId}`}
                     className={getTextInputStyles({
