@@ -102,7 +102,7 @@ function getNotificationByAuthErrCode(code: string): NotificationOptions {
             return {
                 title: "Invalid Credentials",
                 message:
-                "Please check your email and password and try again.",
+                "Please make sure you have the correct credentials and try again.",
             };
         default:
             return {
