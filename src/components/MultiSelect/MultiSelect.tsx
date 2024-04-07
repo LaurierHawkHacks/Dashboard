@@ -95,11 +95,11 @@ export const MultiSelect: FC<MultiSelectProps> = ({
     const handleChange = useCallback(
         (opts: string[]) => {
             setSelected(opts);
+            setQuery("");
             if (onChange) onChange(opts);
         },
-        [onChange]
+        [onChange, query]
     );
-
     const filterQuery = (value: string) => {
         const transformedValue = value.toLowerCase().trim();
         setControlledOptions(() =>
@@ -189,6 +189,7 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                         onFocus={() => setQuery("")}
                         onClick={() => comboboxButtonRef.current?.click()} // Added to handle click and focus event to open the combobox
                         aria-describedby={describedby}
+                        value={query}
                     />
                     <Combobox.Button
                         ref={comboboxButtonRef}
