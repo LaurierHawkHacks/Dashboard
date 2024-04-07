@@ -12,16 +12,16 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { Octokit } from "octokit";
 import { z } from "zod";
-import * as twilio from "twilio";
 
 // data imports
 import { ages } from "./data";
 
-admin.initializeApp();
-
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || "";
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || "";
-const TWILIO_SERVICE_SID = process.env.TWILIO_SERVICE_SID || "";
+
+admin.initializeApp();
+
+const db = admin.firestore();
 
 // Default on-sign-up Claims function
 export const addDefaultClaims = functions.auth.user().onCreate(async (user) => {
@@ -365,132 +365,56 @@ export const submitApplication = functions.https.onCall(
     }
 );
 
-export const sendVerificationSms = functions.https.onCall(
-    async (data, context) => {
-        if (!context.auth) {
-            throw new functions.https.HttpsError(
-                "unauthenticated",
-                "The function must be called while authenticated."
-            );
-        }
+export const sendVerificationCode = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError("unauthenticated", "The function must be called while authenticated.");
+    }
 
-        if (!TWILIO_SERVICE_SID || !TWILIO_AUTH_TOKEN || !TWILIO_ACCOUNT_SID) {
-            if (!TWILIO_SERVICE_SID)
-                functions.logger.error("Missing twilio service sid");
-            if (!TWILIO_AUTH_TOKEN)
-                functions.logger.error("Missing twilio auth token");
-            if (!TWILIO_ACCOUNT_SID)
-                functions.logger.error("Missing twilio account sid");
-            throw new functions.https.HttpsError(
-                "unavailable",
-                "Service unavailable"
-            );
-        }
+    const userId = context.auth.uid;
 
-        const payloadValidation = z.object({
-            phoneNumber: z.string().min(1),
+    console.log("Sending SMS, User ID:", userId);
+
+    const { phoneNumber } = data;
+    const fullPhoneNumber = `${phoneNumber}`;
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    await db.collection('smsVerifications').doc(userId).set({
+        phoneNumber: fullPhoneNumber,
+        code: verificationCode,
+    });
+
+    const twilioClient = require('twilio')(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
+    const message = `Your super awesome verification code is: ${verificationCode}`;
+
+    try {
+        const response = await twilioClient.messages.create({
+            body: message,
+            to: fullPhoneNumber,
+            from: "+15344295429",
         });
 
-        const result = payloadValidation.safeParse(data);
-        if (!result.success) {
-            functions.logger.log("Invalid payload", { fn: "verifySmsCode" });
-            throw new functions.https.HttpsError(
-                "invalid-argument",
-                "Invalid payload"
-            );
-        }
-
-        const { phoneNumber } = result.data;
-        const fullPhoneNumber = "+" + phoneNumber.replace(/\D/g, ""); // remove all non digit
-
-        // twilio is a commonjs pacakge, so we need to use it with default. T.T
-        const client = twilio.default(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
-
-        try {
-            const verification = await client.verify.v2
-                .services(TWILIO_SERVICE_SID)
-                .verifications.create({ to: fullPhoneNumber, channel: "sms" });
-
-            functions.logger.log("Verification SMS sent.", {
-                to: fullPhoneNumber,
-                verification,
-            });
-
-            return { success: true, verificationStatus: verification.status };
-        } catch (error) {
-            functions.logger.error("Error sending verification SMS.", {
-                to: fullPhoneNumber,
-                cause: error,
-            });
-            throw new functions.https.HttpsError(
-                "internal",
-                "Failed to send verification SMS"
-            );
-        }
+        return { success: true, sid: response.sid };
+    } catch (error) {
+        console.error("Error sending verification SMS:", error);
+        throw new functions.https.HttpsError("internal", "Failed to send verification SMS");
     }
-);
+});
 
 export const verifySmsCode = functions.https.onCall(async (data, context) => {
     if (!context.auth) {
-        throw new functions.https.HttpsError(
-            "unauthenticated",
-            "The function must be called while authenticated."
-        );
+        throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
     }
 
-    const payloadValidation = z.object({
-        phoneNumber: z.string().min(1),
-        code: z.string().length(6),
-    });
+    const { code } = data;
+    const userId = context.auth.uid;
 
-    const result = payloadValidation.safeParse(data);
-    if (!result.success) {
-        functions.logger.log("Invalid payload", { fn: "verifySmsCode" });
-        throw new functions.https.HttpsError(
-            "invalid-argument",
-            "Invalid payload"
-        );
+    const doc = await db.collection('smsVerifications').doc(userId).get();
+    const verificationData = doc.data();
+    if (!verificationData || verificationData.code !== code) {
+        throw new functions.https.HttpsError('failed-precondition', 'Verification code does not match or expired.');
     }
 
-    const { phoneNumber, code } = result.data;
-    const fullPhoneNumber = "+" + phoneNumber.replace(/\D/g, ""); // remove all non digit
+    await db.collection('smsVerifications').doc(userId).delete();
 
-    // twilio is a commonjs pacakge, so we need to use it with default. T.T
-    const client = twilio.default(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
-
-    try {
-        functions.logger.log("Verifying phone number.", {
-            phone: fullPhoneNumber,
-        });
-        const verification = await client.verify.v2
-            .services(TWILIO_SERVICE_SID)
-            .verificationChecks.create({ to: fullPhoneNumber, code });
-
-        if (verification.status === "approved") {
-            functions.logger.log("Phone verified.", { phone: fullPhoneNumber });
-            // add claim to user token, cannot be modified by user
-            const existingClaims = await admin
-                .auth()
-                .getUser(context.auth.uid)
-                .then((records) => records.customClaims);
-            const newClaims = {
-                ...existingClaims,
-                phoneVerified: true,
-            };
-            await admin.auth().setCustomUserClaims(context.auth.uid, newClaims);
-            functions.logger.log("User claims added phoneVerified", {
-                uid: context.auth.uid,
-            });
-        }
-
-        return {
-            success: verification.status === "approved",
-        };
-    } catch (error) {
-        functions.logger.error("Error verifying SMS code:", error);
-        throw new functions.https.HttpsError(
-            "internal",
-            "Failed to verify SMS code"
-        );
-    }
+    return { success: true, message: "Phone number verified successfully." };
 });
