@@ -41,7 +41,7 @@ export const getTextInputLabelStyles = cva(
     }
 );
 
-const textInputDescriptionStyles = cva("mt-2 text-sm text-[#32848C]", {
+const textInputDescriptionStyles = cva("mt-2 text-sm text-sageGray", {
     variants: {
         invalid: {
             true: "text-red-500",
