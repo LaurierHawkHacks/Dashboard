@@ -160,10 +160,7 @@ export const submitApplication = functions.https.onCall(
             lastName: z.string().min(1),
             countryOfResidence: z.string().min(1),
             city: z.string().min(1),
-            phone: z
-                .string()
-                .min(1)
-                .regex(/^\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$/),
+            phone: z.string().min(1),
             school: z.string().min(1),
             levelOfStudy: z.string().min(1),
             age: z.string().refine((val) => ages.includes(val)),
@@ -212,16 +209,23 @@ export const submitApplication = functions.https.onCall(
             mentorResumeUrl: z.string(),
             mentorExperience: z.string(),
             reasonToBeMentor: z.string(),
+            linkedinUrl: z.string(),
+            githubUrl: z.string(),
+            personalWebsiteUrl: z.string(),
 
             // volunteer only
             volunteerExperience: z.string(),
             excitedToVolunteerFor: z.string(),
             reasonToBeVolunteer: z.string(),
+
+            mentorResumeRef: z.string().optional(),
+            generalResumeRef: z.string().optional(),
         });
 
         const result = hackerAppFormValidation.safeParse(data);
 
         if (!result.success) {
+            console.log(result.error.issues.map((i) => i.path));
             throw new functions.https.HttpsError(
                 "invalid-argument",
                 "Invalid argument"
@@ -270,6 +274,13 @@ export const submitApplication = functions.https.onCall(
 
             referralSources,
             describeSalt,
+
+            generalResumeRef,
+            mentorResumeRef,
+
+            linkedinUrl,
+            githubUrl,
+            personalWebsiteUrl,
         } = result.data;
 
         // check if there is an application that exists already
@@ -332,6 +343,12 @@ export const submitApplication = functions.https.onCall(
 
                 referralSources,
                 describeSalt,
+                generalResumeRef,
+                mentorResumeRef,
+
+                linkedinUrl,
+                githubUrl,
+                personalWebsiteUrl,
             });
         } catch (e) {
             throw new functions.https.HttpsError(
