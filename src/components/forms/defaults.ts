@@ -44,4 +44,8 @@ export const defaultApplication: ApplicationData = {
     volunteerExperience: "",
     excitedToVolunteerFor: "",
     reasonToBeVolunteer: "",
+
+    linkedinUrl: "",
+    githubUrl: "",
+    personalWebsiteUrl: "",
 };
