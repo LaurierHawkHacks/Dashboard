@@ -3,7 +3,6 @@ import {
     collection,
     getDocs,
     limit,
-    orderBy,
     query,
     where,
     Timestamp,
@@ -66,7 +65,6 @@ export async function getUserApplications(uid: string) {
         const q = query(
             colRef,
             where("applicantId", "==", uid),
-            orderBy("timestamp", "desc")
         );
         const snap = await getDocs(q);
         const apps: ApplicationData[] = [];
