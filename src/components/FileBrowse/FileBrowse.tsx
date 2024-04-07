@@ -51,7 +51,7 @@ export const FileBrowser: React.FC<FileBrowserProps> = ({
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                className={`border ${
+                className={`hover:cursor-pointer hover:brightness-75 transition duration-300 ease-in-out border ${
                     isDragging
                         ? "bg-tbrand border-charcoalBlack"
                         : "border-charcoalBlack bg-gray-50"
