@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import { z } from "zod";
 import { useAuth, useNotification } from "@/providers/hooks";
 import { routes } from "@/navigation/constants";
+import { FileBrowser } from "@/components/FileBrowse/FileBrowse";
 import {
     TextInput,
     Select,
@@ -34,7 +35,12 @@ import {
     profileFormValidation,
     volunteerSpecificValidation,
 } from "@/components/forms/validations";
-import { getUserApplications, submitApplication } from "@/services/utils";
+import {
+    getUserApplications,
+    submitApplication,
+    uploadGeneralResume,
+    uploadMentorResume,
+} from "@/services/utils";
 import { TextArea } from "@/components/TextArea/TextArea";
 import { referralSources } from "@/data";
 
@@ -67,6 +73,10 @@ export const ApplicationPage = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [hasApplied, setHasApplied] = useState(true); // default to true to prevent showing the form at first load
+    const [mentorResumeFile, setMentorResumeFile] = useState<File | null>(null);
+    const [generalResumeFile, setGeneralResumeFile] = useState<File | null>(
+        null
+    );
     const { showNotification } = useNotification();
 
     if (!currentUser) return <Navigate to={routes.login} />;
@@ -173,8 +183,45 @@ export const ApplicationPage = () => {
             return;
         }
 
+        setIsSubmitting(true);
+
         try {
-            setIsSubmitting(true);
+            if (mentorResumeFile) {
+                const mentorResumeRef = await uploadMentorResume(
+                    mentorResumeFile,
+                    currentUser.uid
+                );
+                application.mentorResumeRef = mentorResumeRef;
+            }
+        } catch (e) {
+            console.error(e);
+            showNotification({
+                title: "Error uploading mentor resume",
+                message: "Please try again later.",
+            });
+            setIsSubmitting(false);
+            return;
+        }
+
+        try {
+            if (generalResumeFile) {
+                console.log("resume");
+                application.generalResumeRef = await uploadGeneralResume(
+                    generalResumeFile,
+                    currentUser.uid
+                );
+            }
+        } catch (e) {
+            console.error(e);
+            showNotification({
+                title: "Error uploading sponsor resume",
+                message: "Please try again later.",
+            });
+            setIsSubmitting(false);
+            return;
+        }
+
+        try {
             await submitApplication(application);
             showNotification({
                 title: "Application Submitted!",
@@ -308,6 +355,25 @@ export const ApplicationPage = () => {
                                 ) : null}
                             </div>
                         ))}
+
+                        {application.participatingAs === "Mentor" && (
+                            <div className="sm:col-span-full">
+                                <label className="text-gray-900 font-medium">
+                                    Resume
+                                    <span className="text-red-600">*</span>
+                                </label>
+                                <FileBrowser
+                                    allowedFileTypes={[
+                                        "image/*",
+                                        "application/pdf",
+                                    ]}
+                                    onChange={(file) => {
+                                        console.log("here");
+                                        file && setMentorResumeFile(file);
+                                    }}
+                                />
+                            </div>
+                        )}
                     </div>
                     <div
                         className={`mx-auto sm:grid max-w-2xl space-y-8 sm:gap-x-6 sm:gap-y-8 sm:space-y-0 sm:grid-cols-6${
@@ -355,6 +421,28 @@ export const ApplicationPage = () => {
                             activeStep !== 3 ? " hidden sm:hidden" : ""
                         }`}
                     >
+                        <div className="sm:col-span-full">
+                            <label className="text-gray-900 font-medium">
+                                Resume
+                            </label>
+                            <FileBrowser
+                                allowedFileTypes={[
+                                    "image/*",
+                                    "application/pdf",
+                                ]}
+                                onChange={(file) => {
+                                    console.log("file");
+                                    file && setGeneralResumeFile(file);
+                                }}
+                            />
+                            <div>
+                                If you would like to share your resume with our
+                                sponsors for employment or career opportunities,
+                                please feel free to do so now. Sponsors will be
+                                conducting coffee chats/interviews during the
+                                hackathon, or might reach out via email.
+                            </div>
+                        </div>
                         <div className="sm:col-span-full">
                             <MultiSelect
                                 label="How did you hear about us?"
