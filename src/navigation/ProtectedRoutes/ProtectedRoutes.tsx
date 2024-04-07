@@ -43,18 +43,6 @@ export const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
         }
     }
 
-    if (!session.userProfile) {
-        if (location.pathname !== routes.completeProfile) {
-            return <Navigate to={routes.completeProfile} />;
-        }
-
-        return (
-            <PageWrapper>
-                <Outlet />
-            </PageWrapper>
-        );
-    }
-
     if (adminOnly && !session.currentUser.hawkAdmin) {
         // redirect to not found page if user is not authorized to view
         return <Navigate to={routes.notFound} />;
