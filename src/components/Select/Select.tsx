@@ -124,6 +124,12 @@ export const Select: FC<SelectProps> = ({
                         )}
                     </Combobox.Options>
                 </Transition>
+                {options.length > 50 ? (
+                    <span className="block mt-2">
+                        Showing the first 50 options. Type to search for more.
+                    </span>
+                ) : null }
+
                 {allowCustomValue ? (
                     <span className="block mt-2">
                         Not in the options? Type your answer in the input field.
