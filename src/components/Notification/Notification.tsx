@@ -1,6 +1,6 @@
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { XMarkIcon } from "@heroicons/react/20/solid";
-import { forwardRef } from "react";
+import { forwardRef, useEffect } from "react";
 
 export interface NotificationData {
     id: number;
@@ -15,6 +15,11 @@ export interface NotificationProps extends Omit<NotificationData, "show"> {
 
 export const Notification = forwardRef<HTMLDivElement, NotificationProps>(
     ({ id, title, message, onClose }, ref) => {
+        useEffect(() => {
+            const timer = setTimeout(() => onClose(id), 8000);
+            return () => clearTimeout(timer);
+        }, [id, onClose]);
+
         return (
             <div
                 ref={ref}
