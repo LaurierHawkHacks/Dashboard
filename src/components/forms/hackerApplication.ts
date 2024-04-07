@@ -144,6 +144,36 @@ export const mentorSpecificForm: FormInput[] = [
         name: "mentorExperience",
     },
     {
+        type: "text",
+        props: {
+            label: "Do you have a LinkedIn profile? If so, please provide a link to your profile.",
+            required: false,
+            id: "linkedin-url",
+            placeholder: "https://linkedin.com/in/john-smith",
+        },
+        name: "linkedinUrl",
+    },
+    {
+        type: "text",
+        props: {
+            label: "Do you have a GitHub account? If so, please provide a link to your profile.",
+            required: false,
+            id: "github-url",
+            placeholder: "https://github.com/SherRao",
+        },
+        name: "githubUrl",
+    },
+    {
+        type: "text",
+        props: {
+            label: "Do you have a personal or other website you'd like to include? If so, please provide a link.",
+            required: false,
+            id: "personal-website-url",
+            placeholder: "https://hawkhacks.ca",
+        },
+        name: "personalWebsiteUrl",
+    },
+    {
         type: "textarea",
         props: {
             label: "Why do you want to be a mentor at HawkHacks?",
