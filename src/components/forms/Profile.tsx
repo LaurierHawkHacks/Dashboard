@@ -99,6 +99,7 @@ export const Profile = ({
                     options={schools}
                     initialValue=""
                     onChange={(opt) => handler("school", opt)}
+                    allowCustomValue
                     required
                 />
                 <p className="mt-2 text-sageGray">
