@@ -65,10 +65,14 @@ export const FileBrowser: React.FC<FileBrowserProps> = ({
                     id={`file-${randomId}`}
                 />
                 <label htmlFor={`file-${randomId}`} className="cursor-pointer">
-                    <span>Click to browse or drag and drop file here</span>
+                    <span>
+                        Click to browse or drag and drop file here (max 10MB)
+                    </span>
                 </label>
                 <div>{description}</div>
-                <ul>{file && <li>{file.name}</li>}</ul>
+                <ul className="italic text-sageGray text-sm">
+                    {file && <li>{file.name}</li>}
+                </ul>
             </div>
             {subdescription && (
                 <p className="mt-2 text-sageGray">{subdescription}</p>
