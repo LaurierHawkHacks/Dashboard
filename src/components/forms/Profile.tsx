@@ -100,6 +100,10 @@ export const Profile = ({
                     onChange={(opt) => handler("school", opt)}
                     required
                 />
+                <p className="mt-2 text-sageGray">
+                    If you recently graduated, pick the school you graduated
+                    from.
+                </p>
             </div>
             <div className="sm:col-span-3">
                 <Select
