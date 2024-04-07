@@ -66,13 +66,14 @@ export const ApplicationPage = () => {
     // TODO: save steps in firebase to save progress
     const [steps, setSteps] = useState<Step[]>([
         { position: 0, name: "Basic profile", status: "current" },
+        { position: 1, name: "Verify Phone", status: "upcoming" },
         {
-            position: 1,
+            position: 2,
             name: "I want to participate as a...",
             status: "upcoming",
         },
-        { position: 2, name: "Application", status: "upcoming" },
-        { position: 3, name: "Final checks", status: "upcoming" },
+        { position: 3, name: "Application", status: "upcoming" },
+        { position: 4, name: "Final checks", status: "upcoming" },
     ]);
     const [activeStep, setActiveStep] = useState(0); // index
     const [errors, setErrors] = useState<string[]>([]);
