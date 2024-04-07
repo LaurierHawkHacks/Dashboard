@@ -5,7 +5,7 @@ import { twMerge } from "tailwind-merge";
 const textInputStyles = cva(
     [
         "block w-full py-2 px-3 bg-gray-50 text-gray-900 placeholder:text-sageGray", // base
-        "focus:ring-2 focus:ring-inset focus:ring-[#0FA3B1]", // focus styles
+        "focus:ring-2 focus:ring-inset focus:ring-[#00848C]", // focus styles
     ],
     {
         variants: {
