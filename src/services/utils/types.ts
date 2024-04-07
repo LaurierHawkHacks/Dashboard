@@ -14,4 +14,3 @@ export interface UserProfile {
     age: string;
     discord: string;
 }
-

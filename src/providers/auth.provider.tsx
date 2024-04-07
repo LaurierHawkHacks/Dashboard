@@ -15,15 +15,10 @@ import {
 } from "firebase/auth";
 import { auth } from "@/services/firebase";
 import { useNotification } from "@/providers/notification.provider";
-import {
-    getUserApplications,
-    getUserProfile,
-    verifyGitHubEmail,
-} from "@/services/utils";
+import { getUserApplications, verifyGitHubEmail } from "@/services/utils";
 import { LoadingAnimation } from "@/components";
 
 import type { User, AuthProvider as FirebaseAuthProvider } from "firebase/auth";
-import type { UserProfile } from "@/services/utils/types";
 import type { NotificationOptions } from "@/providers/types";
 import type { ApplicationData } from "@/components/forms/types";
 
@@ -38,7 +33,6 @@ export type AuthMethod = "none" | "credentials" | ProviderName;
 
 export type AuthContextValue = {
     currentUser: UserWithClaims | null;
-    userProfile: UserProfile | null;
     userApp: ApplicationData | null | undefined;
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
@@ -46,12 +40,10 @@ export type AuthContextValue = {
     resetPassword: (email: string) => Promise<void>;
     loginWithProvider: (name: ProviderName) => Promise<void>;
     reloadUser: () => Promise<void>;
-    refreshProfile: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue>({
     currentUser: null,
-    userProfile: null,
     userApp: null,
     login: async () => {},
     logout: async () => {},
@@ -59,7 +51,6 @@ const AuthContext = createContext<AuthContextValue>({
     resetPassword: async () => {},
     loginWithProvider: async () => {},
     reloadUser: async () => {},
-    refreshProfile: async () => {},
 });
 
 /**
@@ -125,7 +116,6 @@ function isMobile() {
 
 export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<UserWithClaims | null>(null);
-    const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     // use undefined to know its at initial state (just mounted) and null if there is no application
     const [userApp, setUserApp] = useState<ApplicationData | null | undefined>(
         undefined
@@ -135,22 +125,13 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
 
     const completeLoginProcess = async (user: User) => {
         // check if user has a profile in firestore
-        const profile = await getUserProfile(user.uid);
         const userWithRole = await validateUserRole(user);
         const app = (await getUserApplications(user.uid))[0] ?? null;
         // make one ui update instead of two due to async function
         flushSync(() => {
             setCurrentUser(userWithRole);
-            setUserProfile(profile);
             setUserApp(app);
         });
-    };
-
-    const refreshProfile = async () => {
-        if (!currentUser) return;
-
-        const profile = await getUserProfile(currentUser.uid);
-        setUserProfile(profile);
     };
 
     const login = async (email: string, password: string) => {
@@ -306,7 +287,6 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 await completeLoginProcess(user);
             } else {
                 setCurrentUser(null);
-                setUserProfile(null);
                 setUserApp(null);
             }
         });
@@ -330,7 +310,6 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
         <AuthContext.Provider
             value={{
                 currentUser,
-                userProfile,
                 userApp,
                 login,
                 logout,
@@ -338,7 +317,6 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 resetPassword,
                 loginWithProvider,
                 reloadUser,
-                refreshProfile,
             }}
         >
             {isLoading ? <LoadingAnimation /> : children}

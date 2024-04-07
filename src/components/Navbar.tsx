@@ -44,14 +44,8 @@ export const Navbar = () => {
     const renderNavItems = (isMobile: boolean) => {
         if (showAllNavItems) {
             return navItems.map(({ path, label, Icon }) => (
-                <li
-                    key={label}
-                    className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black"
-                >
-                    <Link
-                        to={path}
-                        className="flex items-center justify-start gap-2"
-                    >
+                <Link key={label} to={path} className="w-full">
+                    <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
                         {isMobile ? (
                             label
                         ) : (
@@ -60,17 +54,14 @@ export const Navbar = () => {
                                 <span className="hidden md:flex">{label}</span>
                             </>
                         )}
-                    </Link>
-                </li>
+                    </li>
+                </Link>
             ));
         }
 
         return (
-            <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black">
-                <Link
-                    to="/application"
-                    className="flex items-center justify-start gap-2"
-                >
+            <Link to="/application" className="w-full">
+                <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
                     {isMobile ? (
                         "Application"
                     ) : (
@@ -79,8 +70,8 @@ export const Navbar = () => {
                             <span className="hidden md:flex">Application</span>
                         </>
                     )}
-                </Link>
-            </li>
+                </li>
+            </Link>
         );
     };
 

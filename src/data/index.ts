@@ -3,6 +3,7 @@ export { countryNames } from "./countryNames";
 export { majorsList } from "./majorsList";
 export { ages } from "./ages";
 export { levelsOfStudy } from "./levelsOfStudy";
+export { cityNames } from "./cities";
 
 export const genders = [
     "Man",
@@ -28,7 +29,6 @@ export const sexualityList = [
 ];
 
 export const races = [
-    "Asian Indian",
     "Black or African",
     "Chinese",
     "Filipino",
@@ -40,9 +40,11 @@ export const races = [
     "Native America or Alaskan Native",
     "Native Hawaiian",
     "Samoan",
+    "South Asian / Asian Indian",
     "Vietnamese",
     "White",
     "Prefer not to answer",
+    "My racial or ethnic background isn't listed",
 ];
 
 export const diets = [
@@ -67,7 +69,7 @@ export const allergies = [
     "Sesame",
 ];
 
-export const shirtSizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL"];
+// export const shirtSizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL"];
 
 export const interests = [
     "Web3, Crypto, and Blockchain",
@@ -75,7 +77,7 @@ export const interests = [
     "Frontend Engineering",
     "Backend Engineering",
     "Full-stack Engineering",
-    "Data Sciene",
+    "Data Science",
     "Robotics",
     "AR/VR Technology",
     "Embedded Systems",
@@ -88,6 +90,8 @@ export const interests = [
 ];
 
 export const programmingLanguages = [
+    "I'm new to programming",
+    "I'm not sure",
     "C",
     "C++",
     "C#",
@@ -98,14 +102,41 @@ export const programmingLanguages = [
     "JavaScript",
     "TypeScript",
     "Ruby",
-    "New to programming",
-    "Not sure",
 ];
 
 export const hackathonExps = [
     "This is my first hackathon",
-    "1",
-    "2",
-    "3",
-    "4+",
+    "I've only been to a single hackathon before this.",
+    "I've been to 2 hackathons before, so I'm a bit familiar with how a hackathon works.",
+    "I've been to 3-4 hackathons, I'm pretty comfortable.",
+    "I love hackathons - I've been to more than 4.",
+];
+
+export const mentorSpecificOptions = [
+    "I've never mentored.",
+    "I've dabbled in mentoring at 1 or 2 hackathons.",
+    "I've mentored a good amount, probably 3-5.",
+    "I'm kind of crazy - I've mentored more than 5.",
+];
+
+export const volunteerSpecificOptions = [
+    "Never - HawkHacks would be my first big event.",
+    "I've helped out at 1 or 2 events before.",
+    "I've helped out at more than 2 events before.",
+];
+
+export const referralSources = [
+    "HawkHacks Discord",
+    "HawkHacks TikTok",
+    "HawkHacks LinkedIn",
+    "MLH Website",
+    "MLH Discord",
+    "MLH Socials",
+    "Sponsor Social Media Account",
+    "Campus Posters/Advertisements",
+    "Advertisement from professor/class",
+    "Advertisement at high school",
+    "Word of Mouth",
+    "Advertisements on other Discords",
+    "Through Google",
 ];

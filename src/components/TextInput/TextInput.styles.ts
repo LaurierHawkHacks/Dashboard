@@ -28,7 +28,7 @@ export function getTextInputStyles(
 }
 
 export const getTextInputLabelStyles = cva(
-    "block font-medium leading-6 text-charcoalBlack text-md",
+    "block font-medium leading-5 text-charcoalBlack text-md",
     {
         variants: {
             srLabel: {

@@ -5,7 +5,6 @@ import {
     LoginPage,
     NotFoundPage,
     VerifyEmailPage,
-    CompleteProfilePage,
     ApplicationPage,
 } from "@pages";
 import { ProtectedRoutes } from "@/navigation";
@@ -70,7 +69,6 @@ export const Router = () => {
     >([
         { path: routes.application, element: <ApplicationPage /> },
         { path: routes.verifyEmail, element: <VerifyEmailPage /> },
-        { path: routes.completeProfile, element: <CompleteProfilePage /> },
     ]);
     const { userApp } = useAuth();
 
