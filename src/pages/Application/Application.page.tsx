@@ -77,7 +77,7 @@ export const ApplicationPage = () => {
     ]);
     const [activeStep, setActiveStep] = useState(0); // index
     const [errors, setErrors] = useState<string[]>([]);
-    const { currentUser } = useAuth();
+    const { currentUser, reloadUser } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [hasApplied, setHasApplied] = useState(true); // default to true to prevent showing the form at first load
@@ -237,6 +237,12 @@ export const ApplicationPage = () => {
             );
             if (result) {
                 setIsVerified(true);
+                await new Promise((res) =>
+                    setTimeout(() => {
+                        reloadUser();
+                        res(true);
+                    }, 1000)
+                );
                 showNotification({
                     title: "Phone Verified",
                     message:
@@ -331,7 +337,8 @@ export const ApplicationPage = () => {
                                 onClick={sendCode}
                                 disabled={
                                     currentUser.phoneVerified ||
-                                    !application.phone
+                                    !application.phone.replace(/\D/g, "") ||
+                                    isVerified
                                 }
                             >
                                 Send Verification Code
