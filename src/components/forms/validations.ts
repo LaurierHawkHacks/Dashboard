@@ -81,7 +81,7 @@ export const hackerSpecificValidation = z.object({
 
 export const mentorSpecificValidation = z.object({
     // mentor only
-    mentorResumeUrl: z.string(), // we don't have an file upload yet, so this is not populated
+    mentorResumeRef: z.string(), // we don't have an file upload yet, so this is not populated
     mentorExperience: z
         .string()
         .min(1, "Please let us know your past hackathon experiences."),
