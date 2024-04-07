@@ -357,3 +357,30 @@ export const submitApplication = functions.https.onCall(
         return { status: 200 };
     }
 );
+
+exports.uploadFileToBucket = functions.https.onRequest(async (request, response) => {
+    if (request.method !== "POST") {
+        response.status(405).send('Method Not Allowed');
+        return;
+    }
+
+    const bucket = admin.storage().bucket();
+    const fileName = request.body.fileName;
+    const fileData = request.body.fileData;
+    const filePath = `uploads/${fileName}`;
+    const file = bucket.file(filePath);
+
+    const buffer = Buffer.from(fileData, 'base64');
+
+    try {
+        await file.save(buffer, {
+            metadata: {contentType: request.body.fileType || 'application/octet-stream'},
+        });
+
+        console.log(`${fileName} uploaded to Firebase storage.`);
+        response.send(`${fileName} uploaded successfully.`);
+    } catch (error) {
+        console.error('Upload failed:', error);
+        response.status(500).send('Error uploading file.');
+    }
+});
