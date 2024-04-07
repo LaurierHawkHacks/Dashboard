@@ -1469,7 +1469,7 @@ export const schools: string[] = [
     "Rutgers, The State University of New Jersey",
     "Ryde School",
     "Rye High School",
-    "Ryerson University",
+    "Toronto Metropolitan University / Ryerson University",
     "S A Engineering College",
     "S G Balekundri Institute of Technology",
     "Sachdeva Institute of Technology",
