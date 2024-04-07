@@ -6,6 +6,7 @@ import {
     orderBy,
     query,
     where,
+    Timestamp,
 } from "firebase/firestore";
 import { firestore, functions, storage } from "@/services/firebase";
 import type { UserTicketData } from "@/services/utils/types";
@@ -39,6 +40,7 @@ export async function submitApplication(data: ApplicationData, uid: string) {
     const payload = {
         ...data,
         applicantId: uid,
+        timestamp: Timestamp.now(),
     };
 
     const appsRef = collection(firestore, "applications");
