@@ -192,10 +192,10 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                     />
                     <Combobox.Button
                         ref={comboboxButtonRef}
-                        className="absolute inset-y-0 right-0 flex items-center pr-2"
+                        className="absolute inset-y-0 right-0 flex items-center content-center hover:backdrop-brightness-95 transition duration-300 ease-in-out"
                     >
                         <ChevronDownIcon
-                            className="h-5 w-5 text-gray-400"
+                            className="w-5 h-5 text-gray-400 m-2"
                             aria-hidden="true"
                         />
                     </Combobox.Button>

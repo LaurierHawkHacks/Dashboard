@@ -108,11 +108,11 @@ export const Select: FC<SelectProps> = ({
                         onClick={() => comboboxButtonRef.current?.click()} // Added to handle click and focus event to open the combobox
                     />
                     <Combobox.Button
-                        className="absolute inset-y-0 right-0 flex items-center pr-2"
+                        className="absolute inset-y-0 right-0 flex items-center content-center hover:backdrop-brightness-95 transition duration-300 ease-in-out"
                         ref={comboboxButtonRef}
                     >
                         <ChevronDownIcon
-                            className="w-5 h-5 text-gray-400"
+                            className="w-5 h-5 text-gray-400 m-2"
                             aria-hidden="true"
                         />
                     </Combobox.Button>
