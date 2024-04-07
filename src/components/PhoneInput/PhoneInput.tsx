@@ -53,7 +53,7 @@ export const PhoneInput: FC<PhoneInputProps> = ({ onChange, required }) => {
                         <div className="relative w-full cursor-default overflow-hidden bg-gray-50 text-left border border-charcoalBlack">
                             <Combobox.Input
                                 ref={countryCodeInputRef}
-                                className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 bg-gray-50 focus:ring-0"
+                                className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 bg-gray-50 focus:ring-0 hover:cursor-pointer"
                                 displayValue={(opt: string) =>
                                     (opt && "+" + opt.replace(/\D/g, "")) || ""
                                 }
