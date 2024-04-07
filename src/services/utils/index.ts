@@ -6,10 +6,11 @@ import {
     query,
     where,
 } from "firebase/firestore";
-import { firestore, functions } from "@/services/firebase";
+import { firestore, functions, storage } from "@/services/firebase";
 import type { UserTicketData } from "@/services/utils/types";
 import { ApplicationData } from "@/components/forms/types";
 import { httpsCallable } from "firebase/functions";
+import { ref, uploadBytes } from "firebase/storage";
 
 export const TICKETS_COLLECTION = "tickets";
 export const USERS_COLLECTION = "users";
@@ -68,4 +69,30 @@ export async function verifyGitHubEmail(token: string, email: string) {
     }
 
     return true;
+}
+
+export async function uploadMentorResume(file: File, uid: string) {
+    const resumeRef = ref(
+        storage,
+        `/resumes/${uid}-mentor-resume${file.name.substring(
+            file.name.lastIndexOf(".")
+        )}`
+    );
+    const snap = await uploadBytes(resumeRef, file, {
+        customMetadata: { owner: uid },
+    });
+    return snap.ref.toString();
+}
+
+export async function uploadGeneralResume(file: File, uid: string) {
+    const resumeRef = ref(
+        storage,
+        `/resumes/${uid}-general-resume${file.name.substring(
+            file.name.lastIndexOf(".")
+        )}`
+    );
+    const snap = await uploadBytes(resumeRef, file, {
+        customMetadata: { owner: uid },
+    });
+    return snap.ref.toString();
 }
