@@ -129,6 +129,12 @@ export const Select: FC<SelectProps> = ({
                         onScroll={handleScroll}
                         className="absolute border border-charcoalBlack mt-1 max-h-60 z-50 w-full overflow-auto bg-gray-50 py-1 text-base"
                     >
+                        {allowCustomValue && query.length > 0 ? (
+                            <Combobox.Option
+                                className={getOptionStyles}
+                                value={query}
+                            >{`Create "${query}"`}</Combobox.Option>
+                        ) : null}
                         {controlledOptions.length === 0 && query !== "" ? (
                             <div className="cursor-default select-none relative py-2 px-4 text-gray-700">
                                 Nothing found.
