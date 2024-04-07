@@ -57,20 +57,7 @@ export const Profile = ({
                     required
                 />
             </div>
-            <div className="sm:col-span-5"></div>
-            <div className="col-span-3">
-                <TextInput
-                    label="What is your phone number?"
-                    id="phone-number"
-                    placeholder="(999) 999-9999"
-                    value={profile.phone}
-                    onChange={(e) => handler("phone", e.target.value)}
-                    description="Please add the country dialing code. I.E: +1"
-                    required
-                />
-            </div>
-
-            <div className="sm:col-span-3">
+            <div className="sm:col-span-4">
                 <TextInput
                     label="What is your Discord username?"
                     id="discord"
