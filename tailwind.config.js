@@ -5,11 +5,11 @@ export default {
     content: ["./index.html", "./src/**/*.{ts,tsx}"],
     theme: {
         extend: {
-            fontFamily: { 
+            fontFamily: {
                 sans: ["Raleway", ...defaultTheme.fontFamily.sans],
             },
             fontSize: {
-                "raleway": {
+                raleway: {
                     "2.5xl": ["1.6875rem", "1.2"],
                     "3.5xl": ["2rem", "1.2"],
                     "4.5xl": ["2.6875rem", "1.2"],
@@ -17,7 +17,7 @@ export default {
                     "6.5xl": ["4.125rem", "1"],
                     "7.5xl": ["5.25rem", "1"],
                     "8.5xl": ["6.875rem", "1"],
-                }
+                },
             },
             colors: {
                 charcoalBlack: "#333333",
@@ -53,6 +53,9 @@ export default {
             transitionTimingFunction: {
                 notification:
                     "cubic-bezier(.39,.44,0,1.21), cubic-bezier(.39,.44,0,1.21), ease-in",
+            },
+            backdropBrightness: {
+                25: "0.25",
             },
         },
     },

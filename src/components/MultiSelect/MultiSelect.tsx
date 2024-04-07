@@ -181,7 +181,7 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                 <div className="relative w-full mt-2 cursor-default overflow-hidden bg-gray-50 text-left border border-charcoalBlack">
                     <Combobox.Input
                         id={randomId.current}
-                        className="w-full border-none py-2 pl-3 pr-10 leading-5 text-gray-900 bg-gray-50 focus:ring-0"
+                        className="w-full border-none py-2 pl-3 pr-10 leading-5 text-gray-900 bg-gray-50 focus:ring-0 hover:cursor-pointer"
                         onChange={(e) => {
                             setQuery(e.target.value);
                             debounce(e.target.value);
@@ -193,10 +193,10 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                     />
                     <Combobox.Button
                         ref={comboboxButtonRef}
-                        className="absolute inset-y-0 right-0 flex items-center pr-2"
+                        className="absolute inset-y-0 right-0 flex items-center content-center hover:backdrop-brightness-95 transition duration-300 ease-in-out"
                     >
                         <ChevronDownIcon
-                            className="h-5 w-5 text-gray-400"
+                            className="w-5 h-5 text-gray-400 m-2"
                             aria-hidden="true"
                         />
                     </Combobox.Button>

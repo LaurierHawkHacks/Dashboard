@@ -98,7 +98,7 @@ export const Select: FC<SelectProps> = ({
                 </Combobox.Label>
                 <div className="relative w-full mt-2 cursor-default overflow-hidden bg-gray-50 text-left border border-charcoalBlack">
                     <Combobox.Input
-                        className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 bg-gray-50 focus:ring-0"
+                        className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 bg-gray-50 focus:ring-0 hover:cursor-pointer"
                         displayValue={(option: string) => option}
                         onChange={(e) => {
                             setQuery(e.target.value);
@@ -108,11 +108,11 @@ export const Select: FC<SelectProps> = ({
                         onClick={() => comboboxButtonRef.current?.click()} // Added to handle click and focus event to open the combobox
                     />
                     <Combobox.Button
-                        className="absolute inset-y-0 right-0 flex items-center pr-2"
+                        className="absolute inset-y-0 right-0 flex items-center content-center hover:backdrop-brightness-95 transition duration-300 ease-in-out"
                         ref={comboboxButtonRef}
                     >
                         <ChevronDownIcon
-                            className="w-5 h-5 text-gray-400"
+                            className="w-5 h-5 text-gray-400 m-2"
                             aria-hidden="true"
                         />
                     </Combobox.Button>
