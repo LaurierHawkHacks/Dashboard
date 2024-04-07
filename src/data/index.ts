@@ -51,7 +51,6 @@ export const diets = [
     "None",
     "Vegetarian",
     "Celiac Disease",
-    "Allergies",
     "Kosher",
     "Halal",
 ];
