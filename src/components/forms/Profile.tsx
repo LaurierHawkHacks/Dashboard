@@ -89,7 +89,7 @@ export const Profile = ({
             </div>
 
             <div className="col-span-6">
-                <PhoneInput onChange={(phone) => handler("phone", phone)} />
+                <PhoneInput onChange={(phone) => handler("phone", phone)} required />
             </div>
 
             <div className="sm:col-span-3">
