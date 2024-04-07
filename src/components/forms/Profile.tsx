@@ -84,6 +84,7 @@ export const Profile = ({
                     options={cityNames}
                     initialValue=""
                     onChange={(opt) => handler("city", opt)}
+                    allowCustomValue
                     required
                 />
             </div>
