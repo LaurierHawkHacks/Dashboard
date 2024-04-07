@@ -16,7 +16,13 @@ import { z } from "zod";
 // data imports
 import { ages } from "./data";
 
+const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || "";
+const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || "";
+
 admin.initializeApp();
+
+const db = admin.firestore();
+
 // Default on-sign-up Claims function
 export const addDefaultClaims = functions.auth.user().onCreate(async (user) => {
     const { uid } = user;
@@ -24,6 +30,7 @@ export const addDefaultClaims = functions.auth.user().onCreate(async (user) => {
         await admin.auth().setCustomUserClaims(uid, {
             // Default Claims
             admin: false, // Example: set to true for admin users
+            phoneVerified: false,
         });
         console.log(`Custom claims added for user: ${uid}`);
     } catch (error) {
@@ -357,3 +364,57 @@ export const submitApplication = functions.https.onCall(
         return { status: 200 };
     }
 );
+
+export const sendVerificationCode = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError("unauthenticated", "The function must be called while authenticated.");
+    }
+
+    const userId = context.auth.uid;
+
+    console.log("Sending SMS, User ID:", userId);
+
+    const { phoneNumber } = data;
+    const fullPhoneNumber = `${phoneNumber}`;
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    await db.collection('smsVerifications').doc(userId).set({
+        phoneNumber: fullPhoneNumber,
+        code: verificationCode,
+    });
+
+    const twilioClient = require('twilio')(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
+    const message = `Your super awesome verification code is: ${verificationCode}`;
+
+    try {
+        const response = await twilioClient.messages.create({
+            body: message,
+            to: fullPhoneNumber,
+            from: "+15344295429",
+        });
+
+        return { success: true, sid: response.sid };
+    } catch (error) {
+        console.error("Error sending verification SMS:", error);
+        throw new functions.https.HttpsError("internal", "Failed to send verification SMS");
+    }
+});
+
+export const verifySmsCode = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
+    }
+
+    const { code } = data;
+    const userId = context.auth.uid;
+
+    const doc = await db.collection('smsVerifications').doc(userId).get();
+    const verificationData = doc.data();
+    if (!verificationData || verificationData.code !== code) {
+        throw new functions.https.HttpsError('failed-precondition', 'Verification code does not match or expired.');
+    }
+
+    await db.collection('smsVerifications').doc(userId).delete();
+
+    return { success: true, message: "Phone number verified successfully." };
+});

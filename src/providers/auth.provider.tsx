@@ -22,8 +22,9 @@ import type { User, AuthProvider as FirebaseAuthProvider } from "firebase/auth";
 import type { NotificationOptions } from "@/providers/types";
 import type { ApplicationData } from "@/components/forms/types";
 
-export interface UserWithRole extends User {
+export interface UserWithClaims extends User {
     hawkAdmin: boolean;
+    phoneVerified: boolean;
 }
 
 export type ProviderName = "github" | "google" | "apple";
@@ -31,7 +32,7 @@ export type ProviderName = "github" | "google" | "apple";
 export type AuthMethod = "none" | "credentials" | ProviderName;
 
 export type AuthContextValue = {
-    currentUser: UserWithRole | null;
+    currentUser: UserWithClaims | null;
     userApp: ApplicationData | null | undefined;
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
@@ -56,11 +57,12 @@ const AuthContext = createContext<AuthContextValue>({
  * Validates given user for admin authorization.
  * Return object adds `hawkAdmin` boolean field.
  */
-async function validateUserRole(user: User): Promise<UserWithRole> {
+async function validateUserRole(user: User): Promise<UserWithClaims> {
     const { claims } = await user.getIdTokenResult();
     return {
         ...user,
         hawkAdmin: Boolean(claims.admin),
+        phoneVerified: Boolean(claims.phoneVerified),
     };
 }
 
@@ -113,7 +115,7 @@ function isMobile() {
 }
 
 export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
-    const [currentUser, setCurrentUser] = useState<UserWithRole | null>(null);
+    const [currentUser, setCurrentUser] = useState<UserWithClaims | null>(null);
     // use undefined to know its at initial state (just mounted) and null if there is no application
     const [userApp, setUserApp] = useState<ApplicationData | null | undefined>(
         undefined

@@ -1,4 +1,4 @@
-import { FormEventHandler, useEffect, useState } from "react";
+import { FormEventHandler, MouseEventHandler, useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { z } from "zod";
 import { useAuth, useNotification } from "@/providers/hooks";
@@ -40,12 +40,18 @@ import {
     submitApplication,
     uploadGeneralResume,
     uploadMentorResume,
+    sendVerificationCode,
+    verifySmsCode,
+    
 } from "@/services/utils";
 import { TextArea } from "@/components/TextArea/TextArea";
 import { referralSources } from "@/data";
 
 const stepValidations = [
     profileFormValidation,
+    z.object({
+        verificationCode: z.string().optional(),
+    }),
     z.object({
         participatingAs: z
             .string()
@@ -59,17 +65,18 @@ export const ApplicationPage = () => {
     // TODO: save steps in firebase to save progress
     const [steps, setSteps] = useState<Step[]>([
         { position: 0, name: "Basic profile", status: "current" },
+        { position: 1, name: "Verify Phone", status: "upcoming" },
         {
-            position: 1,
+            position: 2,
             name: "I want to participate as a...",
             status: "upcoming",
         },
-        { position: 2, name: "Application", status: "upcoming" },
-        { position: 3, name: "Final checks", status: "upcoming" },
+        { position: 3, name: "Application", status: "upcoming" },
+        { position: 4, name: "Final checks", status: "upcoming" },
     ]);
     const [activeStep, setActiveStep] = useState(0); // index
     const [errors, setErrors] = useState<string[]>([]);
-    const { currentUser } = useAuth();
+    const { currentUser, reloadUser } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [hasApplied, setHasApplied] = useState(true); // default to true to prevent showing the form at first load
@@ -78,6 +85,8 @@ export const ApplicationPage = () => {
         null
     );
     const { showNotification } = useNotification();
+    const [verificationCode, setVerificationCode] = useState("");
+    const [isVerified, setIsVerified] = useState(false);
 
     if (!currentUser) return <Navigate to={routes.login} />;
 
@@ -113,7 +122,7 @@ export const ApplicationPage = () => {
             return false;
         }
 
-        if (activeStep === 1) {
+        if (activeStep === 2) {
             const validateFn =
                 application.participatingAs === "Hacker"
                     ? hackerSpecificValidation
@@ -135,15 +144,17 @@ export const ApplicationPage = () => {
         if (activeStep < steps.length) {
             setSteps((s) => {
                 s[activeStep].status = "complete";
-                s[activeStep + 1].status = "current";
-                return s;
+                s[Math.min(activeStep + 1, steps.length - 1)].status =
+                    "current";
+                return [...s];
             });
-            setActiveStep((s) => s + 1);
+            setActiveStep((s) => Math.min(s + 1, steps.length - 1));
         }
     };
 
     const prevStep = () => {
         if (activeStep > 0) {
+            if (!validate()) return;
             setActiveStep((s) => s - 1);
         }
     };
@@ -240,6 +251,55 @@ export const ApplicationPage = () => {
         }
     };
 
+    const sendCode: MouseEventHandler = async (e) => {
+        e.preventDefault();
+        try {
+            await sendVerificationCode(application.phone);
+            showNotification({
+                title: "Verification Code Sent",
+                message: "Please check your phone for the verification code.",
+            });
+        } catch (error) {
+            console.error("Error sending verification code:", error);
+            showNotification({
+                title: "Error Sending Verification Code",
+                message: "Please try again later.",
+            });
+        }
+    };
+
+    const verifyPhone: MouseEventHandler = async (e) => {
+        e.preventDefault();
+        try {
+            const result = await verifySmsCode(
+                application.phone,
+                verificationCode
+            );
+            if (result) {
+                setIsVerified(true);
+                await new Promise((res) =>
+                    setTimeout(() => {
+                        reloadUser();
+                        res(true);
+                    }, 1000)
+                );
+                showNotification({
+                    title: "Phone Verified",
+                    message:
+                        "Your phone number has been successfully verified.",
+                });
+            } else {
+                setErrors(["Invalid verification code. Please try again."]);
+            }
+        } catch (error) {
+            console.error("Error verifying code:", error);
+            showNotification({
+                title: "Error Verifying Code",
+                message: "Please try again later.",
+            });
+        }
+    };
+
     useEffect(() => {
         const checkApp = async () => {
             const apps = await getUserApplications(currentUser.uid);
@@ -296,6 +356,65 @@ export const ApplicationPage = () => {
                     <div
                         className={`mx-auto sm:grid max-w-2xl space-y-8 sm:gap-x-6 sm:gap-y-8 sm:space-y-0 sm:grid-cols-6${
                             activeStep !== 1 ? " hidden sm:hidden" : ""
+                        }`}
+                    >
+                        <div className="sm:col-span-full space-y-2">
+                            {" "}
+                            {/* Add space-y-2 for vertical spacing */}
+                            <TextInput
+                                label="Phone Number"
+                                id="phone"
+                                type="tel"
+                                placeholder="Enter your phone number"
+                                value={application.phone}
+                                onChange={(e) =>
+                                    handleChange("phone", e.target.value)
+                                }
+                                required
+                            />
+                            <Button
+                                type="button"
+                                onClick={sendCode}
+                                disabled={
+                                    currentUser.phoneVerified ||
+                                    !application.phone.replace(/\D/g, "") ||
+                                    isVerified
+                                }
+                            >
+                                Send Verification Code
+                            </Button>
+                        </div>
+
+                        <div className="sm:col-span-full space-y-2">
+                            {" "}
+                            {/* Add space-y-2 for vertical spacing */}
+                            <TextInput
+                                label="Verification Code"
+                                id="verificationCode"
+                                type="text"
+                                placeholder="Enter the verification code"
+                                value={verificationCode}
+                                onChange={(e) =>
+                                    setVerificationCode(e.target.value)
+                                }
+                                required
+                            />
+                            <Button
+                                type="button"
+                                onClick={verifyPhone}
+                                disabled={
+                                    currentUser.phoneVerified ||
+                                    !verificationCode ||
+                                    isVerified
+                                }
+                            >
+                                Verify Code
+                            </Button>
+                        </div>
+                    </div>
+                    <div
+                        className={`mx-auto sm:grid max-w-2xl space-y-8 sm:gap-x-6 sm:gap-y-8 sm:space-y-0 sm:grid-cols-6${
+                            activeStep !== 2 ? " hidden sm:hidden" : ""
                         }`}
                     >
                         <div className="sm:col-span-full">
@@ -376,10 +495,10 @@ export const ApplicationPage = () => {
                     </div>
                     <div
                         className={`mx-auto sm:grid max-w-2xl space-y-8 sm:gap-x-6 sm:gap-y-8 sm:space-y-0 sm:grid-cols-6${
-                            activeStep !== 2 ? " hidden sm:hidden" : ""
+                            activeStep !== 3 ? " hidden sm:hidden" : ""
                         }`}
                     >
-                        {hackerAppFormInputs?.map((input) => (
+                        {hackerAppFormInputs.map((input) => (
                             <div
                                 key={input.props.label}
                                 className="sm:col-span-full"
@@ -417,7 +536,7 @@ export const ApplicationPage = () => {
                     </div>
                     <div
                         className={`mx-auto sm:grid max-w-2xl space-y-8 sm:gap-x-6 sm:gap-y-8 sm:space-y-0 sm:grid-cols-6${
-                            activeStep !== 3 ? " hidden sm:hidden" : ""
+                            activeStep !== 4 ? " hidden sm:hidden" : ""
                         }`}
                     >
                         <div className="sm:col-span-full">
@@ -614,8 +733,9 @@ export const ApplicationPage = () => {
                     </Button>
                     <Button
                         type="submit"
-                        disabled={isSubmitting}
-                        // I mean.... why not? for funsies
+                        disabled={
+                            isSubmitting || (activeStep === 1 && !isVerified)
+                        }
                         className={isSubmitting ? "animate-spin" : ""}
                     >
                         {isSubmitting
