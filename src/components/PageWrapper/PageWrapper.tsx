@@ -21,7 +21,7 @@ export const PageWrapper: FC<ComponentProps> = ({ children }) => {
                     <h1 className="text-xl md:text-4xl text-gray-800 font-bold font-sans">
                         {title.main}
                     </h1>
-                    <p className="text-md md:text-2xl text-gray-500 md:mt-4 font-sans">
+                    <p className="text-md md:text-2xl text-gray-500 md:mt-4 font-sans whitespace-pre-line">
                         {title.sub}
                     </p>
                     <p className="text-gray-800 mt-2">
