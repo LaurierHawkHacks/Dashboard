@@ -357,3 +357,30 @@ export const submitApplication = functions.https.onCall(
         return { status: 200 };
     }
 );
+
+export const logEvent = functions.https.onCall((data, context) => {
+    const uid = context.auth?.uid;
+
+    const payloadValidation = z.object({
+        type: z
+            .string()
+            .refine((val) => ["error", "info", "log"].includes(val)),
+        data: z.any(),
+    });
+
+    const result = payloadValidation.safeParse(data);
+    if (!result.success) functions.logger.info("Invalid log payload");
+    else {
+        switch (result.data.type) {
+            case "error":
+                functions.logger.error({ data: result.data.data, uid });
+                break;
+            case "info":
+                functions.logger.info({ data: result.data.data, uid });
+                break;
+            default:
+                functions.logger.log({ data: result.data.data, uid });
+                break;
+        }
+    }
+});

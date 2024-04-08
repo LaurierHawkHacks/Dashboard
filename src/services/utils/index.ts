@@ -17,6 +17,19 @@ export const TICKETS_COLLECTION = "tickets";
 export const USERS_COLLECTION = "users";
 export const APPLICATIONS_COLLECTION = "applications";
 
+async function logEvent(
+    type: "error" | "info" | "log",
+    data: Record<string, unknown>
+) {
+    try {
+        const logFn = httpsCallable(functions, "logEvent");
+        await logFn({ type, data });
+    } catch (e) {
+        console.error(e);
+        console.warn("Failed to log in cloud.");
+    }
+}
+
 /**
  * Creates a new ticket entry in the collection 'tickets'.
  *
@@ -34,8 +47,6 @@ export async function createTicket(data: UserTicketData): Promise<string> {
  * Submits an application to firebase
  */
 export async function submitApplication(data: ApplicationData, uid: string) {
-    // const cloudFn = httpsCallable(functions, "submitApplication");
-    // await cloudFn(data);
     const payload = {
         ...data,
         applicantId: uid,
@@ -46,14 +57,34 @@ export async function submitApplication(data: ApplicationData, uid: string) {
     try {
         const q = query(appsRef, where("applicantId", "==", uid), limit(1));
         const snap = await getDocs(q);
-        if (snap.size > 0) return;
+        if (snap.size > 0) {
+            // log how many people tried to resubmit, this should not be possible, so this must be 0 or people trying to hack
+            logEvent("log", {
+                event: "app_duplicate_found",
+                count: snap.size,
+            });
+        }
     } catch (e) {
-        console.error(e);
-        console.log("Could not query app");
+        logEvent("error", {
+            event: "app_failed_query",
+            message: (e as Error).message,
+            name: (e as Error).name,
+            stack: (e as Error).stack,
+        });
     }
 
+    try {
         await addDoc(appsRef, payload);
-        console.log("app submitted!");
+    } catch (e) {
+        logEvent("error", {
+            event: "app_submit_error",
+            message: (e as Error).message,
+            name: (e as Error).name,
+            stack: (e as Error).stack,
+        });
+        // pass this along so that the application page handles the error
+        throw e;
+    }
 }
 
 /**
@@ -62,16 +93,18 @@ export async function submitApplication(data: ApplicationData, uid: string) {
 export async function getUserApplications(uid: string) {
     try {
         const colRef = collection(firestore, APPLICATIONS_COLLECTION);
-        const q = query(
-            colRef,
-            where("applicantId", "==", uid),
-        );
+        const q = query(colRef, where("applicantId", "==", uid));
         const snap = await getDocs(q);
         const apps: ApplicationData[] = [];
         snap.forEach((doc) => apps.push(doc.data() as ApplicationData));
         return apps;
     } catch (e) {
-        console.error("Error: getUserApplications");
+        logEvent("error", {
+            event: "search_user_applications_error",
+            message: (e as Error).message,
+            name: (e as Error).name,
+            stack: (e as Error).stack,
+        });
     }
 
     return [];
@@ -90,27 +123,47 @@ export async function verifyGitHubEmail(token: string, email: string) {
 }
 
 export async function uploadMentorResume(file: File, uid: string) {
-    const resumeRef = ref(
-        storage,
-        `/resumes/${uid}-mentor-resume${file.name.substring(
-            file.name.lastIndexOf(".")
-        )}`
-    );
-    const snap = await uploadBytes(resumeRef, file, {
-        customMetadata: { owner: uid },
-    });
-    return snap.ref.toString();
+    try {
+        const resumeRef = ref(
+            storage,
+            `/resumes/${uid}-mentor-resume${file.name.substring(
+                file.name.lastIndexOf(".")
+            )}`
+        );
+        const snap = await uploadBytes(resumeRef, file, {
+            customMetadata: { owner: uid },
+        });
+        return snap.ref.toString();
+    } catch (e) {
+        logEvent("error", {
+            event: "upload_mentor_resume_error",
+            message: (e as Error).message,
+            name: (e as Error).name,
+            stack: (e as Error).stack,
+        });
+        throw e;
+    }
 }
 
 export async function uploadGeneralResume(file: File, uid: string) {
-    const resumeRef = ref(
-        storage,
-        `/resumes/${uid}-general-resume${file.name.substring(
-            file.name.lastIndexOf(".")
-        )}`
-    );
-    const snap = await uploadBytes(resumeRef, file, {
-        customMetadata: { owner: uid },
-    });
-    return snap.ref.toString();
+    try {
+        const resumeRef = ref(
+            storage,
+            `/resumes/${uid}-general-resume${file.name.substring(
+                file.name.lastIndexOf(".")
+            )}`
+        );
+        const snap = await uploadBytes(resumeRef, file, {
+            customMetadata: { owner: uid },
+        });
+        return snap.ref.toString();
+    } catch (e) {
+        logEvent("error", {
+            event: "upload_general_resume_error",
+            message: (e as Error).message,
+            name: (e as Error).name,
+            stack: (e as Error).stack,
+        });
+        throw e;
+    }
 }
