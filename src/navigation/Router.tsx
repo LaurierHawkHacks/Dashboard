@@ -64,6 +64,10 @@ export const titles: Record<string, Title> = {
         main: "Verify Your Email",
         sub: "Please check your email inbox.",
     },
+    [routes.ticket]: {
+        main: "Ticket",
+        sub: "This is your ticket for the event and will be needed to register (a.k.a., check in) at HawkHacks 2023. Please press \"View my ticket\" then use the buttons below to add this ticket to your mobile wallet or take a screenshot of the ticket page. Registration begins at 5:30 PM local time near the Main Tent in Wilfrid Laurier University's Laz Building.\n\n If you have any questions, please contact info@hawkhacks.ca.",
+    },
 };
 
 export const Router = () => {
@@ -142,6 +146,9 @@ export const Router = () => {
                     {availableRoutes.map((r) => (
                         <Route key={r.path} path={r.path} element={r.element} />
                     ))}
+
+                    {/* Ticket Route here for now for dev purposes */}
+                    <Route index path={routes.ticket} element={<UserPage />} />
                 </Route>
 
                 {/* Admin Routes */}
