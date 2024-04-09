@@ -183,8 +183,6 @@ export const ApplicationPage = () => {
     const submitApp: FormEventHandler = async (e) => {
         e.preventDefault();
 
-        trackProgress("submit");
-
         clearErrors();
         if (!validate()) return;
 
@@ -245,6 +243,7 @@ export const ApplicationPage = () => {
         }
 
         try {
+            trackProgress("submit");
             await submitApplication(application, currentUser.uid);
             showNotification({
                 title: "Application Submitted!",
