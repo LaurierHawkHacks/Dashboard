@@ -10,5 +10,4 @@ interface ImportMetaEnv {
     VITE_CONNECT_AUTH_EMU: string;
     VITE_GOOGLE_CLIENT_ID: string;
     VITE_APP_VERSION: string;
-    VITE_APP_CHECK_KEY: string;
 }
