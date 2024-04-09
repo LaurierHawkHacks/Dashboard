@@ -97,6 +97,18 @@ export const ApplicationPage = () => {
         return app;
     });
 
+    const trackProgress = (component: string) => {
+        try {
+            const event = getLogEventName(component);
+            if (!progressTrackRef.current.has(event)) {
+                logEvent(analytics, event);
+                progressTrackRef.current.add(event);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
     const handleChange = (
         name: ApplicationInputKeys,
         data: string | string[] | boolean
@@ -104,11 +116,7 @@ export const ApplicationPage = () => {
         // @ts-ignore the "name" key is controlled by the keyof typing, restricts having undefined keys, so disable is ok
         application[name] = data;
         setApplication({ ...application });
-        const event = getLogEventName(name);
-        if (!progressTrackRef.current.has(event)) {
-            logEvent(analytics, event);
-            progressTrackRef.current.add(event);
-        }
+        trackProgress(name);
     };
 
     const clearErrors = () => setErrors([]);
@@ -145,11 +153,7 @@ export const ApplicationPage = () => {
 
     const nextStep = () => {
         if (activeStep < steps.length) {
-            const stepEvent = getLogEventName(`step_${activeStep}`);
-            if (!progressTrackRef.current.has(stepEvent)) {
-                logEvent(analytics, stepEvent);
-                progressTrackRef.current.add(stepEvent);
-            }
+            trackProgress(`step_${activeStep}`);
             setSteps((s) => {
                 s[activeStep].status = "complete";
                 s[activeStep + 1].status = "current";
@@ -179,11 +183,7 @@ export const ApplicationPage = () => {
     const submitApp: FormEventHandler = async (e) => {
         e.preventDefault();
 
-        const submitEvent = getLogEventName("submit");
-        if (!progressTrackRef.current.has(submitEvent)) {
-            logEvent(analytics, submitEvent);
-            progressTrackRef.current.add(submitEvent);
-        }
+        trackProgress("submit");
 
         clearErrors();
         if (!validate()) return;
@@ -269,11 +269,7 @@ export const ApplicationPage = () => {
             if (apps.length) setHasApplied(true);
             else {
                 setHasApplied(false);
-                const event = getLogEventName("open");
-                if (!progressTrackRef.current.has(event)) {
-                    logEvent(analytics, event);
-                    progressTrackRef.current.add(event);
-                }
+                trackProgress("open");
             }
             setIsLoading(false);
         };
