@@ -24,6 +24,18 @@ export const PageWrapper: FC<ComponentProps> = ({ children }) => {
                     <p className="text-md md:text-2xl text-gray-500 md:mt-4 font-sans">
                         {title.sub}
                     </p>
+                    <p className="text-gray-800 mt-2">
+                        Having trouble? Get help in our{" "}
+                        <a
+                            href="https://discord.com/invite/GxwvFEn9TB"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sky-600 font-bold underline"
+                        >
+                            Discord
+                        </a>{" "}
+                        support channel.
+                    </p>
                 </div>
                 <div className="px-6 py-6">{children}</div>
             </div>

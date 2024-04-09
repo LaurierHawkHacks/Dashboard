@@ -2,6 +2,7 @@ import { GoHome } from "react-icons/go";
 import { PiCalendarCheckFill } from "react-icons/pi";
 import { TiGroup } from "react-icons/ti";
 import { PiIdentificationBadgeFill } from "react-icons/pi";
+import { RiDiscordLine } from "react-icons/ri";
 import { FiLogOut } from "react-icons/fi";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/providers/hooks";
@@ -104,7 +105,7 @@ export const Navbar = () => {
                     </nav>
 
                     <div
-                        className={`fixed right-0 top-0 z-40 h-full w-full max-w-[12.5rem] p-10 py-24 bg-gray-200 backdrop-blur-xl transition-all duration-300 ease-in-out ${
+                        className={`fixed right-0 top-0 z-40 h-full max-w-full p-10 py-24 bg-gray-200 backdrop-blur-xl transition-all duration-300 ease-in-out ${
                             isMobileMenuOpen
                                 ? "translate-x-0 opacity-100"
                                 : "translate-x-full opacity-0"
@@ -112,6 +113,16 @@ export const Navbar = () => {
                     >
                         <ul className="flex flex-col items-start justify-start gap-4">
                             {renderNavItems(true)}
+                            <a
+                                href="https://discord.com/invite/GxwvFEn9TB"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full"
+                            >
+                                <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
+                                    Discord Support
+                                </li>
+                            </a>
                         </ul>
                         <button
                             className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full flex items-center justify-start gap-2 hover:text-black"
@@ -147,6 +158,17 @@ export const Navbar = () => {
                     <aside className="flex flex-col items-start justify-between h-[90%]">
                         <ul className="flex flex-col items-start justify-start gap-4 w-full">
                             {renderNavItems(false)}
+                            <a
+                                href="https://discord.com/invite/GxwvFEn9TB"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full"
+                            >
+                                <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
+                                    <RiDiscordLine size={32} />
+                                    Discord Support
+                                </li>
+                            </a>
                         </ul>
 
                         <button
