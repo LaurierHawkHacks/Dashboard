@@ -1,4 +1,4 @@
-import { FormEventHandler, useEffect, useState } from "react";
+import { FormEventHandler, useEffect, useRef, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { z } from "zod";
 import { useAuth, useNotification } from "@/providers/hooks";
@@ -43,6 +43,8 @@ import {
 } from "@/services/utils";
 import { TextArea } from "@/components/TextArea/TextArea";
 import { referralSources } from "@/data";
+import { logEvent } from "firebase/analytics";
+import { analytics } from "@/services/firebase";
 
 const stepValidations = [
     profileFormValidation,
@@ -54,6 +56,11 @@ const stepValidations = [
     hackerAppFormValidation,
     finalChecksValidation,
 ];
+
+function getLogEventName(component: string) {
+    if (import.meta.env.PROD) return `app_interaction_${component}`;
+    return "dev_app_interaction"; // not logging the different components becuase it will fill the reports with spam
+}
 
 export const ApplicationPage = () => {
     // TODO: save steps in firebase to save progress
@@ -78,6 +85,7 @@ export const ApplicationPage = () => {
         null
     );
     const { showNotification } = useNotification();
+    const progressTrackRef = useRef(new Set<string>());
 
     if (!currentUser) return <Navigate to={routes.login} />;
 
@@ -89,6 +97,18 @@ export const ApplicationPage = () => {
         return app;
     });
 
+    const trackProgress = (component: string) => {
+        try {
+            const event = getLogEventName(component);
+            if (!progressTrackRef.current.has(event)) {
+                logEvent(analytics, event);
+                progressTrackRef.current.add(event);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
     const handleChange = (
         name: ApplicationInputKeys,
         data: string | string[] | boolean
@@ -96,6 +116,7 @@ export const ApplicationPage = () => {
         // @ts-ignore the "name" key is controlled by the keyof typing, restricts having undefined keys, so disable is ok
         application[name] = data;
         setApplication({ ...application });
+        trackProgress(name);
     };
 
     const clearErrors = () => setErrors([]);
@@ -122,7 +143,6 @@ export const ApplicationPage = () => {
                     : volunteerSpecificValidation;
             const results = validateFn.safeParse(application);
             if (!results.success) {
-                console.log(results.error.issues.map((i) => i.path));
                 setErrors(results.error.issues.map((i) => i.message));
                 return false;
             }
@@ -133,6 +153,7 @@ export const ApplicationPage = () => {
 
     const nextStep = () => {
         if (activeStep < steps.length) {
+            trackProgress(`step_${activeStep}`);
             setSteps((s) => {
                 s[activeStep].status = "complete";
                 s[activeStep + 1].status = "current";
@@ -161,6 +182,8 @@ export const ApplicationPage = () => {
 
     const submitApp: FormEventHandler = async (e) => {
         e.preventDefault();
+
+        trackProgress("submit");
 
         clearErrors();
         if (!validate()) return;
@@ -244,7 +267,10 @@ export const ApplicationPage = () => {
         const checkApp = async () => {
             const apps = await getUserApplications(currentUser.uid);
             if (apps.length) setHasApplied(true);
-            else setHasApplied(false);
+            else {
+                setHasApplied(false);
+                trackProgress("open");
+            }
             setIsLoading(false);
         };
         checkApp();
