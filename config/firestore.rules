@@ -15,11 +15,6 @@ service cloud.firestore {
     }
 
   match /databases/{database}/documents {
-    // Default rule to deny read/write access
-    match /{document=**} {
-      allow read, write: if false;
-    }
-    
     // Allow read/write access to the user owns documents
     // Allow read/write access if
     // 1. document is new
@@ -27,11 +22,6 @@ service cloud.firestore {
     match /users/{documentId} {
       allow read: if isAuthenticated() && (isAdmin() || isOwner(resource.data.id));
       allow write: if isAuthenticated() && isAdmin();
-    }
-
-    // Allow read/write access to the entire database for admin users
-    match /{document=**} {
-      allow read, write: if request.auth != null && request.auth.token.admin == true;
     }
 
     // Tickets Collection Rules
@@ -46,7 +36,12 @@ service cloud.firestore {
     match /applications/{applicationId} {
         // Only grant read access if you are owner/admin
         allow read: if isAuthenticated() && (isAdmin() || isOwner(resource.data.applicantId));
-        allow write: if isAuthenticated() && isAdmin();
+        allow write: if isAuthenticated();
+    }
+
+    // Default rule to deny read/write access
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
