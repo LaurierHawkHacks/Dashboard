@@ -11,4 +11,9 @@ interface ImportMetaEnv {
     VITE_GOOGLE_CLIENT_ID: string;
     VITE_APP_VERSION: string;
     VITE_APP_CHECK_KEY: string;
+    VITE_TICKETS_COLLECTION: string;
+    VITE_USERS_COLLECTION: string;
+    VITE_APPLICATIONS_COLLECTION: string;
+    VITE_FIREBASE_APPCHECK_DEBUG_TOKEN: string;
+    VITE_APP_ENV: string;
 }

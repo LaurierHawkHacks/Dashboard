@@ -13,9 +13,10 @@ import { ApplicationData } from "@/components/forms/types";
 import { httpsCallable } from "firebase/functions";
 import { ref, uploadBytes } from "firebase/storage";
 
-export const TICKETS_COLLECTION = "tickets";
-export const USERS_COLLECTION = "users";
-export const APPLICATIONS_COLLECTION = "applications";
+export const TICKETS_COLLECTION = import.meta.env.VITE_TICKETS_COLLECTION;
+export const USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION;
+export const APPLICATIONS_COLLECTION = import.meta.env
+    .VITE_APPLICATIONS_COLLECTION;
 
 async function logEvent(
     type: "error" | "info" | "log",
@@ -53,7 +54,7 @@ export async function submitApplication(data: ApplicationData, uid: string) {
         timestamp: Timestamp.now(),
     };
 
-    const appsRef = collection(firestore, "applications");
+    const appsRef = collection(firestore, APPLICATIONS_COLLECTION);
     try {
         const q = query(appsRef, where("applicantId", "==", uid), limit(1));
         const snap = await getDocs(q);

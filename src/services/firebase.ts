@@ -22,13 +22,16 @@ export const firestore = getFirestore(app);
 export const auth = getAuth(app);
 export const functions = getFunctions(app);
 export const storage = getStorage(app);
+// @ts-ignore
+self.FIREBASE_APPCHECK_DEBUG_TOKEN =
+    import.meta.env.VITE_FIREBASE_APPCHECK_DEBUG_TOKEN;
 initializeAppCheck(app, {
     provider: new ReCaptchaV3Provider(import.meta.env.VITE_APP_CHECK_KEY),
     isTokenAutoRefreshEnabled: true,
 });
 
 // connect to emulators if not in prod
-if (!import.meta.env.PROD) {
+if (!import.meta.env.PROD && import.meta.env.VITE_APP_ENV === "development") {
     connectFirestoreEmulator(firestore, "127.0.0.1", 8080);
     connectAuthEmulator(auth, "http://127.0.0.1:9099");
     connectStorageEmulator(storage, "127.0.0.1", 9199);
