@@ -39,6 +39,18 @@ service cloud.firestore {
         allow write: if isAuthenticated();
     }
 
+    match /applications-dev/{applicationId} {
+        allow read, write: if isAuthenticated() && isAdmin();
+    }
+
+    match /tickets-dev/{ticketId} {
+        allow read, write: if isAuthenticated() && isAdmin();
+    }
+
+    match /users-dev/{documentId} {
+        allow read, write: if isAuthenticated() && isAdmin();
+    }
+
     // Default rule to deny read/write access
     match /{document=**} {
       allow read, write: if false;
