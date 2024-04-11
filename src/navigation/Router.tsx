@@ -11,6 +11,7 @@ import { ProtectedRoutes } from "@/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/providers/auth.provider";
 import { LoadingAnimation } from "@/components";
+import { PostSubmissionPage } from "@/pages/miscellaneous/PostSubmission.page";
 
 export const routes = {
     admin: "/admin",
@@ -24,6 +25,7 @@ export const routes = {
     networking: "/networking",
     ticket: "/ticket",
     application: "/application",
+    submitted: "/submitted",
 };
 
 interface Title {
@@ -69,6 +71,7 @@ export const Router = () => {
     >([
         { path: routes.application, element: <ApplicationPage /> },
         { path: routes.verifyEmail, element: <VerifyEmailPage /> },
+        { path: routes.submitted, element: <PostSubmissionPage /> },
     ]);
     const { userApp } = useAuth();
 
