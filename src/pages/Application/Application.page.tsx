@@ -36,7 +36,6 @@ import {
     volunteerSpecificValidation,
 } from "@/components/forms/validations";
 import {
-    getUserApplications,
     submitApplication,
     uploadGeneralResume,
     uploadMentorResume,
@@ -85,7 +84,9 @@ export const ApplicationPage = () => {
         null
     );
     const { showNotification } = useNotification();
+    const { userApp } = useAuth();
     const progressTrackRef = useRef(new Set<string>());
+    const loadingTimeoutRef = useRef<number | null>(null);
 
     if (!currentUser) return <Navigate to={routes.login} />;
 
@@ -263,17 +264,28 @@ export const ApplicationPage = () => {
     };
 
     useEffect(() => {
-        const checkApp = async () => {
-            const apps = await getUserApplications(currentUser.uid);
-            if (apps.length) setHasApplied(true);
-            else {
-                setHasApplied(false);
-                trackProgress("open");
-            }
+        if (loadingTimeoutRef.current !== null)
+            window.clearTimeout(loadingTimeoutRef.current as number);
+        loadingTimeoutRef.current = window.setTimeout(
+            () => setIsLoading(false),
+            1000
+        );
+
+        if (userApp) {
+            if (loadingTimeoutRef.current !== null)
+                window.clearTimeout(loadingTimeoutRef.current);
+            setHasApplied(true);
             setIsLoading(false);
+        } else {
+            setHasApplied(false);
+            trackProgress("open");
+        }
+
+        return () => {
+            if (loadingTimeoutRef.current)
+                window.clearTimeout(loadingTimeoutRef.current);
         };
-        checkApp();
-    }, []);
+    }, [userApp]);
 
     const specificQuestions: FormInput[] =
         application.participatingAs === "Hacker"
@@ -284,16 +296,7 @@ export const ApplicationPage = () => {
 
     if (isLoading) return <LoadingAnimation />;
 
-    if (hasApplied)
-        return (
-            <div>
-                <p>Thank you for applying!</p>
-                <p>
-                    We will send you an email once your application has been
-                    processed! Thank you for your patience.
-                </p>
-            </div>
-        );
+    if (hasApplied) return <Navigate to={routes.submitted} />;
 
     return (
         <div>
