@@ -48,6 +48,11 @@ export const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
         return <Navigate to={routes.notFound} />;
     }
 
+    // don't want the page wrapper for this page
+    if (location.pathname === routes.submitted) {
+        return <Outlet />;
+    }
+
     return (
         <PageWrapper>
             <Outlet />
