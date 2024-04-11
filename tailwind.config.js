@@ -57,6 +57,10 @@ export default {
             backdropBrightness: {
                 25: "0.25",
             },
+            backgroundImage: {
+                "radial-gradient-peach":
+                    "radial-gradient(116.17% 116.17% at 50% 1.3%, #F8DFD1 0%, #FFFFFF 100%)",
+            },
         },
     },
     plugins: [forms],
