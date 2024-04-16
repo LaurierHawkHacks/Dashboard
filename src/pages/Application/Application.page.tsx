@@ -78,13 +78,12 @@ export const ApplicationPage = () => {
     const { currentUser } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [hasApplied, setHasApplied] = useState(true); // default to true to prevent showing the form at first load
     const [mentorResumeFile, setMentorResumeFile] = useState<File | null>(null);
     const [generalResumeFile, setGeneralResumeFile] = useState<File | null>(
         null
     );
     const { showNotification } = useNotification();
-    const { userApp } = useAuth();
+    const { userApp, refreshUserApp } = useAuth();
     const progressTrackRef = useRef(new Set<string>());
     const loadingTimeoutRef = useRef<number | null>(null);
 
@@ -251,7 +250,7 @@ export const ApplicationPage = () => {
                 message:
                     "Thank you for applying! You'll received an update from us in your email shortly!",
             });
-            setHasApplied(true);
+            await refreshUserApp();
         } catch (e) {
             showNotification({
                 title: "Error Submitting Application",
@@ -271,13 +270,7 @@ export const ApplicationPage = () => {
             1000
         );
 
-        if (userApp) {
-            if (loadingTimeoutRef.current !== null)
-                window.clearTimeout(loadingTimeoutRef.current);
-            setHasApplied(true);
-            setIsLoading(false);
-        } else {
-            setHasApplied(false);
+        if (!userApp) {
             trackProgress("open");
         }
 
@@ -296,7 +289,7 @@ export const ApplicationPage = () => {
 
     if (isLoading) return <LoadingAnimation />;
 
-    if (hasApplied) return <Navigate to={routes.submitted} />;
+    if (userApp) return <Navigate to={routes.submitted} />;
 
     return (
         <div>

@@ -39,6 +39,7 @@ export type AuthContextValue = {
     resetPassword: (email: string) => Promise<void>;
     loginWithProvider: (name: ProviderName) => Promise<void>;
     reloadUser: () => Promise<void>;
+    refreshUserApp: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue>({
@@ -50,6 +51,7 @@ const AuthContext = createContext<AuthContextValue>({
     resetPassword: async () => {},
     loginWithProvider: async () => {},
     reloadUser: async () => {},
+    refreshUserApp: async () => {},
 });
 
 /**
@@ -102,7 +104,7 @@ function getNotificationByAuthErrCode(code: string): NotificationOptions {
             return {
                 title: "Invalid Credentials",
                 message:
-                "Please make sure you have the correct credentials and try again.",
+                    "Please make sure you have the correct credentials and try again.",
             };
         default:
             return {
@@ -285,6 +287,13 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
         }
     };
 
+    const refreshUserApp = async () => {
+        if (!currentUser) return;
+
+        const app = (await getUserApplications(currentUser.uid))[0] ?? null;
+        setUserApp(app);
+    };
+
     useEffect(() => {
         const unsub = auth.onAuthStateChanged(async (user) => {
             if (user) {
@@ -321,6 +330,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                 resetPassword,
                 loginWithProvider,
                 reloadUser,
+                refreshUserApp,
             }}
         >
             {isLoading ? <LoadingAnimation /> : children}
