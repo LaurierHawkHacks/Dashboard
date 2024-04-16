@@ -41,19 +41,19 @@ export const PostSubmissionPage = () => {
                 aria-hidden
                 className="absolute -z-10 right-2 top-20 w-16 md:w-32"
             />
-            <div className="w-full h-full px-8 gap-4 sm:gap-7 flex py-32 sm:py-60 md:py-80 items-center flex-col text-center">
+            <div className="w-full h-full px-8 flex py-32 sm:py-60 md:py-80 items-center flex-col text-center">
                 <h1 className="text-2xl sm:text-4xl whitespace-nowrap font-bold bg-clip-text text-transparent bg-gradient-to-b from-deepMarine to-tbrand-highlight">
                     Thanks for your submission!
                 </h1>
-                <p className="text-deepMarine font-medium sm:text-lg">
+                <p className="text-deepMarine font-medium sm:text-lg mt-4 sm:mt-7">
                     {"We'll send out acceptances after the application period."}
                 </p>
-                <p className="text-deepMarine font-medium">
+                <p className="text-deepMarine font-medium mt-2 sm:text-lg">
                     {
                         "Team registration begins once you're accepted! See you soon :)"
                     }
                 </p>
-                <p className="text-lg text-deepMarine font-semibold sm:text-lg">
+                <p className="text-deepMarine font-semibold sm:text-lg mt-8">
                     If you have any other questions,{" "}
                     <br className="sm:hidden" />
                     feel free to email us at
@@ -74,9 +74,9 @@ export const PostSubmissionPage = () => {
                     >
                         HawkHacks Discord
                     </a>{" "}
-                    server
+                    server!
                 </p>
-                <div className="mt-4">
+                <div className="mt-12">
                     <Link
                         to="/"
                         className={getButtonStyles({
