@@ -12,4 +12,7 @@ export default defineConfig({
         include: ["./src/**/*.test.{ts,tsx}"],
         clearMocks: true,
     },
+    define: {
+        APP_VERSION: JSON.stringify("1.1.0"),
+    },
 });
