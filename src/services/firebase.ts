@@ -1,9 +1,10 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 import { connectAuthEmulator, getAuth } from "firebase/auth";
-import { getFunctions } from "firebase/functions";
-import { getStorage } from "firebase/storage";
+import { connectFunctionsEmulator, getFunctions } from "firebase/functions";
+import { connectStorageEmulator, getStorage } from "firebase/storage";
+import { ReCaptchaV3Provider, initializeAppCheck } from "firebase/app-check";
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -21,7 +22,18 @@ export const firestore = getFirestore(app);
 export const auth = getAuth(app);
 export const functions = getFunctions(app);
 export const storage = getStorage(app);
+// @ts-ignore
+self.FIREBASE_APPCHECK_DEBUG_TOKEN =
+    import.meta.env.VITE_FIREBASE_APPCHECK_DEBUG_TOKEN;
+initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider(import.meta.env.VITE_APP_CHECK_KEY),
+    isTokenAutoRefreshEnabled: true,
+});
 
-if (!import.meta.env.PROD && import.meta.env.VITE_CONNECT_AUTH_EMU === "true") {
+// connect to emulators if not in prod
+if (!import.meta.env.PROD && import.meta.env.VITE_APP_ENV === "development") {
+    connectFirestoreEmulator(firestore, "127.0.0.1", 8080);
     connectAuthEmulator(auth, "http://127.0.0.1:9099");
+    connectStorageEmulator(storage, "127.0.0.1", 9199);
+    connectFunctionsEmulator(functions, "127.0.0.1", 5001);
 }
