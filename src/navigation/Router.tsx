@@ -167,6 +167,7 @@ export const Router = () => {
                         path={routes.ticket}
                         element={<TicketPage />}
                     />
+                    <Route path={routes.verifyRSVP} element={<VerifyRSVP />} />
                 </Route>
 
                 {/* Admin Routes */}
