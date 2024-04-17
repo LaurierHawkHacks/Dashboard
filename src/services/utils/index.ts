@@ -168,3 +168,21 @@ export async function uploadGeneralResume(file: File, uid: string) {
         throw e;
     }
 }
+
+export async function verifyRSVP() {
+    const verifyFn = httpsCallable(functions, "verifyRSVP");
+    try {
+        console.log("here");
+        const res = await verifyFn();
+        const data = res.data as { verified: boolean };
+        return data.verified;
+    } catch (e) {
+        logEvent("error", {
+            event: "verify_rsvp",
+            message: (e as Error).message,
+            name: (e as Error).name,
+            stack: (e as Error).stack,
+        });
+        throw e;
+    }
+}
