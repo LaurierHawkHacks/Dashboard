@@ -47,6 +47,13 @@ service cloud.firestore {
         allow write: if isAuthenticated();
     }
 
+    // RSVP Verifications
+    match /rsvps/{rsvpId} {
+        // Only grant read access if you are owner/admin
+        allow read: if isAuthenticated() && (isOwner(resource.data.uid));
+        allow write: if isAuthenticated();
+    }
+
     match /applications-dev/{applicationId} {
         allow read, write: if isAuthenticated() && isAdmin();
     }
