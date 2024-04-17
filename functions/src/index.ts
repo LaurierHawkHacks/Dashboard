@@ -10,6 +10,7 @@
  */
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { Timestamp } from "firebase-admin/firestore";
 import { Octokit } from "octokit";
 import { z } from "zod";
 
@@ -385,3 +386,62 @@ export const logEvent = functions.https.onCall((data, context) => {
         }
     }
 });
+
+export const verifyRSVP = functions
+    .runWith({
+        enforceAppCheck: true, // reject requests with missing or invalid app check tokens.
+        consumeAppCheckToken: true,
+    })
+    .https.onCall(async (_, context) => {
+        if (!context.auth) {
+            throw new functions.https.HttpsError(
+                "permission-denied",
+                "Not authenticated"
+            );
+        }
+
+        functions.logger.info("Verify RSVP called.", { uid: context.auth.uid });
+
+        // only verify once
+        const rsvpRef = admin.firestore().collection("rsvps");
+        try {
+            functions.logger.info(
+                "Checking if user has verified their RSVP before..."
+            );
+            const query = rsvpRef.where("uid", "==", context.auth.uid).limit(1);
+            const snap = await query.get();
+            const resource = snap.docs[0];
+            if (resource.exists && resource.data().verified) {
+                return { status: 200, verified: true };
+            }
+        } catch (e) {
+            functions.logger.error(
+                "Error checking for existing rsvp verification. User: " +
+                    context.auth?.uid
+            );
+        }
+
+        try {
+            functions.logger.info("Verifying RSVP. User: " + context.auth.uid);
+            // add entry in rsvp collection
+            await rsvpRef.add({
+                uid: context.auth.uid,
+                verified: true,
+                timestamp: Timestamp.now(),
+            });
+        } catch (e) {
+            functions.logger.error("Error verifying RSVP.", {
+                uid: context.auth.uid,
+                error: (e as Error).message,
+            });
+            throw new functions.https.HttpsError(
+                "internal",
+                "Service down. 1101"
+            );
+        }
+
+        return {
+            status: 200,
+            verified: true,
+        };
+    });
