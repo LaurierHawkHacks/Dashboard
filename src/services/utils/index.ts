@@ -195,6 +195,20 @@ export async function getResume(gs: string) {
     } catch (e) {
         logEvent("error", {
             event: "get_resume_error",
+        });
+    }
+}
+
+export async function verifyRSVP() {
+    const verifyFn = httpsCallable(functions, "verifyRSVP");
+    try {
+        console.log("here");
+        const res = await verifyFn();
+        const data = res.data as { verified: boolean };
+        return data.verified;
+    } catch (e) {
+        logEvent("error", {
+            event: "verify_rsvp",
             message: (e as Error).message,
             name: (e as Error).name,
             stack: (e as Error).stack,
