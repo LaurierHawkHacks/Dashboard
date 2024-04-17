@@ -29,6 +29,7 @@ export const routes = {
     application: "/application",
     myApplication: "my-application",
     submitted: "/submitted",
+    verifyRSVP: "/verify-rsvp",
 };
 
 interface Title {
