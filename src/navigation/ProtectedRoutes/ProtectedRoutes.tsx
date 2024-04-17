@@ -49,10 +49,7 @@ export const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
     }
 
     // don't want the page wrapper for this page
-    if (
-        location.pathname === routes.submitted ||
-        location.pathname === routes.verifyRSVP
-    ) {
+    if (location.pathname === routes.submitted) {
         return <Outlet />;
     }
 
