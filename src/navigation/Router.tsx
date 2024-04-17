@@ -26,6 +26,7 @@ export const routes = {
     ticket: "/ticket",
     application: "/application",
     submitted: "/submitted",
+    verifyRSVP: "/verify-rsvp",
 };
 
 interface Title {
