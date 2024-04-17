@@ -8,7 +8,7 @@ import {
     ApplicationPage,
 } from "@pages";
 import { ProtectedRoutes } from "@/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { isAfter } from "date-fns";
 import { useAuth } from "@/providers/auth.provider";
 import { LoadingAnimation } from "@/components";
@@ -78,9 +78,13 @@ export const Router = () => {
         { path: routes.verifyEmail, element: <VerifyEmailPage /> },
         { path: routes.submitted, element: <PostSubmissionPage /> },
     ]);
-    const { userApp } = useAuth();
+    const { userApp, currentUser } = useAuth();
+
+    const timeoutRef = useRef<number | null>(null);
 
     useEffect(() => {
+        if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+        timeoutRef.current = window.setTimeout(() => setIsLoading(false), 1500);
         if (userApp === undefined) return;
 
         const today = new Date();
@@ -101,9 +105,22 @@ export const Router = () => {
                 },
             ]);
         }
-
-        setTimeout(() => setIsLoading(false), 1500);
     }, [userApp]);
+
+    useEffect(() => {
+        if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+        timeoutRef.current = window.setTimeout(() => setIsLoading(false), 1500);
+        if (!currentUser) return;
+
+        if (!currentUser.rsvpVerified) {
+            setAvailableRoutes([
+                {
+                    path: routes.verifyRSVP,
+                    element: <VerifyRSVP />,
+                },
+            ]);
+        }
+    }, [currentUser]);
 
     if (isLoading) return <LoadingAnimation />;
 
@@ -114,12 +131,23 @@ export const Router = () => {
 
                 {/* User Routes */}
                 <Route path={routes.portal} element={<ProtectedRoutes />}>
-                    <Route index path={routes.portal} element={<UserPage />} />
-                    <Route index path={routes.profile} element={<UserPage />} />
+                    {currentUser && currentUser.rsvpVerified && (
+                        <>
+                            <Route
+                                index
+                                path={routes.portal}
+                                element={<UserPage />}
+                            />
+                            <Route
+                                index
+                                path={routes.profile}
+                                element={<UserPage />}
+                            />
+                        </>
+                    )}
                     {availableRoutes.map((r) => (
                         <Route key={r.path} path={r.path} element={r.element} />
                     ))}
-                    <Route path={routes.verifyRSVP} element={<VerifyRSVP />} />
                 </Route>
 
                 {/* Admin Routes */}
