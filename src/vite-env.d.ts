@@ -15,6 +15,7 @@ interface ImportMetaEnv {
     VITE_USERS_COLLECTION: string;
     VITE_APPLICATIONS_COLLECTION: string;
     VITE_FIREBASE_APPCHECK_DEBUG_TOKEN: string;
+    VITE_RSVP_COLLECTION: string;
 }
 
 declare const APP_VERSION: string;
