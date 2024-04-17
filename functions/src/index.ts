@@ -24,6 +24,7 @@ export const addDefaultClaims = functions.auth.user().onCreate(async (user) => {
         await admin.auth().setCustomUserClaims(uid, {
             // Default Claims
             admin: false, // Example: set to true for admin users
+            phoneVerified: false,
         });
         console.log(`Custom claims added for user: ${uid}`);
     } catch (error) {
