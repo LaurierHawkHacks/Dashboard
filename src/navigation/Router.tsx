@@ -14,6 +14,7 @@ import { useAuth } from "@/providers/auth.provider";
 import { LoadingAnimation } from "@/components";
 import { PostSubmissionPage } from "@/pages/miscellaneous/PostSubmission.page";
 import { appCloseDate } from "@/data/appCloseDate";
+import { VerifyRSVP } from "@/pages/miscellaneous/VerifyRSVP.page";
 
 export const routes = {
     admin: "/admin",
@@ -118,6 +119,7 @@ export const Router = () => {
                     {availableRoutes.map((r) => (
                         <Route key={r.path} path={r.path} element={r.element} />
                     ))}
+                    <Route path={routes.verifyRSVP} element={<VerifyRSVP />} />
                 </Route>
 
                 {/* Admin Routes */}
