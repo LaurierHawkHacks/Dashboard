@@ -127,7 +127,7 @@ export const LoginPage = () => {
             return <Navigate to={routes.admin} />;
         }
         const from = searchParams.get("from");
-        return <Navigate to={from && from !== "/" ? from : routes.profile} />;
+        return <Navigate to={from && from !== "/" ? from : routes.portal} />;
     }
 
     return (
