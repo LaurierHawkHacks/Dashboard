@@ -134,24 +134,11 @@ export const Router = () => {
 
                 {/* User Routes */}
                 <Route path={routes.portal} element={<ProtectedRoutes />}>
-                    {/* {currentUser && currentUser.rsvpVerified && ( */}
-                    <>
-                        <Route
-                            index
-                            path={routes.portal}
-                            element={<HomePage />}
-                        />
-                        <Route
-                            index
-                            path={routes.profile}
-                            element={<HomePage />}
-                        />
-                    </>
-                    {/* )} */}
+                    <Route index path={routes.portal} element={<HomePage />} />
+                    <Route index path={routes.profile} element={<HomePage />} />
                     {availableRoutes.map((r) => (
                         <Route key={r.path} path={r.path} element={r.element} />
                     ))}
-
                     {/* Ticket Route here for now for dev purposes */}
                     <Route
                         index
