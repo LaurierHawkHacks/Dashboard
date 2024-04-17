@@ -8,6 +8,7 @@ import {
     Timestamp,
     doc,
     setDoc,
+    orderBy,
 } from "firebase/firestore";
 import { firestore, functions, storage } from "@/services/firebase";
 import type { UserTicketData } from "@/services/utils/types";
@@ -19,6 +20,7 @@ export const TICKETS_COLLECTION = import.meta.env.VITE_TICKETS_COLLECTION;
 export const USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION;
 export const APPLICATIONS_COLLECTION = import.meta.env
     .VITE_APPLICATIONS_COLLECTION;
+export const RSVP_COLLECTION = import.meta.env.VITE_RSVP_COLLECTION;
 
 async function logEvent(
     type: "error" | "info" | "log",
@@ -192,6 +194,32 @@ export async function verifyRSVP() {
             name: (e as Error).name,
             stack: (e as Error).stack,
         });
-        throw e;
+        return false;
     }
+}
+
+export async function checkRSVP(uid: string) {
+    try {
+        const rsvpRef = collection(firestore, RSVP_COLLECTION);
+        const q = query(
+            rsvpRef,
+            where("uid", "==", uid),
+            orderBy("timestamp", "desc"),
+            limit(1)
+        );
+        const snap = await getDocs(q);
+        if (snap.size < 1) {
+            return false;
+        }
+        return snap.docs[0].data().verified;
+    } catch (e) {
+        console.log(e);
+        logEvent("error", {
+            event: "check_rsvp",
+            message: (e as Error).message,
+            name: (e as Error).name,
+            stack: (e as Error).stack,
+        });
+    }
+    return false;
 }
