@@ -1,34 +1,50 @@
-import { LoadingAnimation } from "@/components";
+import { Button } from "@/components";
+import { useAuth } from "@/providers/auth.provider";
+import { useNotification } from "@/providers/notification.provider";
 import { verifyRSVP } from "@/services/utils";
 import { useEffect, useState } from "react";
-import { flushSync } from "react-dom";
+import { useNavigate } from "react-router-dom";
 
 export const VerifyRSVP = () => {
-    const [isLoading, setIsLoading] = useState(true);
-    const [verified, setVerified] = useState(false);
+    const [isVerifying, setIsVerifying] = useState(false);
+    const { showNotification } = useNotification();
+    const { currentUser, reloadUser } = useAuth();
+    const navigate = useNavigate();
+
+    const verify = async () => {
+        setIsVerifying(true);
+        const confirmed = await verifyRSVP();
+        if (!confirmed) {
+            setIsVerifying(false);
+            showNotification({
+                title: "Error Verifying RSVP",
+                message:
+                    "Please send an email to hello@hawkhacks.ca for us to confirm it for you.",
+            });
+        } else {
+            await reloadUser();
+        }
+    };
 
     useEffect(() => {
-        const verify = async () => {
-            const confirmed = await verifyRSVP();
-            flushSync(() => {
-                setIsLoading(false);
-                setVerified(confirmed);
-            });
-        };
-        verify();
-    }, []);
-
-    if (isLoading) return <LoadingAnimation />;
-
-    if (!verified) return <div>rsvp not verified</div>;
+        // we only want to navigate out of the current page if user rsvp was successfully
+        // verified and has been populated in our database
+        if (currentUser && currentUser.rsvpVerified) navigate("/");
+    }, [currentUser]);
 
     return (
-        <div className="fixed inset-0 bg-radial-gradient-peach overflow-y-auto">
-            <div className="w-full h-full px-8 flex py-32 sm:py-60 md:py-80 items-center flex-col text-center">
-                <h1 className="text-2xl sm:text-4xl whitespace-nowrap font-bold bg-clip-text text-transparent bg-gradient-to-b from-deepMarine to-tbrand-highlight">
-                    Thanks for verifying your RSVP! See you soon!
-                </h1>
-            </div>
+        <div className="pt-12 flex justify-center items-center flex-col gap-6">
+            <p className="text-lg font-bold">
+                Please verify your RSVP to get access to the rest of the
+                dashboard!
+            </p>
+            <Button
+                onClick={verify}
+                disabled={isVerifying}
+                className="font-bold"
+            >
+                Verify
+            </Button>
         </div>
     );
 };
