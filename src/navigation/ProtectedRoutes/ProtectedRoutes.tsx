@@ -49,11 +49,16 @@ export const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
     }
 
     // don't want the page wrapper for this page
-    if (
-        location.pathname === routes.submitted ||
-        location.pathname === routes.verifyRSVP
-    ) {
+    if (location.pathname === routes.submitted) {
         return <Outlet />;
+    }
+
+    // redirect to verify their rsvp if not verified
+    if (
+        location.pathname !== routes.verifyRSVP &&
+        !session.currentUser.rsvpVerified
+    ) {
+        return <Navigate to={routes.verifyRSVP} />;
     }
 
     return (
