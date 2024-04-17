@@ -24,6 +24,7 @@ import type { ApplicationData } from "@/components/forms/types";
 
 export interface UserWithRole extends User {
     hawkAdmin: boolean;
+    phoneVerified: boolean;
 }
 
 export type ProviderName = "github" | "google" | "apple";
@@ -63,6 +64,7 @@ async function validateUserRole(user: User): Promise<UserWithRole> {
     return {
         ...user,
         hawkAdmin: Boolean(claims.admin),
+        phoneVerified: Boolean(claims.phoneVerified),
     };
 }
 
