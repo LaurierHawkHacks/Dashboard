@@ -202,7 +202,6 @@ export async function getResume(gs: string) {
 export async function verifyRSVP() {
     const verifyFn = httpsCallable(functions, "verifyRSVP");
     try {
-        console.log("here");
         const res = await verifyFn();
         const data = res.data as { verified: boolean };
         return data.verified;
