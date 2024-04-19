@@ -47,8 +47,8 @@ devDependencies:
     specifier: ^0.5.7
     version: 0.5.7(tailwindcss@3.3.3)
   '@testing-library/jest-dom':
-    specifier: ^6.1.4
-    version: 6.1.4(vitest@0.34.6)
+    specifier: ^6.4.2
+    version: 6.4.2(vitest@0.34.6)
   '@testing-library/react':
     specifier: ^14.0.0
     version: 14.0.0(react-dom@18.2.0)(react@18.2.0)
@@ -1516,16 +1516,19 @@ packages:
       pretty-format: 27.5.1
     dev: true
 
-  /@testing-library/jest-dom@6.1.4(vitest@0.34.6):
-    resolution: {integrity: sha512-wpoYrCYwSZ5/AxcrjLxJmCU6I5QAJXslEeSiMQqaWmP2Kzpd1LvF/qxmAIW2qposULGWq2gw30GgVNFLSc2Jnw==}
+  /@testing-library/jest-dom@6.4.2(vitest@0.34.6):
+    resolution: {integrity: sha512-CzqH0AFymEMG48CpzXFriYYkOjk6ZGPCLMhW9e9jg3KMCn5OfJecF8GtGW7yGfR/IgCe3SX8BSwjdzI6BBbZLw==}
     engines: {node: '>=14', npm: '>=6', yarn: '>=1'}
     peerDependencies:
       '@jest/globals': '>= 28'
+      '@types/bun': latest
       '@types/jest': '>= 28'
       jest: '>= 28'
       vitest: '>= 0.32'
     peerDependenciesMeta:
       '@jest/globals':
+        optional: true
+      '@types/bun':
         optional: true
       '@types/jest':
         optional: true
@@ -1535,11 +1538,11 @@ packages:
         optional: true
     dependencies:
       '@adobe/css-tools': 4.3.3
-      '@babel/runtime': 7.23.2
+      '@babel/runtime': 7.24.4
       aria-query: 5.3.0
       chalk: 3.0.0
       css.escape: 1.5.1
-      dom-accessibility-api: 0.5.16
+      dom-accessibility-api: 0.6.3
       lodash: 4.17.21
       redent: 3.0.0
       vitest: 0.34.6(jsdom@24.0.0)
@@ -2922,7 +2925,7 @@ packages:
     resolution: {integrity: sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==}
     engines: {node: '>=0.11'}
     dependencies:
-      '@babel/runtime': 7.23.2
+      '@babel/runtime': 7.24.4
     dev: true
 
   /date-fns@3.6.0:
@@ -3132,6 +3135,10 @@ packages:
 
   /dom-accessibility-api@0.5.16:
     resolution: {integrity: sha512-X7BJ2yElsnOJ30pZF4uIIDfBEVgF4XEBxL9Bxhy6dnrm5hkzqmsWHGTiHqRiITNhMyFLyAiWndIJP7Z1NTteDg==}
+    dev: true
+
+  /dom-accessibility-api@0.6.3:
+    resolution: {integrity: sha512-7ZgogeTnjuHbo+ct10G9Ffp0mif17idi0IyWNVA/wcwcm7NPOD/WEHVP3n7n3MhXqxoIYm8d6MuZohYWIZ4T3w==}
     dev: true
 
   /dot-prop@5.3.0:
