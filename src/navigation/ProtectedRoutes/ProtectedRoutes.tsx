@@ -56,6 +56,7 @@ export const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
     // redirect to verify their rsvp if not verified
     if (
         location.pathname !== routes.verifyRSVP &&
+        session.userApp?.applicationStatus === "accepted" &&
         !session.currentUser.rsvpVerified
     ) {
         return <Navigate to={routes.verifyRSVP} />;
