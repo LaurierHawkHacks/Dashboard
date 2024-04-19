@@ -13,6 +13,6 @@ export default defineConfig({
         clearMocks: true,
     },
     define: {
-        APP_VERSION: JSON.stringify("1.2.1"),
+        APP_VERSION: JSON.stringify("1.2.2"),
     },
 });
