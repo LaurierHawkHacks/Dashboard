@@ -619,7 +619,7 @@ export const ApplicationPage = () => {
                     </div>
                 </div>
                 {/* adding some more white space between the last input field and the buttons */}
-                <div className="h-12"></div>
+                <div className="h-12 md:h-28"></div>
                 {/* just a separator line */}
                 <div className="h-0.5 bg-gray-300 my-6"></div>
                 <div>
