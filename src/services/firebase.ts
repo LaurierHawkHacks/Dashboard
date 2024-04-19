@@ -33,7 +33,9 @@ initializeAppCheck(app, {
 // connect to emulators if not in prod
 if (!import.meta.env.PROD && import.meta.env.VITE_APP_ENV === "development") {
     connectFirestoreEmulator(firestore, "127.0.0.1", 8080);
-    connectAuthEmulator(auth, "http://127.0.0.1:9099");
+    connectAuthEmulator(auth, "http://127.0.0.1:9099", {
+        disableWarnings: true,
+    });
     connectStorageEmulator(storage, "127.0.0.1", 9199);
     connectFunctionsEmulator(functions, "127.0.0.1", 5001);
 }
