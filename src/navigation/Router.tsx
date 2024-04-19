@@ -103,7 +103,10 @@ export const Router = () => {
         timeoutRef.current = window.setTimeout(() => setIsLoading(false), 1500);
         if (!currentUser) return;
 
-        if (!currentUser.rsvpVerified) {
+        if (
+            userApp?.applicationStatus === "accepted" &&
+            !currentUser.rsvpVerified
+        ) {
             setAvailableRoutes([
                 {
                     path: routes.verifyRSVP,
