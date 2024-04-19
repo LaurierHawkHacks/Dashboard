@@ -44,6 +44,7 @@ import { TextArea } from "@/components/TextArea/TextArea";
 import { referralSources } from "@/data";
 import { logEvent } from "firebase/analytics";
 import { analytics } from "@/services/firebase";
+import { InfoCallout } from "@/components/InfoCallout/InfoCallout";
 
 const stepValidations = [
     profileFormValidation,
@@ -319,7 +320,10 @@ export const ApplicationPage = () => {
                             activeStep !== 1 ? " hidden sm:hidden" : ""
                         }`}
                     >
-                        <div className="sm:col-span-full">
+                        <div className="sm:col-span-full space-y-4">
+                            {application.participatingAs === "Volunteer" && (
+                                <InfoCallout text="All volunteers will have to be available in the area one week before May 17, 2024 for instructions/training." />
+                            )}
                             <Select
                                 label="Role"
                                 options={["Hacker", "Mentor", "Volunteer"]}
