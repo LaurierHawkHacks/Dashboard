@@ -106,6 +106,11 @@ export const Select: FC<SelectProps> = ({
                         }}
                         onFocus={() => setQuery("")}
                         onClick={() => comboboxButtonRef.current?.click()} // Added to handle click and focus event to open the combobox
+                        onBlur={() => {
+                            setQuery("");
+                            // this resets the filtered list which allows the original list to be rendered when user opens the dropdown again
+                            filterQuery("");
+                        }}
                     />
                     <Combobox.Button
                         className="absolute inset-y-0 right-0 flex items-center content-center hover:backdrop-brightness-95 transition duration-300 ease-in-out"
