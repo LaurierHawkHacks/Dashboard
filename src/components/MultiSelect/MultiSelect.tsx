@@ -190,11 +190,6 @@ export const MultiSelect: FC<MultiSelectProps> = ({
                         onClick={() => comboboxButtonRef.current?.click()} // Added to handle click and focus event to open the combobox
                         aria-describedby={describedby}
                         value={query}
-                        onBlur={() => {
-                            setQuery("");
-                            // this resets the filtered list which allows the original list to be rendered when user opens the dropdown again
-                            filterQuery("");
-                        }}
                     />
                     <Combobox.Button
                         ref={comboboxButtonRef}
