@@ -33,6 +33,14 @@ async function logEvent(
     }
 }
 
+export async function handleError(e: Error, event: string) {
+    await logEvent("error", {
+        event,
+        message: (e as Error).message,
+        name: (e as Error).name,
+    });
+}
+
 /**
  * Creates a new ticket entry in the collection 'tickets'.
  *
