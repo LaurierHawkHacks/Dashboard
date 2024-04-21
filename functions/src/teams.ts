@@ -240,8 +240,20 @@ export const createTeam = functions.https.onCall(async (data, context) => {
             createdAt: Timestamp.now(),
         };
         functions.logger.info("Saving team in firestore - createTeam");
-        await teamsRef.add(doc);
+        const docRef = await teamsRef.add(doc);
         functions.logger.info("Team saved - createTeam");
+        const team: TeamData = {
+            id: docRef.id,
+            teamName: doc.teamName,
+            members: doc.members,
+            isOwner: doc.owner === context.auth.uid,
+        };
+        // return newly created team data
+        return {
+            status: 201,
+            message: "Team created",
+            data: team,
+        };
     } catch (e) {
         functions.logger.error("Code 1207 - Failed to save team in firestore", {
             error: e,
@@ -251,9 +263,4 @@ export const createTeam = functions.https.onCall(async (data, context) => {
             message: "Service down 1207.",
         };
     }
-
-    return {
-        status: 201,
-        message: "Team created!",
-    };
 });
