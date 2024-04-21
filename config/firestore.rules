@@ -36,7 +36,8 @@ service cloud.firestore {
     match /applications/{applicationId} {
         // Only grant read access if you are owner/admin
         allow read: if isAuthenticated() && (isAdmin() || isOwner(resource.data.applicantId));
-        allow write: if isAuthenticated();
+        allow create: if isAuthenticated();
+        allow update: if isAuthenticated() && isAdmin();
     }
 
     // RSVP Verifications
