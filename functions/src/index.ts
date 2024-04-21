@@ -445,3 +445,5 @@ export const verifyRSVP = functions
             verified: true,
         };
     });
+
+export { getTeamByUser, isTeamNameAvailable } from "./teams";
