@@ -38,7 +38,7 @@ This is a collection of all the different error codes in our cloud functions and
 		- Firestore collection name, is the code using the right collection?
 		- Inspect `error` field in the function log. Look for code `1206`.
 		- If nothing helps, is Firebase down?
-- 1207: Error checking if requesting user already belongs to a team.
+- 1207: Error saving team in firestore.
     - Debug:
 		- Firestore rules, are they blocking read/write?
 		- Firestore collection name, is the code using the right collection?
