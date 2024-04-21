@@ -9,6 +9,7 @@ import { useAuth } from "@/providers/hooks";
 import Hamburger from "hamburger-react";
 import { Link } from "react-router-dom";
 import { Logo } from "@/assets";
+import { UserGroupIcon } from "@heroicons/react/24/outline";
 
 const navItems = [
     { path: "/profile", label: "Home", Icon: GoHome },
@@ -16,6 +17,7 @@ const navItems = [
     { path: "/networking", label: "Networking", Icon: TiGroup },
     { path: "/ticket", label: "Ticket", Icon: PiIdentificationBadgeFill },
     { path: "/application", label: "Application", Icon: GoHome },
+    { path: "/my-team", label: "My Team", Icon: UserGroupIcon },
 ];
 
 export const Navbar = () => {
@@ -61,18 +63,34 @@ export const Navbar = () => {
         }
 
         return (
-            <Link to="/application" className="w-full">
-                <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
-                    {isMobile ? (
-                        "Application"
-                    ) : (
-                        <>
-                            <GoHome size={32} />
-                            <span className="hidden md:flex">Application</span>
-                        </>
-                    )}
-                </li>
-            </Link>
+            <>
+                <Link to="/my-team" className="w-full">
+                    <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
+                        {isMobile ? (
+                            "Create Team"
+                        ) : (
+                            <>
+                                <UserGroupIcon className="w-8 h-8" />
+                                <span className="hidden md:flex">My Team</span>
+                            </>
+                        )}
+                    </li>
+                </Link>
+                <Link to="/application" className="w-full">
+                    <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
+                        {isMobile ? (
+                            "Application"
+                        ) : (
+                            <>
+                                <GoHome size={32} />
+                                <span className="hidden md:flex">
+                                    Application
+                                </span>
+                            </>
+                        )}
+                    </li>
+                </Link>
+            </>
         );
     };
 
@@ -83,7 +101,7 @@ export const Navbar = () => {
                     <nav className="flex items-center justify-between p-4 text-white border-b-2 border-b-gray-300">
                         <div className="flex items-center justify-start">
                             <Link
-                                className="flex gap-4 items-center z-50"
+                                className="flex gap-4 items-center z-10"
                                 to="/profile"
                             >
                                 <img
@@ -93,7 +111,7 @@ export const Navbar = () => {
                                 />
                             </Link>
                         </div>
-                        <div className="z-50">
+                        <div className="z-10">
                             <Hamburger
                                 toggled={isMobileMenuOpen}
                                 toggle={setMobileMenuOpen}
@@ -105,7 +123,7 @@ export const Navbar = () => {
                     </nav>
 
                     <div
-                        className={`fixed right-0 top-0 z-40 h-full max-w-full p-10 py-24 bg-gray-200 backdrop-blur-xl transition-all duration-300 ease-in-out ${
+                        className={`fixed right-0 top-0 h-full max-w-full p-10 py-24 bg-gray-200 backdrop-blur-xl transition-all duration-300 ease-in-out ${
                             isMobileMenuOpen
                                 ? "translate-x-0 opacity-100"
                                 : "translate-x-full opacity-0"
@@ -136,7 +154,7 @@ export const Navbar = () => {
             ) : (
                 <nav
                     className={
-                        "h-screen p-4 bg-white transition-all duration-300 gap-12 flex-col w-[60px] font-medium text-cadetBlue hidden md:block md:fixed md:inset-y-0 md:z-50 md:w-72 border-r-2 border-r-gray-300"
+                        "h-screen p-4 bg-white transition-all duration-300 gap-12 flex-col w-[60px] font-medium text-cadetBlue hidden md:block md:fixed md:inset-y-0 md:z-10 md:w-72 border-r-2 border-r-gray-300"
                     }
                 >
                     <div className="flex items-start justify-start p-4">
