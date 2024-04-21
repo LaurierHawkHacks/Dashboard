@@ -105,7 +105,7 @@ export const Navbar = () => {
                     </nav>
 
                     <div
-                        className={`fixed right-0 top-0 z-10 h-full max-w-full p-10 py-24 bg-gray-200 backdrop-blur-xl transition-all duration-300 ease-in-out ${
+                        className={`fixed right-0 top-0 h-full max-w-full p-10 py-24 bg-gray-200 backdrop-blur-xl transition-all duration-300 ease-in-out ${
                             isMobileMenuOpen
                                 ? "translate-x-0 opacity-100"
                                 : "translate-x-full opacity-0"
