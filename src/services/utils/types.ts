@@ -11,9 +11,10 @@ export interface MemberData {
 }
 
 export interface TeamData {
-    teamId: string;
+    id: string;
     members: MemberData[]; // the uid of all the members
     teamName: string;
+    isOwner: boolean;
 }
 
 export interface CloudFunctionResponse<T> {
