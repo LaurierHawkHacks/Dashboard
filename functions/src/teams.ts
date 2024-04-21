@@ -125,6 +125,10 @@ export const isTeamNameAvailable = functions.https.onCall(
     }
 );
 
+/**
+ * Creates a new team using the given team name from data and assigns
+ * the requesting user as a member and owner of the team.
+ */
 export const createTeam = functions.https.onCall(async (data, context) => {
     if (!context.auth) {
         functions.logger.warn("Unauthorized call attempt - createTeam");
