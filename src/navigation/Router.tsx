@@ -13,6 +13,7 @@ import { useAuth } from "@/providers/auth.provider";
 import { LoadingAnimation } from "@/components";
 import { PostSubmissionPage } from "@/pages/miscellaneous/PostSubmission.page";
 import { VerifyRSVP } from "@/pages/miscellaneous/VerifyRSVP.page";
+import { MyTeamPage } from "@/pages/MyTeam.page";
 
 export const routes = {
     admin: "/admin",
@@ -28,6 +29,7 @@ export const routes = {
     application: "/application",
     submitted: "/submitted",
     verifyRSVP: "/verify-rsvp",
+    myTeam: "/my-team",
 };
 
 interface Title {
@@ -63,6 +65,10 @@ export const titles: Record<string, Title> = {
     [routes.verifyEmail]: {
         main: "Verify Your Email",
         sub: "Please check your email inbox.",
+    },
+    [routes.myTeam]: {
+        main: "My Team",
+        sub: "You can create a team or join a team here!",
     },
 };
 
@@ -139,6 +145,7 @@ export const Router = () => {
                             />
                         </>
                     )}
+                    <Route path="/my-team" element={<MyTeamPage />} />
                     {availableRoutes.map((r) => (
                         <Route key={r.path} path={r.path} element={r.element} />
                     ))}
