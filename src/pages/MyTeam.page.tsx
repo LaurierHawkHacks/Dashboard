@@ -1,10 +1,16 @@
 import { Button, LoadingAnimation, TextInput } from "@/components";
+import { InfoCallout } from "@/components/InfoCallout/InfoCallout";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useAuth } from "@/providers/auth.provider";
 import { useNotification } from "@/providers/notification.provider";
-import { getTeamByUser, isTeamNameAvailable } from "@/services/utils/teams";
+import {
+    createTeam,
+    getTeamByUser,
+    isTeamNameAvailable,
+} from "@/services/utils/teams";
 import type { TeamData } from "@/services/utils/types";
-import { FormEventHandler, useEffect, useRef, useState } from "react";
+import { type FirebaseError } from "firebase/app";
+import { type FormEventHandler, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 
 type SearchTeamNameFn = (name: string) => Promise<void>;
@@ -14,6 +20,7 @@ export const MyTeamPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [teamName, setTeamName] = useState("");
     const [isTeamNameTaken, setIsTeamNameTaken] = useState(false);
+    const [invalidTeamName, setInvalidTeamName] = useState(false);
     const { currentUser } = useAuth();
     const { showNotification } = useNotification();
     const debounce = useDebounce<SearchTeamNameFn, string>(
@@ -30,7 +37,30 @@ export const MyTeamPage = () => {
         e.preventDefault();
         const res = await z.string().min(1).safeParseAsync(teamName);
         if (res.success) {
-            // verify if
+            // try to create the new team
+            try {
+                const res = await createTeam(teamName);
+                if (res.status === 201) {
+                    showNotification({
+                        title: "Team Created!",
+                        message:
+                            "Awesome, it looks like your team has been created successfully! Start inviting hackers into your team!",
+                    });
+                    setTeam(res.data);
+                } else {
+                    showNotification({
+                        title: "It looks like something went wrong",
+                        message: res.message,
+                    });
+                }
+            } catch (e) {
+                showNotification({
+                    title: "Oh Uh! Error Creating Team",
+                    message: (e as FirebaseError).message,
+                });
+            }
+        } else {
+            setInvalidTeamName(true);
         }
     };
 
@@ -62,35 +92,46 @@ export const MyTeamPage = () => {
 
     if (!team)
         return (
-            <div className="relative">
-                <div className="text-lg space-y-2">
-                    <p>It looks like you are not in any team yet.</p>
-                    <p>Enter a team name to create one!</p>
-                    <p>You will be able to invite your teammates after!</p>
+            <div>
+                <div className="mx-auto max-w-lg">
+                    <div className="text-lg space-y-2">
+                        <InfoCallout text="It looks like you are not in any team yet. You can create a team now. If you wish to join an existing team, the owner of the team can send you an invitation." />
+                    </div>
+                    <form className="mt-6 space-y-4" onSubmit={submitNewTeam}>
+                        <TextInput
+                            label="Team Name"
+                            id="team-name-input"
+                            description={
+                                invalidTeamName
+                                    ? "The entered team name is not valid."
+                                    : !isTeamNameTaken
+                                    ? "Enter awesome team name."
+                                    : "The team name has been taken. Please choose another one."
+                            }
+                            invalid={invalidTeamName || isTeamNameTaken}
+                            required
+                            value={teamName}
+                            onChange={(e) => {
+                                setInvalidTeamName(false);
+                                setTeamName(e.target.value);
+                                debounce(e.target.value);
+                            }}
+                        />
+                        <Button type="submit">Create Team!</Button>
+                    </form>
                 </div>
-                <form
-                    className="mt-6 space-y-4 max-w-md"
-                    onSubmit={submitNewTeam}
-                >
-                    <TextInput
-                        label="Team Name"
-                        id="team-name-input"
-                        description={
-                            !isTeamNameTaken
-                                ? "The team name can NOT be edited later."
-                                : "The team name has been taken. Please choose another one."
-                        }
-                        invalid={isTeamNameTaken}
-                        required
-                        value={teamName}
-                        onChange={(e) => {
-                            setTeamName(e.target.value);
-                            debounce(e.target.value);
-                        }}
-                    />
-                    <Button type="submit">Create Team!</Button>
-                </form>
             </div>
         );
-    return <div>Create a team</div>;
+
+    return (
+        <div>
+            <div className="mx-auto max-w-lg">
+                {/* team information */}
+                <div className="text-lg">
+                    <p className="font-bold">Team Name:</p>
+                    <p>{team.teamName}</p>
+                </div>
+            </div>
+        </div>
+    );
 };
