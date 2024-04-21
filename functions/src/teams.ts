@@ -1,5 +1,7 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { Timestamp } from "firebase-admin/firestore";
+import { z } from "zod";
 
 interface Member {
     firstName: string;
@@ -12,6 +14,14 @@ interface TeamData {
     teamName: string;
     members: Member[];
     isOwner: boolean;
+}
+
+interface Team {
+    teamName: string;
+    members: Member[];
+    owner: string;
+    memberIDs: string[];
+    createdAt: Timestamp;
 }
 
 const COLLECTION = "teams";
@@ -114,3 +124,136 @@ export const isTeamNameAvailable = functions.https.onCall(
         }
     }
 );
+
+export const createTeam = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        functions.logger.warn("Unauthorized call attempt - createTeam");
+        return {
+            status: 401,
+            message: "unauthorized",
+        };
+    }
+
+    if (!data.teamName) {
+        functions.logger.warn("Invalid payload - createTeam");
+        return {
+            status: 400,
+            message: "Invalid payload",
+        };
+    }
+
+    functions.logger.info("Validating payload...", data);
+    const res = await z.string().min(1).safeParseAsync(data.teamName);
+    if (!res.success) {
+        functions.logger.warn("Invalid payload - createTeam");
+        return {
+            status: 400,
+            message: "Invalid payload",
+        };
+    }
+
+    // defined outside since it will be reused
+    const teamsRef = admin.firestore().collection(COLLECTION);
+
+    // check if there is a team with the same name, reject if there is
+    try {
+        functions.logger.info(
+            "Checking for duplicate team - createTeam",
+            data.teamName
+        );
+        const snap = await teamsRef
+            .where("teamName", "==", data.teamName)
+            .get();
+        if (snap.size > 0) {
+            functions.logger.warn(
+                "Code 1204 - Attempt to create a team with duplicated team name."
+            );
+            return {
+                status: 400,
+                message: "Service Error 1204.",
+            };
+        }
+    } catch (e) {
+        functions.logger.error(
+            "Code 1203 - Failed to check for duplicate team",
+            { error: e }
+        );
+        return {
+            status: 500,
+            message: "Service down 1203.",
+        };
+    }
+
+    // check if user belongs to a team already, reject team creation from someone who belongs to a team
+    try {
+        functions.logger.info(
+            "Checking if requesting user belongs to a team already - createTeam"
+        );
+        const snap = await teamsRef
+            .where("memberIDs", "array-contains", context.auth.uid)
+            .get();
+        if (snap.size > 0) {
+            functions.logger.warn(
+                "Code 1205 - Attempt to create a team when user already belongs to an existing team."
+            );
+            return {
+                status: 400,
+                message: "Service Error 1205.",
+            };
+        }
+    } catch (e) {
+        functions.logger.error(
+            "Code 1206 - Failed to check if user belongs to a team",
+            { error: e }
+        );
+        return {
+            status: 500,
+            message: "Service down 1206.",
+        };
+    }
+
+    // create team
+    try {
+        functions.logger.info(
+            "Getting requesting user application - createTeam"
+        );
+        // we get the application to get their first and last names
+        const app = (
+            await admin
+                .firestore()
+                .collection("applications")
+                .where("applicantId", "==", context.auth.uid)
+                .select("firstName", "lastName")
+                .get()
+        ).docs[0].data();
+        const doc: Team = {
+            teamName: data.teamName,
+            memberIDs: [context.auth.uid],
+            members: [
+                {
+                    firstName: app.firstName,
+                    lastName: app.lastName,
+                    email: context.auth.token.email as string,
+                },
+            ],
+            owner: context.auth.uid,
+            createdAt: Timestamp.now(),
+        };
+        functions.logger.info("Saving team in firestore - createTeam");
+        await teamsRef.add(doc);
+        functions.logger.info("Team saved - createTeam");
+    } catch (e) {
+        functions.logger.error("Code 1207 - Failed to save team in firestore", {
+            error: e,
+        });
+        return {
+            status: 500,
+            message: "Service down 1207.",
+        };
+    }
+
+    return {
+        status: 201,
+        message: "Team created!",
+    };
+});
