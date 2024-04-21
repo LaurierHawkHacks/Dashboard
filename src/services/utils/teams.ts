@@ -23,3 +23,24 @@ export async function getTeamByUser() {
 
     return null;
 }
+
+/**
+ * Searches if a team with given name exists or not
+ */
+export async function isTeamNameAvailable(name: string) {
+    try {
+        const fn = httpsCallable<unknown, CloudFunctionResponse<boolean>>(
+            functions,
+            "isTeamNameAvailable"
+        );
+        const { data } = await fn({ name });
+        if (data.status === 200) {
+            return data.data;
+        }
+    } catch (e) {
+        await handleError(e as Error, "available_team_name_error");
+        throw e;
+    }
+
+    return false;
+}
