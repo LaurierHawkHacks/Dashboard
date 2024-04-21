@@ -39,6 +39,9 @@ This is a collection of all the different error codes in our cloud functions and
 		- Inspect `error` field in the function log. Look for code `1206`.
 		- If nothing helps, is Firebase down?
 - 1207: Error saving team in firestore.
+    - When the code has reached this portion of the code, it involves a 2 steps for storing the team data into firestore.
+        1. gets the requesting user application for first and last name information.
+        2. tries to save the team data in firestore `teams` collection
     - Debug:
 		- Firestore rules, are they blocking read/write?
 		- Firestore collection name, is the code using the right collection?
