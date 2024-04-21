@@ -40,6 +40,15 @@ service cloud.firestore {
         allow update: if isAuthenticated() && isAdmin();
     }
 
+    // Teams Collection Rules
+    match /teams/{teamId} {
+        // this rule is to allow only admin to read,write
+        // because there is no way to filter out members
+        // beloging to the team in rules, so the process
+        // is done in cloud functions.
+        allow read, write: if isAuthenticated() && isAdmin();
+    }
+
     // RSVP Verifications
     match /rsvps/{rsvpId} {
         // Only grant read access if you are owner/admin
