@@ -83,7 +83,7 @@ export const Navbar = () => {
                     <nav className="flex items-center justify-between p-4 text-white border-b-2 border-b-gray-300">
                         <div className="flex items-center justify-start">
                             <Link
-                                className="flex gap-4 items-center z-50"
+                                className="flex gap-4 items-center z-10"
                                 to="/profile"
                             >
                                 <img
@@ -93,7 +93,7 @@ export const Navbar = () => {
                                 />
                             </Link>
                         </div>
-                        <div className="z-50">
+                        <div className="z-10">
                             <Hamburger
                                 toggled={isMobileMenuOpen}
                                 toggle={setMobileMenuOpen}
@@ -105,7 +105,7 @@ export const Navbar = () => {
                     </nav>
 
                     <div
-                        className={`fixed right-0 top-0 z-40 h-full max-w-full p-10 py-24 bg-gray-200 backdrop-blur-xl transition-all duration-300 ease-in-out ${
+                        className={`fixed right-0 top-0 h-full max-w-full p-10 py-24 bg-gray-200 backdrop-blur-xl transition-all duration-300 ease-in-out ${
                             isMobileMenuOpen
                                 ? "translate-x-0 opacity-100"
                                 : "translate-x-full opacity-0"
@@ -136,7 +136,7 @@ export const Navbar = () => {
             ) : (
                 <nav
                     className={
-                        "h-screen p-4 bg-white transition-all duration-300 gap-12 flex-col w-[60px] font-medium text-cadetBlue hidden md:block md:fixed md:inset-y-0 md:z-50 md:w-72 border-r-2 border-r-gray-300"
+                        "h-screen p-4 bg-white transition-all duration-300 gap-12 flex-col w-[60px] font-medium text-cadetBlue hidden md:block md:fixed md:inset-y-0 md:z-10 md:w-72 border-r-2 border-r-gray-300"
                     }
                 >
                     <div className="flex items-start justify-start p-4">
