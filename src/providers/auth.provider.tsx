@@ -99,14 +99,17 @@ function getNotificationByAuthErrCode(code: string): NotificationOptions {
         case "auth/email-already-in-use":
             return {
                 title: "Email In Use",
-                message:
-                    "If you forgot your password, click on 'forgot password' to recover it!",
+                message: "If you forgot your password, click on 'forgot password' to recover it!",
             };
         case "auth/invalid-login-credentials":
             return {
                 title: "Invalid Credentials",
-                message:
-                    "Please make sure you have the correct credentials and try again.",
+                message: "Please make sure you have the correct credentials and try again.",
+            };
+        case "auth/popup-blocked":
+            return {
+                title: "Login Blocked",
+                message: "Popup windows are blocked. Please allow them in your browser settings to continue.",
             };
         default:
             return {
