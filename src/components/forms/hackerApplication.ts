@@ -13,6 +13,16 @@ import {
 } from "@data";
 import type { FormInput } from "./types";
 
+function isValidUrl(url: string) {
+    const pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address (you never know!!)
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+        '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+    return !!pattern.test(url);
+}
+
 export const hackerAppFormInputs: FormInput[] = [
     {
         type: "select",
@@ -150,6 +160,7 @@ export const mentorSpecificForm: FormInput[] = [
             required: false,
             id: "linkedin-url",
             placeholder: "https://linkedin.com/in/john-smith",
+            validate: (value: string) => isValidUrl(value) || value === "",
         },
         name: "linkedinUrl",
     },
@@ -160,6 +171,7 @@ export const mentorSpecificForm: FormInput[] = [
             required: false,
             id: "github-url",
             placeholder: "https://github.com/SherRao",
+            validate: (value: string) => isValidUrl(value) || value === "",
         },
         name: "githubUrl",
     },
@@ -170,6 +182,7 @@ export const mentorSpecificForm: FormInput[] = [
             required: false,
             id: "personal-website-url",
             placeholder: "https://hawkhacks.ca",
+            validate: (value: string) => isValidUrl(value) || value === "",
         },
         name: "personalWebsiteUrl",
     },
