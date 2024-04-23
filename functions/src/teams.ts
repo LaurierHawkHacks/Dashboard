@@ -507,3 +507,48 @@ export const deleteTeam = functions.https.onCall(async (_, context) => {
         message: "Team not found",
     };
 });
+
+export const updateTeamName = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        return {
+            status: 401,
+            message: "unauthorize",
+        };
+    }
+
+    if (!z.string().min(1).safeParse(data.name).success) {
+        return {
+            status: 400,
+            message: "Invalid payload",
+        };
+    }
+
+    try {
+        const snap = await admin
+            .firestore()
+            .collection(COLLECTION)
+            .where("owner", "==", context.auth.uid)
+            .get();
+        const doc = snap.docs[0];
+        if (doc) {
+            // update team name
+            await admin
+                .firestore()
+                .collection(COLLECTION)
+                .doc(doc.id)
+                .update({ teamName: data.name });
+            return {
+                status: 200,
+                message: "team name updated",
+            };
+        } else {
+            return {
+                status: 404,
+                message: "team not found - updateTeamName",
+            };
+        }
+    } catch (e) {
+        functions.logger.error("Failed to update team name", { error: e });
+        throw new functions.https.HttpsError("internal", "Service down 1211");
+    }
+});
