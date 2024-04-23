@@ -4,6 +4,7 @@ import {
     getTextInputStyles,
     getTextInputDescriptionStyles,
 } from "./TextInput.styles";
+import React, { useState } from 'react';
 
 export interface TextInputProps
     extends TextInputStylesProps,
@@ -28,6 +29,11 @@ export interface TextInputProps
      * Description of the input field.
      */
     description?: string;
+
+    /**
+     * Function to validate the input value.
+     */
+    validate?: (value: string) => boolean;
 }
 
 export const TextInput: React.FC<TextInputProps> = ({
@@ -37,9 +43,20 @@ export const TextInput: React.FC<TextInputProps> = ({
     description,
     srLabel = false,
     required,
+    validate,
     ...inputProps
 }) => {
     const describedby = `text-input-description-${inputProps.id}`;
+    const [error, setError] = useState<string | null>(null);
+
+    const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+        if (validate && !validate(event.target.value)) {
+            setError("Invalid URL format.");
+        } else {
+            setError(null);
+        }
+    };
+
     return (
         <div>
             <label
@@ -57,8 +74,12 @@ export const TextInput: React.FC<TextInputProps> = ({
                         describedby,
                     ].join(" ")}
                     className={getTextInputStyles({ invalid, className })}
+                    onBlur={handleBlur}
                 />
             </div>
+            {error && (
+                <p className="text-red-500 text-sm mt-1">{error}</p>
+            )}
             {description && (
                 <p
                     className={getTextInputDescriptionStyles({ invalid })}
