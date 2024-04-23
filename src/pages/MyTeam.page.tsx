@@ -10,6 +10,7 @@ import {
     getTeamByUser,
     inviteMembers,
     isTeamNameAvailable,
+    updateTeamName,
 } from "@/services/utils/teams";
 import type { TeamData } from "@/services/utils/types";
 import {
@@ -20,7 +21,7 @@ import {
     useState,
 } from "react";
 import { z } from "zod";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { CheckIcon, PencilIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { flushSync } from "react-dom";
 
 type SearchTeamNameFn = (name: string) => Promise<void>;
@@ -36,6 +37,7 @@ export const MyTeamPage = () => {
     const [invalidEmailMsg, setInvalidEmailMsg] = useState("");
     const [email, setEmail] = useState("");
     const [disableAllActions, setDisableAllActions] = useState(false);
+    const [isEditingTeamName, setIsEditingTeamName] = useState(false);
     const { currentUser } = useAuth();
     const { showNotification } = useNotification();
     const debounce = useDebounce<SearchTeamNameFn, string>(
@@ -132,13 +134,49 @@ export const MyTeamPage = () => {
                 });
             }
         } catch (e) {
-            console.log((e as Error).message);
             showNotification({
                 title: "Error Deleting Team",
                 message: `Please try again later. (${(e as Error).message})`,
             });
         } finally {
             setDisableAllActions(false);
+        }
+    };
+
+    const handleTeamNameUpdate = async () => {
+        const res = await z.string().min(1).safeParseAsync(teamName);
+        if (res.success) {
+            setDisableAllActions(true);
+            try {
+                const res = await updateTeamName(teamName);
+                if (res.status === 200) {
+                    showNotification({
+                        title: "Team Name Updated!",
+                        message:
+                            "You have until May 16th to change the team name again.",
+                    });
+                    // want to set the new team name in the team object
+                    setTeam((t) => (t ? { ...t, teamName } : null));
+                    setTeamName("");
+                    setIsEditingTeamName(false);
+                    setInvalidTeamName(false);
+                    setIsTeamNameTaken(false);
+                } else {
+                    showNotification({
+                        title: "Oh no... Something went wrong.",
+                        message: res.message,
+                    });
+                }
+            } catch (e) {
+                showNotification({
+                    title: "Error Updating Team Name",
+                    message: `Please try again later. (${
+                        (e as Error).message
+                    })`,
+                });
+            } finally {
+                setDisableAllActions(false);
+            }
         }
     };
 
@@ -152,7 +190,8 @@ export const MyTeamPage = () => {
         if (!currentUser) return;
         (async () => {
             try {
-                setTeam(await getTeamByUser());
+                const data = await getTeamByUser();
+                setTeam(data);
                 if (loadingTimeoutRef.current !== null)
                     window.clearTimeout(loadingTimeoutRef.current);
                 setIsLoading(false);
@@ -207,9 +246,74 @@ export const MyTeamPage = () => {
                 <div className="mx-auto max-w-lg">
                     {/* team information */}
                     <div className="text-lg flex flex-col gap-4">
-                        <div>
-                            <p className="font-bold">Team Name:</p>
-                            <p>{team.teamName}</p>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="font-bold">Team Name:</p>
+                                {!isEditingTeamName && (
+                                    <>
+                                        <p>{team.teamName}</p>
+                                    </>
+                                )}
+                                {team.isOwner && isEditingTeamName && (
+                                    <TextInput
+                                        label="Team Name"
+                                        srLabel
+                                        id="team-name-input"
+                                        description={
+                                            invalidTeamName
+                                                ? "The entered team name is not valid."
+                                                : !isTeamNameTaken
+                                                ? "You have until May 16th 23:59:59 to edit the team name."
+                                                : "The team name has been taken. Please choose anther one."
+                                        }
+                                        value={teamName}
+                                        invalid={
+                                            invalidTeamName || isTeamNameTaken
+                                        }
+                                        onChange={(e) => {
+                                            setTeamName(e.target.value);
+                                            setInvalidTeamName(false);
+                                            debounce(e.target.value);
+                                        }}
+                                        disabled={disableAllActions}
+                                    />
+                                )}
+                            </div>
+                            {team.isOwner && !isEditingTeamName && (
+                                <button
+                                    className="group"
+                                    aria-label="Edit team name"
+                                    disabled={disableAllActions}
+                                    onClick={() => setIsEditingTeamName(true)}
+                                >
+                                    <PencilIcon className="w-6 h-6 text-gray-300 transition group-hover:text-blue-500" />
+                                </button>
+                            )}
+                            {team.isOwner && isEditingTeamName && (
+                                <div>
+                                    <button
+                                        className="group"
+                                        aria-label="Cancel edit team name"
+                                        disabled={disableAllActions}
+                                        onClick={() => {
+                                            setTeamName("");
+                                            setIsEditingTeamName(false);
+                                            setInvalidTeamName(false);
+                                            setIsTeamNameTaken(false);
+                                        }}
+                                    >
+                                        <XMarkIcon className="w-6 h-6 text-gray-300 transition group-hover:text-red-600" />
+                                    </button>
+                                    <button
+                                        className="group ml-2"
+                                        aria-label="Cancel edit team name"
+                                        disabled={disableAllActions}
+                                        onClick={handleTeamNameUpdate}
+                                    >
+                                        <CheckIcon className="w-6 h-6 text-green-500 transition group-hover:text-green-600" />
+                                    </button>
+                                </div>
+                            )}
                         </div>
                         <div>
                             <div className="flex items-center justify-between">
