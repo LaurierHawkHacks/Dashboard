@@ -63,6 +63,16 @@ function getLogEventName(component: string) {
     return "dev_app_interaction"; // not logging the different components becuase it will fill the reports with spam
 }
 
+function isValidUrl(url: string) {
+    const pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address (you never know!!)
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+        '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+    return !!pattern.test(url);
+}
+
 export const ApplicationPage = () => {
     // TODO: save steps in firebase to save progress
     const [steps, setSteps] = useState<Step[]>([
@@ -129,6 +139,16 @@ export const ApplicationPage = () => {
 
     const validate = () => {
         clearErrors();
+
+        // Check URL validation status
+        let urlFields: (keyof ApplicationData)[] = ['linkedinUrl', 'githubUrl', 'personalWebsiteUrl'] as const;
+        for (let field of urlFields) {
+            const fieldValue = application[field as keyof ApplicationData] as string;
+            if (fieldValue && !isValidUrl(fieldValue)) {
+                setErrors((prev) => [...prev, `${field} has an invalid URL.`]);
+                return false;
+            }
+        }
 
         // validate step form
         const validateFn = stepValidations[activeStep];
