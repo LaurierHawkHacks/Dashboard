@@ -446,4 +446,10 @@ export const verifyRSVP = functions
         };
     });
 
-export { getTeamByUser, isTeamNameAvailable, createTeam } from "./teams";
+export {
+    getTeamByUser,
+    isTeamNameAvailable,
+    createTeam,
+    inviteMembers,
+    deleteTeam,
+} from "./teams";

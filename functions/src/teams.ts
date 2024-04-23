@@ -2,6 +2,24 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { Timestamp } from "firebase-admin/firestore";
 import { z } from "zod";
+import { Resend } from "resend";
+
+const config = functions.config();
+
+const RESEND_API_KEY = config.resend.key;
+const NOREPLY_EMAIL = config.email.noreply;
+
+const resend = new Resend(RESEND_API_KEY);
+
+type InvitationStatus = "pending" | "sent" | "opened" | "accepted";
+
+interface Invitation {
+    uid: string;
+    email: string;
+    timestamp: Timestamp;
+    status: InvitationStatus;
+    teamId: string;
+}
 
 interface Member {
     firstName: string;
@@ -25,6 +43,7 @@ interface Team {
 }
 
 const COLLECTION = "teams";
+const PENDING_COLLECTION = "pending-invitations";
 
 /**
  * get team information the requesting user is part of
@@ -267,4 +286,224 @@ export const createTeam = functions.https.onCall(async (data, context) => {
             message: "Service down 1207.",
         };
     }
+});
+
+/**
+ * Send invitation emails
+ */
+export const inviteMembers = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        functions.logger.warn("Unauthorized call to inviteMembers");
+        return {
+            status: 401,
+            message: "Unauthorized",
+        };
+    }
+
+    if (!z.string().email().array().nonempty().safeParse(data.emails).success) {
+        return {
+            status: 400,
+            message: "Invalid payload",
+        };
+    }
+
+    let team: Team | null = null;
+    let teamId = "";
+    try {
+        // try to find if user has a team or not
+        const snap = await admin
+            .firestore()
+            .collection(COLLECTION)
+            .where("owner", "==", context.auth.uid)
+            .get();
+        if (snap.size < 1) {
+            functions.logger.warn(
+                "User requested invitations when not belonging to any team"
+            );
+            return {
+                status: 400,
+                message: "Requesting user does not belong to any team",
+            };
+        }
+        team = snap.docs[0].data() as Team;
+        teamId = snap.docs[0].id;
+    } catch (e) {
+        functions.logger.error(
+            "Code 1208 - Failed to get the team requesting user belongs to.",
+            { error: e }
+        );
+        throw new functions.https.HttpsError("internal", "Service down 1208");
+    }
+
+    if (!team) {
+        return {
+            status: 404,
+            message: "Team not found",
+        };
+    }
+
+    // setup document entries to track users when they accept the invitation
+    // get invited user information
+    functions.logger.info(
+        "Verifying all invitations are for existing and accepted users..."
+    );
+    const invitationsRef = admin.firestore().collection(PENDING_COLLECTION);
+    await Promise.allSettled(
+        data.emails.map(async (email: string) => {
+            try {
+                const userRecord = await admin.auth().getUserByEmail(email);
+                // we gotta make sure the user has been accepted to the hackathon
+                const appSnap = await admin
+                    .firestore()
+                    .collection("applications")
+                    .where("applicantId", "==", userRecord.uid)
+                    .where("accepted", "==", true)
+                    .get();
+                if (appSnap.size < 1) {
+                    functions.logger.info(
+                        "User not accepted was invited to join a team. Skipping..."
+                    );
+                    return;
+                }
+
+                // add to invitation list
+                const invitation: Invitation = {
+                    uid: userRecord.uid,
+                    email: email,
+                    timestamp: Timestamp.now(),
+                    status: "pending",
+                    teamId: teamId,
+                };
+
+                let invitationId = "";
+                try {
+                    functions.logger.info(
+                        "Storing invitation in firestore...",
+                        email
+                    );
+                    const docRef = await invitationsRef.add(invitation);
+                    invitationId = docRef.id;
+                    functions.logger.info("Invitation stored.", email);
+                } catch (e) {
+                    functions.logger.error(
+                        "Failed to store invitation in firestore.",
+                        email,
+                        { error: e }
+                    );
+                }
+
+                if (invitationId) {
+                    try {
+                        functions.logger.info(
+                            "Sending invitation email",
+                            email
+                        );
+
+                        // send invitation
+                        const res = await resend.emails.send({
+                            from: NOREPLY_EMAIL as string,
+                            to: email,
+                            subject: `[HawkHacks] Team invitation to join ${team?.teamName}`,
+                            html: `<a href="https://us-central1-hawkhacks-dashboard.cloudfunctions.net/joinTeam?invitation=${invitationId}">Join ${team?.teamName}</a>`,
+                        });
+
+                        if (res.error) {
+                            functions.logger.error(
+                                "Failed to send invitation email to",
+                                email,
+                                { error: res.error }
+                            );
+                        } else {
+                            functions.logger.info(
+                                "Invitation email sent to",
+                                email
+                            );
+                        }
+                    } catch (e) {
+                        functions.logger.error(
+                            "Failed to send invitation email",
+                            email,
+                            { error: e }
+                        );
+                    }
+                }
+            } catch (e) {
+                functions.logger.error(
+                    "Attempt to send invitation to a non registered user.",
+                    email,
+                    { error: e }
+                );
+            }
+        })
+    );
+
+    return {
+        status: 200,
+        message: "Processed",
+    };
+});
+
+export const deleteTeam = functions.https.onCall(async (_, context) => {
+    if (!context.auth) {
+        return {
+            status: 401,
+            message: "",
+        };
+    }
+
+    // first, get the team the requesting user owns
+    let teamDocRef:
+        | admin.firestore.QueryDocumentSnapshot<
+              admin.firestore.DocumentData,
+              admin.firestore.DocumentData
+          >
+        | undefined = undefined;
+    try {
+        const snap = await admin
+            .firestore()
+            .collection(COLLECTION)
+            .where("owner", "==", context.auth.uid)
+            .get();
+        teamDocRef = snap.docs[0];
+    } catch (e) {
+        functions.logger.error(
+            "Failed to get team for requesting user - deleteTeam",
+            { error: e }
+        );
+        throw new functions.https.HttpsError("internal", "Service down 1209");
+    }
+
+    if (teamDocRef) {
+        // try to delete team
+        try {
+            functions.logger.info("Deleting team", { team: teamDocRef.data() });
+            const res = await admin
+                .firestore()
+                .collection(COLLECTION)
+                .doc(teamDocRef.id)
+                .delete();
+            functions.logger.info("Team deleted", {
+                team: teamDocRef.data(),
+                deleteTime: res.writeTime,
+            });
+
+            return {
+                status: 200,
+                message: "Team deleted.",
+            };
+        } catch (e) {
+            functions.logger.error("Failed to delete team", {
+                team: teamDocRef.data(),
+            });
+            throw new functions.https.HttpsError(
+                "internal",
+                "Service down 1210"
+            );
+        }
+    }
+
+    return {
+        status: 404,
+        message: "Team not found",
+    };
 });
