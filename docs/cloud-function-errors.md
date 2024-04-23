@@ -47,3 +47,6 @@ This is a collection of all the different error codes in our cloud functions and
 		- Firestore collection name, is the code using the right collection?
 		- Inspect `error` field in the function log. Look for code `1207`.
 		- If nothing helps, is Firebase down?
+- 1208: Error while trying to fetch the team requesting user belongs for invitations
+- 1209: Failed to get team for requesting user - deleteTeam
+- 1210: Failed to delete team
