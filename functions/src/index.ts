@@ -452,4 +452,5 @@ export {
     createTeam,
     inviteMembers,
     deleteTeam,
+    updateTeamName,
 } from "./teams";
