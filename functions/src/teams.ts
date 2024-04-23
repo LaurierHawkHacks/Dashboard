@@ -246,6 +246,7 @@ export const createTeam = functions.https.onCall(async (data, context) => {
                 .firestore()
                 .collection("applications")
                 .where("applicantId", "==", context.auth.uid)
+                .where("accepted", "==", true)
                 .select("firstName", "lastName")
                 .get()
         ).docs[0].data();
