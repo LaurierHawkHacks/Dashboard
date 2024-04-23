@@ -12,7 +12,6 @@ import {
     isTeamNameAvailable,
 } from "@/services/utils/teams";
 import type { TeamData } from "@/services/utils/types";
-import { type FirebaseError } from "firebase/app";
 import {
     type FormEventHandler,
     Fragment,
@@ -72,7 +71,9 @@ export const MyTeamPage = () => {
             } catch (e) {
                 showNotification({
                     title: "Oh Uh! Error Creating Team",
-                    message: (e as FirebaseError).message,
+                    message: `Please try again later. (${
+                        (e as Error).message
+                    })`,
                 });
             }
         } else {
@@ -99,10 +100,10 @@ export const MyTeamPage = () => {
                 setOpenInviteDialog(false);
                 setInviteEmails([]);
             }
-        } catch {
+        } catch (e) {
             showNotification({
                 title: "Error Sending Invitations",
-                message: "Please try again later.",
+                message: `Please try again later. (${(e as Error).message})`,
             });
         } finally {
             setDisableAllActions(false);
