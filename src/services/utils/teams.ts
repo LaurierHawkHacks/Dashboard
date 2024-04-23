@@ -82,6 +82,22 @@ export async function inviteMembers(emails: string[]) {
     }
 }
 
+/**
+ * Calls the cloud function 'updateTeamName' that updates the given team
+ */
+export async function updateTeamName(name: string) {
+    try {
+        const fn = httpsCallable<unknown, CloudFunctionResponse<void>>(
+            functions,
+            "updateTeamName"
+        );
+        const { data } = await fn({ name });
+        return data;
+    } catch (e) {
+        await handleError(e as Error, "update_team_name_error");
+        throw e;
+    }
+}
 
 /**
  * Calls the cloud function 'deleteTeam' that deletes the given team the requesting user owns
