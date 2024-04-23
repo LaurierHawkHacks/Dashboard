@@ -61,3 +61,41 @@ export async function createTeam(teamName: string) {
         throw e;
     }
 }
+
+// The following functions are team owners only. Regular members calling this will result in failure/rejection
+
+/**
+ * Calls the cloud function that sends emails to the given members.
+ * @param members the email addresses of those members
+ */
+export async function inviteMembers(emails: string[]) {
+    try {
+        const fn = httpsCallable<unknown, CloudFunctionResponse<void>>(
+            functions,
+            "inviteMembers"
+        );
+        const { data } = await fn({ emails });
+        return data;
+    } catch (e) {
+        await handleError(e as Error, "invite_members_error");
+        throw e;
+    }
+}
+
+
+/**
+ * Calls the cloud function 'deleteTeam' that deletes the given team the requesting user owns
+ */
+export async function deleteTeam() {
+    try {
+        const fn = httpsCallable<unknown, CloudFunctionResponse<void>>(
+            functions,
+            "deleteTeam"
+        );
+        const { data } = await fn();
+        return data;
+    } catch (e) {
+        await handleError(e as Error, "delete_team_error");
+        throw e;
+    }
+}
