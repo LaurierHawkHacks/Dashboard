@@ -249,7 +249,7 @@ export const ApplicationPage = () => {
             showNotification({
                 title: "Application Submitted!",
                 message:
-                    "Thank you for applying! You'll received an update from us in your email shortly!",
+                    "Thank you for applying! You'll hear from us via email within one week after applications close on May 3rd.",
             });
             await refreshUserApp();
         } catch (e) {
