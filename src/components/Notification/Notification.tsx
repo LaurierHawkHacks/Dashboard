@@ -27,7 +27,7 @@ export const Notification = forwardRef<HTMLDivElement, NotificationProps>(
                 className="pointer-events-none flex items-end sm:items-start"
             >
                 <div className="flex w-full flex-col items-center space-y-4 sm:items-end">
-                    <div className="pointer-events-auto max-h-32 w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+                    <div className="pointer-events-auto w-full overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
                         <div className="p-4">
                             <div className="flex items-start">
                                 <div className="flex-shrink-0">
