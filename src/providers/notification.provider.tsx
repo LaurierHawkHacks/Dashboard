@@ -80,7 +80,7 @@ export const NotificationProvider = ({
         <NotificationProviderContext.Provider value={{ showNotification }}>
             {children}
             {createPortal(
-                <div className="z-50 fixed bottom-4 md:bottom-auto md:top-4 md:right-4 w-full px-4 md:w-80">
+                <div className="z-50 fixed bottom-4 md:bottom-auto md:top-4 md:right-4 w-full px-4 md:w-96">
                     <div className="space-y-4">{notifications}</div>
                 </div>,
                 document.getElementById("notifications")!
