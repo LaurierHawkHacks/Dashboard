@@ -418,6 +418,7 @@ export const inviteMembers = functions.https.onCall(async (data, context) => {
                             from: NOREPLY_EMAIL as string,
                             to: email,
                             subject: `[HawkHacks] Team invitation to join ${team?.teamName}`,
+                            // TODO: improve email body
                             html: `<a href="https://us-central1-hawkhacks-dashboard.cloudfunctions.net/joinTeam?invitation=${invitationId}">Join ${team?.teamName}</a>`,
                         });
 
@@ -617,6 +618,26 @@ export const removeMembers = functions.https.onCall(async (data, context) => {
             (m) => !data.emails.includes(m.email)
         );
         functions.logger.info("Members filtered", { members: docData.members });
+
+        if (docData.members.length < 1) {
+            functions.logger.info(
+                "Team has no members. Deleting team",
+                docData.teamName
+            );
+
+            try {
+                const docRef = admin
+                    .firestore()
+                    .collection(COLLECTION)
+                    .doc(snap.docs[0].id);
+                await docRef.delete();
+            } catch (e) {
+                functions.logger.error(
+                    "Failed to delete team with no members",
+                    { error: e, docId: snap.docs[0] }
+                );
+            }
+        }
 
         return {
             status: 200,
