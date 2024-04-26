@@ -21,19 +21,27 @@ interface Invitation {
     teamId: string;
 }
 
-interface Member {
+// return schema to client
+interface MemberData {
     firstName: string;
     lastName: string;
     email: string;
 }
 
+// return schema to client
 interface TeamData {
     id: string;
     teamName: string;
-    members: Member[];
+    members: MemberData[];
     isOwner: boolean;
 }
 
+// private schema for internal
+interface Member extends MemberData {
+    id: string; // store the id for easy access for us when someone edits a team; but not exposed to client
+}
+
+// private schema for internal use
 interface Team {
     teamName: string;
     members: Member[];
@@ -262,6 +270,7 @@ export const createTeam = functions.https.onCall(async (data, context) => {
                     firstName: app.firstName,
                     lastName: app.lastName,
                     email: context.auth.token.email as string,
+                    id: context.auth.uid,
                 },
             ],
             owner: context.auth.uid,
@@ -555,5 +564,70 @@ export const updateTeamName = functions.https.onCall(async (data, context) => {
     } catch (e) {
         functions.logger.error("Failed to update team name", { error: e });
         throw new functions.https.HttpsError("internal", "Service down 1211");
+    }
+});
+
+export const removeMembers = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        functions.logger.warn("Unauthorized call to 'removeMembers'");
+        return {
+            status: 401,
+            message: "unauthorize",
+        };
+    }
+
+    if (!z.string().min(1).email().array().safeParse(data.emails).success) {
+        return {
+            status: 400,
+            message: "Invalid payload",
+        };
+    }
+
+    try {
+        // we need to get the team that the requesting user owns
+        // we'll use the information from the team document
+        // to match the given emails of the members that are going
+        // to be removed from the team
+        const snap = await admin
+            .firestore()
+            .collection(COLLECTION)
+            .where("owner", "==", context.auth.uid)
+            .get();
+        const docData = snap.docs[0]?.data() as Team;
+
+        if (!docData) {
+            functions.logger.warn(
+                "Requesting user trying to remove team members when not owning any team.",
+                {
+                    uid: context.auth.uid,
+                    emails: data.emails,
+                }
+            );
+            return {
+                status: 400,
+                message: "Requesting user does not own any team.",
+            };
+        }
+
+        // remove any team member with matching email
+        functions.logger.info(
+            "Removing members by filtering the members list..."
+        );
+        docData.members = docData.members.filter(
+            (m) => !data.emails.includes(m.email)
+        );
+        functions.logger.info("Members filtered", { members: docData.members });
+
+        return {
+            status: 200,
+            message: "Successfully removed members.",
+        };
+    } catch (e) {
+        functions.logger.error("Failed to remove team members.", {
+            error: e,
+            owner: context.auth.uid,
+            emails: data.emails,
+        });
+        throw new functions.https.HttpsError("internal", "Service down 1212");
     }
 });
