@@ -76,12 +76,16 @@ export const getTeamByUser = functions.https.onCall(async (_, context) => {
         }
 
         // only returning the nessesary information.
-        const { teamName, members, owner } = snap.docs[0].data();
+        const { teamName, members, owner } = snap.docs[0].data() as Team;
         const id = snap.docs[0].id;
         const teamData: TeamData = {
             id,
             teamName,
-            members,
+            members: members.map((m) => ({
+                firstName: m.firstName,
+                lastName: m.lastName,
+                email: m.email,
+            })),
             isOwner: owner === context.auth.uid,
         };
 
