@@ -100,6 +100,24 @@ export async function updateTeamName(name: string) {
 }
 
 /**
+ * Calls the cloud function 'removeMembers' that removes memebrs from a given team
+ * @param emails - the emails of the members to remove from the team.
+ */
+export async function removeMembers(emails: string[]) {
+    try {
+        const fn = httpsCallable<unknown, CloudFunctionResponse<void>>(
+            functions,
+            "removeMembers"
+        );
+        const { data } = await fn({ emails });
+        return data;
+    } catch (e) {
+        await handleError(e as Error, "remove_members_error");
+        throw e;
+    }
+}
+
+/**
  * Calls the cloud function 'deleteTeam' that deletes the given team the requesting user owns
  */
 export async function deleteTeam() {
