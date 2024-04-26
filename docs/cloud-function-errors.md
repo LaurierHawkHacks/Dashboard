@@ -50,3 +50,5 @@ This is a collection of all the different error codes in our cloud functions and
 - 1208: Error while trying to fetch the team requesting user belongs for invitations
 - 1209: Failed to get team for requesting user - deleteTeam
 - 1210: Failed to delete team
+- 1211: Failed to update team name
+- 1212: Failed to remove team members
