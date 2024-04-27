@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 // import { Resend } from "resend";
 import { HttpStatus, response } from "./utils";
 
-// type InvitationStatus = "pending" | "sent" | "opened" | "accepted";
+type InvitationStatus = "pending" | "rejected" | "accepted";
 
 // interface Invitation {
 //     invitedUserId: string;
@@ -20,6 +20,7 @@ interface MemberData {
     firstName: string;
     lastName: string;
     email: string;
+    status: InvitationStatus;
 }
 
 // return schema to client
@@ -37,6 +38,7 @@ interface Member {
     lastName: string;
     email: string;
     teamId: string;
+    status: InvitationStatus; // to display the correct icon in the FE
 }
 
 // private schema for internal use
@@ -266,6 +268,7 @@ export const createTeam = functions.https.onCall(async (data, context) => {
                 lastName,
                 email,
                 teamId,
+                status: "accepted",
             });
         const memberId = memberRef.id;
         functions.logger.info("Successfully added a member to team.", {
@@ -284,6 +287,7 @@ export const createTeam = functions.https.onCall(async (data, context) => {
                     firstName,
                     lastName,
                     email,
+                    status: "accepted",
                 },
             ],
         };
@@ -335,6 +339,7 @@ export const getTeamByUser = functions.https.onCall(async (_, context) => {
                     email: m.email,
                     firstName: m.firstName,
                     lastName: m.lastName,
+                    status: m.status,
                 };
                 return member;
             }),
