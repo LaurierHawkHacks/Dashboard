@@ -66,6 +66,10 @@ export const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
         return <Navigate to={routes.verifyRSVP} />;
     }
 
+    if (location.pathname.startsWith("/join-team")) {
+        return <Outlet />;
+    }
+
     return (
         <PageWrapper>
             <Outlet />
