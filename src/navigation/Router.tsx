@@ -68,7 +68,7 @@ export const titles: Record<string, Title> = {
     },
     [routes.myTeam]: {
         main: "My Team",
-        sub: "You can create a team or join a team here!",
+        sub: "Create your dream team! Add, manage, and view your teammates.",
     },
 };
 
