@@ -13,15 +13,11 @@ export async function getTeamByUser() {
             "getTeamByUser"
         );
         const { data } = await fn();
-        if (data.status === 200) {
-            return data.data;
-        }
+        return data;
     } catch (e) {
         await handleError(e as Error, "get_team_error");
         throw e;
     }
-
-    return null;
 }
 
 /**
@@ -48,16 +44,16 @@ export async function isTeamNameAvailable(name: string) {
 /**
  * Calls the cloud function to create new team
  */
-export async function createTeam(teamName: string) {
+export async function createTeam(name: string) {
     try {
         const fn = httpsCallable<unknown, CloudFunctionResponse<TeamData>>(
             functions,
             "createTeam"
         );
-        const { data } = await fn({ teamName });
+        const { data } = await fn({ name });
         return data;
     } catch (e) {
-        await handleError(e as Error, "create_team_erro");
+        await handleError(e as Error, "create_team_error");
         throw e;
     }
 }
@@ -130,6 +126,25 @@ export async function deleteTeam() {
         return data;
     } catch (e) {
         await handleError(e as Error, "delete_team_error");
+        throw e;
+    }
+}
+
+/**
+ * Calls the cloud function 'validateTeamInvitation' that validates the invitation code.
+ * If it is a valid code and meant to be for the authenticated user, then it will add
+ * the user to the team.
+ */
+export async function validateTeamInvitation(code: string) {
+    try {
+        const fn = httpsCallable<unknown, CloudFunctionResponse<void>>(
+            functions,
+            "validateTeamInvitation"
+        );
+        const { data } = await fn({ code });
+        return data;
+    } catch (e) {
+        await handleError(e as Error, "validate_team_invitation_error");
         throw e;
     }
 }
