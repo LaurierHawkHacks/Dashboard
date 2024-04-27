@@ -1,5 +1,4 @@
 import { Button, LoadingAnimation, TextInput } from "@/components";
-import { Dialog, Transition } from "@headlessui/react";
 import { InfoCallout } from "@/components/InfoCallout/InfoCallout";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useAuth } from "@/providers/auth.provider";
@@ -8,7 +7,7 @@ import {
     createTeam,
     deleteTeam,
     getTeamByUser,
-    inviteMembers,
+    inviteMember,
     isTeamNameAvailable,
     updateTeamName,
 } from "@/services/utils/teams";
@@ -21,8 +20,14 @@ import {
     useState,
 } from "react";
 import { z } from "zod";
-import { CheckIcon, PencilIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { flushSync } from "react-dom";
+import {
+    CheckCircleIcon,
+    ClockIcon,
+    XCircleIcon,
+} from "@heroicons/react/24/solid";
+import { Modal } from "@/components/Modal";
 
 type SearchTeamNameFn = (name: string) => Promise<void>;
 
@@ -33,7 +38,6 @@ export const MyTeamPage = () => {
     const [isTeamNameTaken, setIsTeamNameTaken] = useState(false);
     const [invalidTeamName, setInvalidTeamName] = useState(false);
     const [openInviteDialog, setOpenInviteDialog] = useState(false);
-    const [inviteEmails, setInviteEmails] = useState<string[]>([]);
     const [invalidEmailMsg, setInvalidEmailMsg] = useState("");
     const [email, setEmail] = useState("");
     const [disableAllActions, setDisableAllActions] = useState(false);
@@ -87,20 +91,20 @@ export const MyTeamPage = () => {
         // do not close dialog if disableAllActions invitations
         if (disableAllActions) return;
         setOpenInviteDialog(false);
-        setInviteEmails([]);
+        setEmail("");
     };
 
-    const sendInvitations = async () => {
+    const sendInvitation = async () => {
         setDisableAllActions(true);
         try {
-            const res = await inviteMembers(inviteEmails);
+            const res = await inviteMember(email);
             if (res.status === 200) {
                 showNotification({
                     title: "Invitations Sent!",
                     message: "",
                 });
                 setOpenInviteDialog(false);
-                setInviteEmails([]);
+                setEmail("");
             }
         } catch (e) {
             showNotification({
@@ -125,7 +129,7 @@ export const MyTeamPage = () => {
                     // reset all states
                     setTeam(null);
                     setTeamName("");
-                    setInviteEmails([]);
+                    setEmail("");
                 });
             } else {
                 showNotification({
@@ -244,244 +248,111 @@ export const MyTeamPage = () => {
     return (
         <>
             <div>
-                <div className="mx-auto max-w-lg">
-                    {/* team information */}
-                    <div className="text-lg flex flex-col gap-4">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="font-bold">Team Name:</p>
-                                {!isEditingTeamName && (
-                                    <>
-                                        <p>{team.teamName}</p>
-                                    </>
-                                )}
-                                {team.isOwner && isEditingTeamName && (
-                                    <TextInput
-                                        label="Team Name"
-                                        srLabel
-                                        id="team-name-input"
-                                        description={
-                                            invalidTeamName
-                                                ? "The entered team name is not valid."
-                                                : !isTeamNameTaken
-                                                ? "You have until May 16th 23:59:59 to edit the team name."
-                                                : "The team name has been taken. Please choose anther one."
-                                        }
-                                        value={teamName}
-                                        invalid={
-                                            invalidTeamName || isTeamNameTaken
-                                        }
-                                        onChange={(e) => {
-                                            setTeamName(e.target.value);
-                                            setInvalidTeamName(false);
-                                            debounce(e.target.value);
-                                        }}
-                                        disabled={disableAllActions}
-                                    />
-                                )}
-                            </div>
-                            {team.isOwner && !isEditingTeamName && (
-                                <button
-                                    className="group"
-                                    aria-label="Edit team name"
-                                    disabled={disableAllActions}
-                                    onClick={() => setIsEditingTeamName(true)}
-                                >
-                                    <PencilIcon className="w-6 h-6 text-gray-300 transition group-hover:text-blue-500" />
-                                </button>
-                            )}
-                            {team.isOwner && isEditingTeamName && (
-                                <div>
-                                    <button
-                                        className="group"
-                                        aria-label="Cancel edit team name"
-                                        disabled={disableAllActions}
-                                        onClick={() => {
-                                            setTeamName("");
-                                            setIsEditingTeamName(false);
-                                            setInvalidTeamName(false);
-                                            setIsTeamNameTaken(false);
-                                        }}
-                                    >
-                                        <XMarkIcon className="w-6 h-6 text-gray-300 transition group-hover:text-red-600" />
-                                    </button>
-                                    <button
-                                        className="group ml-2"
-                                        aria-label="Cancel edit team name"
-                                        disabled={disableAllActions}
-                                        onClick={handleTeamNameUpdate}
-                                    >
-                                        <CheckIcon className="w-6 h-6 text-green-500 transition group-hover:text-green-600" />
-                                    </button>
-                                </div>
-                            )}
+                <div className="flex gap-4">
+                    <div className="flex-1 w-full lg:flex-auto lg:max-w-sm p-4 rounded shadow-basic">
+                        <div className="relative">
+                            <h3 className="font-bold">Add Teammates</h3>
+                            <button
+                                aria-label="add teammates"
+                                className="absolute group right-2 top-1/2 -translate-y-1/2"
+                                onClick={() => setOpenInviteDialog(true)}
+                            >
+                                <PlusCircleIcon className="w-8 h-8 text-charcoalBlack/70 transition group-hover:text-charcoalBlack" />
+                            </button>
                         </div>
-                        <div>
-                            <div className="flex items-center justify-between">
-                                <p className="font-bold">Team Members:</p>
-                                <Button
-                                    className="p-2"
-                                    onClick={() => {
-                                        setOpenInviteDialog(true);
-                                    }}
-                                >
-                                    Invite
-                                </Button>
-                            </div>
-                            <ul>
-                                {team.members.map((member) => (
+                        {/* separator */}
+                        <div className="h-[1px] bg-gray-200 my-4"></div>
+                        <ul>
+                            {team &&
+                                team.members.length > 0 &&
+                                team.members.map((m) => (
                                     <li
-                                        key={
-                                            member.email +
-                                            member.firstName +
-                                            member.lastName
-                                        }
-                                        onClick={() => {
-                                            console.log(member);
-                                        }}
+                                        key={m.email}
+                                        className="p-4 shadow-basic rounded relative"
                                     >
-                                        <p>{member.firstName}</p>
-                                        <p>{member.lastName}</p>
-                                        <p>{member.email}</p>
+                                        <div>
+                                            <p className="font-medium">
+                                                <span>{m.firstName}</span>{" "}
+                                                <span>{m.lastName}</span>
+                                            </p>
+                                            <p className="text-gray-500">
+                                                {m.email}
+                                            </p>
+                                        </div>
+                                        <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                                            {m.status === "accepted" && (
+                                                <CheckCircleIcon className="w-8 h-8 text-tbrand" />
+                                            )}
+                                            {m.status === "pending" && (
+                                                <ClockIcon className="w-8 h-8 text-yellow-500" />
+                                            )}
+                                            {m.status === "rejected" && (
+                                                <XCircleIcon className="w-8 h-8 text-red-500" />
+                                            )}
+                                        </div>
                                     </li>
                                 ))}
-                            </ul>
-                        </div>
+                        </ul>
                     </div>
-
-                    {/* render delete team btn */}
-                    {team.isOwner && (
-                        <Button intent="danger" onClick={handleDeleteTeam}>
-                            Delete Team
-                        </Button>
-                    )}
                 </div>
             </div>
-            <Transition appear show={openInviteDialog} as={Fragment}>
-                <Dialog
-                    as="div"
-                    className="relative z-10"
-                    onClose={closeInviteDialog}
-                >
-                    <Transition.Child
-                        as={Fragment}
-                        enter="ease-out duration-300"
-                        enterFrom="opacity-0"
-                        enterTo="opacity-100"
-                        leave="ease-in duration-200"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
+            <Modal
+                open={openInviteDialog}
+                onClose={closeInviteDialog}
+                title="Invite a teammate"
+                subTitle="Send a team invitation via email!"
+            >
+                <TextInput
+                    required
+                    label="Email"
+                    description={invalidEmailMsg}
+                    id="invite-email"
+                    type="email"
+                    srLabel
+                    placeholder="name@email.com"
+                    invalid={!!invalidEmailMsg}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            const res = z
+                                .string()
+                                .email()
+                                .safeParse(
+                                    (e.target as HTMLInputElement).value
+                                );
+                            if (res.success) {
+                                sendInvitation();
+                            } else {
+                                setInvalidEmailMsg(
+                                    "The email entered is not a valid email."
+                                );
+                            }
+                        } else {
+                            if (invalidEmailMsg) setInvalidEmailMsg("");
+                        }
+                    }}
+                />
+                <div className="h-12"></div>
+                <div className="flex items-center justify-center">
+                    <Button
+                        disabled={disableAllActions}
+                        type="button"
+                        onClick={() => {
+                            const res = z.string().email().safeParse(email);
+                            if (res.success) {
+                                sendInvitation();
+                            } else {
+                                setInvalidEmailMsg(
+                                    "The email entered is not a valid email."
+                                );
+                            }
+                        }}
                     >
-                        <div className="fixed inset-0 bg-black/25" />
-                    </Transition.Child>
-
-                    <div className="fixed inset-0 overflow-y-auto">
-                        <div className="flex min-h-full items-center justify-center p-4 text-center">
-                            <Transition.Child
-                                as={Fragment}
-                                enter="ease-out duration-300"
-                                enterFrom="opacity-0 scale-95"
-                                enterTo="opacity-100 scale-100"
-                                leave="ease-in duration-200"
-                                leaveFrom="opacity-100 scale-100"
-                                leaveTo="opacity-0 scale-95"
-                            >
-                                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded bg-white p-6 text-left align-middle shadow-xl transition-all">
-                                    <Dialog.Title
-                                        as="h3"
-                                        className="text-lg font-medium leading-6 text-gray-900"
-                                    >
-                                        <div className="flex items-center justify-between">
-                                            <span>Invite Hackers</span>
-                                            <button onClick={closeInviteDialog}>
-                                                <XMarkIcon className="w-6 h-6" />
-                                            </button>
-                                        </div>
-                                    </Dialog.Title>
-                                    <div className="mt-4">
-                                        <TextInput
-                                            label="Email"
-                                            description={
-                                                invalidEmailMsg ||
-                                                "Enter the email of the person you want to invite into your team."
-                                            }
-                                            id="invite-email"
-                                            type="email"
-                                            invalid={!!invalidEmailMsg}
-                                            value={email}
-                                            onChange={(e) =>
-                                                setEmail(e.target.value)
-                                            }
-                                            onKeyDown={(e) => {
-                                                if (e.key === "Enter") {
-                                                    const res = z
-                                                        .string()
-                                                        .email()
-                                                        .safeParse(
-                                                            (
-                                                                e.target as HTMLInputElement
-                                                            ).value
-                                                        );
-                                                    if (res.success) {
-                                                        if (
-                                                            !inviteEmails.includes(
-                                                                res.data
-                                                            )
-                                                        ) {
-                                                            setInviteEmails([
-                                                                ...inviteEmails,
-                                                                res.data,
-                                                            ]);
-                                                            setEmail("");
-                                                        } else {
-                                                            setInvalidEmailMsg(
-                                                                "This email has already been added to the list."
-                                                            );
-                                                        }
-                                                    } else {
-                                                        setInvalidEmailMsg(
-                                                            "The email entered is not a valid email."
-                                                        );
-                                                    }
-                                                } else {
-                                                    if (invalidEmailMsg)
-                                                        setInvalidEmailMsg("");
-                                                }
-                                            }}
-                                        />
-                                        <ul>
-                                            {inviteEmails.map((email) => (
-                                                <li
-                                                    key={email}
-                                                    className="relative py-2"
-                                                >
-                                                    <span className="font-medium">
-                                                        {email}
-                                                    </span>
-                                                    <button className="group p-1 absolute right-0 top-1/2 -translate-y-1/2 rounded transition hover:bg-black/5">
-                                                        <XMarkIcon className="w-6 h-6 transition text-charcoalBlack/70 group-hover:text-charcoalBlack" />
-                                                    </button>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                        <div className="h-8"></div>
-                                        <Button
-                                            disabled={
-                                                disableAllActions ||
-                                                inviteEmails.length < 1
-                                            }
-                                            type="button"
-                                            onClick={sendInvitations}
-                                        >
-                                            Send Invitation
-                                        </Button>
-                                    </div>
-                                </Dialog.Panel>
-                            </Transition.Child>
-                        </div>
-                    </div>
-                </Dialog>
-            </Transition>
+                        Send Invitation
+                    </Button>
+                </div>
+            </Modal>
         </>
     );
 };
