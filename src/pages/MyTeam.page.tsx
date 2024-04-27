@@ -190,8 +190,9 @@ export const MyTeamPage = () => {
         if (!currentUser) return;
         (async () => {
             try {
-                const data = await getTeamByUser();
-                setTeam(data);
+                const res = await getTeamByUser();
+                console.log(res);
+                setTeam(res.data);
                 if (loadingTimeoutRef.current !== null)
                     window.clearTimeout(loadingTimeoutRef.current);
                 setIsLoading(false);
@@ -209,11 +210,11 @@ export const MyTeamPage = () => {
 
     if (!team)
         return (
-            <div>
-                <div className="mx-auto max-w-lg">
-                    <div className="text-lg space-y-2">
-                        <InfoCallout text="It looks like you are not in any team yet. You can create a team now. If you wish to join an existing team, the owner of the team can send you an invitation." />
-                    </div>
+            <div className="space-y-4">
+                <div className="text-lg space-y-2">
+                    <InfoCallout text="It looks like you are not in any team yet. You can create a team now. If you wish to join an existing team, the owner of the team can send you an invitation." />
+                </div>
+                <div className="mx-auto max-w-lg p-4 shadow-basic rounded">
                     <form className="mt-6 space-y-4" onSubmit={submitNewTeam}>
                         <TextInput
                             label="Team Name"
@@ -234,7 +235,7 @@ export const MyTeamPage = () => {
                                 debounce(e.target.value);
                             }}
                         />
-                        <Button type="submit">Create Team!</Button>
+                        <Button type="submit">Create Team</Button>
                     </form>
                 </div>
             </div>
@@ -335,8 +336,13 @@ export const MyTeamPage = () => {
                                             member.firstName +
                                             member.lastName
                                         }
+                                        onClick={() => {
+                                            console.log(member);
+                                        }}
                                     >
                                         <p>{member.firstName}</p>
+                                        <p>{member.lastName}</p>
+                                        <p>{member.email}</p>
                                     </li>
                                 ))}
                             </ul>
