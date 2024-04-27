@@ -8,6 +8,7 @@ export interface MemberData {
     firstName: string;
     lastName: string;
     email: string;
+    status: "pending" | "rejected" | "accepted";
 }
 
 export interface TeamData {

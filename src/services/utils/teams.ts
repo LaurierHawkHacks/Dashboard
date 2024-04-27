@@ -62,15 +62,14 @@ export async function createTeam(name: string) {
 
 /**
  * Calls the cloud function that sends emails to the given members.
- * @param members the email addresses of those members
  */
-export async function inviteMembers(emails: string[]) {
+export async function inviteMember(email: string) {
     try {
         const fn = httpsCallable<unknown, CloudFunctionResponse<void>>(
             functions,
-            "inviteMembers"
+            "inviteMember"
         );
-        const { data } = await fn({ emails });
+        const { data } = await fn({ email });
         return data;
     } catch (e) {
         await handleError(e as Error, "invite_members_error");
