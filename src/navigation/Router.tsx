@@ -14,6 +14,7 @@ import { LoadingAnimation } from "@/components";
 import { PostSubmissionPage } from "@/pages/miscellaneous/PostSubmission.page";
 import { VerifyRSVP } from "@/pages/miscellaneous/VerifyRSVP.page";
 import { MyTeamPage } from "@/pages/MyTeam.page";
+import { JoinTeamPage } from "@/pages/JoinTeam.page";
 
 export const routes = {
     admin: "/admin",
@@ -30,6 +31,7 @@ export const routes = {
     submitted: "/submitted",
     verifyRSVP: "/verify-rsvp",
     myTeam: "/my-team",
+    joinTeam: "/join-team/:invitationId",
 };
 
 interface Title {
@@ -69,6 +71,10 @@ export const titles: Record<string, Title> = {
     [routes.myTeam]: {
         main: "My Team",
         sub: "Create your dream team! Add, manage, and view your teammates.",
+    },
+    [routes.joinTeam]: {
+        main: "Join Team",
+        sub: "Awesome, it looks like you have found teammates!",
     },
 };
 
@@ -146,6 +152,7 @@ export const Router = () => {
                         </>
                     )}
                     <Route path="/my-team" element={<MyTeamPage />} />
+                    <Route path={routes.joinTeam} element={<JoinTeamPage />} />
                     {availableRoutes.map((r) => (
                         <Route key={r.path} path={r.path} element={r.element} />
                     ))}
