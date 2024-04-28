@@ -401,8 +401,22 @@ export const inviteMember = functions.https.onCall(async (data, context) => {
         });
     }
 
+    // check if invitee is a real user in the app
+    let userRecord: admin.auth.UserRecord | undefined;
+    try {
+        userRecord = await admin.auth().getUserByEmail(data.email);
+    } catch (error) {
+        functions.logger.error(
+            "Failed to find user record with email",
+            data.email,
+            { error, func }
+        );
+        return response(HttpStatus.NOT_FOUND, {
+            message: "Could not send invitation.",
+        });
+    }
+
     // only send invitation if invitee has been accepted
-    const userRecord = await admin.auth().getUserByEmail(data.email);
     let app: { firstName: string; lastName: string; accepted: boolean };
     try {
         functions.logger.info(
