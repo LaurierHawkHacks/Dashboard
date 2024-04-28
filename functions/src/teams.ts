@@ -48,6 +48,7 @@ const config = functions.config();
 const RESEND_API_KEY = config.resend.key;
 const NOREPLY_EMAIL = config.email.noreply;
 const FE_URL = config.fe.url;
+const APP_ENV = config.app.env;
 const TEAMS_COLLECTION = "teams";
 const TEAM_MEMBERS_COLLECTION = "team-members";
 
@@ -506,34 +507,44 @@ export const inviteMember = functions.https.onCall(async (data, context) => {
     }
 
     // send invitation
-    try {
-        functions.logger.info("Sending invitation email", {
-            to: data.email,
-            func,
-        });
-        const resend = new Resend(RESEND_API_KEY);
-        await resend.emails.send({
-            from: NOREPLY_EMAIL,
-            to: data.email,
-            subject: "[HawkHacks] Team Invitation",
-            html: `<a href="http://${FE_URL}/join-team/${invitationId}">link</a>`,
-        });
-        functions.logger.info("Invitation email sent!", {
-            to: data.email,
-            func,
-        });
-    } catch (error) {
-        functions.logger.error("Failed to invite member to join team.", {
-            error,
-            func,
-            email: data.email,
-        });
-        return response(HttpStatus.INTERNAL_SERVER_ERROR, {
-            message: "Service down 1201",
-        });
+    if (APP_ENV === "production") {
+        try {
+            functions.logger.info("Sending invitation email", {
+                to: data.email,
+                func,
+            });
+            const resend = new Resend(RESEND_API_KEY);
+            await resend.emails.send({
+                from: NOREPLY_EMAIL,
+                to: data.email,
+                subject: "[HawkHacks] Team Invitation",
+                html: `<a href="http://${FE_URL}/join-team/${invitationId}">link</a>`,
+            });
+            functions.logger.info("Invitation email sent!", {
+                to: data.email,
+                func,
+            });
+        } catch (error) {
+            functions.logger.error("Failed to invite member to join team.", {
+                error,
+                func,
+                email: data.email,
+            });
+            return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+                message: "Service down 1201",
+            });
+        }
     }
 
-    return response(HttpStatus.CREATED, { message: "Email sent!" });
+    return response(HttpStatus.CREATED, {
+        message: "Email sent!",
+        data: {
+            email: userRecord.email,
+            firstName: app.firstName,
+            lastName: app.lastName,
+            status: "pending",
+        } as MemberData,
+    });
 });
 
 /*
