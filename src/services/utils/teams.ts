@@ -1,7 +1,7 @@
 import { functions } from "@/services/firebase";
 import { handleError } from "@/services/utils";
 import { httpsCallable } from "firebase/functions";
-import type { CloudFunctionResponse, TeamData } from "./types";
+import type { CloudFunctionResponse, MemberData, TeamData } from "./types";
 
 /**
  * Get the team the authenticated user belongs to.
@@ -65,7 +65,7 @@ export async function createTeam(name: string) {
  */
 export async function inviteMember(email: string) {
     try {
-        const fn = httpsCallable<unknown, CloudFunctionResponse<void>>(
+        const fn = httpsCallable<unknown, CloudFunctionResponse<MemberData>>(
             functions,
             "inviteMember"
         );
