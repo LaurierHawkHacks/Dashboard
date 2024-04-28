@@ -658,3 +658,53 @@ export const removeMembers = functions.https.onCall(async (data, context) => {
 
     return response(HttpStatus.OK);
 });
+
+/**
+ * Delete the team the requesting user owns.
+ */
+export const deleteTeam = functions.https.onCall(async (_, context) => {
+    if (!context.auth) {
+        return response(HttpStatus.UNAUTHORIZED, { message: "Unauthorized" });
+    }
+
+    const func = "deleteTeam";
+
+    // delete team if requesting user owns one
+    try {
+        functions.logger.info("Deleting team...", { func });
+        const snap = await admin
+            .firestore()
+            .collection(TEAMS_COLLECTION)
+            .where("owner", "==", context.auth.uid)
+            .get();
+        const team = snap.docs[0]?.data() as Team | undefined;
+        if (!team) {
+            functions.logger.info("No team found to delete.", { func });
+            return response(HttpStatus.NOT_FOUND, {
+                message: "Team not found.",
+            });
+        }
+        // make a batch write request to delete team and all team members in the given team
+        const memberSnap = await admin
+            .firestore()
+            .collection(TEAM_MEMBERS_COLLECTION)
+            .where("teamId", "==", team.id)
+            .get();
+        const batch = admin.firestore().batch();
+        memberSnap.forEach((m) => {
+            // delete member
+            batch.delete(m.ref);
+        });
+        // delete team
+        batch.delete(snap.docs[0].ref);
+        // commit
+        await batch.commit();
+    } catch (error) {
+        functions.logger.error("Failed to delete team.", { func, error });
+        return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+            message: "Failed to delete team (1).",
+        });
+    }
+
+    return response(HttpStatus.OK, { message: "Team deleted" });
+});
