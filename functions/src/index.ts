@@ -454,4 +454,6 @@ export {
     updateTeamName,
     removeMembers,
     deleteTeam,
+    validateTeamInvitation,
+    rejectInvitation,
 } from "./teams";
