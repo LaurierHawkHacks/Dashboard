@@ -147,3 +147,20 @@ export async function validateTeamInvitation(code: string) {
         throw e;
     }
 }
+
+/**
+ * Calls the cloud function 'rejectInvitation' that rejects an invitation.
+ */
+export async function rejectInvitation(code: string) {
+    try {
+        const fn = httpsCallable<unknown, CloudFunctionResponse<void>>(
+            functions,
+            "rejectInvitation"
+        );
+        const { data } = await fn({ code });
+        return data;
+    } catch (e) {
+        await handleError(e as Error, "reject_invitation_error");
+        throw e;
+    }
+}
