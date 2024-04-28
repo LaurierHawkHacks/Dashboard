@@ -6,3 +6,4 @@ export { VerifyEmailPage } from "./miscellaneous/VerifyEmail.page";
 export { ApplicationPage } from "./Application/Application.page";
 export { TicketPage } from "./Ticket/Ticket.page";
 export { HomePage } from "./Home/Home.page";
+export { NetworkingPage } from "./Networking/Networking.page";
