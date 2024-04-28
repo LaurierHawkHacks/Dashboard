@@ -107,6 +107,8 @@ export const MyTeamPage = () => {
     };
 
     const sendInvitation = async () => {
+        // do not allow to send another invitation to someone who is already in the team
+        if (team && team.members.some((m) => m.email === email)) return;
         setDisableAllActions(true);
         try {
             const { data } = await inviteMember(email);
@@ -495,7 +497,10 @@ export const MyTeamPage = () => {
                 <div className="h-12"></div>
                 <div className="flex items-center justify-center">
                     <Button
-                        disabled={disableAllActions}
+                        disabled={
+                            disableAllActions ||
+                            team.members.some((m) => m.email === email)
+                        }
                         type="button"
                         onClick={() => {
                             const res = z.string().email().safeParse(email);
