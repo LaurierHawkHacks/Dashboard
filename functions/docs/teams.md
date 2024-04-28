@@ -68,3 +68,11 @@ Stores all invitations to join a team.
 ### Code 1206
 
 -   Failed to get user auth records for email access.
+
+### Code 1207
+
+-   Failed to get user's team to send invitations.
+
+### Code 1208
+
+-   Failed to check if invitee has been accepted to HawkHacks
