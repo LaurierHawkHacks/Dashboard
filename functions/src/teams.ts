@@ -701,3 +701,133 @@ export const deleteTeam = functions.https.onCall(async (_, context) => {
 
     return response(HttpStatus.OK, { message: "Team deleted" });
 });
+
+/**
+ * Validates the invitation and set the status in team-members collection for the given user to "accepted"
+ */
+export const validateTeamInvitation = functions.https.onCall(
+    async (data, context) => {
+        if (!context.auth) {
+            return response(HttpStatus.UNAUTHORIZED, {
+                message: "Unathorized",
+            });
+        }
+
+        if (!z.string().uuid().safeParse(data.code).success) {
+            return response(HttpStatus.BAD_REQUEST, {
+                message: "Invalid payload",
+            });
+        }
+
+        const func = "validateTeamInvitation";
+
+        // check if invitation code is for the given user
+        try {
+            functions.logger.info(
+                "Checking if invitation is for requesting user",
+                { func }
+            );
+            const snap = await admin
+                .firestore()
+                .collection(TEAM_MEMBERS_COLLECTION)
+                .where("invitationId", "==", data.code)
+                .where("uid", "==", context.auth.uid)
+                .get();
+            if (!snap.docs[0]) {
+                functions.logger.info(
+                    "Requesting user is not the user the invitation is meant for. Do not add user to team.",
+                    { func }
+                );
+                return response(HttpStatus.BAD_REQUEST, {
+                    message: "Invitation does not exists or expired.",
+                });
+            }
+            // if we found a member, then it is for the requesting user
+            // now we update the status of the member
+            functions.logger.info("Updating member status", { func });
+            await admin
+                .firestore()
+                .collection(TEAM_MEMBERS_COLLECTION)
+                .doc(snap.docs[0].id)
+                .update({ status: "accepted" });
+            functions.logger.info("Member status updated.", { func });
+        } catch (error) {
+            functions.logger.error(
+                "Failed to check if invitation is for requesting user",
+                { func, error }
+            );
+            return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+                message: "Failed to join team. (2)",
+            });
+        }
+
+        return response(HttpStatus.OK, { message: "Joined team." });
+    }
+);
+
+/**
+ * Reject an invitation if the invitation is for the requesting user
+ */
+export const rejectInvitation = functions.https.onCall(
+    async (data, context) => {
+        if (!context.auth) {
+            return response(HttpStatus.UNAUTHORIZED, {
+                message: "Unathorized",
+            });
+        }
+
+        if (!z.string().uuid().safeParse(data.code).success) {
+            return response(HttpStatus.BAD_REQUEST, {
+                message: "Invalid payload",
+            });
+        }
+
+        const func = "rejectInvitation";
+
+        // check if invitation code is for the given user
+        try {
+            functions.logger.info(
+                "Checking if invitation is for requesting user",
+                { func }
+            );
+            const snap = await admin
+                .firestore()
+                .collection(TEAM_MEMBERS_COLLECTION)
+                .where("invitationId", "==", data.code)
+                .where("uid", "==", context.auth.uid)
+                .get();
+            if (!snap.docs[0]) {
+                functions.logger.info(
+                    "Requesting user is not the user the invitation is meant for. Do not proceed.",
+                    { func }
+                );
+                return response(HttpStatus.BAD_REQUEST, {
+                    message: "Invitation does not exists or expired.",
+                });
+            }
+            // if we found a member, then it is for the requesting user
+            // now we update the status of the member
+            functions.logger.info("Updating member status to rejected", {
+                func,
+            });
+            await admin
+                .firestore()
+                .collection(TEAM_MEMBERS_COLLECTION)
+                .doc(snap.docs[0].id)
+                .update({ status: "rejected" });
+            functions.logger.info("Member status updated to rejected.", {
+                func,
+            });
+        } catch (error) {
+            functions.logger.error(
+                "Failed to check if invitation is for requesting user",
+                { func, error }
+            );
+            return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+                message: "Failed to reject team. (2)",
+            });
+        }
+
+        return response(HttpStatus.OK, { message: "Joined team." });
+    }
+);
