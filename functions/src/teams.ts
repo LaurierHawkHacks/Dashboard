@@ -276,14 +276,7 @@ export const createTeam = functions.https.onCall(async (data, context) => {
             teamName: data.name,
             id: teamId,
             isOwner: true,
-            members: [
-                {
-                    firstName,
-                    lastName,
-                    email,
-                    status: "accepted",
-                },
-            ],
+            members: [],
         };
 
         return response<TeamData>(HttpStatus.CREATED, {
