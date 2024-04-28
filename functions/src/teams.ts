@@ -597,3 +597,64 @@ export const updateTeamName = functions.https.onCall(async (data, context) => {
 
     return response(HttpStatus.OK, { message: "Team name updated!" });
 });
+
+/**
+ * Remove the members given in the payload as long as the requesting user is owner of
+ * a team. It will just remove the members from the team the user owns to avoid others messing up
+ * with other teams.
+ */
+export const removeMembers = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        return response(HttpStatus.UNAUTHORIZED, { message: "Unauthorized" });
+    }
+
+    if (!z.string().email().array().min(1).safeParse(data.emails).success) {
+        return response(HttpStatus.BAD_REQUEST, { message: "Invalid payload" });
+    }
+
+    const func = "removeMembers";
+
+    // find the team the requesting user owns and update members
+    try {
+        functions.logger.info("Getting team that requesting user owns", {
+            func,
+        });
+        const snap = await admin
+            .firestore()
+            .collection(TEAMS_COLLECTION)
+            .where("owner", "==", context.auth.uid)
+            .get();
+        const team = snap.docs[0]?.data() as Team | undefined;
+        if (!team) {
+            functions.logger.info("Team not found", { func });
+            return response(HttpStatus.NOT_FOUND, {
+                message: "Team not found.",
+            });
+        }
+        functions.logger.info("Found team requesting user owns.", { func });
+
+        // now we need to remove any document form team-members collection that are in the given team
+        // and it matches any email in the payload
+        const deleteSnap = await admin
+            .firestore()
+            .collection(TEAM_MEMBERS_COLLECTION)
+            .where("email", "in", data.emails)
+            .where("teamId", "==", team.id)
+            .get();
+        const batch = admin.firestore().batch();
+        deleteSnap.forEach((doc) => {
+            batch.delete(doc.ref);
+        });
+        await batch.commit();
+    } catch (error) {
+        functions.logger.error(
+            "Failed to get team that requesting user owns.",
+            { func }
+        );
+        return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+            message: "Failed to remove members (1).",
+        });
+    }
+
+    return response(HttpStatus.OK);
+});
