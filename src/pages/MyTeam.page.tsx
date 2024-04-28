@@ -298,7 +298,7 @@ export const MyTeamPage = () => {
                                 ))}
                         </ul>
                     </div>
-                    <div className="w-full lg:flex-auto lg:max-w-md p-4 rounded shadow-basic">
+                    <div className="w-full h-fit lg:flex-auto lg:max-w-md p-4 rounded shadow-basic">
                         <div className="relative">
                             <h3 className="font-bold">Team Name</h3>
                             {team.isOwner && (
