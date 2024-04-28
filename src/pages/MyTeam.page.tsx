@@ -42,6 +42,7 @@ export const MyTeamPage = () => {
     const [disableAllActions, setDisableAllActions] = useState(false);
     const [isEditingTeamName, setIsEditingTeamName] = useState(false);
     const [openTeammatesDialog, setOpenTeammatesDialog] = useState(false);
+    const [confirmDelete, setConfirmDelete] = useState("");
     // holds ths emails of the members to be removed
     const [toBeRemovedTeammates, setToBeRemovedTeammates] = useState<string[]>(
         []
@@ -130,8 +131,8 @@ export const MyTeamPage = () => {
     };
 
     const handleDeleteTeam = async () => {
-        setDisableAllActions(true);
         try {
+            setDisableAllActions(true);
             const res = await deleteTeam();
             if (res.status === 200) {
                 showNotification({
@@ -143,6 +144,7 @@ export const MyTeamPage = () => {
                     setTeam(null);
                     setTeamName("");
                     setEmail("");
+                    setConfirmDelete("");
                 });
             } else {
                 showNotification({
@@ -426,6 +428,30 @@ export const MyTeamPage = () => {
                                 </>
                             )}
                         </div>
+                    </div>
+                </div>
+                <div className="shadow-basic p-4 max-w-lg rounded-lg mt-8">
+                    <div className="space-y-4">
+                        <h3 className="font-bold">Delete Team?</h3>
+                        <p>Are you sure you want to delete your team?</p>
+                        <p>Retype your team name to confirm deleteion.</p>
+                    </div>
+                    <TextInput
+                        label="Confirm Delete Team"
+                        id="confirm-delete-team-input"
+                        placeholder="Team name"
+                        srLabel
+                        value={confirmDelete}
+                        onChange={(e) => setConfirmDelete(e.target.value)}
+                    />
+                    <div className="mt-4 flex items-center justify-end">
+                        <Button
+                            disabled={confirmDelete !== team?.teamName}
+                            intent="danger"
+                            onClick={handleDeleteTeam}
+                        >
+                            Delete
+                        </Button>
                     </div>
                 </div>
             </div>
