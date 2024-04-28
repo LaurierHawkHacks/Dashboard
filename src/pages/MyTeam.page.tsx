@@ -250,14 +250,20 @@ export const MyTeamPage = () => {
                 <div className="flex gap-4">
                     <div className="flex-1 w-full lg:flex-auto lg:max-w-sm p-4 rounded shadow-basic">
                         <div className="relative">
-                            <h3 className="font-bold">Add Teammates</h3>
-                            <button
-                                aria-label="add teammates"
-                                className="absolute group right-2 top-1/2 -translate-y-1/2"
-                                onClick={() => setOpenInviteDialog(true)}
-                            >
-                                <PlusCircleIcon className="w-8 h-8 text-charcoalBlack/70 transition group-hover:text-charcoalBlack" />
-                            </button>
+                            <h3 className="font-bold">
+                                {team.isOwner
+                                    ? "Add Teammates"
+                                    : "My Teammates"}
+                            </h3>
+                            {team.isOwner && (
+                                <button
+                                    aria-label="add teammates"
+                                    className="absolute group right-2 top-1/2 -translate-y-1/2"
+                                    onClick={() => setOpenInviteDialog(true)}
+                                >
+                                    <PlusCircleIcon className="w-8 h-8 text-charcoalBlack/70 transition group-hover:text-charcoalBlack" />
+                                </button>
+                            )}
                         </div>
                         {/* separator */}
                         <div className="h-[1px] bg-gray-200 my-4"></div>
