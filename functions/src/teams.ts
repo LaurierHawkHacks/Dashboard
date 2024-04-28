@@ -521,3 +521,54 @@ export const inviteMember = functions.https.onCall(async (data, context) => {
 
     return response(HttpStatus.CREATED, { message: "Email sent!" });
 });
+
+/*
+ * Updates the name for the requesting user's team
+ * The requesting user must be the owner
+ */
+export const updateTeamName = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        return response(HttpStatus.UNAUTHORIZED, { message: "Unauthorized" });
+    }
+
+    if (!z.string().min(1).safeParse(data.name)) {
+        return response(HttpStatus.BAD_REQUEST, { message: "Invalid payload" });
+    }
+
+    const func = "updateTeamName";
+
+    // find the team the requesting user owns and update name
+    try {
+        functions.logger.info("Getting team requesting user owns", { func });
+        const snap = await admin
+            .firestore()
+            .collection(TEAMS_COLLECTION)
+            .where("owner", "==", context.auth.uid)
+            .get();
+        const team = snap.docs[0]?.data() as Team | undefined;
+        if (!team) {
+            functions.logger.info("Requesting user's team not found", { func });
+            return response(HttpStatus.NOT_FOUND, {
+                message: "Failed to find team.",
+            });
+        }
+        functions.logger.info("Found requesting user's team", { func });
+        functions.logger.info("Updating team's name...", { func });
+        await admin
+            .firestore()
+            .collection(TEAMS_COLLECTION)
+            .doc(team.id)
+            .update({ name: data.name });
+        functions.logger.info("Team name updated!", { func });
+    } catch (error) {
+        functions.logger.error("Failed to get team for requesting user.", {
+            func,
+            error,
+        });
+        return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+            message: "Failed to changed team name (1).",
+        });
+    }
+
+    return response(HttpStatus.OK, { message: "Team name updated!" });
+});

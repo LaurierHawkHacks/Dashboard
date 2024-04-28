@@ -20,7 +20,11 @@ import {
     useState,
 } from "react";
 import { z } from "zod";
-import { PlusCircleIcon } from "@heroicons/react/24/outline";
+import {
+    PencilIcon,
+    PlusCircleIcon,
+    XCircleIcon as XCircleOutlineIcon,
+} from "@heroicons/react/24/outline";
 import { flushSync } from "react-dom";
 import {
     CheckCircleIcon,
@@ -68,6 +72,7 @@ export const MyTeamPage = () => {
                             "Awesome, it looks like your team has been created successfully! Start inviting hackers into your team!",
                     });
                     setTeam(res.data);
+                    setTeamName("");
                 } else {
                     showNotification({
                         title: "It looks like something went wrong",
@@ -180,6 +185,8 @@ export const MyTeamPage = () => {
             } finally {
                 setDisableAllActions(false);
             }
+        } else {
+            setInvalidTeamName(true);
         }
     };
 
@@ -194,7 +201,6 @@ export const MyTeamPage = () => {
         (async () => {
             try {
                 const res = await getTeamByUser();
-                console.log(res);
                 setTeam(res.data);
                 if (loadingTimeoutRef.current !== null)
                     window.clearTimeout(loadingTimeoutRef.current);
@@ -248,7 +254,7 @@ export const MyTeamPage = () => {
         <>
             <div>
                 <div className="flex gap-4">
-                    <div className="flex-1 w-full lg:flex-auto lg:max-w-sm p-4 rounded shadow-basic">
+                    <div className="w-full lg:flex-auto lg:max-w-sm p-4 rounded shadow-basic h-fit">
                         <div className="relative">
                             <h3 className="font-bold">
                                 {team.isOwner
@@ -298,6 +304,69 @@ export const MyTeamPage = () => {
                                     </li>
                                 ))}
                         </ul>
+                    </div>
+                    <div className="w-full lg:flex-auto lg:max-w-md p-4 rounded shadow-basic">
+                        <div className="relative">
+                            <h3 className="font-bold">Team Name</h3>
+                            {team.isOwner && (
+                                <button
+                                    aria-label="edit team name"
+                                    className="absolute group right-2 top-1/2 -translate-y-1/2"
+                                    onClick={() =>
+                                        setIsEditingTeamName(!isEditingTeamName)
+                                    }
+                                >
+                                    {!isEditingTeamName && (
+                                        <PencilIcon className="w-7 h-7 text-charcoalBlack/70 transition group-hover:text-charcoalBlack" />
+                                    )}
+                                    {isEditingTeamName && (
+                                        <XCircleOutlineIcon className="w-8 h-8 text-charcoalBlack/70 transition group-hover:text-charcoalBlack" />
+                                    )}
+                                </button>
+                            )}
+                        </div>
+                        {/* separator */}
+                        <div className="h-[1px] bg-gray-200 my-4"></div>
+                        <div className="relative">
+                            {!isEditingTeamName && team && (
+                                <p>{team.teamName}</p>
+                            )}
+                            {isEditingTeamName && team && team.isOwner && (
+                                <>
+                                    <TextInput
+                                        label="Edit Team Name"
+                                        srLabel
+                                        id="edit-team-name-input"
+                                        value={teamName}
+                                        onChange={(e) => {
+                                            setInvalidTeamName(false);
+                                            setIsTeamNameTaken(false);
+                                            setTeamName(e.target.value);
+                                            debounce(e.target.value);
+                                        }}
+                                        placeholder="Awesome Team Name Here!"
+                                        description={
+                                            invalidTeamName
+                                                ? "The entered team name is not valid."
+                                                : !isTeamNameTaken
+                                                ? ""
+                                                : "The team name has been taken. Please choose another one."
+                                        }
+                                        invalid={
+                                            invalidTeamName || isTeamNameTaken
+                                        }
+                                    />
+                                    <div className="flex items-center justify-end">
+                                        <Button
+                                            onClick={handleTeamNameUpdate}
+                                            className="mt-8"
+                                        >
+                                            Confirm
+                                        </Button>
+                                    </div>
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
