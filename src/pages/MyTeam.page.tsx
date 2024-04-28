@@ -9,9 +9,10 @@ import {
     getTeamByUser,
     inviteMember,
     isTeamNameAvailable,
+    removeMembers,
     updateTeamName,
 } from "@/services/utils/teams";
-import type { TeamData } from "@/services/utils/types";
+import { type TeamData } from "@/services/utils/types";
 import { type FormEventHandler, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import {
@@ -40,6 +41,11 @@ export const MyTeamPage = () => {
     const [email, setEmail] = useState("");
     const [disableAllActions, setDisableAllActions] = useState(false);
     const [isEditingTeamName, setIsEditingTeamName] = useState(false);
+    const [openTeammatesDialog, setOpenTeammatesDialog] = useState(false);
+    // holds ths emails of the members to be removed
+    const [toBeRemovedTeammates, setToBeRemovedTeammates] = useState<string[]>(
+        []
+    );
     const { currentUser } = useAuth();
     const { showNotification } = useNotification();
     const debounce = useDebounce<SearchTeamNameFn, string>(
@@ -91,6 +97,12 @@ export const MyTeamPage = () => {
         if (disableAllActions) return;
         setOpenInviteDialog(false);
         setEmail("");
+    };
+
+    const closeTeammatesDialog = () => {
+        if (disableAllActions) return;
+        setOpenTeammatesDialog(false);
+        setToBeRemovedTeammates([]);
     };
 
     const sendInvitation = async () => {
@@ -187,6 +199,46 @@ export const MyTeamPage = () => {
         }
     };
 
+    const handleRemoveTeammates = async () => {
+        if (toBeRemovedTeammates.length < 1) {
+            // just close the dialog
+            closeTeammatesDialog();
+            return;
+        }
+
+        try {
+            setDisableAllActions(true);
+            const res = await removeMembers(toBeRemovedTeammates);
+            if (res.status === 200) {
+                showNotification({
+                    title: "Successfully removed teammate(s)",
+                    message: "",
+                });
+                // set new team members list
+                if (team) {
+                    const newTeam = { ...team };
+                    newTeam.members = team!.members.filter(
+                        (m) => !toBeRemovedTeammates.includes(m.email)
+                    );
+                    setTeam(newTeam);
+                }
+                closeTeammatesDialog();
+            } else {
+                showNotification({
+                    title: "Oh no... Something went wrong",
+                    message: res.message,
+                });
+            }
+        } catch (e) {
+            showNotification({
+                title: "Error Removing Teammates",
+                message: (e as Error).message,
+            });
+        } finally {
+            setDisableAllActions(false);
+        }
+    };
+
     useEffect(() => {
         if (loadingTimeoutRef.current !== null)
             window.clearTimeout(loadingTimeoutRef.current);
@@ -220,7 +272,7 @@ export const MyTeamPage = () => {
                 <div className="text-lg space-y-2">
                     <InfoCallout text="It looks like you are not in any team yet. You can create a team now. If you wish to join an existing team, the owner of the team can send you an invitation." />
                 </div>
-                <div className="mx-auto max-w-lg p-4 shadow-basic rounded">
+                <div className="mx-auto max-w-lg p-4 shadow-basic rounded-lg">
                     <form className="mt-6 space-y-4" onSubmit={submitNewTeam}>
                         <TextInput
                             label="Team Name"
@@ -251,7 +303,7 @@ export const MyTeamPage = () => {
         <>
             <div>
                 <div className="flex gap-4">
-                    <div className="w-full lg:flex-auto lg:max-w-sm p-4 rounded shadow-basic h-fit">
+                    <div className="w-full lg:flex-auto lg:max-w-sm p-4 rounded-lg shadow-basic h-fit">
                         <div className="relative">
                             <h3 className="font-bold">
                                 {team.isOwner
@@ -271,13 +323,13 @@ export const MyTeamPage = () => {
                         </div>
                         {/* separator */}
                         <div className="h-[1px] bg-gray-200 my-4"></div>
-                        <ul>
+                        <ul className="space-y-4">
                             {team &&
                                 team.members.length > 0 &&
                                 team.members.map((m) => (
                                     <li
                                         key={m.email}
-                                        className="p-4 shadow-basic rounded relative"
+                                        className="p-4 shadow-basic rounded-lg relative"
                                     >
                                         <div>
                                             <p className="font-medium">
@@ -302,8 +354,17 @@ export const MyTeamPage = () => {
                                     </li>
                                 ))}
                         </ul>
+                        {team && team.isOwner && (
+                            <div className="mt-8 flex items-center justify-end">
+                                <Button
+                                    onClick={() => setOpenTeammatesDialog(true)}
+                                >
+                                    Edit Team
+                                </Button>
+                            </div>
+                        )}
                     </div>
-                    <div className="w-full h-fit lg:flex-auto lg:max-w-md p-4 rounded shadow-basic">
+                    <div className="w-full h-fit lg:flex-auto lg:max-w-md p-4 rounded-lg shadow-basic">
                         <div className="relative">
                             <h3 className="font-bold">Team Name</h3>
                             {team.isOwner && (
@@ -422,6 +483,59 @@ export const MyTeamPage = () => {
                         }}
                     >
                         Send Invitation
+                    </Button>
+                </div>
+            </Modal>
+            <Modal
+                open={openTeammatesDialog}
+                onClose={closeTeammatesDialog}
+                title="Edit Team"
+                subTitle="Manage your teammates!"
+            >
+                <ul className="space-y-4">
+                    {team &&
+                        team.members.length > 0 &&
+                        team.members
+                            .filter(
+                                (m) => !toBeRemovedTeammates.includes(m.email)
+                            )
+                            .map((m) => (
+                                <li
+                                    key={m.email}
+                                    className="p-4 shadow-basic rounded-lg relative"
+                                >
+                                    <div>
+                                        <p className="font-medium">
+                                            <span>{m.firstName}</span>{" "}
+                                            <span>{m.lastName}</span>
+                                        </p>
+                                        <p className="text-gray-500">
+                                            {m.email}
+                                        </p>
+                                    </div>
+                                    <button
+                                        onClick={() =>
+                                            setToBeRemovedTeammates([
+                                                ...toBeRemovedTeammates,
+                                                m.email,
+                                            ])
+                                        }
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 group"
+                                    >
+                                        <XCircleOutlineIcon className="w-8 h-8 text-charcoalBlack/70 transition group-hover:text-charcoalBlack" />
+                                    </button>
+                                </li>
+                            ))}
+                </ul>
+                <div className="mt-8 flex items-center justify-center">
+                    <Button
+                        disabled={
+                            toBeRemovedTeammates.length < 1 || disableAllActions
+                        }
+                        className="px-14"
+                        onClick={handleRemoveTeammates}
+                    >
+                        Done
                     </Button>
                 </div>
             </Modal>
