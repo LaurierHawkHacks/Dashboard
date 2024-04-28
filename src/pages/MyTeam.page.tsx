@@ -96,12 +96,17 @@ export const MyTeamPage = () => {
     const sendInvitation = async () => {
         setDisableAllActions(true);
         try {
-            await inviteMember(email);
+            const { data } = await inviteMember(email);
             showNotification({
                 title: "Invitation Sent!",
                 message: "",
             });
             setEmail("");
+            if (data && team) {
+                const newTeam = { ...team };
+                newTeam.members.push(data);
+                setTeam(newTeam);
+            }
         } catch (e) {
             showNotification({
                 title: "Error Sending Invitations",
