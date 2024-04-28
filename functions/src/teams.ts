@@ -326,16 +326,19 @@ export const getTeamByUser = functions.https.onCall(async (_, context) => {
             id: team.id,
             teamName: team.name,
             isOwner: team.owner === context.auth.uid,
-            members: members.map((m) => {
-                // remove the uid from the general member data
-                const member: MemberData = {
-                    email: m.email,
-                    firstName: m.firstName,
-                    lastName: m.lastName,
-                    status: m.status,
-                };
-                return member;
-            }),
+            members: members
+                .map((m) => {
+                    // remove the uid from the general member data
+                    const member: MemberData = {
+                        email: m.email,
+                        firstName: m.firstName,
+                        lastName: m.lastName,
+                        status: m.status,
+                    };
+                    return member;
+                })
+                // do not include themselves as members
+                .filter((m) => m.email !== context.auth?.token.email),
         };
 
         functions.logger.info("data", { teamData });
