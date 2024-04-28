@@ -12,13 +12,7 @@ import {
     updateTeamName,
 } from "@/services/utils/teams";
 import type { TeamData } from "@/services/utils/types";
-import {
-    type FormEventHandler,
-    Fragment,
-    useEffect,
-    useRef,
-    useState,
-} from "react";
+import { type FormEventHandler, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import {
     PencilIcon,
@@ -259,7 +253,8 @@ export const MyTeamPage = () => {
                                     ? "Add Teammates"
                                     : "My Teammates"}
                             </h3>
-                            {team.isOwner && (
+                            {/* members length has to be less than 3 because the logged in user is not in the list */}
+                            {team.isOwner && team.members.length < 3 && (
                                 <button
                                     aria-label="add teammates"
                                     className="absolute group right-2 top-1/2 -translate-y-1/2"
