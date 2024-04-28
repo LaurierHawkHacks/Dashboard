@@ -102,14 +102,12 @@ export const MyTeamPage = () => {
     const sendInvitation = async () => {
         setDisableAllActions(true);
         try {
-            const res = await inviteMember(email);
-            if (res.status === 201) {
-                showNotification({
-                    title: "Invitations Sent!",
-                    message: "",
-                });
-                setEmail("");
-            }
+            await inviteMember(email);
+            showNotification({
+                title: "Invitation Sent!",
+                message: "",
+            });
+            setEmail("");
         } catch (e) {
             showNotification({
                 title: "Error Sending Invitations",
