@@ -98,12 +98,11 @@ export const MyTeamPage = () => {
         setDisableAllActions(true);
         try {
             const res = await inviteMember(email);
-            if (res.status === 200) {
+            if (res.status === 201) {
                 showNotification({
                     title: "Invitations Sent!",
                     message: "",
                 });
-                setOpenInviteDialog(false);
                 setEmail("");
             }
         } catch (e) {

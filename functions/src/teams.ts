@@ -3,17 +3,10 @@ import * as admin from "firebase-admin";
 import { Timestamp } from "firebase-admin/firestore";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
-// import { Resend } from "resend";
+import { Resend } from "resend";
 import { HttpStatus, response } from "./utils";
 
 type InvitationStatus = "pending" | "rejected" | "accepted";
-
-// interface Invitation {
-//     invitedUserId: string;
-//     sentAt: Timestamp;
-//     status: InvitationStatus;
-//     teamId: string;
-// }
 
 // return schema to client
 interface MemberData {
@@ -39,6 +32,7 @@ interface Member {
     email: string;
     teamId: string;
     status: InvitationStatus; // to display the correct icon in the FE
+    invitationId: string;
 }
 
 // private schema for internal use
@@ -49,14 +43,13 @@ interface Team {
     createdAt: Timestamp;
 }
 
-// const config = functions.config();
+const config = functions.config();
 
-// const RESEND_API_KEY = config.resend.key;
-// const NOREPLY_EMAIL = config.email.noreply;
-// const FE_URL = config.fe.url;
+const RESEND_API_KEY = config.resend.key;
+const NOREPLY_EMAIL = config.email.noreply;
+const FE_URL = config.fe.url;
 const TEAMS_COLLECTION = "teams";
 const TEAM_MEMBERS_COLLECTION = "team-members";
-// const resend = new Resend(RESEND_API_KEY);
 
 async function internalSearchTeam(name: string): Promise<Team | undefined> {
     const snap = await admin
@@ -357,4 +350,171 @@ export const getTeamByUser = functions.https.onCall(async (_, context) => {
             message: "Service down 1201",
         });
     }
+});
+
+/**
+ * Sends an email invitation
+ */
+export const inviteMember = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        return response(HttpStatus.UNAUTHORIZED, { message: "Unauthorized" });
+    }
+
+    if (!z.string().min(1).email().safeParse(data.email).success) {
+        return response(HttpStatus.BAD_REQUEST, { message: "Invalid payload" });
+    }
+
+    const func = "inviteMember";
+
+    // try to find requesting user team
+    let team: Team | undefined;
+    try {
+        functions.logger.info("Getting requesting user's team...", { func });
+        team = await internalGetTeamByUser(context.auth.uid);
+        if (!team) {
+            functions.logger.info(
+                "Team not found for requesting user. Cannot proceed with invitation",
+                { func }
+            );
+            return response(HttpStatus.BAD_REQUEST, {
+                message: "No team found",
+            });
+        }
+    } catch (error) {
+        functions.logger.error("Failed to get requesting user's team", {
+            error,
+            func,
+        });
+        return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+            message: "Service down 1207",
+        });
+    }
+
+    // check if user is owner
+    if (team.owner !== context.auth.uid) {
+        functions.logger.info("Invitation attempt by non-owner user", { func });
+        return response(HttpStatus.BAD_REQUEST, {
+            message: "You must be the owner of the team to invite others.",
+        });
+    }
+
+    // only send invitation if invitee has been accepted
+    const userRecord = await admin.auth().getUserByEmail(data.email);
+    let app: { firstName: string; lastName: string; accepted: boolean };
+    try {
+        functions.logger.info(
+            "Checking if invitee has been accepted to HawkHacks...",
+            { func }
+        );
+        const snap = await admin
+            .firestore()
+            .collection("applications")
+            .where("applicantId", "==", userRecord.uid)
+            .get();
+        app = snap.docs[0]?.data() as {
+            firstName: string;
+            lastName: string;
+            accepted: boolean;
+        };
+        if (app && !app.accepted) {
+            functions.logger.info(
+                "Invitee was not accepted to HawkHacks. Skip sending invitation email.",
+                { func }
+            );
+            return response(HttpStatus.BAD_REQUEST, {
+                message: "Invalid request",
+            });
+        } else if (!app) {
+            functions.logger.info("Invitee did not apply to HawkHacks", {
+                func,
+            });
+            return response(HttpStatus.BAD_REQUEST, {
+                message: "Invalid request",
+            });
+        }
+    } catch (error) {
+        functions.logger.error(
+            "Failed to check if inviteee has been accpeted to HawkHacks.",
+            { func }
+        );
+        return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+            message: "Service down 1208",
+        });
+    }
+
+    const invitationId = uuidv4();
+    // add invitee to the team members collection
+    try {
+        const snap = await admin
+            .firestore()
+            .collection(TEAM_MEMBERS_COLLECTION)
+            .where("uid", "==", userRecord.uid)
+            .get();
+        const doc = snap.docs[0];
+        if (doc) {
+            functions.logger.info("Updating existing team member entry", {
+                func,
+            });
+            await admin
+                .firestore()
+                .collection(TEAM_MEMBERS_COLLECTION)
+                .doc(doc.id)
+                .update({ invitationId, invitationSentAt: Timestamp.now() });
+        } else {
+            functions.logger.info("Adding invitee to team members collection", {
+                func,
+            });
+            await admin
+                .firestore()
+                .collection(TEAM_MEMBERS_COLLECTION)
+                .add({
+                    uid: userRecord.uid,
+                    email: userRecord.email,
+                    firstName: app.firstName,
+                    lastName: app.lastName,
+                    teamId: team.id,
+                    status: "pending",
+                    invitationId,
+                    invitationSentAt: Timestamp.now(),
+                } as Member);
+        }
+    } catch (error) {
+        functions.logger.error(
+            "Failed to add invitee to team members collection.",
+            { func, error }
+        );
+        return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+            message: "Failed to invite member to join team.",
+        });
+    }
+
+    // send invitation
+    try {
+        functions.logger.info("Sending invitation email", {
+            to: data.email,
+            func,
+        });
+        const resend = new Resend(RESEND_API_KEY);
+        await resend.emails.send({
+            from: NOREPLY_EMAIL,
+            to: data.email,
+            subject: "[HawkHacks] Team Invitation",
+            html: `<a href="http://${FE_URL}/join-team/${invitationId}">link</a>`,
+        });
+        functions.logger.info("Invitation email sent!", {
+            to: data.email,
+            func,
+        });
+    } catch (error) {
+        functions.logger.error("Failed to invite member to join team.", {
+            error,
+            func,
+            email: data.email,
+        });
+        return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+            message: "Service down 1201",
+        });
+    }
+
+    return response(HttpStatus.CREATED, { message: "Email sent!" });
 });
