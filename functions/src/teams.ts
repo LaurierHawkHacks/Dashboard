@@ -24,23 +24,32 @@ interface TeamData {
     isOwner: boolean;
 }
 
-// private schema for internal
-interface Member {
-    uid: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    teamId: string;
-    status: InvitationStatus; // to display the correct icon in the FE
-    invitationId: string;
-}
-
 // private schema for internal use
 interface Team {
     id: string;
     name: string;
     owner: string;
     createdAt: Timestamp;
+}
+
+interface Invitation {
+    invitationId: string;
+    status: InvitationStatus;
+    userId: string;
+    teamId: string;
+    invitationSentAt: Timestamp;
+    resendEmailId: string; // this is for checking the email that was sent in resend.com
+    firstName: string;
+    lastName: string;
+    email: string;
+}
+
+interface UserProfile {
+    firstName: string;
+    lastName: string;
+    email: string;
+    teamId: string;
+    uid: string;
 }
 
 const config = functions.config();
@@ -50,7 +59,8 @@ const NOREPLY_EMAIL = config.email.noreply;
 const FE_URL = config.fe.url;
 const APP_ENV = config.app.env;
 const TEAMS_COLLECTION = "teams";
-const TEAM_MEMBERS_COLLECTION = "team-members";
+const USER_PROFILES_COLLECTION = "user-profiles";
+const INVITATIONS_COLLECTION = "invitations";
 
 async function internalSearchTeam(name: string): Promise<Team | undefined> {
     const snap = await admin
@@ -62,33 +72,73 @@ async function internalSearchTeam(name: string): Promise<Team | undefined> {
 }
 
 async function internalGetTeamByUser(uid: string): Promise<Team | undefined> {
-    const snap = await admin
+    // get the user profile
+    const profileSnap = await admin
         .firestore()
-        .collection(TEAM_MEMBERS_COLLECTION)
+        .collection(USER_PROFILES_COLLECTION)
         .where("uid", "==", uid)
         .get();
-    const memberData = snap.docs[0]?.data() as Member;
-    if (memberData && memberData.teamId) {
-        const snap = await admin
-            .firestore()
-            .collection(TEAMS_COLLECTION)
-            .doc(memberData.teamId)
-            .get();
-        return snap.data() as Team;
+    const profile = profileSnap.docs[0]?.data() as UserProfile | undefined;
+    if (!profile || !profile.teamId) {
+        return;
     }
 
-    return undefined;
-}
-
-async function internalGetMembersByTeam(teamId: string): Promise<Member[]> {
+    // have to get the team first
     const snap = await admin
         .firestore()
-        .collection(TEAM_MEMBERS_COLLECTION)
+        .collection(TEAMS_COLLECTION)
+        .doc(profile.teamId)
+        .get();
+
+    if (!snap.exists) {
+        return;
+    }
+
+    return snap.data() as Team | undefined;
+}
+
+async function internalGetMembersByTeam(teamId: string): Promise<MemberData[]> {
+    const snap = await admin
+        .firestore()
+        .collection(USER_PROFILES_COLLECTION)
         .where("teamId", "==", teamId)
         .get();
-    const members: Member[] = [];
+    const members: MemberData[] = [];
     snap.forEach((doc) => {
-        members.push(doc.data() as Member);
+        const data = doc.data() as UserProfile;
+        // to get the status, we need to
+        members.push({
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            status: "accepted", // everyone who is in the team already must have accepted the team invitation
+        });
+    });
+    return members;
+}
+
+/**
+ * This functions differs from `internalGetMembersByTeam` because it gets the potential team members
+ * based on invitations sent to join the given team.
+ */
+async function internalGetInvitedMembersByTeam(
+    teamId: string
+): Promise<MemberData[]> {
+    const snap = await admin
+        .firestore()
+        .collection(INVITATIONS_COLLECTION)
+        .where("teamId", "==", teamId)
+        .where("status", "==", "pending")
+        .get();
+    const members: MemberData[] = [];
+    snap.forEach((doc) => {
+        const data = doc.data() as Invitation;
+        members.push({
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            status: data.status,
+        });
     });
     return members;
 }
@@ -233,12 +283,16 @@ export const createTeam = functions.https.onCall(async (data, context) => {
     const teamId = uuidv4();
     try {
         functions.logger.info("Creating team for requesting user...", { func });
-        await admin.firestore().collection(TEAMS_COLLECTION).doc(teamId).set({
-            id: teamId,
-            name: data.name,
-            owner: context.auth.uid,
-            createdAt: Timestamp.now(),
-        });
+        await admin
+            .firestore()
+            .collection(TEAMS_COLLECTION)
+            .doc(teamId)
+            .set({
+                id: teamId,
+                name: data.name,
+                owner: context.auth.uid,
+                createdAt: Timestamp.now(),
+            } as Team);
     } catch (e) {
         functions.logger.error("Failed to create a team", { error: e, func });
         return response(HttpStatus.INTERNAL_SERVER_ERROR, {
@@ -247,30 +301,40 @@ export const createTeam = functions.https.onCall(async (data, context) => {
     }
 
     functions.logger.info("New team created.", { name: data.name, func });
+    // find user profile or create one
+    try {
+        functions.logger.info("Looking for user profile", { func });
+        const snap = await admin
+            .firestore()
+            .collection(USER_PROFILES_COLLECTION)
+            .where("uid", "==", context.auth.uid)
+            .get();
+        const userProfile = snap.docs[0]?.data() as UserProfile | undefined;
+        if (!userProfile) {
+            functions.logger.info("User profile not found, creating one...", {
+                func,
+            });
+            await admin
+                .firestore()
+                .collection(USER_PROFILES_COLLECTION)
+                .add({
+                    firstName,
+                    lastName,
+                    email,
+                    teamId,
+                    uid: context.auth.uid,
+                } as UserProfile);
+            functions.logger.info("User profile created.", { func });
+        }
+    } catch (error) {
+        functions.logger.error("Failed to check user profile", { error, func });
+        return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+            message: "Failed to create team. (3)",
+        });
+    }
+
     // now we need to add the user as part of the team
     try {
-        functions.logger.info(
-            "Adding requesting user as a member of newly created team...",
-            { func }
-        );
-        const memberRef = await admin
-            .firestore()
-            .collection(TEAM_MEMBERS_COLLECTION)
-            .add({
-                uid: context.auth.uid,
-                firstName,
-                lastName,
-                email,
-                teamId,
-                status: "accepted",
-            });
-        const memberId = memberRef.id;
-        functions.logger.info("Successfully added a member to team.", {
-            func,
-            memberId,
-            teamId,
-        });
-
         // return the team data for the FE to render
         const teamData: TeamData = {
             teamName: data.name,
@@ -314,23 +378,15 @@ export const getTeamByUser = functions.https.onCall(async (_, context) => {
 
         functions.logger.info("Getting team members...", { func });
         const members = await internalGetMembersByTeam(team.id);
+        const invitedMembers = await internalGetInvitedMembersByTeam(team.id);
+        const totalMembers = [...members, ...invitedMembers];
 
         // create team data
         const teamData: TeamData = {
             id: team.id,
             teamName: team.name,
             isOwner: team.owner === context.auth.uid,
-            members: members
-                .map((m) => {
-                    // remove the uid from the general member data
-                    const member: MemberData = {
-                        email: m.email,
-                        firstName: m.firstName,
-                        lastName: m.lastName,
-                        status: m.status,
-                    };
-                    return member;
-                })
+            members: totalMembers
                 // do not include themselves as members
                 .filter((m) => m.email !== context.auth?.token.email),
         };
@@ -461,17 +517,19 @@ export const inviteMember = functions.https.onCall(async (data, context) => {
         });
         await admin
             .firestore()
-            .collection(TEAM_MEMBERS_COLLECTION)
-            .add({
-                uid: userRecord.uid,
-                email: userRecord.email,
+            .collection(INVITATIONS_COLLECTION)
+            .doc(invitationId)
+            .set({
+                userId: userRecord.uid,
+                email: userRecord.email || data.email,
                 firstName: app.firstName,
                 lastName: app.lastName,
                 teamId: team.id,
                 status: "pending",
+                resendEmailId: "", // email not sent yet
                 invitationId,
                 invitationSentAt: Timestamp.now(),
-            } as Member);
+            } as Invitation);
     } catch (error) {
         functions.logger.error(
             "Failed to add invitee to team members collection.",
@@ -490,7 +548,7 @@ export const inviteMember = functions.https.onCall(async (data, context) => {
                 func,
             });
             const resend = new Resend(RESEND_API_KEY);
-            await resend.emails.send({
+            const sent = await resend.emails.send({
                 from: NOREPLY_EMAIL,
                 to: data.email,
                 subject: "[HawkHacks] Team Invitation",
@@ -500,6 +558,20 @@ export const inviteMember = functions.https.onCall(async (data, context) => {
                 to: data.email,
                 func,
             });
+            functions.logger.info("Updating invitation with resend email id.", {
+                func,
+            });
+            await admin
+                .firestore()
+                .collection(INVITATIONS_COLLECTION)
+                .doc(invitationId)
+                .update({ resendEmailId: sent.data?.id ?? "" })
+                .catch((e) =>
+                    functions.logger.error(
+                        "Failed to update invitation with resend email id",
+                        { func, error: e }
+                    )
+                );
         } catch (error) {
             functions.logger.error("Failed to invite member to join team.", {
                 error,
@@ -613,13 +685,13 @@ export const removeMembers = functions.https.onCall(async (data, context) => {
         // and it matches any email in the payload
         const deleteSnap = await admin
             .firestore()
-            .collection(TEAM_MEMBERS_COLLECTION)
+            .collection(USER_PROFILES_COLLECTION)
             .where("email", "in", data.emails)
             .where("teamId", "==", team.id)
             .get();
         const batch = admin.firestore().batch();
         deleteSnap.forEach((doc) => {
-            batch.delete(doc.ref);
+            batch.update(doc.ref, { teamId: "" });
         });
         await batch.commit();
     } catch (error) {
@@ -663,13 +735,13 @@ export const deleteTeam = functions.https.onCall(async (_, context) => {
         // make a batch write request to delete team and all team members in the given team
         const memberSnap = await admin
             .firestore()
-            .collection(TEAM_MEMBERS_COLLECTION)
+            .collection(USER_PROFILES_COLLECTION)
             .where("teamId", "==", team.id)
             .get();
         const batch = admin.firestore().batch();
         memberSnap.forEach((m) => {
-            // delete member
-            batch.delete(m.ref);
+            // update the user profile to not have the team id
+            batch.update(m.ref, { teamId: "" });
         });
         // delete team
         batch.delete(snap.docs[0].ref);
@@ -705,6 +777,7 @@ export const validateTeamInvitation = functions.https.onCall(
         const func = "validateTeamInvitation";
 
         // check if invitation code is for the given user
+        let invitation: Invitation | undefined;
         try {
             functions.logger.info(
                 "Checking if invitation is for requesting user",
@@ -712,11 +785,13 @@ export const validateTeamInvitation = functions.https.onCall(
             );
             const snap = await admin
                 .firestore()
-                .collection(TEAM_MEMBERS_COLLECTION)
+                .collection(INVITATIONS_COLLECTION)
                 .where("invitationId", "==", data.code)
-                .where("uid", "==", context.auth.uid)
+                .where("userId", "==", context.auth.uid)
+                .where("status", "==", "pending")
                 .get();
-            if (!snap.docs[0]) {
+            invitation = snap.docs[0]?.data() as Invitation;
+            if (!invitation) {
                 functions.logger.info(
                     "Requesting user is not the user the invitation is meant for. Do not add user to team.",
                     { func }
@@ -727,13 +802,13 @@ export const validateTeamInvitation = functions.https.onCall(
             }
             // if we found a member, then it is for the requesting user
             // now we update the status of the member
-            functions.logger.info("Updating member status", { func });
+            functions.logger.info("Updating invitation status", { func });
             await admin
                 .firestore()
-                .collection(TEAM_MEMBERS_COLLECTION)
-                .doc(snap.docs[0].id)
+                .collection(INVITATIONS_COLLECTION)
+                .doc(data.code)
                 .update({ status: "accepted" });
-            functions.logger.info("Member status updated.", { func });
+            functions.logger.info("Invitation status updated.", { func });
         } catch (error) {
             functions.logger.error(
                 "Failed to check if invitation is for requesting user",
@@ -741,6 +816,53 @@ export const validateTeamInvitation = functions.https.onCall(
             );
             return response(HttpStatus.INTERNAL_SERVER_ERROR, {
                 message: "Failed to join team. (2)",
+            });
+        }
+
+        // update user profile
+        try {
+            functions.logger.info(
+                "Checking if requesting user has a profile...",
+                { func }
+            );
+            const snap = await admin
+                .firestore()
+                .collection(USER_PROFILES_COLLECTION)
+                .where("uid", "==", context.auth.uid)
+                .get();
+            if (!snap.docs[0]) {
+                functions.logger.info(
+                    "Requesting user has no profile, creating...",
+                    { func }
+                );
+                await admin
+                    .firestore()
+                    .collection(USER_PROFILES_COLLECTION)
+                    .add({
+                        firstName: invitation.firstName,
+                        lastName: invitation.lastName,
+                        email: invitation.email,
+                        teamId: invitation.teamId,
+                        uid: context.auth.uid,
+                    } as UserProfile);
+            } else {
+                functions.logger.info(
+                    "Found user profile, updating teamId...",
+                    { func }
+                );
+                await admin
+                    .firestore()
+                    .collection(USER_PROFILES_COLLECTION)
+                    .doc(snap.docs[0].id)
+                    .update({ teamId: invitation.teamId });
+            }
+        } catch (error) {
+            functions.logger.error("Failed to update user profile", {
+                func,
+                error,
+            });
+            return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+                message: "Failed to join team.",
             });
         }
 
@@ -768,6 +890,7 @@ export const rejectInvitation = functions.https.onCall(
         const func = "rejectInvitation";
 
         // check if invitation code is for the given user
+        let invitation: Invitation | undefined;
         try {
             functions.logger.info(
                 "Checking if invitation is for requesting user",
@@ -775,13 +898,15 @@ export const rejectInvitation = functions.https.onCall(
             );
             const snap = await admin
                 .firestore()
-                .collection(TEAM_MEMBERS_COLLECTION)
+                .collection(INVITATIONS_COLLECTION)
                 .where("invitationId", "==", data.code)
-                .where("uid", "==", context.auth.uid)
+                .where("userId", "==", context.auth.uid)
+                .where("status", "==", "pending")
                 .get();
-            if (!snap.docs[0]) {
+            invitation = snap.docs[0]?.data() as Invitation;
+            if (!invitation) {
                 functions.logger.info(
-                    "Requesting user is not the user the invitation is meant for. Do not proceed.",
+                    "Requesting user is not the user the invitation is meant for. Do not add user to team.",
                     { func }
                 );
                 return response(HttpStatus.BAD_REQUEST, {
@@ -790,27 +915,70 @@ export const rejectInvitation = functions.https.onCall(
             }
             // if we found a member, then it is for the requesting user
             // now we update the status of the member
-            functions.logger.info("Updating member status to rejected", {
-                func,
-            });
+            functions.logger.info("Updating invitation status", { func });
             await admin
                 .firestore()
-                .collection(TEAM_MEMBERS_COLLECTION)
-                .doc(snap.docs[0].id)
+                .collection(INVITATIONS_COLLECTION)
+                .doc(data.code)
                 .update({ status: "rejected" });
-            functions.logger.info("Member status updated to rejected.", {
-                func,
-            });
+            functions.logger.info("Invitation status updated.", { func });
         } catch (error) {
             functions.logger.error(
                 "Failed to check if invitation is for requesting user",
                 { func, error }
             );
             return response(HttpStatus.INTERNAL_SERVER_ERROR, {
-                message: "Failed to reject team. (2)",
+                message: "Failed to reject invitation. (2)",
             });
         }
 
-        return response(HttpStatus.OK, { message: "Joined team." });
+        // update user profile
+        try {
+            functions.logger.info(
+                "Checking if requesting user has a profile...",
+                { func }
+            );
+            const snap = await admin
+                .firestore()
+                .collection(USER_PROFILES_COLLECTION)
+                .where("uid", "==", context.auth.uid)
+                .get();
+            if (!snap.docs[0]) {
+                functions.logger.info(
+                    "Requesting user has no profile, creating...",
+                    { func }
+                );
+                await admin
+                    .firestore()
+                    .collection(USER_PROFILES_COLLECTION)
+                    .add({
+                        firstName: invitation.firstName,
+                        lastName: invitation.lastName,
+                        email: invitation.email,
+                        teamId: "",
+                        uid: context.auth.uid,
+                    } as UserProfile);
+            } else {
+                functions.logger.info(
+                    "Found user profile, updating teamId...",
+                    { func }
+                );
+                await admin
+                    .firestore()
+                    .collection(USER_PROFILES_COLLECTION)
+                    .doc(snap.docs[0].id)
+                    .update({ teamId: "" });
+            }
+        } catch (error) {
+            functions.logger.error("Failed to update user profile", {
+                func,
+                error,
+            });
+            return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+                message: "Failed to reject invitation.",
+            });
+        }
+
+        return response(HttpStatus.OK, { message: "Invitation rejected." });
     }
 );
