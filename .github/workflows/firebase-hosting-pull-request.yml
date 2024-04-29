@@ -23,7 +23,6 @@ jobs:
                 VITE_FIREBASE_APP_ID: 1:587778980690:web:9921f73c9fa10e9b33d88b
                 VITE_FIREBASE_MEASUREMENT_ID: G-K3820D1QBT
                 VITE_GOOGLE_CLIENT_ID: 587778980690-prp41ai8id509jm8dqs6dkuucqmda5e7.apps.googleusercontent.com
-                VITE_APP_ENV: preview
                 VITE_APP_CHECK_KEY: 6LeTXbUpAAAAAMiCkScqCpndgaxIzVg5PrDld-oh
                 VITE_FIREBASE_APPCHECK_DEBUG_TOKEN: "${{ secrets.VITE_FIREBASE_APPCHECK_DEBUG_TOKEN }}"
                 VITE_APPLICATIONS_COLLECTION: applications-dev
