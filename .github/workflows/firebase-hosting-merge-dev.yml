@@ -26,7 +26,7 @@ jobs:
                   VITE_APPLICATIONS_COLLECTION: applications-dev
                   VITE_TICKETS_COLLECTION: tickets-dev
                   VITE_RSVP_COLLECTION: rsvps-dev
-            - run: pnpm i && pnpm build
+            - run: pnpm i && pnpm build --mode="development"
             - uses: FirebaseExtended/action-hosting-deploy@v0
               with:
                   repoToken: "${{ secrets.GITHUB_TOKEN }}"
