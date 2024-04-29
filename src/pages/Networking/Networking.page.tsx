@@ -1,10 +1,6 @@
 import { defaultApplication } from "@/components/forms/defaults";
-import { ReactElement, useRef, useState } from "react";
-import {
-    MdCheckCircle,
-    MdOutlineEdit,
-    MdOutlineFileDownload,
-} from "react-icons/md";
+import { useState } from "react";
+import { MdOutlineEdit, MdOutlineFileDownload } from "react-icons/md";
 
 interface MediaItem {
     media: string;
@@ -16,7 +12,6 @@ const mediaList: MediaItem[] = [
     { media: "LinkedIn", type: "text" },
     { media: "GitHub", type: "text" },
     { media: "Discord", type: "text" },
-    // { media: "Resume", type: "file" },
 ];
 
 interface MediaValues {
@@ -86,6 +81,7 @@ export const NetworkingPage = () => {
                 <div className="bg-white shadow-md p-4 rounded-xl flex flex-col">
                     <div className="mb-2 flex justify-between items-center">
                         <p className="flex-1">Resume</p>
+                        {/* UPDATE HERE */}
                         {/* {mediaValues[item.media] && ( */}
                         <p className="bg-green-300 rounded-full px-4 py-1">
                             Completed
@@ -95,13 +91,13 @@ export const NetworkingPage = () => {
                     <div className="relative flex items-center w-1/2">
                         <label
                             htmlFor="file-upload"
-                            className="w-8 h-8 bg-peachPuff rounded-lg flex items-center justify-center hover:cursor-pointer"
+                            className="w-8 h-8 bg-peachWhite rounded-lg flex items-center justify-center hover:cursor-pointer"
                         >
                             <MdOutlineFileDownload className="text-gray-500" />
                         </label>
                         <input
                             id="file-upload"
-                            className="hidden bg-peachWhite border-0 text-gray-500 flex-grow"
+                            className="hidden"
                             type="file"
                             onChange={(e) =>
                                 handleFileChange(
