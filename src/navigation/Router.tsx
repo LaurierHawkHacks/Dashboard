@@ -7,6 +7,7 @@ import {
     ApplicationPage,
     TicketPage,
     HomePage,
+    NetworkingPage,
 } from "@pages";
 import { ProtectedRoutes } from "@/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -106,7 +107,7 @@ export const Router = () => {
                 },
                 {
                     path: routes.networking,
-                    element: <div>network</div>,
+                    element: <NetworkingPage />,
                 },
                 {
                     path: routes.schedule,
