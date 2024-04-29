@@ -1,4 +1,4 @@
-import { defaultApplication } from "@/components/forms/defaults";
+import { useAuth } from "@/providers/auth.provider";
 import { useState } from "react";
 import { MdOutlineEdit, MdOutlineFileDownload } from "react-icons/md";
 
@@ -15,7 +15,7 @@ const mediaList: MediaItem[] = [
 ];
 
 interface MediaValues {
-    [key: string]: string; // This defines an index signature
+    [key: string]: string;
 }
 
 export const NetworkingPage = () => {
@@ -24,13 +24,17 @@ export const NetworkingPage = () => {
         mediaList.reduce((acc, item) => ({ ...acc, [item.media]: "" }), {})
     );
 
-    // Function to update the corresponding media value
+    const user = useAuth();
+
+    user.userApp?.generalResumeRef;
+
+    // Handle Social Media input change
     const handleInputChange = (media: string, value: string) => {
         setMediaValues((prev) => ({ ...prev, [media]: value }));
     };
 
     const handleFileChange = (media: string, file: FileList | null) => {
-        // Assuming you want to handle the file list here
+        // Handle RESUME UPLOAD
         console.log(media, file);
     };
 
@@ -38,11 +42,9 @@ export const NetworkingPage = () => {
         <div>
             <div className="flex items-center gap-10">
                 <h1 className="font-bold text-2xl">
-                    {defaultApplication.firstName +
-                        "Gabriel Diniz " +
-                        defaultApplication.lastName}
+                    {user.userApp?.firstName + " " + user.userApp?.lastName}
                 </h1>
-                <p>{defaultApplication.pronouns}she/her</p>
+                <p>{user.userApp?.pronouns}</p>
             </div>
             <p className="mt-10">Your connections</p>
             <form className="flex flex-col max-w-md gap-5 mt-12">
@@ -64,7 +66,7 @@ export const NetworkingPage = () => {
                                 className="bg-peachWhite border-0 rounded-lg text-gray-500 flex-grow "
                                 type={item.type}
                                 placeholder="Add your account!"
-                                value={mediaValues[item.media]}
+                                value={mediaValues[item.media]} // <-- this will be the backend stored value
                                 onChange={(e) =>
                                     handleInputChange(
                                         item.media,
@@ -82,13 +84,14 @@ export const NetworkingPage = () => {
                     <div className="mb-2 flex justify-between items-center">
                         <p className="flex-1">Resume</p>
                         {/* UPDATE HERE */}
-                        {/* {mediaValues[item.media] && ( */}
-                        <p className="bg-green-300 rounded-full px-4 py-1">
-                            Completed
-                        </p>
-                        {/* )} */}
+                        {(user.userApp?.mentorResumeRef ||
+                            user.userApp?.generalResumeRef) && (
+                            <p className="bg-green-300 rounded-full px-4 py-1">
+                                Completed
+                            </p>
+                        )}
                     </div>
-                    <div className="relative flex items-center w-1/2">
+                    <div className="relative flex items-center w-1/2 gap-4">
                         <label
                             htmlFor="file-upload"
                             className="w-8 h-8 bg-peachWhite rounded-lg flex items-center justify-center hover:cursor-pointer"
@@ -101,11 +104,18 @@ export const NetworkingPage = () => {
                             type="file"
                             onChange={(e) =>
                                 handleFileChange(
-                                    "YourMediaIdentifier",
+                                    "FileName Here",
                                     e.target.files
                                 )
                             }
                         />
+                        {(user.userApp?.mentorResumeRef ||
+                            user.userApp?.generalResumeRef) && (
+                            <p className="bg-peachWhite px-4 py-1 w-full rounded-md text-gray-500 overflow-hidden">
+                                {user.userApp?.mentorResumeRef ||
+                                    user.userApp?.generalResumeRef}
+                            </p>
+                        )}
                     </div>
                 </div>
             </form>
