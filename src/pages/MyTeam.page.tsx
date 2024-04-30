@@ -432,30 +432,32 @@ export const MyTeamPage = () => {
                         </div>
                     </div>
                 </div>
-                <div className="shadow-basic p-4 max-w-lg rounded-lg mt-8">
-                    <div className="space-y-4">
-                        <h3 className="font-bold">Delete Team?</h3>
-                        <p>Are you sure you want to delete your team?</p>
-                        <p>Retype your team name to confirm deleteion.</p>
+                {team && team.isOwner && (
+                    <div className="shadow-basic p-4 max-w-lg rounded-lg mt-8">
+                        <div className="space-y-4">
+                            <h3 className="font-bold">Delete Team?</h3>
+                            <p>Are you sure you want to delete your team?</p>
+                            <p>Retype your team name to confirm deleteion.</p>
+                        </div>
+                        <TextInput
+                            label="Confirm Delete Team"
+                            id="confirm-delete-team-input"
+                            placeholder="Team name"
+                            srLabel
+                            value={confirmDelete}
+                            onChange={(e) => setConfirmDelete(e.target.value)}
+                        />
+                        <div className="mt-4 flex items-center justify-end">
+                            <Button
+                                disabled={confirmDelete !== team?.teamName}
+                                intent="danger"
+                                onClick={handleDeleteTeam}
+                            >
+                                Delete
+                            </Button>
+                        </div>
                     </div>
-                    <TextInput
-                        label="Confirm Delete Team"
-                        id="confirm-delete-team-input"
-                        placeholder="Team name"
-                        srLabel
-                        value={confirmDelete}
-                        onChange={(e) => setConfirmDelete(e.target.value)}
-                    />
-                    <div className="mt-4 flex items-center justify-end">
-                        <Button
-                            disabled={confirmDelete !== team?.teamName}
-                            intent="danger"
-                            onClick={handleDeleteTeam}
-                        >
-                            Delete
-                        </Button>
-                    </div>
-                </div>
+                )}
             </div>
             <Modal
                 open={openInviteDialog}
