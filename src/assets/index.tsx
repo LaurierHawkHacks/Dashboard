@@ -5,6 +5,8 @@ import AppleLogo from "./apple-logo.svg";
 import CloudRR from "./cloudRR.svg";
 import CloudLL from "./cloudLL.svg";
 import AirBalloon from "./air-balloon.svg";
+import GoldenHawk from "./goldenHawk.svg";
+import IpadKidHawks from "./ipadKidHawks.svg";
 
 export {
     Logo,
@@ -14,4 +16,28 @@ export {
     CloudRR,
     CloudLL,
     AirBalloon,
+    GoldenHawk,
+    IpadKidHawks,
+};
+
+/**
+ * sponsors
+ */
+
+import Solana from "./sponsors/solana.png";
+import Near from "./sponsors/near.png";
+import Fantuan from "./sponsors/fantuan.png";
+import SmokesPoutinerie from "./sponsors/smokes.png";
+import Dominos from "./sponsors/dominos.png";
+import Nibiru from "./sponsors/nibiru.png";
+import Distributive from "./sponsors/distributive.png";
+
+export {
+    Solana,
+    Near,
+    Fantuan,
+    SmokesPoutinerie,
+    Dominos,
+    Nibiru,
+    Distributive,
 };
