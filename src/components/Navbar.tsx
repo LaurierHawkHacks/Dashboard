@@ -18,7 +18,7 @@ export const Navbar = () => {
 
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const { userRoutes, paths, routes } = useAvailableRoutes();
+    const { userRoutes, paths } = useAvailableRoutes();
     const navItems = {
         [paths.portal]: {
             label: "Home",
@@ -45,8 +45,6 @@ export const Navbar = () => {
             Icon: UserGroupIcon,
         },
     };
-
-    console.log(routes);
 
     const updateNavbarState = () => {
         setIsMobile(window.innerWidth <= 768);
