@@ -23,7 +23,7 @@ export const TicketPage = () => {
         </div>
         <h1 className="font-semibold text-[42px] mb-1 truncate">{firstName} {lastName}</h1>
         <h2 className="text-gray-500 underline mb-6 truncate">{email}</h2>
-        <div className="bg-gray-200 rounded-xl h-[2px] my-4"></div>
+        <div className="bg-gray-200 rounded-xl h-[2px] my-8"></div>
         <div className="flex flex-col items-center">
           <img src={testQRCode} alt="QR Code" className="w-[350px] mb-4" />
           <button className="text-3xl mb-4" onClick={handleDownload}>
