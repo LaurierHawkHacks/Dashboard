@@ -155,6 +155,12 @@ export const Router = () => {
                         path={routes.ticket}
                         element={<TicketPage />}
                     />
+                    {/* Networking Route here for now for dev purposes */}
+                    <Route
+                        index
+                        path={routes.networking}
+                        element={<NetworkingPage />}
+                    />
                     <Route path={routes.verifyRSVP} element={<VerifyRSVP />} />
                 </Route>
 
