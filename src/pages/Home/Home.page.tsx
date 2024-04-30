@@ -120,7 +120,7 @@ const HomePage = () => {
                             HawkHacks could not have happened!
                             <br />
                             <br />
-                            Here are some of our top sponsors that we'd like to
+                            Here are some of our top sponsors that we like to
                             thank:
                         </p>
 
