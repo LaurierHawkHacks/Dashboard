@@ -95,4 +95,4 @@ export { SocialIcons } from "./SocialIcons/SocialIcons";
  * @component SponsorCard
  *
  */
-export { SponsorCard } from "./ProductCard/ProductCard";
+export { ProductCard } from "./ProductCard/ProductCard";
