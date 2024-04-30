@@ -1,8 +1,9 @@
 import { getButtonStyles } from "@/components/Button/Button.styles";
-import { routes } from "@/navigation/constants";
+import { useAvailableRoutes } from "@/providers/routes.provider";
 import { Link } from "react-router-dom";
 
 const UserPage = () => {
+    const { paths: routes } = useAvailableRoutes();
     return (
         <>
             <div>

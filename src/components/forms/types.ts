@@ -33,6 +33,7 @@ export interface HackerApplicationData {
     agreetToMLHToCAndPrivacyPolicy: boolean;
     agreedToReceiveEmailsFromMLH: boolean;
     applicationStatus?: "pending" | "rejected" | "accepted";
+    accepted?: boolean;
     referralSources: string[];
     describeSalt: string;
     generalResumeRef: string;
