@@ -1,6 +1,6 @@
 import { Button } from "@/components";
-import { routes } from "@/navigation/constants";
 import { useNotification } from "@/providers/notification.provider";
+import { useAvailableRoutes } from "@/providers/routes.provider";
 import {
     rejectInvitation,
     validateTeamInvitation,
@@ -13,6 +13,7 @@ export const JoinTeamPage = () => {
     const { invitationId } = useParams();
     const navigate = useNavigate();
     const { showNotification } = useNotification();
+    const { paths: routes } = useAvailableRoutes();
 
     const accept = async () => {
         if (!invitationId) return;
