@@ -1,11 +1,12 @@
 import { Button } from "@/components";
 import { getButtonStyles } from "@/components/Button/Button.styles";
-import { routes } from "@/navigation/constants";
 import { useAuth } from "@/providers/auth.provider";
+import { useAvailableRoutes } from "@/providers/routes.provider";
 import { Link } from "react-router-dom";
 
 const UserPage = () => {
     const { userApp } = useAuth();
+    const { paths: routes } = useAvailableRoutes();
 
     return (
         <>

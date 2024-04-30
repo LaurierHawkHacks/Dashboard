@@ -2,7 +2,6 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { z } from "zod";
 import { useAuth, useNotification } from "@/providers/hooks";
-import { routes } from "@/navigation/constants";
 import { FileBrowser } from "@/components/FileBrowse/FileBrowse";
 import {
     TextInput,
@@ -46,6 +45,7 @@ import { logEvent } from "firebase/analytics";
 import { analytics } from "@/services/firebase";
 import { InfoCallout } from "@/components/InfoCallout/InfoCallout";
 import { Modal } from "@/components/Modal";
+import { useAvailableRoutes } from "@/providers/routes.provider";
 
 const stepValidations = [
     profileFormValidation,
@@ -94,6 +94,7 @@ export const ApplicationPage = () => {
     const { userApp, refreshUserApp } = useAuth();
     const progressTrackRef = useRef(new Set<string>());
     const loadingTimeoutRef = useRef<number | null>(null);
+    const { paths: routes } = useAvailableRoutes();
 
     if (!currentUser) return <Navigate to={routes.login} />;
 
@@ -133,9 +134,15 @@ export const ApplicationPage = () => {
         clearErrors();
 
         // Check URL validation status
-        let urlFields: (keyof ApplicationData)[] = ['linkedinUrl', 'githubUrl', 'personalWebsiteUrl'] as const;
-        for (let field of urlFields) {
-            const fieldValue = application[field as keyof ApplicationData] as string;
+        const urlFields: (keyof ApplicationData)[] = [
+            "linkedinUrl",
+            "githubUrl",
+            "personalWebsiteUrl",
+        ] as const;
+        for (const field of urlFields) {
+            const fieldValue = application[
+                field as keyof ApplicationData
+            ] as string;
             if (fieldValue && !isValidUrl(fieldValue)) {
                 setErrors((prev) => [...prev, `${field} has an invalid URL.`]);
                 return false;

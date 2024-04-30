@@ -2,10 +2,11 @@ import { Link, Navigate } from "react-router-dom";
 import { AirBalloon, CloudLL, CloudRR, Logo } from "@/assets";
 import { getButtonStyles } from "@/components/Button/Button.styles";
 import { useAuth } from "@/providers/auth.provider";
-import { routes } from "@/navigation/constants";
+import { useAvailableRoutes } from "@/providers/routes.provider";
 
 export const PostSubmissionPage = () => {
     const { userApp } = useAuth();
+    const { paths: routes } = useAvailableRoutes();
 
     if (!userApp) return <Navigate to={routes.application} />;
 

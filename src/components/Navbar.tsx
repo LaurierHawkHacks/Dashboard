@@ -9,22 +9,37 @@ import { useAuth } from "@/providers/hooks";
 import Hamburger from "hamburger-react";
 import { Link } from "react-router-dom";
 import { Logo } from "@/assets";
-
-const navItems = [
-    { path: "/profile", label: "Home", Icon: GoHome },
-    { path: "/schedule", label: "Schedule", Icon: PiCalendarCheckFill },
-    { path: "/networking", label: "Networking", Icon: TiGroup },
-    { path: "/ticket", label: "Ticket", Icon: PiIdentificationBadgeFill },
-    { path: "/application", label: "Application", Icon: GoHome },
-];
+import { useAvailableRoutes } from "@/providers/routes.provider";
+import { CodeBracketIcon } from "@heroicons/react/24/outline";
 
 export const Navbar = () => {
     const { logout } = useAuth();
 
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [showAllNavItems, setShowAllNavItems] = useState(false);
-    const { userApp } = useAuth();
+    const { userRoutes, paths } = useAvailableRoutes();
+    const navItems = {
+        [paths.portal]: {
+            label: "Home",
+            Icon: GoHome,
+        },
+        [paths.schedule]: {
+            label: "Schedule",
+            Icon: PiCalendarCheckFill,
+        },
+        [paths.networking]: {
+            label: "Networking",
+            Icon: TiGroup,
+        },
+        [paths.ticket]: {
+            label: "Ticket",
+            Icon: PiIdentificationBadgeFill,
+        },
+        [paths.application]: {
+            label: "Application",
+            Icon: CodeBracketIcon,
+        },
+    };
 
     const updateNavbarState = () => {
         setIsMobile(window.innerWidth <= 768);
@@ -37,43 +52,28 @@ export const Navbar = () => {
         };
     }, []);
 
-    useEffect(() => {
-        if (userApp && userApp.applicationStatus === "accepted")
-            setShowAllNavItems(true);
-    }, [userApp]);
-
     const renderNavItems = (isMobile: boolean) => {
-        if (showAllNavItems) {
-            return navItems.map(({ path, label, Icon }) => (
-                <Link key={label} to={path} className="w-full">
-                    <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
-                        {isMobile ? (
-                            label
-                        ) : (
-                            <>
-                                <Icon size={32} />
-                                <span className="hidden md:flex">{label}</span>
-                            </>
-                        )}
-                    </li>
-                </Link>
-            ));
-        }
-
-        return (
-            <Link to="/application" className="w-full">
-                <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
-                    {isMobile ? (
-                        "Application"
-                    ) : (
-                        <>
-                            <GoHome size={32} />
-                            <span className="hidden md:flex">Application</span>
-                        </>
-                    )}
-                </li>
-            </Link>
-        );
+        return userRoutes
+            .filter(({ path }) => !!navItems[path as string])
+            .map(({ path }) => {
+                const { label, Icon } = navItems[path as string];
+                return (
+                    <Link key={label} to={path as string} className="w-full">
+                        <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
+                            {isMobile ? (
+                                label
+                            ) : (
+                                <>
+                                    <Icon className="w-8 h-8" />
+                                    <span className="hidden md:flex">
+                                        {label}
+                                    </span>
+                                </>
+                            )}
+                        </li>
+                    </Link>
+                );
+            });
     };
 
     return (
@@ -142,7 +142,7 @@ export const Navbar = () => {
                     <div className="flex items-start justify-start p-4">
                         <Link
                             className="flex gap-4 items-center justify-start"
-                            to="/profile"
+                            to={paths.portal}
                         >
                             <img
                                 className="h-10 w-10"
