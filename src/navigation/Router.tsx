@@ -7,6 +7,7 @@ import {
     VerifyEmailPage,
     ApplicationPage,
     TicketPage,
+    HomePage,
 } from "@pages";
 import { ProtectedRoutes } from "@/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -67,7 +68,7 @@ export const titles: Record<string, Title> = {
     },
     [routes.ticket]: {
         main: "Ticket",
-        sub: "This is your ticket for the event and will be needed to register (a.k.a., check in) at HawkHacks 2023. Please press \"View my ticket\" then use the buttons below to add this ticket to your mobile wallet or take a screenshot of the ticket page. Registration begins at 5:30 PM local time near the Main Tent in Wilfrid Laurier University's Laz Building.\n\n If you have any questions, please contact info@hawkhacks.ca.",
+        sub: 'This is your ticket for the event and will be needed to register (a.k.a., check in) at HawkHacks 2023. Please press "View my ticket" then use the buttons below to add this ticket to your mobile wallet or take a screenshot of the ticket page. Registration begins at 5:30 PM local time near the Main Tent in Wilfrid Laurier University\'s Laz Building.\n\n If you have any questions, please contact info@hawkhacks.ca.',
     },
 };
 
@@ -91,6 +92,10 @@ export const Router = () => {
 
         if (userApp && userApp.applicationStatus === "accepted") {
             setAvailableRoutes([
+                {
+                    path: routes.profile,
+                    element: <HomePage />,
+                },
                 {
                     path: routes.networking,
                     element: <div>network</div>,
@@ -130,26 +135,30 @@ export const Router = () => {
 
                 {/* User Routes */}
                 <Route path={routes.portal} element={<ProtectedRoutes />}>
-                    {currentUser && currentUser.rsvpVerified && (
-                        <>
-                            <Route
-                                index
-                                path={routes.portal}
-                                element={<UserPage />}
-                            />
-                            <Route
-                                index
-                                path={routes.profile}
-                                element={<UserPage />}
-                            />
-                        </>
-                    )}
+                    {/* {currentUser && currentUser.rsvpVerified && ( */}
+                    <>
+                        <Route
+                            index
+                            path={routes.portal}
+                            element={<UserPage />}
+                        />
+                        <Route
+                            index
+                            path={routes.profile}
+                            element={<UserPage />}
+                        />
+                    </>
+                    {/* )} */}
                     {availableRoutes.map((r) => (
                         <Route key={r.path} path={r.path} element={r.element} />
                     ))}
 
                     {/* Ticket Route here for now for dev purposes */}
-                    <Route index path={routes.ticket} element={<TicketPage />} />
+                    <Route
+                        index
+                        path={routes.ticket}
+                        element={<TicketPage />}
+                    />
                 </Route>
 
                 {/* Admin Routes */}
