@@ -11,7 +11,9 @@ import {
     AdminPage,
     ApplicationPage,
     LoginPage,
+    NetworkingPage,
     NotFoundPage,
+    TicketPage,
     UserPage,
     VerifyEmailPage,
 } from "@/pages";
@@ -87,6 +89,10 @@ const titles: Record<string, Title> = {
     [paths.verifyRSVP]: {
         main: "Verify Your RSVP",
         sub: "All checkboxes are required.",
+    },
+    [paths.ticket]: {
+        main: "Ticket",
+        sub: 'This is your ticket for the event and will be needed to register (a.k.a., check in) at HawkHacks 2023. Please press "View my ticket" then use the buttons below to add this ticket to your mobile wallet or take a screenshot of the ticket page. Registration begins at 5:30 PM local time near the Main Tent in Wilfrid Laurier University\'s Laz Building.\n\n If you have any questions, please contact info@hawkhacks.ca.',
     },
 };
 
@@ -185,10 +191,10 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
             userRoutes.children.push(
                 {
                     path: paths.networking,
-                    element: <div>networking</div>,
+                    element: <NetworkingPage />,
                 },
                 { path: paths.schedule, element: <div>schedule</div> },
-                { path: paths.ticket, element: <div>ticket</div> }
+                { path: paths.ticket, element: <TicketPage /> }
             );
             setUserRoutes(userRoutes.children);
             setRoutes(availableRoutes);
