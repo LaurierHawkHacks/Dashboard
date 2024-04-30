@@ -20,3 +20,5 @@ const freeBbts = [
         image: "",
     },
 ];
+
+export { freeBbts };
