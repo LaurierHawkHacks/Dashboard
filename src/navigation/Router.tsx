@@ -6,6 +6,7 @@ import {
     NotFoundPage,
     VerifyEmailPage,
     ApplicationPage,
+    TicketPage,
 } from "@pages";
 import { ProtectedRoutes } from "@/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -157,7 +158,7 @@ export const Router = () => {
                     ))}
 
                     {/* Ticket Route here for now for dev purposes */}
-                    <Route index path={routes.ticket} element={<UserPage />} />
+                    <Route index path={routes.ticket} element={<TicketPage />} />
                 </Route>
 
                 {/* Admin Routes */}
