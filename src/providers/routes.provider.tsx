@@ -137,6 +137,7 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
     const { currentUser, userApp } = useAuth();
 
     useEffect(() => {
+        setLoadingRoutes(true);
         const cleanUp = () => {
             if (timeoutRef.current !== null)
                 window.clearTimeout(timeoutRef.current);
@@ -168,6 +169,10 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                 {
                     path: paths.submitted,
                     element: <PostSubmissionPage />,
+                },
+                {
+                    path: `${paths.joinTeam}/:invitationId`,
+                    element: <div />, // dummy placeholder
                 },
             ],
         };
@@ -231,18 +236,16 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
             // enable all routes
             userRoutes.children = [
                 {
-                    index: true,
-                    path: paths.portal,
-                    element: <UserPage />,
-                },
-                {
                     path: paths.networking,
                     element: <NetworkingPage />,
                 },
                 { path: paths.schedule, element: <div>schedule</div> },
                 { path: paths.ticket, element: <TicketPage /> },
                 { path: paths.myTeam, element: <MyTeamPage /> },
-                { path: paths.joinTeam, element: <JoinTeamPage /> },
+                {
+                    path: `${paths.joinTeam}/:invitationId`,
+                    element: <JoinTeamPage />,
+                },
             ];
             setUserRoutes(userRoutes.children);
             setRoutes(availableRoutes);
