@@ -22,6 +22,8 @@ import { useAuth } from "./auth.provider";
 import { ProtectedRoutes } from "@/navigation";
 import { PostSubmissionPage } from "@/pages/miscellaneous/PostSubmission.page";
 import { VerifyRSVP } from "@/pages/miscellaneous/VerifyRSVP.page";
+import { MyTeamPage } from "@/pages/MyTeam.page";
+import { JoinTeamPage } from "@/pages/JoinTeam.page";
 
 interface PathObject {
     admin: string;
@@ -35,6 +37,8 @@ interface PathObject {
     application: string;
     submitted: string;
     verifyRSVP: string;
+    myTeam: string;
+    joinTeam: string;
 }
 
 interface Title {
@@ -63,6 +67,8 @@ const paths: PathObject = {
     application: "/application",
     submitted: "/submitted",
     verifyRSVP: "/verify-rsvp",
+    myTeam: "/my-team",
+    joinTeam: "/join-team",
 };
 
 const titles: Record<string, Title> = {
@@ -93,6 +99,14 @@ const titles: Record<string, Title> = {
     [paths.ticket]: {
         main: "Ticket",
         sub: 'This is your ticket for the event and will be needed to register (a.k.a., check in) at HawkHacks 2023. Please press "View my ticket" then use the buttons below to add this ticket to your mobile wallet or take a screenshot of the ticket page. Registration begins at 5:30 PM local time near the Main Tent in Wilfrid Laurier University\'s Laz Building.\n\n If you have any questions, please contact info@hawkhacks.ca.',
+    },
+    [paths.myTeam]: {
+        main: "My Team",
+        sub: "Create your dream team! Add, manage, and view your teammates.",
+    },
+    [paths.joinTeam]: {
+        main: "Join Team",
+        sub: "Awesome, it looks like you have found teammates!",
     },
 };
 
@@ -223,10 +237,12 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                 },
                 {
                     path: paths.networking,
-                    element: <div>networking</div>,
+                    element: <NetworkingPage />,
                 },
                 { path: paths.schedule, element: <div>schedule</div> },
-                { path: paths.ticket, element: <div>ticket</div> },
+                { path: paths.ticket, element: <TicketPage /> },
+                { path: paths.myTeam, element: <MyTeamPage /> },
+                { path: paths.joinTeam, element: <JoinTeamPage /> },
             ];
             setUserRoutes(userRoutes.children);
             setRoutes(availableRoutes);
