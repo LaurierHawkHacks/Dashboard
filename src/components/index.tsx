@@ -68,3 +68,31 @@ export { Steps } from "./Steps/Steps";
 export { LoadingAnimation } from "./LoadingAnimation";
 
 export { PhoneInput } from "./PhoneInput/PhoneInput";
+
+/*
+ *
+ * @component Card
+ *
+ */
+export { Card } from "./Card/Card";
+
+/*
+ *
+ * @component Accordion
+ *
+ */
+export { Accordion } from "./Accordion/Accordion";
+
+/*
+ *
+ * @component SocialIcons
+ *
+ */
+export { SocialIcons } from "./SocialIcons/SocialIcons";
+
+/*
+ *
+ * @component SponsorCard
+ *
+ */
+export { SponsorCard } from "./SponsorCard/SponsorCard";
