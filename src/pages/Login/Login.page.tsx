@@ -129,7 +129,11 @@ export const LoginPage = () => {
             return <Navigate to={routes.admin} />;
         }
         const from = searchParams.get("from");
-        const available = userRoutes.some((r) => r.path === from);
+        const available = userRoutes.some((r) => {
+            // join team is globally available
+            if (r.path && r.path.startsWith("/join-team")) return true;
+            return r.path === from;
+        });
         return (
             <Navigate
                 to={from && from !== "/" && available ? from : routes.portal}
