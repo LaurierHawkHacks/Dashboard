@@ -11,13 +11,14 @@ import { Link } from "react-router-dom";
 import { Logo } from "@/assets";
 import { useAvailableRoutes } from "@/providers/routes.provider";
 import { CodeBracketIcon } from "@heroicons/react/24/outline";
+import { UserGroupIcon } from "@heroicons/react/24/solid";
 
 export const Navbar = () => {
     const { logout } = useAuth();
 
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const { userRoutes, paths } = useAvailableRoutes();
+    const { userRoutes, paths, routes } = useAvailableRoutes();
     const navItems = {
         [paths.portal]: {
             label: "Home",
@@ -39,7 +40,13 @@ export const Navbar = () => {
             label: "Application",
             Icon: CodeBracketIcon,
         },
+        [paths.myTeam]: {
+            label: "My Team",
+            Icon: UserGroupIcon,
+        },
     };
+
+    console.log(routes);
 
     const updateNavbarState = () => {
         setIsMobile(window.innerWidth <= 768);
