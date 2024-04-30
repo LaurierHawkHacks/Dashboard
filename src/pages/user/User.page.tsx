@@ -1,7 +1,7 @@
 import { Button } from "@/components";
 import { getButtonStyles } from "@/components/Button/Button.styles";
-import { routes } from "@/navigation/constants";
 import { useAuth } from "@/providers/auth.provider";
+import { useAvailableRoutes } from "@/providers/routes.provider";
 import { Link } from "react-router-dom";
 import { isAfter } from "date-fns";
 import { useEffect, useState } from "react";
@@ -12,6 +12,7 @@ import { Application } from "@/components/Application";
 const UserPage = () => {
     const [showInfo, setShowInfo] = useState(false);
     const { userApp } = useAuth();
+    const { paths: routes } = useAvailableRoutes();
 
     useEffect(() => {
         const today = new Date();
