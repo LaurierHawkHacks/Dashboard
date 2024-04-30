@@ -4,7 +4,7 @@ import { Navigate } from "react-router-dom";
 import { auth } from "@/services/firebase";
 import { useAuth } from "@/providers/hooks";
 import { Button } from "@components";
-import { routes } from "@/navigation/constants";
+import { useAvailableRoutes } from "@/providers/routes.provider";
 
 export const VerifyEmailPage = () => {
     // 60 seconds timeout before the user can send the next email verification
@@ -12,6 +12,7 @@ export const VerifyEmailPage = () => {
     // -9999 random number to init the ref, this will hold the id for the time interval
     const resendEmailCountdownRef = useRef<number>(-9999);
     const { logout, reloadUser, currentUser } = useAuth();
+    const { paths: routes } = useAvailableRoutes();
 
     const startCountdown = () => {
         resendEmailCountdownRef.current = window.setInterval(() => {
@@ -27,7 +28,7 @@ export const VerifyEmailPage = () => {
     };
 
     if (currentUser && currentUser.emailVerified)
-        return <Navigate to={routes.profile} />;
+        return <Navigate to={routes.portal} />;
 
     return (
         <div className="px-4 sm:px-6 lg:px-8">

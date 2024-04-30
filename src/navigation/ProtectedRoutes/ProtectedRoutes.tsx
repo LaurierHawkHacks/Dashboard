@@ -1,7 +1,7 @@
 import { Outlet, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/providers/hooks";
-import { routes } from "@/navigation/constants";
 import { PageWrapper } from "@components";
+import { useAvailableRoutes } from "@/providers/routes.provider";
 
 export interface ProtectedRoutesProps {
     /**
@@ -16,6 +16,9 @@ export const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
 }) => {
     const location = useLocation();
     const session = useAuth();
+    const { paths: routes } = useAvailableRoutes();
+
+    // console.log(available);
 
     if (!session.currentUser) {
         return (
@@ -29,7 +32,7 @@ export const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
         );
     }
 
-    if (!session.currentUser.emailVerified) {
+    if (!session.currentUser.hawkAdmin && !session.currentUser.emailVerified) {
         if (location.pathname !== routes.verifyEmail) {
             // redirect user to complete email verification
             // avoid spam users/bot or fake clients
@@ -56,7 +59,8 @@ export const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
     // redirect to verify their rsvp if not verified
     if (
         location.pathname !== routes.verifyRSVP &&
-        session.userApp?.applicationStatus === "accepted" &&
+        !session.currentUser.hawkAdmin &&
+        session.userApp?.accepted &&
         !session.currentUser.rsvpVerified
     ) {
         return <Navigate to={routes.verifyRSVP} />;
