@@ -1,4 +1,5 @@
 const majorsList = [
+    "None",
     "Computer Science",
     "Data Science",
     "Business Management and Administration",
