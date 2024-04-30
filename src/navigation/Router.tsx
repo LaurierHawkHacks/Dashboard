@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {
     AdminPage,
-    UserPage,
     LoginPage,
     NotFoundPage,
     VerifyEmailPage,
@@ -149,12 +148,12 @@ export const Router = () => {
                         <Route
                             index
                             path={routes.portal}
-                            element={<UserPage />}
+                            element={<HomePage />}
                         />
                         <Route
                             index
                             path={routes.profile}
-                            element={<UserPage />}
+                            element={<HomePage />}
                         />
                     </>
                     {/* )} */}
