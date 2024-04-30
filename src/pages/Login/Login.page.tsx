@@ -5,8 +5,8 @@ import { Navigate, useSearchParams } from "react-router-dom";
 import { Button, TextInput } from "@components";
 import { useAuth } from "@/providers/hooks";
 import type { ProviderName } from "@/providers/types";
-import { routes } from "@/navigation/constants";
 import { GithubLogo, GoogleLogo, AppleLogo } from "@assets";
+import { useAvailableRoutes } from "@/providers/routes.provider";
 
 // email validation with zod, double guard just in case someone changes the input type in html
 const emailParser = z.string().email();
@@ -43,6 +43,8 @@ export const LoginPage = () => {
         loginWithProvider,
         currentUser,
     } = useAuth();
+
+    const { paths: routes, userRoutes } = useAvailableRoutes();
 
     const [searchParams] = useSearchParams();
 
@@ -127,7 +129,12 @@ export const LoginPage = () => {
             return <Navigate to={routes.admin} />;
         }
         const from = searchParams.get("from");
-        return <Navigate to={from && from !== "/" ? from : routes.portal} />;
+        const available = userRoutes.some((r) => r.path === from);
+        return (
+            <Navigate
+                to={from && from !== "/" && available ? from : routes.portal}
+            />
+        );
     }
 
     return (
