@@ -5,6 +5,10 @@ export { ages } from "./ages";
 export { levelsOfStudy } from "./levelsOfStudy";
 export { cityNames } from "./cities";
 
+export { faqs } from "./faqs";
+export { socialLinks } from "./SocialLinks";
+export { sponsors } from "./sponsors";
+
 export const genders = [
     "Man",
     "Woman",
