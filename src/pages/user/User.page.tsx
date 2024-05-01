@@ -11,7 +11,7 @@ const UserPage = () => {
                     to={routes.application}
                     className={getButtonStyles({ intent: "primary" })}
                 >
-                    Apply To Hackathon!
+                    Start your application To Hackathon!
                 </Link>
             </div>
         </>
