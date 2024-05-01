@@ -35,11 +35,11 @@ interface Title {
 
 export const titles: Record<string, Title> = {
     [routes.portal]: {
-        main: "Home",
+        main: "Application", // TODO: change this when applications closes and we are ready to allow users to use all features
         sub: "The dashboard for all your needs.",
     },
     [routes.profile]: {
-        main: "Home",
+        main: "Application", // TODO: here too
         sub: "The dashboard for all your needs.",
     },
     [routes.schedule]: {
