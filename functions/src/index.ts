@@ -112,13 +112,19 @@ export const createPassObject = functions.https.onCall(
     async (data, context) => {
         if (!context.auth) {
             throw new functions.https.HttpsError(
-                "unauthenticated",
-                "The function must be called while authenticated."
+                "permission-denied",
+                "Not authenticated"
             );
         }
+        const userId = context.auth.uid;
+        const userRecord = await admin.auth().getUser(userId);
+        const fullName = userRecord.displayName || "";
+        const names = fullName.split(" ");
+        const firstName = names[0] || "Unknown";
+        const lastName = names[1] || "Unknown";
 
-        const userEmail = context.auth.token.email || null;
-        const userName = context.auth.token.name || "No Name Provided";
+        // const userEmail = context.auth.token.email || null;
+        // const userName = context.auth.token.name || "No Name Provided";
 
         const objectSuffix = data.email.replace(/[^\w.-]/g, "_");
         const objectId = `${runtimeConfig.googleWallet.issuerId}.${objectSuffix}`;
@@ -155,14 +161,10 @@ export const createPassObject = functions.https.onCall(
             header: {
                 defaultValue: {
                     language: "en-US",
-                    value: userName,
+                    value: `${firstName} ${lastName}`,
                 },
             },
             textModulesData: [
-                {
-                    header: "Email",
-                    body: userEmail, // User's email
-                },
                 {
                     id: "from",
                     header: "From",
@@ -176,7 +178,7 @@ export const createPassObject = functions.https.onCall(
             ],
             barcode: {
                 type: "QR_CODE",
-                value: objectId,
+                value: `${objectId}`,
                 alternateText: "QR code goes here",
             },
 
@@ -239,6 +241,14 @@ export const createPassObject = functions.https.onCall(
             algorithm: "RS256",
         });
         const saveUrl = `https://pay.google.com/gp/v/save/${token}`;
+
+        const ticketsRef = admin.firestore().collection("tickets");
+        await ticketsRef.doc(userId).set({
+            userId: userId,
+            firstName: firstName,
+            lastName: lastName,
+            timestamp: new Date(),
+        });
 
         return { url: saveUrl };
     }
