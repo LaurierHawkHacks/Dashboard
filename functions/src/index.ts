@@ -12,8 +12,240 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { Octokit } from "octokit";
 import { z } from "zod";
+import { GoogleAuth } from "google-auth-library";
+import * as jwt from "jsonwebtoken";
+
+// data imports
+const runtimeConfig = require("../../functions/.runtimeconfig.json");
 
 admin.initializeApp();
+
+const credentials = require("../../functions/hawkhacks-googleWallet-key.json");
+
+const httpClient = new GoogleAuth({
+    credentials: credentials,
+    scopes: "https://www.googleapis.com/auth/wallet_object.issuer",
+});
+
+export const createPassClass = functions.https.onCall(
+    async (data: any, context: any) => {
+        const baseUrl = "https://walletobjects.googleapis.com/walletobjects/v1";
+        const issuerId = runtimeConfig.googleWallet.issuerId;
+        const classId = `${issuerId}.hawkhacks-ticket`;
+
+        const updatedClass = {
+            id: `${classId}`,
+            classTemplateInfo: {
+                cardTemplateOverride: {
+                    cardRowTemplateInfos: [
+                        {
+                            twoItems: {
+                                startItem: {
+                                    firstValue: {
+                                        fields: [
+                                            {
+                                                fieldPath:
+                                                    "object.textModulesData['from']",
+                                            },
+                                        ],
+                                    },
+                                },
+                                endItem: {
+                                    firstValue: {
+                                        fields: [
+                                            {
+                                                fieldPath:
+                                                    "object.textModulesData['to']",
+                                            },
+                                        ],
+                                    },
+                                },
+                            },
+                        },
+                    ],
+                },
+            },
+        };
+
+        try {
+            // Try to get the class, if it exists
+            const response = await httpClient.request({
+                url: `${baseUrl}/genericClass/${classId}`,
+                // method: "GET",
+                method: "PUT",
+                data: updatedClass,
+            });
+
+            return {
+                result: "Class updated successfully",
+                details: response.data,
+            };
+        } catch (error) {
+            if (error instanceof Response && error.status === 404) {
+                // Class does not exist, create it
+                const createResponse = await httpClient.request({
+                    url: `${baseUrl}/genericClass`,
+                    method: "POST",
+                    data: updatedClass,
+                });
+
+                console.log("Class insert response");
+                console.log(createResponse);
+
+                return {
+                    result: "Class created",
+                    details: createResponse.data,
+                };
+            } else {
+                console.log(error);
+                throw new functions.https.HttpsError(
+                    "unknown",
+                    "Failed to handle request",
+                    error
+                );
+            }
+        }
+    }
+);
+
+export const createPassObject = functions.https.onCall(
+    async (data, context) => {
+        if (!context.auth) {
+            throw new functions.https.HttpsError(
+                "unauthenticated",
+                "The function must be called while authenticated."
+            );
+        }
+
+        const userEmail = context.auth.token.email || null;
+        const userName = context.auth.token.name || "No Name Provided";
+
+        const objectSuffix = data.email.replace(/[^\w.-]/g, "_");
+        const objectId = `${runtimeConfig.googleWallet.issuerId}.${objectSuffix}`;
+        const classId = `${runtimeConfig.googleWallet.issuerId}.hawkhacks-ticket`;
+        const baseUrl = "https://walletobjects.googleapis.com/walletobjects/v1";
+
+        const updatedGenericObject = {
+            id: `${objectId}`,
+            classId: `${classId}`,
+            genericType: "GENERIC_TYPE_UNSPECIFIED",
+            logo: {
+                sourceUri: {
+                    uri: "https://hawkhacks.ca/icon.png",
+                },
+                contentDescription: {
+                    defaultValue: {
+                        language: "en-US",
+                        value: "LOGO_IMAGE_DESCRIPTION",
+                    },
+                },
+            },
+            cardTitle: {
+                defaultValue: {
+                    language: "en-US",
+                    value: "HawkHacks 2024",
+                },
+            },
+            subheader: {
+                defaultValue: {
+                    language: "en-US",
+                    value: "Hacker",
+                },
+            },
+            header: {
+                defaultValue: {
+                    language: "en-US",
+                    value: userName,
+                },
+            },
+            textModulesData: [
+                {
+                    header: "Email",
+                    body: userEmail, // User's email
+                },
+                {
+                    id: "from",
+                    header: "From",
+                    body: "May 12th, 2024",
+                },
+                {
+                    id: "to",
+                    header: "To",
+                    body: "May 16th, 2024",
+                },
+            ],
+            barcode: {
+                type: "QR_CODE",
+                value: objectId,
+                alternateText: "QR code goes here",
+            },
+
+            hexBackgroundColor: "#006d8f",
+            heroImage: {
+                sourceUri: {
+                    uri: "https://hawkhacks.ca/icon.png",
+                },
+                contentDescription: {
+                    defaultValue: {
+                        language: "en-US",
+                        value: "HERO_IMAGE_DESCRIPTION",
+                    },
+                },
+            },
+        };
+
+        console.log("Pass object being sent:", updatedGenericObject);
+
+        //FOR POSTING NEW OBJECTS
+        // try {
+        //     const response = await httpClient.request({
+        //         url: `${baseUrl}/genericObject`,
+        //         method: "POST",
+        //         data: updatedGenericObject,
+        //     });
+        //     console.log("Pass created successfully", response.data);
+        // } catch (error) {
+        //     console.error("Failed to create pass object", error);
+        // }
+
+        //FOR UPDATING OBJECTS
+        try {
+            const response = await httpClient.request({
+                url: `${baseUrl}/genericObject/${objectId}`,
+                method: "PATCH",
+                data: updatedGenericObject,
+            });
+
+            console.log("Pass updated successfully", response.data);
+        } catch (error) {
+            console.error("Failed to update object", error);
+            throw new functions.https.HttpsError(
+                "internal",
+                "Object update failed"
+            );
+        }
+
+        const claims = {
+            iss: credentials.client_email,
+            aud: "google",
+            origins: [],
+            typ: "savetowallet",
+            payload: {
+                genericObjects: [updatedGenericObject],
+            },
+        };
+
+        const token = jwt.sign(claims, credentials.private_key, {
+            algorithm: "RS256",
+        });
+        const saveUrl = `https://pay.google.com/gp/v/save/${token}`;
+
+        return { url: saveUrl };
+    }
+);
+
+///////////////////
+
 // Default on-sign-up Claims function
 export const addDefaultClaims = functions.auth.user().onCreate(async (user) => {
     const { uid } = user;
