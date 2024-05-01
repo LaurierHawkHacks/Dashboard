@@ -33,3 +33,5 @@ coverage
 
 env.development
 env.production
+.runtimeconfig.json
+hawkhacks-googleWallet-key.json
