@@ -4,6 +4,7 @@ import type {
     MultiSelectProps,
 } from "@/components/types";
 import { TextAreaProps } from "../TextArea/TextArea";
+import { Timestamp } from "firebase/firestore";
 
 export interface HackerApplicationData {
     firstName: string;
@@ -36,6 +37,7 @@ export interface HackerApplicationData {
     referralSources: string[];
     describeSalt: string;
     generalResumeRef: string;
+    timestamp?: Timestamp;
 }
 
 export interface HackerSpecificAppData {

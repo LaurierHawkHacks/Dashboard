@@ -6,6 +6,8 @@ import {
     query,
     where,
     Timestamp,
+    doc,
+    setDoc,
 } from "firebase/firestore";
 import { firestore, functions, storage } from "@/services/firebase";
 import type { UserTicketData } from "@/services/utils/types";
@@ -55,9 +57,11 @@ export async function submitApplication(data: ApplicationData, uid: string) {
     };
 
     const appsRef = collection(firestore, APPLICATIONS_COLLECTION);
+    let appId = "";
     try {
         const q = query(appsRef, where("applicantId", "==", uid), limit(1));
         const snap = await getDocs(q);
+        appId = snap.docs[0]?.id ?? "";
         if (snap.size > 0) {
             // log how many people tried to resubmit, this should not be possible, so this must be 0 or people trying to hack
             logEvent("log", {
@@ -75,7 +79,13 @@ export async function submitApplication(data: ApplicationData, uid: string) {
     }
 
     try {
-        await addDoc(appsRef, payload);
+        if (appId) {
+            // replace
+            const docRef = doc(firestore, "applications", appId);
+            await setDoc(docRef, payload);
+        } else {
+            await addDoc(appsRef, payload);
+        }
     } catch (e) {
         logEvent("error", {
             event: "app_submit_error",
