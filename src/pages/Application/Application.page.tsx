@@ -690,7 +690,7 @@ export const ApplicationPage = () => {
                 onClose={() => setOpenConfirmPopUp(false)}
             >
                 <div className="mt-12 space-y-4 text-center">
-                    <p>This will replaced your previous submission.</p>
+                    <p>This will replace your previous submission.</p>
                     <p>Are you sure you want to continue?</p>
                 </div>
                 <div className="flex gap-12 justify-center items-center mt-12">
