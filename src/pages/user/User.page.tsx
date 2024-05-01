@@ -9,9 +9,10 @@ const UserPage = () => {
 
     return (
         <>
-            <div>
+            <h3 className="text-md md:text-2xl font-bold">My Application</h3>
+            <div className="mt-4">
                 {userApp ? (
-                    <Button disabled={!!userApp}>Apply to HawkHacks!</Button>
+                    <Button disabled={!!userApp}>Submitted</Button>
                 ) : (
                     <Link
                         to={routes.application}
