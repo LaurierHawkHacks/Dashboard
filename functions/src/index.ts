@@ -13,6 +13,8 @@ import * as admin from "firebase-admin";
 import { Timestamp } from "firebase-admin/firestore";
 import { Octokit } from "octokit";
 import { z } from "zod";
+import { PKPass } from "passkit-generator";
+import axios from "axios";
 
 // data imports
 import { ages } from "./data";
@@ -32,6 +34,110 @@ export const addDefaultClaims = functions.auth.user().onCreate(async (user) => {
         console.error("Error adding custom claims:", error);
     }
 });
+
+const signerCert = `-----BEGIN CERTIFICATE-----
+next commit will have this in firebase config
+-----END CERTIFICATE-----`
+
+const signerKey = `-----BEGIN PRIVATE KEY-----
+but im lazy and need to push this code 🙏
+-----END PRIVATE KEY-----`
+
+const wwdr = `-----BEGIN CERTIFICATE-----
+1337
+-----END CERTIFICATE-----`
+
+export const createTicket = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError(
+            "permission-denied",
+            "Not authenticated"
+        );
+    }
+
+    try {
+        const userId = context.auth.uid;
+        const userRecord = await admin.auth().getUser(userId);
+        const fullName = userRecord.displayName || '';
+        const names = fullName.split(' ');
+        const firstName = names[0] || 'Unknown';
+        const lastName = names[1] || 'Unknown';
+
+        const mealsEaten = 0;
+        const bubbleTeasDrank = 0;
+        const cookiesMunched = 0;
+
+        const signerKeyPassphrase = "";
+
+        const passJsonBuffer = Buffer.from(JSON.stringify({
+            formatVersion: 1,
+            passTypeIdentifier: "pass.com.dashboard.hawkhacks",
+            teamIdentifier: "1337",
+            organizationName: "HawkHacks",
+            description: "Simple Pass",
+            serialNumber: "123456789",
+            generic: {
+                primaryFields: [{
+                    key: "event",
+                    label: "Event",
+                    value: "Sample Event"
+                }]
+            }
+        }));
+
+        const iconUrl = 'https://hawkhacks.ca/icon.png';
+        const iconResponse = await axios.get(iconUrl, { responseType: 'arraybuffer' });
+        const iconBuffer = iconResponse.data;
+        const icon2xBuffer = iconResponse.data;
+
+        const pass = new PKPass({
+            "pass.json": passJsonBuffer,
+            "icon.png": iconBuffer,
+            "icon@2x.png": icon2xBuffer
+        }, {
+            wwdr,
+            signerCert,
+            signerKey,
+            signerKeyPassphrase,
+        });
+
+        const buffer = await pass.getAsBuffer();
+
+        const storageRef = admin.storage().bucket();
+        const fileRef = storageRef.file(`passes/${userId}/pass.pkpass`);
+        await fileRef.save(buffer, {
+            metadata: {
+                contentType: 'application/vnd.apple.pkpass'
+            }
+        });
+
+        await fileRef.makePublic();
+        const passUrl = fileRef.publicUrl();
+
+        const ticketsRef = admin.firestore().collection("tickets");
+        await ticketsRef.doc(userId).set({
+            userId: userId,
+            firstName: firstName,
+            lastName: lastName,
+            mealsEaten: mealsEaten,
+            bubbleTeasDrank: bubbleTeasDrank,
+            cookiesMunched: cookiesMunched,
+            timestamp: new Date()
+        });
+
+        return { url: passUrl };
+    } catch (error) {
+        console.error("Error creating ticket:", error);
+        throw new functions.https.HttpsError(
+            "internal",
+            "Failed to create ticket",
+            error instanceof Error ? error.message : "Unknown error"
+        );
+    }
+});
+
+
+
 
 // onCall Function to be called from Frontend for making user Admin
 export const addAdminRole = functions.https.onCall((data, context) => {

@@ -6,6 +6,7 @@ import {
     NotFoundPage,
     VerifyEmailPage,
     ApplicationPage,
+    MyticketPage,
 } from "@pages";
 import { ProtectedRoutes } from "@/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -26,7 +27,7 @@ export const routes = {
     completeProfile: "/complete-profile",
     schedule: "/schedule",
     networking: "/networking",
-    ticket: "/ticket",
+    myticket: "/myticket",
     application: "/application",
     submitted: "/submitted",
     verifyRSVP: "/verify-rsvp",
@@ -84,6 +85,7 @@ export const Router = () => {
         { path: string; element: JSX.Element }[]
     >([
         { path: routes.application, element: <ApplicationPage /> },
+        { path: routes.myticket, element: <MyticketPage /> },
         { path: routes.verifyEmail, element: <VerifyEmailPage /> },
         { path: routes.submitted, element: <PostSubmissionPage /> },
     ]);
