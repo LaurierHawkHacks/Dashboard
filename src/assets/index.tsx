@@ -7,6 +7,7 @@ import CloudLL from "./cloudLL.svg";
 import AirBalloon from "./air-balloon.svg";
 import GoldenHawk from "./goldenHawk.svg";
 import IpadKidHawks from "./ipadKidHawks.svg";
+import GoogleWalletButton from "./google-wallet-button.png";
 
 export {
     Logo,
@@ -16,6 +17,7 @@ export {
     CloudRR,
     CloudLL,
     AirBalloon,
+    GoogleWalletButton,
     GoldenHawk,
     IpadKidHawks,
 };
