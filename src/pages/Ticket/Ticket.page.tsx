@@ -2,22 +2,21 @@ import testQRCode from "../../assets/qrcode.png";
 import { Logo } from "@assets";
 import { FiDownload } from "react-icons/fi";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { GoogleWalletButton } from "@/assets";
+import { GoogleWalletBadge } from "@/assets";
 import { useAuth } from "@/providers/hooks";
 import { Navigate } from "react-router-dom";
 import { useAvailableRoutes } from "@/providers/routes.provider";
 
-interface PassObjectResponse {
-    url: string;
-}
-
 export const TicketPage = () => {
     const functions = getFunctions();
-    const { currentUser } = useAuth();
-    const firstName = "FirstName"; // Replace with Ticket First Name
-    const lastName = "LastName"; // Replace with Ticket Last Name
-    const email = "email@email.com"; // Replace with Ticket Email
     const { paths } = useAvailableRoutes();
+
+    const { currentUser } = useAuth();
+    const email = currentUser?.email;
+    const fullName = currentUser?.displayName || "";
+    const names = fullName.split(" ");
+    const firstName = names[0] || "Unknown";
+    const lastName = names[1] || "Unknown";
 
     const handleDownload = () => {
         const link = document.createElement("a");
@@ -28,28 +27,15 @@ export const TicketPage = () => {
 
     if (!currentUser) return <Navigate to={paths.login} />;
 
-    const handleCreatePassClass = () => {
-        const addPassClass = httpsCallable(functions, "createPassClass");
-        addPassClass({})
-            .then((result) => {
-                console.log("Pass class result:", result.data);
-            })
-            .catch((error) => {
-                console.error("Error creating pass class:", error);
-            });
-    };
-
-    // const handleCreatePassObject = async () => {
-    //     const addPassObject = httpsCallable<unknown, PassObjectResponse>(
-    //         functions,
-    //         "createPassObject"
-    //     );
-    //     try {
-    //         const result = await addPassObject();
-    //         window.open(result.data.url, "_blank");
-    //     } catch (error) {
-    //         console.error("Error creating pass object:", error);
-    //     }
+    // const handleCreatePassClass = () => {
+    //     const addPassClass = httpsCallable(functions, "createPassClass");
+    //     addPassClass({})
+    //         .then((result) => {
+    //             console.log("Pass class result:", result.data);
+    //         })
+    //         .catch((error) => {
+    //             console.error("Error creating pass class:", error);
+    //         });
     // };
 
     const handleCreatePassObject = async () => {
@@ -78,23 +64,12 @@ export const TicketPage = () => {
     return (
         <>
             <div>
-                <button
+                {/* <button
                     className="p-4 bg-red-50 m-2"
                     onClick={handleCreatePassClass}
                 >
                     Create Pass Class
-                </button>
-                <a
-                    href="#"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        handleCreatePassObject();
-                    }}
-                >
-                    <img src={GoogleWalletButton} alt="Add to Google Wallet" />
-                </a>
-
-                <p>Here you are</p>
+                </button> */}
             </div>
             <div className="flex justify-start">
                 <div className="bg-white drop-shadow-xl rounded-xl box-border max-w-[540px] w-full p-10 mt-10">
@@ -125,6 +100,29 @@ export const TicketPage = () => {
                         >
                             <FiDownload />
                         </button>
+                        <div className="flex w-full justify-evenly items-center">
+                            <a
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    // handleCreatePassObject();
+                                }}
+                            >
+                                REPLACE WITH APPLE
+                            </a>
+                            <a
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    handleCreatePassObject();
+                                }}
+                            >
+                                <img
+                                    src={GoogleWalletBadge}
+                                    alt="Add to Google Wallet"
+                                />
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
