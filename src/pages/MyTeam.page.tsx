@@ -273,10 +273,10 @@ export const MyTeamPage = () => {
     if (!team)
         return (
             <div className="space-y-4">
-                <div className="mx-auto max-w-lg text-lg space-y-2">
+                <div className="w-fit text-lg space-y-2">
                     <InfoCallout text="It looks like you are not enrolled in a team. Create one below, or enroll in an existing team by receiving an invitation from the team owner." />
                 </div>
-                <div className="mx-auto max-w-lg p-4 shadow-basic rounded-lg">
+                <div className="max-w-lg p-4 shadow-basic rounded-lg">
                     <form className="mt-6 space-y-4" onSubmit={submitNewTeam}>
                         <TextInput
                             label="Team Name"
