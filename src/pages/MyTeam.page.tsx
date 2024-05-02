@@ -285,7 +285,7 @@ export const MyTeamPage = () => {
                                 invalidTeamName
                                     ? "The entered team name is not valid."
                                     : !isTeamNameTaken
-                                    ? "Enter awesome team name."
+                                    ? "Enter an awesome team name."
                                     : "The team name has been taken. Please choose another one."
                             }
                             invalid={invalidTeamName || isTeamNameTaken}
