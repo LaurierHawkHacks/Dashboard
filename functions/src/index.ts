@@ -27,8 +27,6 @@ const httpClient = new GoogleAuth({
     scopes: "https://www.googleapis.com/auth/wallet_object.issuer",
 });
 
-// console.log("runtimeConf", runtimeConfig);
-
 export const createPassClass = functions.https.onCall(
     async (data: any, context: any) => {
         const baseUrl = "https://walletobjects.googleapis.com/walletobjects/v1";
@@ -47,7 +45,7 @@ export const createPassClass = functions.https.onCall(
                                         fields: [
                                             {
                                                 fieldPath:
-                                                    'textModulesData["from"].body',
+                                                    'textModulesData["from"]',
                                             },
                                         ],
                                     },
@@ -65,46 +63,6 @@ export const createPassClass = functions.https.onCall(
                             },
                         },
                     ],
-                    detailsTemplateOverride: {
-                        detailsItemInfos: [
-                            {
-                                item: {
-                                    firstValue: {
-                                        fields: [
-                                            {
-                                                fieldPath:
-                                                    'class.imageModulesData["event_banner"]',
-                                            },
-                                        ],
-                                    },
-                                },
-                            },
-                            {
-                                item: {
-                                    firstValue: {
-                                        fields: [
-                                            {
-                                                fieldPath:
-                                                    'class.textModulesData["game_overview"]',
-                                            },
-                                        ],
-                                    },
-                                },
-                            },
-                            {
-                                item: {
-                                    firstValue: {
-                                        fields: [
-                                            {
-                                                fieldPath:
-                                                    'class.linksModuleData.uris["official_site"]',
-                                            },
-                                        ],
-                                    },
-                                },
-                            },
-                        ],
-                    },
                 },
             },
             linksModuleData: {
@@ -140,8 +98,8 @@ export const createPassClass = functions.https.onCall(
                     data: updatedClass,
                 });
 
-                console.log("Class insert response");
-                console.log(createResponse);
+                // console.log("Class insert response");
+                // console.log(createResponse);
 
                 return {
                     result: "Class created",
