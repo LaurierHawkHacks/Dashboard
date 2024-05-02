@@ -39,16 +39,39 @@ export const TicketPage = () => {
             });
     };
 
+    // const handleCreatePassObject = async () => {
+    //     const addPassObject = httpsCallable<unknown, PassObjectResponse>(
+    //         functions,
+    //         "createPassObject"
+    //     );
+    //     try {
+    //         const result = await addPassObject();
+    //         window.open(result.data.url, "_blank");
+    //     } catch (error) {
+    //         console.error("Error creating pass object:", error);
+    //     }
+    // };
+
     const handleCreatePassObject = async () => {
-        const addPassObject = httpsCallable<unknown, PassObjectResponse>(
-            functions,
-            "createPassObject"
-        );
         try {
-            const result = await addPassObject({ email: currentUser.email });
-            window.open(result.data.url, "_blank");
+            const createTicket = httpsCallable(functions, "createPassObject");
+            const ticketResult = await createTicket({
+                email: currentUser.email,
+            });
+            const ticketData = ticketResult.data as { url?: string };
+            if (ticketData.url) {
+                window.location.href = ticketData.url; // Redirects user to download the pass
+                alert(
+                    "Ticket has been issued and your pass is ready to add to Apple Wallet!"
+                );
+            } else {
+                alert(
+                    "Ticket has been issued but could not generate Apple Wallet pass."
+                );
+            }
         } catch (error) {
-            console.error("Error creating pass object:", error);
+            console.error("Failed to issue ticket:", error);
+            alert("Failed to issue ticket.");
         }
     };
 
