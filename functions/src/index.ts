@@ -27,6 +27,8 @@ const httpClient = new GoogleAuth({
     scopes: "https://www.googleapis.com/auth/wallet_object.issuer",
 });
 
+// console.log("runtimeConf", runtimeConfig);
+
 export const createPassClass = functions.https.onCall(
     async (data: any, context: any) => {
         const baseUrl = "https://walletobjects.googleapis.com/walletobjects/v1";
@@ -45,7 +47,7 @@ export const createPassClass = functions.https.onCall(
                                         fields: [
                                             {
                                                 fieldPath:
-                                                    "object.textModulesData['from']",
+                                                    'textModulesData["from"].body',
                                             },
                                         ],
                                     },
@@ -63,7 +65,56 @@ export const createPassClass = functions.https.onCall(
                             },
                         },
                     ],
+                    detailsTemplateOverride: {
+                        detailsItemInfos: [
+                            {
+                                item: {
+                                    firstValue: {
+                                        fields: [
+                                            {
+                                                fieldPath:
+                                                    'class.imageModulesData["event_banner"]',
+                                            },
+                                        ],
+                                    },
+                                },
+                            },
+                            {
+                                item: {
+                                    firstValue: {
+                                        fields: [
+                                            {
+                                                fieldPath:
+                                                    'class.textModulesData["game_overview"]',
+                                            },
+                                        ],
+                                    },
+                                },
+                            },
+                            {
+                                item: {
+                                    firstValue: {
+                                        fields: [
+                                            {
+                                                fieldPath:
+                                                    'class.linksModuleData.uris["official_site"]',
+                                            },
+                                        ],
+                                    },
+                                },
+                            },
+                        ],
+                    },
                 },
+            },
+            linksModuleData: {
+                uris: [
+                    {
+                        uri: "https://hawkhacks.ca/",
+                        description: "Hawkhacks 2024",
+                        id: "official_site",
+                    },
+                ],
             },
         };
 
@@ -123,10 +174,11 @@ export const createPassObject = functions.https.onCall(
         const firstName = names[0] || "Unknown";
         const lastName = names[1] || "Unknown";
 
-        // const userEmail = context.auth.token.email || null;
+        const userEmail = context.auth.token.email || data.email;
+
         // const userName = context.auth.token.name || "No Name Provided";
 
-        const objectSuffix = data.email.replace(/[^\w.-]/g, "_");
+        const objectSuffix = userEmail.replace(/[^\w.-]/g, "_");
         const objectId = `${runtimeConfig.googleWallet.issuerId}.${objectSuffix}`;
         const classId = `${runtimeConfig.googleWallet.issuerId}.hawkhacks-ticket`;
         const baseUrl = "https://walletobjects.googleapis.com/walletobjects/v1";
@@ -163,6 +215,15 @@ export const createPassObject = functions.https.onCall(
                     language: "en-US",
                     value: `${firstName} ${lastName}`,
                 },
+            },
+            linksModuleData: {
+                uris: [
+                    {
+                        kind: "walletobjects#uri",
+                        uri: "https://www.hawkhacks.ca",
+                        description: "Visit HawkHacks",
+                    },
+                ],
             },
             textModulesData: [
                 {
