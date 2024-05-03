@@ -1,4 +1,5 @@
 import { FC, Fragment } from "react";
+import { SlidingHawkBody, SlidingHawkBodyParts } from "@/assets";
 import { Dialog, Transition } from "@headlessui/react";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { ComponentProps } from "./types";
@@ -42,9 +43,19 @@ export const Modal: FC<ModalProps> = ({
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            {/* bird */}
-                            <Dialog.Panel className="relative w-full max-w-md transform overflow-hidden rounded">
-                                <div className="bg-white p-6 text-left align-middle shadow-xl transition-all">
+                            <Dialog.Panel className="w-full max-w-md transform rounded">
+                                <div className="relative bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                    {/* birdy is here */}
+                                    <img
+                                        src={SlidingHawkBody}
+                                        alt=""
+                                        className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[calc(100%-1px)] w-[70%] -z-10"
+                                    />
+                                    <img
+                                        src={SlidingHawkBodyParts}
+                                        alt=""
+                                        className="absolute top-0 left-[calc(49%)] -translate-x-1/2 -translate-y-[calc(43.2%)] w-[70%]"
+                                    />
                                     <div className="flex justify-end">
                                         <button onClick={onClose}>
                                             <XCircleIcon className="w-8 h-8" />
