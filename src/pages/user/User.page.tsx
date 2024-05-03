@@ -20,15 +20,20 @@ const UserPage = () => {
 
     return (
         <>
-            {showInfo && (
-                <div className="w-fit mb-4">
-                    <InfoCallout text="Applications have now closed for HawkHacks 2024." />
-                </div>
-            )}
-            <div className="flex items-center gap-8">
+            <div className="items-center gap-8 space-y-4">
                 <h3 className="text-md md:text-2xl font-bold">
                     My Application
                 </h3>
+                {!userApp && !showInfo && (
+                    <div className="w-fit">
+                        <InfoCallout text="It seems like you haven't submitted an application yet." />
+                    </div>
+                )}
+                {showInfo && (
+                    <div className="w-fit mb-4">
+                        <InfoCallout text="Applications have now closed for HawkHacks 2024." />
+                    </div>
+                )}
                 <div className="mt-4">
                     {userApp || showInfo ? (
                         <Button disabled={!!userApp || showInfo}>
@@ -37,7 +42,10 @@ const UserPage = () => {
                     ) : (
                         <Link
                             to={routes.application}
-                            className={getButtonStyles({ intent: "primary" })}
+                            className={getButtonStyles({
+                                intent: "primary",
+                                className: "block w-fit",
+                            })}
                         >
                             Apply To HawkHacks!
                         </Link>
