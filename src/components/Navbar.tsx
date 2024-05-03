@@ -7,8 +7,10 @@ import { FiLogOut } from "react-icons/fi";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/providers/hooks";
 import Hamburger from "hamburger-react";
+import { isAfter } from "date-fns";
 import { Link } from "react-router-dom";
 import { Logo } from "@/assets";
+import { appCloseDate } from "@/data/appCloseDate";
 
 const navItems = [
     { path: "/profile", label: "Home", Icon: GoHome },
@@ -43,6 +45,26 @@ export const Navbar = () => {
     }, [userApp]);
 
     const renderNavItems = (isMobile: boolean) => {
+        const today = new Date();
+
+        if (isAfter(today, new Date(appCloseDate))) {
+            const { path, label, Icon } = navItems[0];
+            return (
+                <Link to={path} className="w-full">
+                    <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
+                        {isMobile ? (
+                            label
+                        ) : (
+                            <>
+                                <Icon size={32} />
+                                <span className="hidden md:flex">{label}</span>
+                            </>
+                        )}
+                    </li>
+                </Link>
+            );
+        }
+
         if (showAllNavItems) {
             return navItems.map(({ path, label, Icon }) => (
                 <Link key={label} to={path} className="w-full">
