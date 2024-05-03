@@ -41,3 +41,12 @@ export {
     Nibiru,
     Distributive,
 };
+
+/**
+ * SlidingHawks
+ */
+
+import SlidingHawkBody from "./slidingHawk/body.png";
+import SlidingHawkBodyParts from "./slidingHawk/body-parts.svg";
+
+export { SlidingHawkBody, SlidingHawkBodyParts };
