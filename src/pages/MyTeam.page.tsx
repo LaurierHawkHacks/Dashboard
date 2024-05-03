@@ -306,8 +306,8 @@ export const MyTeamPage = () => {
     return (
         <>
             <div>
-                <div className="flex gap-4">
-                    <div className="w-full lg:flex-auto lg:max-w-sm p-4 rounded-lg shadow-basic h-fit">
+                <div className="flex gap-4 flex-col sm:flex-row md:flex-col lg:flex-row lg:min-h-[20rem] [&>div]:p-5 [&>div]:rounded-lg [&>div]:shadow-basic lg:[&>div]:flex-auto">
+                    <div className="w-full lg:max-w-sm h-fit">
                         <div className="relative">
                             <h3 className="font-bold">
                                 {team.isOwner
@@ -326,7 +326,7 @@ export const MyTeamPage = () => {
                             )}
                         </div>
                         {/* separator */}
-                        <div className="h-[1px] bg-gray-200 my-4"></div>
+                        <hr className="h-[1px] bg-gray-200 my-4" />
                         <ul className="space-y-4">
                             {team &&
                                 team.members.length > 0 &&
@@ -368,7 +368,7 @@ export const MyTeamPage = () => {
                             </div>
                         )}
                     </div>
-                    <div className="w-full h-fit lg:flex-auto lg:max-w-md p-4 rounded-lg shadow-basic">
+                    <div className="w-full h-fit lg:max-w-[30rem]">
                         <div className="relative">
                             <h3 className="font-bold">Team Name</h3>
                             {team.isOwner && (
@@ -433,7 +433,7 @@ export const MyTeamPage = () => {
                     </div>
                 </div>
                 {team && team.isOwner && (
-                    <div className="shadow-basic p-4 max-w-lg rounded-lg mt-8">
+                    <div className="shadow-basic p-4 max-w-xl rounded-lg mt-8">
                         <div className="space-y-4">
                             <h3 className="font-bold">Delete Team?</h3>
                             <p>Are you sure you want to delete your team?</p>
@@ -447,7 +447,7 @@ export const MyTeamPage = () => {
                             value={confirmDelete}
                             onChange={(e) => setConfirmDelete(e.target.value)}
                         />
-                        <div className="mt-4 flex items-center justify-end">
+                        <div className="mt-3 flex items-center justify-end">
                             <Button
                                 disabled={confirmDelete !== team?.teamName}
                                 intent="danger"
