@@ -20,7 +20,7 @@ const UserPage = () => {
 
     return (
         <>
-            <div className="items-center gap-8 space-y-4">
+            <div className="items-center gap-8 space-y-4 mb-4">
                 <h3 className="text-md md:text-2xl font-bold">
                     My Application
                 </h3>
@@ -34,7 +34,7 @@ const UserPage = () => {
                         <InfoCallout text="Applications have now closed for HawkHacks 2024." />
                     </div>
                 )}
-                <div className="mt-4 flex gap-4">
+                <div className="flex gap-4">
                     {userApp || showInfo ? (
                         <Button disabled={!!userApp || showInfo}>
                             {showInfo ? "Applications Closed" : "Submitted"}
@@ -50,7 +50,7 @@ const UserPage = () => {
                             Apply To HawkHacks!
                         </Link>
                     )}
-                    {userApp && (
+                    {userApp && !showInfo && (
                         <Link
                             to={routes.application}
                             className={getButtonStyles({
@@ -63,7 +63,7 @@ const UserPage = () => {
                     )}
                 </div>
             </div>
-            {userApp && (
+            {userApp && !showInfo && (
                 <p className="my-4">
                     {"Didn't like your submission? "}
                     <Link
