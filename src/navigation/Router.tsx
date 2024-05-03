@@ -9,9 +9,11 @@ import {
 } from "@pages";
 import { ProtectedRoutes } from "@/navigation";
 import { useEffect, useState } from "react";
+import { isAfter } from "date-fns";
 import { useAuth } from "@/providers/auth.provider";
 import { LoadingAnimation } from "@/components";
 import { PostSubmissionPage } from "@/pages/miscellaneous/PostSubmission.page";
+import { appCloseDate } from "@/data/appCloseDate";
 
 export const routes = {
     admin: "/admin",
@@ -77,6 +79,12 @@ export const Router = () => {
 
     useEffect(() => {
         if (userApp === undefined) return;
+
+        const today = new Date();
+
+        if (isAfter(today, new Date(appCloseDate))) {
+            setAvailableRoutes([]);
+        }
 
         if (userApp && userApp.applicationStatus === "accepted") {
             setAvailableRoutes([
