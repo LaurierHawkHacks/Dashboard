@@ -96,3 +96,10 @@ export { SocialIcons } from "./SocialIcons/SocialIcons";
  *
  */
 export { ProductCard } from "./ProductCard/ProductCard";
+
+/*
+ *
+ * @component Modal
+ *
+ */
+export { Modal } from "./Modal";
