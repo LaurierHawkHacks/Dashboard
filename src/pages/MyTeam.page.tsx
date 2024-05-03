@@ -262,7 +262,7 @@ export const MyTeamPage = () => {
                 showNotification({
                     title: "Could not get team",
                     message:
-                        "Oh no... please try later and if this error persist, contact us in our Discord support channel.",
+                        "Yikes, something went wrong. Try again later; if the error continues, shoot us a message on our Discord tech-support channel.",
                 });
             }
         })();
