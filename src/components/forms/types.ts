@@ -38,6 +38,7 @@ export interface HackerApplicationData {
     describeSalt: string;
     generalResumeRef: string;
     timestamp?: Timestamp;
+    email: string;
 }
 
 export interface HackerSpecificAppData {

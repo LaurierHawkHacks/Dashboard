@@ -256,6 +256,7 @@ export const ApplicationPage = () => {
 
         try {
             trackProgress("submit");
+            application.email = currentUser.email as string;
             await submitApplication(application, currentUser.uid);
             showNotification({
                 title: "Application Submitted!",
