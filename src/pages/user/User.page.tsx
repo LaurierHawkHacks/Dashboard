@@ -65,12 +65,12 @@ const UserPage = () => {
             </div>
             {userApp && (
                 <p className="my-4">
-                    Had issues with your application?{" "}
+                    {"Didn't like your submission? "}
                     <Link
                         to={`${routes.application}?restart=true`}
                         className="font-medium text-sky-600 underline"
                     >
-                        Resubmit one here.
+                        Start a new application here.
                     </Link>
                 </p>
             )}
