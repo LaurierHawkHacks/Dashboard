@@ -43,8 +43,8 @@ export const Modal: FC<ModalProps> = ({
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-full max-w-md transform rounded">
-                                <div className="relative bg-white p-6 text-left align-middle shadow-xl transition-all">
+                            <Dialog.Panel className="w-full max-w-md transform">
+                                <div className="relative bg-white p-6 text-left align-middle shadow-xl transition-all rounded-lg">
                                     {/* birdy is here */}
                                     <img
                                         src={SlidingHawkBody}
