@@ -27,6 +27,7 @@ export const routes = {
     networking: "/networking",
     ticket: "/ticket",
     application: "/application",
+    myApplication: "my-application",
     submitted: "/submitted",
 };
 

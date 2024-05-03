@@ -13,7 +13,7 @@ import { firestore, functions, storage } from "@/services/firebase";
 import type { UserTicketData } from "@/services/utils/types";
 import { ApplicationData } from "@/components/forms/types";
 import { httpsCallable } from "firebase/functions";
-import { ref, uploadBytes } from "firebase/storage";
+import { getBlob, getMetadata, ref, uploadBytes } from "firebase/storage";
 
 export const TICKETS_COLLECTION = import.meta.env.VITE_TICKETS_COLLECTION;
 export const USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION;
@@ -171,6 +171,29 @@ export async function uploadGeneralResume(file: File, uid: string) {
     } catch (e) {
         logEvent("error", {
             event: "upload_general_resume_error",
+            message: (e as Error).message,
+            name: (e as Error).name,
+            stack: (e as Error).stack,
+        });
+        throw e;
+    }
+}
+
+export async function getResume(gs: string) {
+    const gsRef = ref(storage, gs);
+    try {
+        const metadata = await getMetadata(gsRef);
+        const blob = await getBlob(gsRef);
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.download = metadata.name;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (e) {
+        logEvent("error", {
+            event: "get_resume_error",
             message: (e as Error).message,
             name: (e as Error).name,
             stack: (e as Error).stack,

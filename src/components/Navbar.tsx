@@ -17,7 +17,7 @@ const navItems = [
     { path: "/schedule", label: "Schedule", Icon: PiCalendarCheckFill },
     { path: "/networking", label: "Networking", Icon: TiGroup },
     { path: "/ticket", label: "Ticket", Icon: PiIdentificationBadgeFill },
-    { path: "/application", label: "Application", Icon: GoHome },
+    { path: "/my-application", label: "My Application", Icon: GoHome },
 ];
 
 export const Navbar = () => {
@@ -83,14 +83,16 @@ export const Navbar = () => {
         }
 
         return (
-            <Link to="/application" className="w-full">
+            <Link to="/" className="w-full">
                 <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
                     {isMobile ? (
-                        "Application"
+                        "My Application"
                     ) : (
                         <>
                             <GoHome size={32} />
-                            <span className="hidden md:flex">Application</span>
+                            <span className="hidden md:flex">
+                                My Application
+                            </span>
                         </>
                     )}
                 </li>

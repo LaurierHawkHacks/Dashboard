@@ -7,6 +7,7 @@ import { isAfter } from "date-fns";
 import { useEffect, useState } from "react";
 import { InfoCallout } from "@/components/InfoCallout/InfoCallout";
 import { appCloseDate } from "@/data/appCloseDate";
+import { Application } from "@/components/Application";
 
 const UserPage = () => {
     const [showInfo, setShowInfo] = useState(false);
@@ -24,23 +25,27 @@ const UserPage = () => {
                     <InfoCallout text="Applications have now closed for HawkHacks 2024." />
                 </div>
             )}
-            <h3 className="text-md md:text-2xl font-bold">My Application</h3>
-            <div className="mt-4">
-                {userApp || showInfo ? (
-                    <Button disabled={!!userApp || showInfo}>
-                        {showInfo ? "Applications Closed" : "Submitted"}
-                    </Button>
-                ) : (
-                    <Link
-                        to={routes.application}
-                        className={getButtonStyles({ intent: "primary" })}
-                    >
-                        Apply To HawkHacks!
-                    </Link>
-                )}
+            <div className="flex items-center gap-8">
+                <h3 className="text-md md:text-2xl font-bold">
+                    My Application
+                </h3>
+                <div className="mt-4">
+                    {userApp || showInfo ? (
+                        <Button disabled={!!userApp || showInfo}>
+                            {showInfo ? "Applications Closed" : "Submitted"}
+                        </Button>
+                    ) : (
+                        <Link
+                            to={routes.application}
+                            className={getButtonStyles({ intent: "primary" })}
+                        >
+                            Apply To HawkHacks!
+                        </Link>
+                    )}
+                </div>
             </div>
             {userApp && (
-                <p className="mt-4">
+                <p className="my-4">
                     Had issues with your application?{" "}
                     <Link
                         to={routes.application}
@@ -50,6 +55,7 @@ const UserPage = () => {
                     </Link>
                 </p>
             )}
+            {userApp && <Application app={userApp} />}
         </>
     );
 };
