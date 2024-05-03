@@ -93,7 +93,7 @@ export const Navbar = () => {
                                 />
                             </Link>
                         </div>
-                        <div className="z-10">
+                        <div className="z-20">
                             <Hamburger
                                 toggled={isMobileMenuOpen}
                                 toggle={setMobileMenuOpen}
@@ -111,7 +111,7 @@ export const Navbar = () => {
                                 : "translate-x-full opacity-0"
                         }`}
                     >
-                        <ul className="flex flex-col items-start justify-start gap-4">
+                        <ul className="flex flex-col items-start justify-start">
                             {renderNavItems(true)}
                             <a
                                 href="https://discord.com/invite/GxwvFEn9TB"
