@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import { useAuth, useNotification } from "@/providers/hooks";
 import { routes } from "@/navigation/constants";
@@ -90,6 +90,7 @@ export const ApplicationPage = () => {
     const { userApp, refreshUserApp } = useAuth();
     const progressTrackRef = useRef(new Set<string>());
     const loadingTimeoutRef = useRef<number | null>(null);
+    const [sp] = useSearchParams();
 
     if (!currentUser) return <Navigate to={routes.login} />;
 
@@ -294,6 +295,15 @@ export const ApplicationPage = () => {
         };
     }, [userApp]);
 
+    useEffect(() => {
+        if (userApp && !sp.get("restart")) {
+            console.log("here");
+            setApplication({
+                ...userApp,
+            });
+        }
+    }, [userApp, sp]);
+
     const specificQuestions: FormInput[] =
         application.participatingAs === "Hacker"
             ? hackerSpecificForm
@@ -346,7 +356,11 @@ export const ApplicationPage = () => {
                                 <Select
                                     label="Role"
                                     options={["Hacker", "Mentor", "Volunteer"]}
-                                    initialValue="Hacker"
+                                    initialValue={
+                                        userApp
+                                            ? userApp.participatingAs
+                                            : "Hacker"
+                                    }
                                     onChange={(opt) =>
                                         handleChange("participatingAs", opt)
                                     }
@@ -380,12 +394,29 @@ export const ApplicationPage = () => {
                                             onChange={(opt) =>
                                                 handleChange(input.name, opt)
                                             }
+                                            initialValue={
+                                                application[input.name]
+                                                    ? (application[
+                                                          input.name
+                                                      ] as string)
+                                                    : ""
+                                            }
                                         />
                                     ) : input.type === "multiselect" ? (
                                         <MultiSelect
                                             {...input.props}
                                             onChange={(opts) =>
                                                 handleChange(input.name, opts)
+                                            }
+                                            // @ts-ignore
+                                            initialValues={
+                                                (
+                                                    application[
+                                                        input.name
+                                                    ] as string[]
+                                                ).length > 0
+                                                    ? application[input.name]
+                                                    : []
                                             }
                                         />
                                     ) : input.type === "textarea" ? (
@@ -396,6 +427,12 @@ export const ApplicationPage = () => {
                                                     input.name,
                                                     e.target.value
                                                 )
+                                            }
+                                            // @ts-ignore
+                                            value={
+                                                application[input.name]
+                                                    ? application[input.name]
+                                                    : ""
                                             }
                                         />
                                     ) : null}
@@ -451,12 +488,29 @@ export const ApplicationPage = () => {
                                             onChange={(opt) =>
                                                 handleChange(input.name, opt)
                                             }
+                                            initialValue={
+                                                application[input.name]
+                                                    ? (application[
+                                                          input.name
+                                                      ] as string)
+                                                    : ""
+                                            }
                                         />
                                     ) : input.type === "multiselect" ? (
                                         <MultiSelect
                                             {...input.props}
                                             onChange={(opts) =>
                                                 handleChange(input.name, opts)
+                                            }
+                                            // @ts-ignore
+                                            initialValues={
+                                                (
+                                                    application[
+                                                        input.name
+                                                    ] as string[]
+                                                ).length > 0
+                                                    ? application[input.name]
+                                                    : []
                                             }
                                         />
                                     ) : null}
@@ -505,6 +559,11 @@ export const ApplicationPage = () => {
                                     }
                                     allowCustomValue
                                     required
+                                    initialValues={
+                                        application.referralSources.length > 0
+                                            ? application.referralSources
+                                            : []
+                                    }
                                 />
                             </div>
                             <div className="sm:col-span-full">
@@ -518,6 +577,7 @@ export const ApplicationPage = () => {
                                         )
                                     }
                                     required
+                                    value={application.describeSalt}
                                 />
                             </div>
                             {/* dont have the CoC yet */}

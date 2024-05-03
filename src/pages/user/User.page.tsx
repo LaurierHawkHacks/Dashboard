@@ -34,7 +34,7 @@ const UserPage = () => {
                         <InfoCallout text="Applications have now closed for HawkHacks 2024." />
                     </div>
                 )}
-                <div className="mt-4">
+                <div className="mt-4 flex gap-4">
                     {userApp || showInfo ? (
                         <Button disabled={!!userApp || showInfo}>
                             {showInfo ? "Applications Closed" : "Submitted"}
@@ -50,13 +50,24 @@ const UserPage = () => {
                             Apply To HawkHacks!
                         </Link>
                     )}
+                    {userApp && (
+                        <Link
+                            to={routes.application}
+                            className={getButtonStyles({
+                                intent: "primary",
+                                className: "block w-fit",
+                            })}
+                        >
+                            Edit/View Submission
+                        </Link>
+                    )}
                 </div>
             </div>
             {userApp && (
                 <p className="my-4">
                     Had issues with your application?{" "}
                     <Link
-                        to={routes.application}
+                        to={`${routes.application}?restart=true`}
                         className="font-medium text-sky-600 underline"
                     >
                         Resubmit one here.

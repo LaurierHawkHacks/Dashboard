@@ -51,7 +51,7 @@ export const Profile = ({
                 <Select
                     label="How old are you?"
                     options={ages}
-                    initialValue=""
+                    initialValue={profile.age ?? ""}
                     onChange={(opt) => handler("age", opt)}
                     required
                 />
@@ -72,7 +72,7 @@ export const Profile = ({
                 <Select
                     label="Which country do you currently reside in?"
                     options={countryNames}
-                    initialValue=""
+                    initialValue={profile.countryOfResidence ?? ""}
                     onChange={(opt) => handler("countryOfResidence", opt)}
                     required
                 />
@@ -82,7 +82,7 @@ export const Profile = ({
                 <Select
                     label="Which city do you live in?"
                     options={cityNames}
-                    initialValue=""
+                    initialValue={profile.city ?? ""}
                     onChange={(opt) => handler("city", opt)}
                     allowCustomValue
                     required
@@ -90,14 +90,17 @@ export const Profile = ({
             </div>
 
             <div className="col-span-6">
-                <PhoneInput onChange={(phone) => handler("phone", phone)} required />
+                <PhoneInput
+                    onChange={(phone) => handler("phone", phone)}
+                    required
+                />
             </div>
 
             <div className="sm:col-span-3">
                 <Select
                     label="Which school are you currently attending?"
                     options={schools}
-                    initialValue=""
+                    initialValue={profile.school ?? ""}
                     onChange={(opt) => handler("school", opt)}
                     allowCustomValue
                     required
@@ -111,7 +114,7 @@ export const Profile = ({
                 <Select
                     label="What is your current level of study?"
                     options={levelsOfStudy}
-                    initialValue=""
+                    initialValue={profile.levelOfStudy ?? ""}
                     onChange={(opt) => handler("levelOfStudy", opt)}
                     required
                 />
@@ -122,6 +125,7 @@ export const Profile = ({
                     label="What is your major/field of study?"
                     options={majorsList}
                     onChange={(opts) => handler("major", opts)}
+                    initialValues={profile.major.length ? profile.major : []}
                     allowCustomValue
                     required
                 />
