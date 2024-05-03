@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { Navigate, useSearchParams } from "react-router-dom";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import { useAuth, useNotification } from "@/providers/hooks";
 import { routes } from "@/navigation/constants";
@@ -91,6 +91,7 @@ export const ApplicationPage = () => {
     const progressTrackRef = useRef(new Set<string>());
     const loadingTimeoutRef = useRef<number | null>(null);
     const [sp] = useSearchParams();
+    const navigate = useNavigate();
 
     if (!currentUser) return <Navigate to={routes.login} />;
 
@@ -719,13 +720,23 @@ export const ApplicationPage = () => {
                         ) : null}
                     </div>
                     <div className="flex items-center justify-between px-4 py-4 sm:px-8">
-                        <Button
-                            disabled={activeStep === 0 || isSubmitting}
-                            onClick={prevStep}
-                            type="button"
-                        >
-                            Back
-                        </Button>
+                        <div className="space-x-4">
+                            <Button
+                                disabled={activeStep === 0 || isSubmitting}
+                                onClick={prevStep}
+                                type="button"
+                            >
+                                Back
+                            </Button>
+                            <Button
+                                intent="secondary"
+                                className="text-charcoalBlack"
+                                onClick={() => navigate("/")}
+                                type="button"
+                            >
+                                Cancel
+                            </Button>
+                        </div>
                         <Button
                             type="submit"
                             disabled={isSubmitting}
