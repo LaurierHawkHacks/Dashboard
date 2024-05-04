@@ -6,14 +6,14 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { LoadingAnimation } from "@/components/LoadingAnimation";
 
 const mediaTypes = [
-    // { name: "Instagram", key: "instagramUrl" },
+    { name: "Instagram", key: "instagram" },
     { name: "LinkedIn", key: "linkedinUrl" },
     { name: "GitHub", key: "githubUrl" },
     { name: "Discord", key: "discord" },
 ];
 
 interface MediaValues {
-    // instagram?: string;
+    instagram?: string;
     linkedinUrl?: string;
     githubUrl?: string;
     discord?: string;
@@ -25,6 +25,7 @@ export const NetworkingPage = () => {
     const { currentUser } = useAuth();
     const [isLoading, setIsLoading] = useState(true);
     const [editMode, setEditMode] = useState("");
+
     console.log("userApp", userApp);
     console.log("user", currentUser);
 
@@ -33,7 +34,7 @@ export const NetworkingPage = () => {
 
     // State to keep track of each media account value
     const [mediaValues, setMediaValues] = useState<MediaValues>({
-        //instagram: userApp?.instagram,
+        instagram: userApp?.instagram,
         linkedinUrl: userApp?.linkedinUrl,
         githubUrl: userApp?.githubUrl,
         discord: userApp?.discord,
@@ -42,7 +43,7 @@ export const NetworkingPage = () => {
     useEffect(() => {
         if (userApp) {
             setMediaValues({
-                // instagramUrl: userApp.instagramUrl || "",
+                instagram: userApp.instagram || "",
                 linkedinUrl: userApp.linkedinUrl || "",
                 githubUrl: userApp.githubUrl || "",
                 discord: userApp.discord || "",

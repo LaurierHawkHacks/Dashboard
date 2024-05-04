@@ -569,11 +569,18 @@ export const updateSocials = functions.https.onCall(async (data, context) => {
 
         console.log("Updating socials for application:", docRef.id);
         console.log("Data in ref:", docRef);
+
+        if (data.instagram === undefined) {
+            await docRef.set({
+                instagram: data.instagram,
+            });
+        }
+
         await docRef.update({
             discord: data.discord,
             linkedinUrl: data.linkedinUrl,
             githubUrl: data.githubUrl,
-            // instagram: data.instagram,
+            instagram: data.instagram,
         });
         console.log("Socials updated:", data);
         return { status: "success", data };
