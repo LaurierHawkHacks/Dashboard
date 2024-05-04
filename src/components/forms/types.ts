@@ -16,6 +16,7 @@ export interface HackerApplicationData {
     city: string;
     age: string;
     discord: string;
+    instagram: string;
     major: string[];
     gender: string;
     pronouns: string[];
