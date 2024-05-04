@@ -9,13 +9,13 @@ import {
 import type { ComponentProps } from "@/components/types";
 import {
     AdminPage,
-    ApplicationPage,
     LoginPage,
     NetworkingPage,
     NotFoundPage,
     TicketPage,
     HomePage,
     VerifyEmailPage,
+    UserPage,
 } from "@/pages";
 import { type RouteObject } from "react-router-dom";
 import { useAuth } from "./auth.provider";
@@ -24,6 +24,8 @@ import { PostSubmissionPage } from "@/pages/miscellaneous/PostSubmission.page";
 import { VerifyRSVP } from "@/pages/miscellaneous/VerifyRSVP.page";
 import { MyTeamPage } from "@/pages/MyTeam.page";
 import { JoinTeamPage } from "@/pages/JoinTeam.page";
+import { isAfter } from "date-fns";
+import { appCloseDate } from "@/data/appCloseDate";
 
 interface PathObject {
     admin: string;
@@ -213,6 +215,19 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                 { path: paths.schedule, element: <div>schedule</div> },
                 { path: paths.ticket, element: <TicketPage /> }
             );
+            setUserRoutes(userRoutes.children);
+            setRoutes(availableRoutes);
+            return cleanUp;
+        }
+
+        if (!userApp && isAfter(new Date(), new Date(appCloseDate))) {
+            userRoutes.children = [
+                {
+                    index: true,
+                    path: paths.portal,
+                    element: <UserPage />,
+                },
+            ];
             setUserRoutes(userRoutes.children);
             setRoutes(availableRoutes);
             return cleanUp;
