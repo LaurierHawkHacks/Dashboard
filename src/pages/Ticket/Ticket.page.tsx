@@ -48,23 +48,19 @@ export const TicketPage = () => {
             const ticketResult = await createTicket({
                 email: currentUser.email,
                 pronouns: user?.pronouns || pronouns[0],
-                linkedin: user?.linkedin || "",
-                github: user?.github || "",
-                discord: user?.discord || "",
-                instagram: user?.instagram || "",
-
-                
+                // linkedin: user?.linkedin || "",
+                // github: user?.github || "",
+                // discord: user?.discord || "",
+                // instagram: user?.instagram || "",
             });
             const ticketData = ticketResult.data as {
                 url?: string;
-                userRecord?: any;
             };
             if (ticketData.url) {
-                //window.location.href = ticketData.url; // Redirects user to download the pass
+                window.location.href = ticketData.url; // Redirects user to download the pass
                 alert(
                     "Ticket has been issued and your pass is ready to add to Apple Wallet!"
                 );
-                console.log("userRecord: ", ticketData.userRecord);
             } else {
                 alert(
                     "Ticket has been issued but could not generate Apple Wallet pass."
