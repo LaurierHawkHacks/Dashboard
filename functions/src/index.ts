@@ -457,3 +457,5 @@ export {
     validateTeamInvitation,
     rejectInvitation,
 } from "./teams";
+
+export { syncWithNotion, updateWithNotion, deleteWithNotion } from "./notion";
