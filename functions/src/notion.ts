@@ -130,6 +130,9 @@ async function getProperties(app) {
                 let url = app[key];
                 if (key === "generalResumeRef" || key === "mentorResumeRef") {
                     if (app[key].startsWith("gs://")) {
+                        functions.logger.info(
+                            "Getting storage bucket download url..."
+                        );
                         // gotta get a shareable url first
                         const ref = app[key].replace(
                             "gs://hawkhacks-dashboard.appspot.com/",
@@ -207,6 +210,7 @@ async function getProperties(app) {
 // }
 
 async function addToNotion(snap: functions.firestore.QueryDocumentSnapshot) {
+    functions.logger.info("Preparing to add to notion.");
     const app = snap.data();
     app.docId = snap.id;
     app.accepted = false;
@@ -229,10 +233,14 @@ async function addToNotion(snap: functions.firestore.QueryDocumentSnapshot) {
             ...properties,
         },
     });
+    functions.logger.info(
+        "Notion page added. Now updating firestore document."
+    );
     await snap.ref.update({ pageId: res.id });
 }
 
 async function updateToNotion(snap: functions.firestore.QueryDocumentSnapshot) {
+    functions.logger.info("Preparing to update to notion.");
     const app = snap.data();
     const pageId = app.pageId;
     if (!pageId) {
@@ -243,10 +251,12 @@ async function updateToNotion(snap: functions.firestore.QueryDocumentSnapshot) {
             page_id: pageId,
             properties,
         });
+        functions.logger.info("Notion updated.");
     }
 }
 
 async function deleteToNotion(snap: functions.firestore.QueryDocumentSnapshot) {
+    functions.logger.info("Preparing to delete from notion.");
     const app = snap.data();
     const pageId = app.pageId;
     if (pageId) {
