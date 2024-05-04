@@ -54,6 +54,7 @@ export async function submitApplication(data: ApplicationData, uid: string) {
         ...data,
         applicantId: uid,
         timestamp: Timestamp.now(),
+        applicationStatus: "In Review",
     };
 
     const appsRef = collection(firestore, APPLICATIONS_COLLECTION);
