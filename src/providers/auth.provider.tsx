@@ -15,11 +15,7 @@ import {
 } from "firebase/auth";
 import { auth } from "@/services/firebase";
 import { useNotification } from "@/providers/notification.provider";
-import {
-    checkRSVP,
-    getUserApplications,
-    verifyGitHubEmail,
-} from "@/services/utils";
+import { getUserApplications, verifyGitHubEmail } from "@/services/utils";
 import { LoadingAnimation } from "@/components";
 
 import type { User, AuthProvider as FirebaseAuthProvider } from "firebase/auth";
@@ -65,13 +61,13 @@ const AuthContext = createContext<AuthContextValue>({
  * Return object adds `hawkAdmin` boolean field.
  */
 async function validateUser(user: User): Promise<UserWithClaims> {
-    const { claims } = await user.getIdTokenResult();
-    const verified = await checkRSVP(user.uid);
+    const { claims } = await user.getIdTokenResult(true);
+    console.log(claims);
     return {
         ...user,
         hawkAdmin: Boolean(claims.admin),
         phoneVerified: Boolean(claims.phoneVerified),
-        rsvpVerified: verified,
+        rsvpVerified: Boolean(claims.rsvpVerified),
     };
 }
 
@@ -106,17 +102,20 @@ function getNotificationByAuthErrCode(code: string): NotificationOptions {
         case "auth/email-already-in-use":
             return {
                 title: "Email In Use",
-                message: "If you forgot your password, click on 'forgot password' to recover it!",
+                message:
+                    "If you forgot your password, click on 'forgot password' to recover it!",
             };
         case "auth/invalid-login-credentials":
             return {
                 title: "Invalid Credentials",
-                message: "Please make sure you have the correct credentials and try again.",
+                message:
+                    "Please make sure you have the correct credentials and try again.",
             };
         case "auth/popup-blocked":
             return {
                 title: "Login Blocked",
-                message: "Popup windows are blocked. Please allow them in your browser settings to continue.",
+                message:
+                    "Popup windows are blocked. Please allow them in your browser settings to continue.",
             };
         default:
             return {

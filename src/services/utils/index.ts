@@ -225,29 +225,3 @@ export async function verifyRSVP() {
         return false;
     }
 }
-
-export async function checkRSVP(uid: string) {
-    try {
-        const rsvpRef = collection(firestore, RSVP_COLLECTION);
-        const q = query(
-            rsvpRef,
-            where("uid", "==", uid),
-            orderBy("timestamp", "desc"),
-            limit(1)
-        );
-        const snap = await getDocs(q);
-        if (snap.size < 1) {
-            return false;
-        }
-        return snap.docs[0].data().verified;
-    } catch (e) {
-        console.log(e);
-        logEvent("error", {
-            event: "check_rsvp",
-            message: (e as Error).message,
-            name: (e as Error).name,
-            stack: (e as Error).stack,
-        });
-    }
-    return false;
-}
