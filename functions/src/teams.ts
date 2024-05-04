@@ -77,6 +77,7 @@ async function internalGetTeamByUser(uid: string): Promise<Team | undefined> {
         .firestore()
         .collection(USER_PROFILES_COLLECTION)
         .where("uid", "==", uid)
+        .where("teamId", "!=", "")
         .get();
     const profile = profileSnap.docs[0]?.data() as UserProfile | undefined;
     if (!profile || !profile.teamId) {
@@ -308,9 +309,10 @@ export const createTeam = functions.https.onCall(async (data, context) => {
             .firestore()
             .collection(USER_PROFILES_COLLECTION)
             .where("uid", "==", context.auth.uid)
+            .where("teamId", "==", "")
             .get();
-        const userProfile = snap.docs[0]?.data() as UserProfile | undefined;
-        if (!userProfile) {
+        const doc = snap.docs[0];
+        if (!doc) {
             functions.logger.info("User profile not found, creating one...", {
                 func,
             });
@@ -325,6 +327,13 @@ export const createTeam = functions.https.onCall(async (data, context) => {
                     uid: context.auth.uid,
                 } as UserProfile);
             functions.logger.info("User profile created.", { func });
+        } else {
+            functions.logger.info("User profile found, updating...", { func });
+            await admin
+                .firestore()
+                .collection(USER_PROFILES_COLLECTION)
+                .doc(doc.id)
+                .update({ teamId });
         }
     } catch (error) {
         functions.logger.error("Failed to check user profile", { error, func });
