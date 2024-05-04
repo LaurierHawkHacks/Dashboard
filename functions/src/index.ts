@@ -540,6 +540,53 @@ export const addAdminRole = functions.https.onCall((data, context) => {
         });
 });
 
+export const updateSocials = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        console.log("Authentication required.");
+        throw new functions.https.HttpsError(
+            "permission-denied",
+            "Not authenticated"
+        );
+    }
+
+    console.log("Updating socials:", data);
+    console.log("User ID in Func:", context.auth.uid);
+
+    const appsRef = admin.firestore().collection("applications");
+    const query = appsRef.where("applicantId", "==", context.auth.uid).limit(1);
+
+    try {
+        const querySnapshot = await query.get();
+        if (querySnapshot.empty) {
+            console.log("No matching documents.");
+            throw new functions.https.HttpsError(
+                "not-found",
+                "Document with the specified applicantId does not exist"
+            );
+        }
+
+        const docRef = querySnapshot.docs[0].ref;
+
+        console.log("Updating socials for application:", docRef.id);
+        console.log("Data in ref:", docRef);
+        await docRef.update({
+            discord: data.discord,
+            linkedinUrl: data.linkedinUrl,
+            githubUrl: data.githubUrl,
+            // instagram: data.instagram,
+        });
+        console.log("Socials updated:", data);
+        return { status: "success", data };
+    } catch (error) {
+        console.error("Failed to update socials:", error);
+        throw new functions.https.HttpsError(
+            "internal",
+            "Failed to update socials",
+            error
+        );
+    }
+});
+
 /**
  * This cloud function is use as a solution to the work around
  * when signing in with github would lead to unverified email
