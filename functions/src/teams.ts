@@ -811,7 +811,7 @@ export const validateTeamInvitation = functions.https.onCall(
                 "Checking if invitation is for requesting user",
                 { func }
             );
-            const snap = await admin
+            let snap = await admin
                 .firestore()
                 .collection(INVITATIONS_COLLECTION)
                 .where("invitationId", "==", data.code)
@@ -828,6 +828,24 @@ export const validateTeamInvitation = functions.https.onCall(
                     message: "Invitation does not exists or expired.",
                 });
             }
+
+            // make sure we only add someone who is not in a team
+            snap = await admin
+                .firestore()
+                .collection(USER_PROFILES_COLLECTION)
+                .where("uid", "==", context.auth.uid)
+                .where("teamId", "!=", "")
+                .get();
+            if (snap.size > 0) {
+                functions.logger.info(
+                    "Requesting user belongs to a team already.",
+                    { func }
+                );
+                return response(HttpStatus.BAD_REQUEST, {
+                    message: "Invitation does not exists or expired.",
+                });
+            }
+
             // if we found a member, then it is for the requesting user
             // now we update the status of the member
             functions.logger.info("Updating invitation status", { func });
@@ -982,6 +1000,19 @@ export const checkInvitation = functions.https.onCall(async (data, context) => {
             .get();
         const doc = snap.docs[0];
         if (!doc) {
+            return response(HttpStatus.NOT_FOUND, { message: "Not Found" });
+        }
+
+        // make sure requesting user is not in a team already
+        const profileDoc = (
+            await admin
+                .firestore()
+                .collection(USER_PROFILES_COLLECTION)
+                .where("uid", "==", context.auth.uid)
+                .where("teamId", "!=", "")
+                .get()
+        ).docs[0];
+        if (profileDoc) {
             return response(HttpStatus.NOT_FOUND, { message: "Not Found" });
         }
 
