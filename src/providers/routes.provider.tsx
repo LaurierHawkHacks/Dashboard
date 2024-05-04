@@ -14,7 +14,7 @@ import {
     NetworkingPage,
     NotFoundPage,
     TicketPage,
-    UserPage,
+    HomePage,
     VerifyEmailPage,
 } from "@/pages";
 import { type RouteObject } from "react-router-dom";
@@ -39,6 +39,7 @@ interface PathObject {
     verifyRSVP: string;
     myTeam: string;
     joinTeam: string;
+    myApp: string;
 }
 
 interface Title {
@@ -69,6 +70,7 @@ const paths: PathObject = {
     verifyRSVP: "/verify-rsvp",
     myTeam: "/my-team",
     joinTeam: "/join-team",
+    myApp: "/my-application",
 };
 
 const titles: Record<string, Title> = {
@@ -156,7 +158,7 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                 {
                     index: true,
                     path: paths.portal,
-                    element: <UserPage />,
+                    element: <HomePage />,
                 },
                 {
                     path: paths.application,
