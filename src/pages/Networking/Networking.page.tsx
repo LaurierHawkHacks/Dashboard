@@ -1,5 +1,4 @@
 import { useAuth as useAuthProvider } from "@/providers/auth.provider";
-import { useAuth } from "@/providers/hooks";
 import { useEffect, useState } from "react";
 import { MdOutlineEdit, MdOutlineFileDownload } from "react-icons/md";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -12,6 +11,18 @@ const mediaTypes = [
     { name: "Discord", key: "discord" },
 ];
 
+const allowedFileTypes = [
+    "image/*", //png, jpg, jpeg, jfif, pjpeg, pjp, gif, webp, bmp, svg
+    "application/pdf", //pdf
+    "application/msword", //doc, dot, wiz
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document", //docx
+    "application/rtf", //rtf
+    "application/oda", //oda
+    "text/markdown", //md, markdown, mdown, markdn
+    "text/plain", //txt, text, conf, def, list, log, in, ini
+    "application/vnd.oasis.opendocument.text", //odt
+];
+
 interface MediaValues {
     instagram?: string;
     linkedinUrl?: string;
@@ -22,15 +33,22 @@ interface MediaValues {
 
 export const NetworkingPage = () => {
     const userApp = useAuthProvider().userApp;
-    const { currentUser } = useAuth();
     const [isLoading, setIsLoading] = useState(true);
     const [editMode, setEditMode] = useState("");
+    const [randomId] = useState(Math.random().toString(32));
+
+    const [file, setFile] = useState<File | null>(null);
 
     console.log("userApp", userApp);
-    console.log("user", currentUser);
 
-    const { firstName, lastName, pronouns, mentorResumeRef, generalResumeRef } =
-        userApp || {};
+    const {
+        firstName,
+        lastName,
+        pronouns,
+        mentorResumeRef,
+        participatingAs,
+        generalResumeRef,
+    } = userApp || {};
 
     // State to keep track of each media account value
     const [mediaValues, setMediaValues] = useState<MediaValues>({
@@ -52,28 +70,25 @@ export const NetworkingPage = () => {
         }
     }, [userApp]);
 
-    const handleFileChange = (media: string, file: FileList | null) => {
-        // Handle RESUME UPLOAD
-        console.log(media, file);
+    const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFiles = Array.from(e.target.files || []);
+        setFile(selectedFiles[0] ?? null);
     };
-
-    console.log("uid", currentUser?.uid);
 
     const handleInputChange = (key, value) => {
         setMediaValues((prev) => ({ ...prev, [key]: value }));
-        setEditMode(key); // Set edit mode to the current key
+        setEditMode(key);
     };
 
-    // console.log("userID", currentUser?.uid);
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
         const functions = getFunctions();
         try {
             const updateMedia = httpsCallable(functions, "updateSocials");
-            await updateMedia(mediaValues);
+            await updateMedia(mediaValues && file && participatingAs);
             setIsLoading(false);
-            setEditMode(""); // Reset edit mode after saving
+            setEditMode("");
         } catch (e) {
             console.error(e);
             setIsLoading(false);
@@ -82,11 +97,12 @@ export const NetworkingPage = () => {
 
     const handleCancel = () => {
         setMediaValues({
-            linkedinUrl: userApp.linkedinUrl || "",
-            githubUrl: userApp.githubUrl || "",
-            discord: userApp.discord || "",
+            instagram: userApp?.instagram || "",
+            linkedinUrl: userApp?.linkedinUrl || "",
+            githubUrl: userApp?.githubUrl || "",
+            discord: userApp?.discord || "",
         });
-        setEditMode(""); // Exit edit mode without saving
+        setEditMode("");
     };
 
     if (isLoading) return <LoadingAnimation />;
@@ -173,19 +189,15 @@ export const NetworkingPage = () => {
                             <MdOutlineFileDownload className="text-gray-500" />
                         </label>
                         <input
-                            id="file-upload"
+                            id={`file-${randomId}`}
                             className="hidden"
                             type="file"
-                            onChange={(e) =>
-                                handleFileChange(
-                                    "FileName Here",
-                                    e.target.files
-                                )
-                            }
+                            accept={allowedFileTypes.join(", ")}
+                            onChange={handleFileInput}
                         />
                         {(mentorResumeRef || generalResumeRef) && (
                             <p className="bg-peachWhite px-4 py-1 w-full rounded-md text-gray-500 overflow-hidden">
-                                {mentorResumeRef || generalResumeRef}
+                                {file?.name || "Resume Uploaded"}
                             </p>
                         )}
                     </div>
