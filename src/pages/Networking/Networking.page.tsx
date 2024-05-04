@@ -3,6 +3,7 @@ import { useAuth } from "@/providers/hooks";
 import { useEffect, useState } from "react";
 import { MdOutlineEdit, MdOutlineFileDownload } from "react-icons/md";
 import { getFunctions, httpsCallable } from "firebase/functions";
+import { LoadingAnimation } from "@/components/LoadingAnimation";
 
 const mediaTypes = [
     // { name: "Instagram", key: "instagramUrl" },
@@ -22,6 +23,8 @@ interface MediaValues {
 export const NetworkingPage = () => {
     const userApp = useAuthProvider().userApp;
     const { currentUser } = useAuth();
+    const [isLoading, setIsLoading] = useState(true);
+    const [editMode, setEditMode] = useState("");
     console.log("userApp", userApp);
     console.log("user", currentUser);
 
@@ -36,6 +39,18 @@ export const NetworkingPage = () => {
         discord: userApp?.discord,
     });
 
+    useEffect(() => {
+        if (userApp) {
+            setMediaValues({
+                // instagramUrl: userApp.instagramUrl || "",
+                linkedinUrl: userApp.linkedinUrl || "",
+                githubUrl: userApp.githubUrl || "",
+                discord: userApp.discord || "",
+            });
+            setIsLoading(false);
+        }
+    }, [userApp]);
+
     const handleFileChange = (media: string, file: FileList | null) => {
         // Handle RESUME UPLOAD
         console.log(media, file);
@@ -43,27 +58,37 @@ export const NetworkingPage = () => {
 
     console.log("uid", currentUser?.uid);
 
-    const handleInputChange = (key: string, value: string) => {
+    const handleInputChange = (key, value) => {
         setMediaValues((prev) => ({ ...prev, [key]: value }));
-        console.log("mediaValues", mediaValues);
+        setEditMode(key); // Set edit mode to the current key
     };
 
     // console.log("userID", currentUser?.uid);
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
         const functions = getFunctions();
         try {
             const updateMedia = httpsCallable(functions, "updateSocials");
-            console.log("mediaValues", mediaValues);
-
-            const response = await updateMedia(mediaValues);
-            const data = response.data;
-
-            console.log(data);
+            await updateMedia(mediaValues);
+            setIsLoading(false);
+            setEditMode(""); // Reset edit mode after saving
         } catch (e) {
             console.error(e);
+            setIsLoading(false);
         }
     };
+
+    const handleCancel = () => {
+        setMediaValues({
+            linkedinUrl: userApp.linkedinUrl || "",
+            githubUrl: userApp.githubUrl || "",
+            discord: userApp.discord || "",
+        });
+        setEditMode(""); // Exit edit mode without saving
+    };
+
+    if (isLoading) return <LoadingAnimation />;
 
     return (
         <div>
@@ -84,7 +109,7 @@ export const NetworkingPage = () => {
                             <p className="flex-1">{name}</p>
                             {mediaValues[key] && (
                                 <p className="bg-green-300 rounded-full px-4 py-1">
-                                    Completed
+                                    {editMode === key ? "Pending" : "Complete"}
                                 </p>
                             )}
                         </div>
@@ -103,15 +128,17 @@ export const NetworkingPage = () => {
                             )}
                         </div>
 
-                        {mediaValues[key] && (
+                        {editMode === key && (
                             <div className="mt-2 flex gap-2">
-                                <button className="bg-peachWhite rounded-lg px-4 py-1">
+                                <button
+                                    className="bg-gray-300 rounded-lg px-4 py-1"
+                                    onClick={handleCancel}
+                                >
                                     Cancel
                                 </button>
                                 <button
-                                    className="bg-peachWhite rounded-lg px-4 py-1"
-                                    type="button"
-                                    onClick={(e) => handleSubmit(e)}
+                                    className="bg-blue-500 text-white rounded-lg px-4 py-1"
+                                    onClick={handleSubmit}
                                 >
                                     Save
                                 </button>
