@@ -109,7 +109,13 @@ export const NetworkingPage = () => {
                         <div className="mb-2 flex justify-between items-center">
                             <p className="flex-1">{name}</p>
                             {mediaValues[key] && (
-                                <p className="bg-green-300 rounded-full px-4 py-1">
+                                <p
+                                    className={`rounded-full px-4 py-1 ${
+                                        editMode === key
+                                            ? "bg-blue-500/60 text-white"
+                                            : "bg-green-300"
+                                    }`}
+                                >
                                     {editMode === key ? "Pending" : "Complete"}
                                 </p>
                             )}
@@ -125,20 +131,20 @@ export const NetworkingPage = () => {
                                 }
                             />
                             {mediaValues[key] && (
-                                <MdOutlineEdit className="absolute right-2 text-gray-500 ml-2" />
+                                <MdOutlineEdit className="absolute -right-[5%] text-gray-500 ml-2" />
                             )}
                         </div>
 
                         {editMode === key && (
                             <div className="mt-2 flex gap-2">
                                 <button
-                                    className="bg-gray-300 rounded-lg px-4 py-1"
+                                    className="bg-gray-300/30 rounded-lg px-4 py-1"
                                     onClick={handleCancel}
                                 >
                                     Cancel
                                 </button>
                                 <button
-                                    className="bg-blue-500 text-white rounded-lg px-4 py-1"
+                                    className="bg-peachWhite text-black rounded-lg px-4 py-1"
                                     onClick={handleSubmit}
                                 >
                                     Save
