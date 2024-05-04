@@ -23,3 +23,8 @@ export interface CloudFunctionResponse<T> {
     message: string;
     data: T;
 }
+
+export interface Invitation {
+    owner: string; // the name of the owner
+    teamName: string;
+}
