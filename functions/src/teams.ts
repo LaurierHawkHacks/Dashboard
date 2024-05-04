@@ -481,6 +481,24 @@ export const inviteMember = functions.https.onCall(async (data, context) => {
         });
     }
 
+    // found out if user already belongs to a team
+    try {
+        const team = await internalGetTeamByUser(userRecord.uid);
+        if (team) {
+            return response(HttpStatus.NOT_FOUND, {
+                message: "Could not send invitation.",
+            });
+        }
+    } catch (e) {
+        functions.logger.error(
+            "Failed to check if invitation is for a user who does not have a team.",
+            { error: e, func }
+        );
+        return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+            message: "Service Down (team-invitation)",
+        });
+    }
+
     // only send invitation if invitee has been accepted
     let app: { firstName: string; lastName: string; accepted: boolean };
     try {
