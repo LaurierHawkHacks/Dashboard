@@ -161,10 +161,6 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                     element: <HomePage />,
                 },
                 {
-                    path: paths.application,
-                    element: <ApplicationPage />,
-                },
-                {
                     path: paths.verifyEmail,
                     element: <VerifyEmailPage />,
                 },
