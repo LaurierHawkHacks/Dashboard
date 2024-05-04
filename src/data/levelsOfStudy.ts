@@ -1,6 +1,6 @@
 export const levelsOfStudy: string[] = [
     "Undergraduate University (3+ years)",
-    "Undergraduate University (2 year - community collecge or similar)",
+    "Undergraduate University (2 year - community college or similar)",
     "Graduate University (Masters, Professional, Doctoral, etc)",
     "Less than Secondary / High School",
     "Secondary / High School",
