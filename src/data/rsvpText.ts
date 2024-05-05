@@ -1,4 +1,4 @@
-const rsvpDropdown = [
+const rsvpText = [
     "I accept full responsibility for my actions for the entire duration of this event.",
     "I acknowledge that the Wilfrid Laurier University Students’ Union and its officers, directors, employees, volunteers, and the event organizers are in no way responsible for lost or stolen property, bodily injury or any other misfortune that might come to me as a result of my participation in this event.",
     "I acknowledge that I will not hold the Wilfrid Laurier University Students’ Union and its officers, directors, employees, volunteers, and the event organizers liable or responsible for any injury or damages sustained from activities related to participation in the Event.",
@@ -9,4 +9,4 @@ const rsvpDropdown = [
     "I hereby grant permission to the event organizers to photograph and video me, and otherwise capture my image, and to make recordings of my voice to be used in marketing materials at the event or location noted above.",
 ];
 
-export { rsvpDropdown };
+export { rsvpText };
