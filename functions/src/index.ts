@@ -153,55 +153,48 @@ export const logEvent = functions.https.onCall((data, context) => {
     }
 });
 
-export const verifyRSVP = functions
-    .runWith({
-        enforceAppCheck: true, // reject requests with missing or invalid app check tokens.
-        consumeAppCheckToken: true,
-    })
-    .https.onCall(async (_, context) => {
-        if (!context.auth) {
+export const verifyRSVP = functions.https.onCall(async (_, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError(
+            "permission-denied",
+            "Not authenticated"
+        );
+    }
+
+    functions.logger.info("Verify RSVP called.", { uid: context.auth.uid });
+
+    // only verify once
+    const user = await admin.auth().getUser(context.auth.uid);
+    if (user.customClaims?.rsvpVerified) {
+        return {
+            status: 200,
+            verified: true,
+        };
+    } else {
+        try {
+            functions.logger.info("Verifying RSVP. User: " + context.auth.uid);
+            // add to custom claims
+            await admin.auth().setCustomUserClaims(user.uid, {
+                ...user.customClaims,
+                rsvpVerified: true,
+            });
+        } catch (e) {
+            functions.logger.error("Error verifying RSVP.", {
+                uid: context.auth.uid,
+                error: (e as Error).message,
+            });
             throw new functions.https.HttpsError(
-                "permission-denied",
-                "Not authenticated"
+                "internal",
+                "Service down. 1101"
             );
         }
 
-        functions.logger.info("Verify RSVP called.", { uid: context.auth.uid });
-
-        // only verify once
-        const user = await admin.auth().getUser(context.auth.uid);
-        if (user.customClaims?.rsvpVerified) {
-            return {
-                status: 200,
-                verified: true,
-            };
-        } else {
-            try {
-                functions.logger.info(
-                    "Verifying RSVP. User: " + context.auth.uid
-                );
-                // add to custom claims
-                await admin.auth().setCustomUserClaims(user.uid, {
-                    ...user.customClaims,
-                    rsvpVerified: true,
-                });
-            } catch (e) {
-                functions.logger.error("Error verifying RSVP.", {
-                    uid: context.auth.uid,
-                    error: (e as Error).message,
-                });
-                throw new functions.https.HttpsError(
-                    "internal",
-                    "Service down. 1101"
-                );
-            }
-
-            return {
-                status: 200,
-                verified: true,
-            };
-        }
-    });
+        return {
+            status: 200,
+            verified: true,
+        };
+    }
+});
 
 export {
     isTeamNameAvailable,
