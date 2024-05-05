@@ -8,7 +8,6 @@ import {
     Timestamp,
     doc,
     setDoc,
-    orderBy,
 } from "firebase/firestore";
 import { firestore, functions, storage } from "@/services/firebase";
 import type { UserTicketData } from "@/services/utils/types";
