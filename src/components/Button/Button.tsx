@@ -7,8 +7,10 @@ export const Button: React.FC<ButtonProps> = ({
     className,
     ...props
 }) => {
+    const buttonClass = getButtonStyles({ intent, className });
+
     return (
-        <button className={getButtonStyles({ intent, className })} {...props}>
+        <button className={buttonClass} {...props}>
             {children}
         </button>
     );
