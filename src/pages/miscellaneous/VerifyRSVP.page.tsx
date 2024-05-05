@@ -4,7 +4,7 @@ import { verifyRSVP } from "@/services/utils";
 import { useNotification } from "@/providers/notification.provider";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { rsvpDropdown } from "@/data";
+import { rsvpText } from "@/data";
 
 export const VerifyRSVP = () => {
     const [isVerifying, setIsVerifying] = useState(false);
@@ -58,7 +58,7 @@ export const VerifyRSVP = () => {
                     </label>
 
                     <div className="border border-blueGreen p-2 my-8 flex flex-col gap-2 text-gray-500 max-w-3xl max-h-72 overflow-y-scroll">
-                        {rsvpDropdown.map((content, index) => {
+                        {rsvpText.map((content, index) => {
                             return <p key={index}>{content}</p>;
                         })}
                     </div>

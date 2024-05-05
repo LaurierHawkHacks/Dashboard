@@ -8,7 +8,7 @@ export { cityNames } from "./cities";
 export { faqs } from "./faqs";
 export { socialLinks } from "./SocialLinks";
 export { sponsors } from "./sponsors";
-export { rsvpDropdown } from "./rsvpDropdown";
+export { rsvpText } from "./rsvpText";
 
 export const genders = [
     "Man",
