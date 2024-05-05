@@ -36,7 +36,7 @@ const signerKeyPassphrase = config.certs.signer_key_passphrase;
 const teamIdentifier = config.certs.team_id;
 
 // apple wallet ticket
-export const createTicket = functions.https.onCall(async (data, context) => {
+export const createTicket = functions.https.onCall(async (_, context) => {
     if (!context.auth) {
         throw new functions.https.HttpsError(
             "permission-denied",
@@ -53,22 +53,20 @@ export const createTicket = functions.https.onCall(async (data, context) => {
         const lastName = names[1] || "Unknown";
 
         const ticketsRef = admin.firestore().collection("tickets");
-        const ticketDoc = await ticketsRef.doc(userId).get();
-        let passId;
-        if (ticketDoc.exists && ticketDoc.data()?.passId) {
-            passId = ticketDoc.data()?.passId;
+        const ticketDoc = (await ticketsRef.where("userId", "==", userId).get())
+            .docs[0];
+        let ticketId = "";
+        if (!ticketDoc) {
+            ticketId = uuidv4();
+            await ticketsRef.doc(ticketId).set({
+                userId: userId,
+                ticketId: ticketId,
+                firstName: firstName,
+                lastName: lastName,
+                timestamp: new Date(),
+            });
         } else {
-            passId = uuidv4();
-            await ticketsRef.doc(userId).set(
-                {
-                    userId: userId,
-                    passId: passId,
-                    firstName: firstName,
-                    lastName: lastName,
-                    timestamp: new Date(),
-                },
-                { merge: true }
-            );
+            ticketId = ticketDoc.id;
         }
 
         const passJsonBuffer = Buffer.from(
@@ -77,7 +75,7 @@ export const createTicket = functions.https.onCall(async (data, context) => {
                 formatVersion: 1,
                 teamIdentifier: teamIdentifier,
                 organizationName: "HawkHacks",
-                serialNumber: passId,
+                serialNumber: ticketId,
                 description: "Access to HawkHacks 2024",
                 foregroundColor: "rgb(255, 255, 255)",
                 backgroundColor: "rgb(12, 105, 117)",
@@ -85,7 +83,7 @@ export const createTicket = functions.https.onCall(async (data, context) => {
                 logoText: "Welcome to HawkHacks",
                 barcodes: [
                     {
-                        message: `https://portal.hawkhacks.ca/ticket/${passId}`,
+                        message: `https://${config.fe.url}/ticket/${ticketId}`,
                         format: "PKBarcodeFormatQR",
                         messageEncoding: "iso-8859-1",
                     },
@@ -455,6 +453,7 @@ export const createPassObject = functions.https.onCall(
         const ticketsRef = admin.firestore().collection("tickets");
         await ticketsRef.doc(ticketId).set({
             userId: userId,
+            ticketId,
             firstName: firstName,
             lastName: lastName,
             timestamp: new Date(),
