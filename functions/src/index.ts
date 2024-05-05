@@ -104,15 +104,15 @@ export const createPassClass = functions.https.onCall(async (_, context) => {
                 data: updatedClass,
             });
 
-            // console.log("Class insert response");
-            // console.log(createResponse);
+            // functions.logger.info("Class insert response");
+            // functions.logger.info(createResponse);
 
             return {
                 result: "Class created",
                 details: createResponse.data,
             };
         } else {
-            console.log(error);
+            functions.logger.info(error);
             throw new functions.https.HttpsError(
                 "unknown",
                 "Failed to handle request",
@@ -221,7 +221,7 @@ export const createPassObject = functions.https.onCall(
             },
         };
 
-        console.log("Pass object being sent:", updatedGenericObject);
+        functions.logger.info("Pass object being sent:", updatedGenericObject);
 
         //FOR POSTING NEW OBJECTS
         // try {
@@ -230,7 +230,7 @@ export const createPassObject = functions.https.onCall(
         //         method: "POST",
         //         data: updatedGenericObject,
         //     });
-        //     console.log("Pass created successfully", response.data);
+        //     functions.logger.info("Pass created successfully", response.data);
         // } catch (error) {
         //     console.error("Failed to create pass object", error);
         // }
@@ -243,7 +243,7 @@ export const createPassObject = functions.https.onCall(
                 data: updatedGenericObject,
             });
 
-            console.log("Pass updated successfully", response.data);
+            functions.logger.info("Pass updated successfully", response.data);
         } catch (error) {
             console.error("Failed to update object", error);
             throw new functions.https.HttpsError(
@@ -290,7 +290,7 @@ export const addDefaultClaims = functions.auth.user().onCreate(async (user) => {
             admin: false, // Example: set to true for admin users
             phoneVerified: false,
         });
-        console.log(`Custom claims added for user: ${uid}`);
+        functions.logger.info(`Custom claims added for user: ${uid}`);
     } catch (error) {
         console.error("Error adding custom claims:", error);
     }
