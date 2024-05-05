@@ -15,6 +15,8 @@ import { z } from "zod";
 import { GoogleAuth } from "google-auth-library";
 import * as jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
+import { PKPass } from "passkit-generator";
+import axios from "axios";
 
 const config = functions.config();
 
@@ -27,6 +29,149 @@ const httpClient = new GoogleAuth({
     scopes: "https://www.googleapis.com/auth/wallet_object.issuer",
 });
 
+const signerCert = config.certs.signer_cert;
+const signerKey = config.certs.signer_key;
+const wwdr = config.certs.wwdr_cert;
+const signerKeyPassphrase = config.certs.signer_key_passphrase;
+const teamIdentifier = config.certs.team_id;
+
+export const createTicket = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError(
+            "permission-denied",
+            "Not authenticated"
+        );
+    }
+
+    try {
+        const userId = context.auth.uid;
+        const userRecord = await admin.auth().getUser(userId);
+        const fullName = userRecord.displayName || '';
+        const names = fullName.split(' ');
+        const firstName = names[0] || 'Unknown';
+        const lastName = names[1] || 'Unknown';
+
+        const ticketsRef = admin.firestore().collection("tickets");
+        const ticketDoc = await ticketsRef.doc(userId).get();
+        let passId;
+        if (ticketDoc.exists && ticketDoc.data()?.passId) {
+            passId = ticketDoc.data()?.passId;
+        } else {
+            passId = uuidv4();
+            await ticketsRef.doc(userId).set({
+                userId: userId,
+                passId: passId,
+                firstName: firstName,
+                lastName: lastName,
+                timestamp: new Date()
+            }, { merge: true });
+        }
+
+        const passJsonBuffer = Buffer.from(JSON.stringify({
+            "passTypeIdentifier": "pass.com.dashboard.hawkhacks",
+            "formatVersion": 1,
+            "teamIdentifier": teamIdentifier,
+            "organizationName": "HawkHacks",
+            "serialNumber": passId,
+            "description": "Access to HawkHacks 2024",
+            "foregroundColor": "rgb(255, 255, 255)",
+            "backgroundColor": "rgb(12, 105, 117)",
+            "labelColor": "rgb(255, 255, 255)",
+            "logoText": "Welcome to HawkHacks",
+            "barcodes": [{
+                "message": `https://portal.hawkhacks.ca/ticket/${passId}`,
+                "format": "PKBarcodeFormatQR",
+                "messageEncoding": "iso-8859-1"
+            }],
+            "locations": [{
+                "latitude": 51.50506,
+                "longitude": -0.01960,
+                "relevantText": "Event Entrance"
+            }],
+            "generic": {
+                "headerFields": [{
+                    "key": "eventHeader",
+                    "label": "Event Date",
+                    "value": "May 25, 2024"
+                }],
+                "primaryFields": [{
+                    "key": "eventName",
+                    "label": "Participant",
+                    "value": fullName
+                }, {
+                    "key": "teamName",
+                    "label": "Team",
+                    "value": "Team Here"
+                }],
+                "auxiliaryFields": [{
+                    "key": "location",
+                    "label": "Location",
+                    "value": "Wilfrid Laurier University"
+                }, {
+                    "key": "startTime",
+                    "label": "Start Time",
+                    "value": "09:00 AM"
+                }],
+                "backFields": [{
+                    "key": "moreInfo",
+                    "label": "More Info",
+                    "value": "For more details, visit our website at hawkhacks.ca or contact support@hawkhacks.ca"
+                }, {
+                    "key": "emergencyContact",
+                    "label": "Emergency Contact",
+                    "value": "911"
+                }]
+            },
+            "images": {
+                "logo": {
+                    "filename": "logo.png"
+                },
+                "logo@2x": {
+                    "filename": "logo@2x.png"
+                }
+            }
+        }));
+
+        const iconResponse = await axios.get("https://hawkhacks.ca/icon.png", { responseType: 'arraybuffer' });
+        const icon2xResponse = await axios.get("https://hawkhacks.ca/icon.png", { responseType: 'arraybuffer' });
+        const iconBuffer = iconResponse.data;
+        const icon2xBuffer = icon2xResponse.data;
+
+        const pass = new PKPass({
+            "pass.json": passJsonBuffer,
+            "icon.png": iconBuffer,
+            "icon@2x.png": icon2xBuffer
+        }, {
+            signerCert: signerCert,
+            signerKey: signerKey,
+            wwdr: wwdr,
+            signerKeyPassphrase: signerKeyPassphrase,
+        });
+
+        const buffer = await pass.getAsBuffer();
+
+        const storageRef = admin.storage().bucket();
+        const fileRef = storageRef.file(`passes/${userId}/pass.pkpass`);
+        await fileRef.save(buffer, {
+            metadata: {
+                contentType: 'application/vnd.apple.pkpass'
+            }
+        });
+
+        await fileRef.makePublic();
+        const passUrl = fileRef.publicUrl();
+
+        return { url: passUrl };
+    } catch (error) {
+        console.error("Error creating ticket:", error);
+        throw new functions.https.HttpsError(
+            "internal",
+            "Failed to create ticket",
+            error instanceof Error ? error.message : "Unknown error"
+        );
+    }
+});
+
 export const createPassClass = functions.https.onCall(async (_, context) => {
     if (!context.auth) {
         return {
@@ -37,10 +182,22 @@ export const createPassClass = functions.https.onCall(async (_, context) => {
 
     const baseUrl = "https://walletobjects.googleapis.com/walletobjects/v1";
     const issuerid = config.googlewallet.issuerid;
-    const classId = `${issuerid}.hawkhacks-ticket`;
+
+    const classesRef = admin.firestore().collection("passClasses");
+    const classDoc = await classesRef.doc(issuerid).get();
+    let classId;
+    if (classDoc.exists && classDoc.data()?.classId) {
+        classId = classDoc.data()?.classId;
+    } else {
+        classId = `${issuerid}.hawkhacks-ticket-${uuidv4()}`;
+        await classesRef.doc(issuerid).set({
+            classId: classId,
+            timestamp: new Date()
+        }, { merge: true });
+    }
 
     const updatedClass = {
-        id: `${classId}`,
+        id: classId,
         classTemplateInfo: {
             cardTemplateOverride: {
                 cardRowTemplateInfos: [
@@ -50,8 +207,7 @@ export const createPassClass = functions.https.onCall(async (_, context) => {
                                 firstValue: {
                                     fields: [
                                         {
-                                            fieldPath:
-                                                'textModulesData["from"]',
+                                            fieldPath: 'textModulesData["from"]',
                                         },
                                     ],
                                 },
@@ -60,8 +216,7 @@ export const createPassClass = functions.https.onCall(async (_, context) => {
                                 firstValue: {
                                     fields: [
                                         {
-                                            fieldPath:
-                                                "object.textModulesData['to']",
+                                            fieldPath: "object.textModulesData['to']",
                                         },
                                     ],
                                 },
@@ -86,7 +241,6 @@ export const createPassClass = functions.https.onCall(async (_, context) => {
         // Try to get the class, if it exists
         const response = await httpClient.request({
             url: `${baseUrl}/genericClass/${classId}`,
-            // method: "GET",
             method: "PUT",
             data: updatedClass,
         });
@@ -103,9 +257,6 @@ export const createPassClass = functions.https.onCall(async (_, context) => {
                 method: "POST",
                 data: updatedClass,
             });
-
-            // functions.logger.info("Class insert response");
-            // functions.logger.info(createResponse);
 
             return {
                 result: "Class created",
