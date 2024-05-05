@@ -22,7 +22,7 @@ export const VerifyRSVP = () => {
             showNotification({
                 title: "Error Verifying RSVP",
                 message:
-                    "Please send an email to hello@hawkhacks.ca for us to confirm it for you.",
+                    "Please reach out to us in our tech support channel on Discord.",
             });
         } else {
             await reloadUser();
@@ -84,6 +84,18 @@ export const VerifyRSVP = () => {
             >
                 Verify
             </Button>
+            <p className="text-gray-800 mt-2">
+                Having trouble? Get help in our{" "}
+                <a
+                    href="https://discord.com/invite/GxwvFEn9TB"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sky-600 font-bold underline"
+                >
+                    Discord
+                </a>{" "}
+                support channel.
+            </p>
         </div>
     );
 };
