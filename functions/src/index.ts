@@ -14,6 +14,7 @@ import { Octokit } from "octokit";
 import { z } from "zod";
 import { GoogleAuth } from "google-auth-library";
 import * as jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
 
 const config = functions.config();
 
@@ -135,6 +136,7 @@ export const createPassObject = functions.https.onCall(
         const names = fullName.split(" ");
         const firstName = names[0] || "Unknown";
         const lastName = names[1] || "Unknown";
+        const ticketId = uuidv4();
 
         const userEmail = context.auth.token.email || data.email;
 
@@ -201,7 +203,7 @@ export const createPassObject = functions.https.onCall(
             ],
             barcode: {
                 type: "QR_CODE",
-                value: `${objectId}`,
+                value: `${config.fe.url}/ticket/${ticketId}`,
                 alternateText: "QR code goes here",
             },
 
@@ -266,7 +268,7 @@ export const createPassObject = functions.https.onCall(
         const saveUrl = `https://pay.google.com/gp/v/save/${token}`;
 
         const ticketsRef = admin.firestore().collection("tickets");
-        await ticketsRef.doc(userId).set({
+        await ticketsRef.doc(ticketId).set({
             userId: userId,
             firstName: firstName,
             lastName: lastName,
