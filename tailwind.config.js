@@ -43,6 +43,12 @@ export default {
                 "tbrand-hover": "#0FA3B1",
                 "tbrand-mouse-down": "#1D7882",
                 "tbrand-highlight": "#00CEDB",
+                "btn-gradient-start": "#2B6469",
+                "btn-gradient-end": "#00CEDB",
+                "btn-gradient-start-dg": "#FE8E8E",
+                "btn-gradient-end-dg": "#D94E4E",
+                "btn-gradient-start-disabled": "#686868",
+                "btn-gradient-end-disabled": "#9A9A9A",
             },
             translate: {
                 0.75: "0.1875rem", // value in between of 0.5 and 1 (0.125rem + 0.25) / 2
@@ -60,6 +66,15 @@ export default {
             backgroundImage: {
                 "radial-gradient-peach":
                     "radial-gradient(116.17% 116.17% at 50% 1.3%, #F8DFD1 0%, #FFFFFF 100%)",
+                
+                "btn-gradient":
+                    "linear-gradient(182.75deg, #2B6469 -10.16%, #00CEDB 202.3%)",
+
+                "btn-gradient-dg":
+                    "linear-gradient(0deg, #FE8E8E 0%, #D94E4E 80%)",
+
+                "btn-gradient-disabled":
+                    "linear-gradient(0deg, #525151 0%, #9A9A9A 80%)",
             },
             boxShadow: {
                 basic: "rgba(0, 0, 0, 0.1) 0px 3px 8px;",
