@@ -319,7 +319,23 @@ export const createPassObject = functions.https.onCall(
         const names = fullName.split(" ");
         const firstName = names[0] || "Unknown";
         const lastName = names[1] || "Unknown";
-        const ticketId = uuidv4();
+
+        let ticketId = "";
+        const ticketsRef = admin.firestore().collection("tickets");
+        const ticketDoc = (await ticketsRef.where("userId", "==", userId).get())
+            .docs[0];
+        if (!ticketDoc) {
+            ticketId = uuidv4();
+            await ticketsRef.doc(ticketId).set({
+                userId: userId,
+                ticketId,
+                firstName: firstName,
+                lastName: lastName,
+                timestamp: new Date(),
+            });
+        } else {
+            ticketId = ticketDoc.id;
+        }
 
         const userEmail = context.auth.token.email || data.email;
 
@@ -449,15 +465,6 @@ export const createPassObject = functions.https.onCall(
             algorithm: "RS256",
         });
         const saveUrl = `https://pay.google.com/gp/v/save/${token}`;
-
-        const ticketsRef = admin.firestore().collection("tickets");
-        await ticketsRef.doc(ticketId).set({
-            userId: userId,
-            ticketId,
-            firstName: firstName,
-            lastName: lastName,
-            timestamp: new Date(),
-        });
 
         return { url: saveUrl };
     }
