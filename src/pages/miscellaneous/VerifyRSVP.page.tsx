@@ -53,13 +53,13 @@ export const VerifyRSVP = () => {
                         <span className="ml-2 text-gray-700 cursor-pointer">
                             I have read the content below and agree to
                             participate in the event using my free will and good
-                            judgment. (Click this text to read)
+                            judgment.
                         </span>
                     </label>
 
                     <div className="border border-blueGreen p-2 my-8 flex flex-col gap-2 text-gray-500 max-w-3xl max-h-72 overflow-y-scroll">
-                        {rsvpDropdown.map((content) => {
-                            return <p>{content}</p>;
+                        {rsvpDropdown.map((content, index) => {
+                            return <p key={index}>{content}</p>;
                         })}
                     </div>
                 </div>
