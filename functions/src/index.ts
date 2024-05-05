@@ -15,107 +15,111 @@ import { z } from "zod";
 import { GoogleAuth } from "google-auth-library";
 import * as jwt from "jsonwebtoken";
 
-// data imports
-const runtimeConfig = require("../../functions/.runtimeconfig.json");
+const config = functions.config();
 
 admin.initializeApp();
 
-const credentials = require("../../functions/hawkhacks-googleWallet-key.json");
+const credentials = config.googlewallet;
 
 const httpClient = new GoogleAuth({
     credentials: credentials,
     scopes: "https://www.googleapis.com/auth/wallet_object.issuer",
 });
 
-export const createPassClass = functions.https.onCall(
-    async (data: any, context: any) => {
-        const baseUrl = "https://walletobjects.googleapis.com/walletobjects/v1";
-        const issuerId = runtimeConfig.googleWallet.issuerId;
-        const classId = `${issuerId}.hawkhacks-ticket`;
+export const createPassClass = functions.https.onCall(async (_, context) => {
+    if (!context.auth) {
+        return {
+            status: 401,
+            message: "Unauthorized",
+        };
+    }
 
-        const updatedClass = {
-            id: `${classId}`,
-            classTemplateInfo: {
-                cardTemplateOverride: {
-                    cardRowTemplateInfos: [
-                        {
-                            twoItems: {
-                                startItem: {
-                                    firstValue: {
-                                        fields: [
-                                            {
-                                                fieldPath:
-                                                    'textModulesData["from"]',
-                                            },
-                                        ],
-                                    },
+    const baseUrl = "https://walletobjects.googleapis.com/walletobjects/v1";
+    const issuerid = config.googlewallet.issuerid;
+    const classId = `${issuerid}.hawkhacks-ticket`;
+
+    const updatedClass = {
+        id: `${classId}`,
+        classTemplateInfo: {
+            cardTemplateOverride: {
+                cardRowTemplateInfos: [
+                    {
+                        twoItems: {
+                            startItem: {
+                                firstValue: {
+                                    fields: [
+                                        {
+                                            fieldPath:
+                                                'textModulesData["from"]',
+                                        },
+                                    ],
                                 },
-                                endItem: {
-                                    firstValue: {
-                                        fields: [
-                                            {
-                                                fieldPath:
-                                                    "object.textModulesData['to']",
-                                            },
-                                        ],
-                                    },
+                            },
+                            endItem: {
+                                firstValue: {
+                                    fields: [
+                                        {
+                                            fieldPath:
+                                                "object.textModulesData['to']",
+                                        },
+                                    ],
                                 },
                             },
                         },
-                    ],
-                },
-            },
-            linksModuleData: {
-                uris: [
-                    {
-                        uri: "https://hawkhacks.ca/",
-                        description: "Hawkhacks 2024",
-                        id: "official_site",
                     },
                 ],
             },
-        };
+        },
+        linksModuleData: {
+            uris: [
+                {
+                    uri: "https://hawkhacks.ca/",
+                    description: "Hawkhacks 2024",
+                    id: "official_site",
+                },
+            ],
+        },
+    };
 
-        try {
-            // Try to get the class, if it exists
-            const response = await httpClient.request({
-                url: `${baseUrl}/genericClass/${classId}`,
-                // method: "GET",
-                method: "PUT",
+    try {
+        // Try to get the class, if it exists
+        const response = await httpClient.request({
+            url: `${baseUrl}/genericClass/${classId}`,
+            // method: "GET",
+            method: "PUT",
+            data: updatedClass,
+        });
+
+        return {
+            result: "Class updated successfully",
+            details: response.data,
+        };
+    } catch (error) {
+        if (error instanceof Response && error.status === 404) {
+            // Class does not exist, create it
+            const createResponse = await httpClient.request({
+                url: `${baseUrl}/genericClass`,
+                method: "POST",
                 data: updatedClass,
             });
 
+            // console.log("Class insert response");
+            // console.log(createResponse);
+
             return {
-                result: "Class updated successfully",
-                details: response.data,
+                result: "Class created",
+                details: createResponse.data,
             };
-        } catch (error) {
-            if (error instanceof Response && error.status === 404) {
-                // Class does not exist, create it
-                const createResponse = await httpClient.request({
-                    url: `${baseUrl}/genericClass`,
-                    method: "POST",
-                    data: updatedClass,
-                });
-
-                // console.log("Class insert response");
-                // console.log(createResponse);
-
-                return {
-                    result: "Class created",
-                    details: createResponse.data,
-                };
-            } else {
-                console.log(error);
-                throw new functions.https.HttpsError(
-                    "unknown",
-                    "Failed to handle request",
-                    error
-                );
-            }
+        } else {
+            console.log(error);
+            throw new functions.https.HttpsError(
+                "unknown",
+                "Failed to handle request",
+                error
+            );
         }
     }
-);
+});
 
 export const createPassObject = functions.https.onCall(
     async (data, context) => {
@@ -137,8 +141,8 @@ export const createPassObject = functions.https.onCall(
         // const userName = context.auth.token.name || "No Name Provided";
 
         const objectSuffix = userEmail.replace(/[^\w.-]/g, "_");
-        const objectId = `${runtimeConfig.googleWallet.issuerId}.${objectSuffix}`;
-        const classId = `${runtimeConfig.googleWallet.issuerId}.hawkhacks-ticket`;
+        const objectId = `${config.googlewallet.issuerid}.${objectSuffix}`;
+        const classId = `${config.googlewallet.issuerid}.hawkhacks-ticket`;
         const baseUrl = "https://walletobjects.googleapis.com/walletobjects/v1";
 
         const updatedGenericObject = {
