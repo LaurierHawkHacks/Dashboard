@@ -4,17 +4,15 @@ import { verifyRSVP } from "@/services/utils";
 import { useNotification } from "@/providers/notification.provider";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { rsvpDropdown } from "@/data";
 
 export const VerifyRSVP = () => {
     const [isVerifying, setIsVerifying] = useState(false);
     const [agreedToParticipate, setAgreedToParticipate] = useState(false);
     const [willAttend, setWillAttend] = useState(false);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const { showNotification } = useNotification();
     const { currentUser, reloadUser } = useAuth();
     const navigate = useNavigate();
-
-    const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
     const verify = async () => {
         setIsVerifying(true);
@@ -52,23 +50,18 @@ export const VerifyRSVP = () => {
                             }
                             className="form-checkbox h-5 w-5 text-gray-600"
                         />
-                        <span
-                            onClick={toggleDropdown}
-                            className="ml-2 text-gray-700 cursor-pointer"
-                        >
+                        <span className="ml-2 text-gray-700 cursor-pointer">
                             I have read the content below and agree to
                             participate in the event using my free will and good
                             judgment. (Click this text to read)
                         </span>
                     </label>
-                    {isDropdownOpen && (
-                        <div className="mt-2 ml-14 text-gray-500">
-                            <p>
-                                I accept full responsibility for my actions for
-                                the entire duration of this event.
-                            </p>
-                        </div>
-                    )}
+
+                    <div className="border border-blueGreen p-2 my-8 flex flex-col gap-2 text-gray-500 max-w-3xl max-h-72 overflow-y-scroll">
+                        {rsvpDropdown.map((content) => {
+                            return <p>{content}</p>;
+                        })}
+                    </div>
                 </div>
                 <label className="inline-flex items-center gap-3 mt-3">
                     <input
@@ -78,19 +71,19 @@ export const VerifyRSVP = () => {
                         className="form-checkbox h-5 w-5 text-gray-600"
                     />
                     <span className="ml-2 text-gray-700">
-                        I agree that I will be attending HawkHacks from May 17th
-                        to May 19th. I will try to be on the premises for the
-                        vast majority for the duration of the event.
+                        I confirm that I will be attending HawkHacks from May
+                        17th to May 19th. I will try to be on the premises for
+                        the vast majority for the duration of the event.
                     </span>
                 </label>
             </div>
-            <button
+            <Button
                 onClick={verify}
                 disabled={isVerifying || !agreedToParticipate || !willAttend}
-                className="mt-4 font-bold px-4 py-2 rounded bg-blue-500 text-white disabled:bg-gray-300"
+                className="mt-4  px-4 py-2 rounded disabled:bg-gray-300"
             >
                 Verify
-            </button>
+            </Button>
         </div>
     );
 };
