@@ -16,7 +16,8 @@
         "setup": "firebase init emulators",
         "firebase": "firebase",
         "vite": "vite",
-        "analyse-build": "vite-bundle-visualizer"
+        "analyse-build": "vite-bundle-visualizer",
+        "dev:withFunctions": "cd functions && tsc && cd .. && pnpm run dev"
     },
     "dependencies": {
         "@headlessui/react": "^1.7.18",
