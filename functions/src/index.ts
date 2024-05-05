@@ -35,6 +35,7 @@ const wwdr = config.certs.wwdr_cert;
 const signerKeyPassphrase = config.certs.signer_key_passphrase;
 const teamIdentifier = config.certs.team_id;
 
+// apple wallet ticket
 export const createTicket = functions.https.onCall(async (data, context) => {
     if (!context.auth) {
         throw new functions.https.HttpsError(
@@ -46,10 +47,10 @@ export const createTicket = functions.https.onCall(async (data, context) => {
     try {
         const userId = context.auth.uid;
         const userRecord = await admin.auth().getUser(userId);
-        const fullName = userRecord.displayName || '';
-        const names = fullName.split(' ');
-        const firstName = names[0] || 'Unknown';
-        const lastName = names[1] || 'Unknown';
+        const fullName = userRecord.displayName || "";
+        const names = fullName.split(" ");
+        const firstName = names[0] || "Unknown";
+        const lastName = names[1] || "Unknown";
 
         const ticketsRef = admin.firestore().collection("tickets");
         const ticketDoc = await ticketsRef.doc(userId).get();
@@ -58,95 +59,123 @@ export const createTicket = functions.https.onCall(async (data, context) => {
             passId = ticketDoc.data()?.passId;
         } else {
             passId = uuidv4();
-            await ticketsRef.doc(userId).set({
-                userId: userId,
-                passId: passId,
-                firstName: firstName,
-                lastName: lastName,
-                timestamp: new Date()
-            }, { merge: true });
+            await ticketsRef.doc(userId).set(
+                {
+                    userId: userId,
+                    passId: passId,
+                    firstName: firstName,
+                    lastName: lastName,
+                    timestamp: new Date(),
+                },
+                { merge: true }
+            );
         }
 
-        const passJsonBuffer = Buffer.from(JSON.stringify({
-            "passTypeIdentifier": "pass.com.dashboard.hawkhacks",
-            "formatVersion": 1,
-            "teamIdentifier": teamIdentifier,
-            "organizationName": "HawkHacks",
-            "serialNumber": passId,
-            "description": "Access to HawkHacks 2024",
-            "foregroundColor": "rgb(255, 255, 255)",
-            "backgroundColor": "rgb(12, 105, 117)",
-            "labelColor": "rgb(255, 255, 255)",
-            "logoText": "Welcome to HawkHacks",
-            "barcodes": [{
-                "message": `https://portal.hawkhacks.ca/ticket/${passId}`,
-                "format": "PKBarcodeFormatQR",
-                "messageEncoding": "iso-8859-1"
-            }],
-            "locations": [{
-                "latitude": 51.50506,
-                "longitude": -0.01960,
-                "relevantText": "Event Entrance"
-            }],
-            "generic": {
-                "headerFields": [{
-                    "key": "eventHeader",
-                    "label": "Event Date",
-                    "value": "May 25, 2024"
-                }],
-                "primaryFields": [{
-                    "key": "eventName",
-                    "label": "Participant",
-                    "value": fullName
-                }, {
-                    "key": "teamName",
-                    "label": "Team",
-                    "value": "Team Here"
-                }],
-                "auxiliaryFields": [{
-                    "key": "location",
-                    "label": "Location",
-                    "value": "Wilfrid Laurier University"
-                }, {
-                    "key": "startTime",
-                    "label": "Start Time",
-                    "value": "09:00 AM"
-                }],
-                "backFields": [{
-                    "key": "moreInfo",
-                    "label": "More Info",
-                    "value": "For more details, visit our website at hawkhacks.ca or contact support@hawkhacks.ca"
-                }, {
-                    "key": "emergencyContact",
-                    "label": "Emergency Contact",
-                    "value": "911"
-                }]
-            },
-            "images": {
-                "logo": {
-                    "filename": "logo.png"
+        const passJsonBuffer = Buffer.from(
+            JSON.stringify({
+                passTypeIdentifier: "pass.com.dashboard.hawkhacks",
+                formatVersion: 1,
+                teamIdentifier: teamIdentifier,
+                organizationName: "HawkHacks",
+                serialNumber: passId,
+                description: "Access to HawkHacks 2024",
+                foregroundColor: "rgb(255, 255, 255)",
+                backgroundColor: "rgb(12, 105, 117)",
+                labelColor: "rgb(255, 255, 255)",
+                logoText: "Welcome to HawkHacks",
+                barcodes: [
+                    {
+                        message: `https://portal.hawkhacks.ca/ticket/${passId}`,
+                        format: "PKBarcodeFormatQR",
+                        messageEncoding: "iso-8859-1",
+                    },
+                ],
+                locations: [
+                    {
+                        latitude: 51.50506,
+                        longitude: -0.0196,
+                        relevantText: "Event Entrance",
+                    },
+                ],
+                generic: {
+                    headerFields: [
+                        {
+                            key: "eventHeader",
+                            label: "Event Date",
+                            value: "May 25, 2024",
+                        },
+                    ],
+                    primaryFields: [
+                        {
+                            key: "eventName",
+                            label: "Participant",
+                            value: fullName,
+                        },
+                        {
+                            key: "teamName",
+                            label: "Team",
+                            value: "Team Here",
+                        },
+                    ],
+                    auxiliaryFields: [
+                        {
+                            key: "location",
+                            label: "Location",
+                            value: "Wilfrid Laurier University",
+                        },
+                        {
+                            key: "startTime",
+                            label: "Start Time",
+                            value: "09:00 AM",
+                        },
+                    ],
+                    backFields: [
+                        {
+                            key: "moreInfo",
+                            label: "More Info",
+                            value: "For more details, visit our website at hawkhacks.ca or contact support@hawkhacks.ca",
+                        },
+                        {
+                            key: "emergencyContact",
+                            label: "Emergency Contact",
+                            value: "911",
+                        },
+                    ],
                 },
-                "logo@2x": {
-                    "filename": "logo@2x.png"
-                }
-            }
-        }));
+                images: {
+                    logo: {
+                        filename: "logo.png",
+                    },
+                    "logo@2x": {
+                        filename: "logo@2x.png",
+                    },
+                },
+            })
+        );
 
-        const iconResponse = await axios.get("https://hawkhacks.ca/icon.png", { responseType: 'arraybuffer' });
-        const icon2xResponse = await axios.get("https://hawkhacks.ca/icon.png", { responseType: 'arraybuffer' });
+        const iconResponse = await axios.get("https://hawkhacks.ca/icon.png", {
+            responseType: "arraybuffer",
+        });
+        const icon2xResponse = await axios.get(
+            "https://hawkhacks.ca/icon.png",
+            { responseType: "arraybuffer" }
+        );
         const iconBuffer = iconResponse.data;
         const icon2xBuffer = icon2xResponse.data;
 
-        const pass = new PKPass({
-            "pass.json": passJsonBuffer,
-            "icon.png": iconBuffer,
-            "icon@2x.png": icon2xBuffer
-        }, {
-            signerCert: signerCert,
-            signerKey: signerKey,
-            wwdr: wwdr,
-            signerKeyPassphrase: signerKeyPassphrase,
-        });
+        const pass = new PKPass(
+            {
+                "pass.json": passJsonBuffer,
+                "icon.png": iconBuffer,
+                "icon@2x.png": icon2xBuffer,
+            },
+            {
+                signerCert: signerCert,
+                signerKey: signerKey,
+                wwdr: wwdr,
+                signerKeyPassphrase: signerKeyPassphrase,
+            }
+        );
 
         const buffer = await pass.getAsBuffer();
 
@@ -154,8 +183,8 @@ export const createTicket = functions.https.onCall(async (data, context) => {
         const fileRef = storageRef.file(`passes/${userId}/pass.pkpass`);
         await fileRef.save(buffer, {
             metadata: {
-                contentType: 'application/vnd.apple.pkpass'
-            }
+                contentType: "application/vnd.apple.pkpass",
+            },
         });
 
         await fileRef.makePublic();
@@ -190,10 +219,13 @@ export const createPassClass = functions.https.onCall(async (_, context) => {
         classId = classDoc.data()?.classId;
     } else {
         classId = `${issuerid}.hawkhacks-ticket-${uuidv4()}`;
-        await classesRef.doc(issuerid).set({
-            classId: classId,
-            timestamp: new Date()
-        }, { merge: true });
+        await classesRef.doc(issuerid).set(
+            {
+                classId: classId,
+                timestamp: new Date(),
+            },
+            { merge: true }
+        );
     }
 
     const updatedClass = {
@@ -207,7 +239,8 @@ export const createPassClass = functions.https.onCall(async (_, context) => {
                                 firstValue: {
                                     fields: [
                                         {
-                                            fieldPath: 'textModulesData["from"]',
+                                            fieldPath:
+                                                'textModulesData["from"]',
                                         },
                                     ],
                                 },
@@ -216,7 +249,8 @@ export const createPassClass = functions.https.onCall(async (_, context) => {
                                 firstValue: {
                                     fields: [
                                         {
-                                            fieldPath: "object.textModulesData['to']",
+                                            fieldPath:
+                                                "object.textModulesData['to']",
                                         },
                                     ],
                                 },
