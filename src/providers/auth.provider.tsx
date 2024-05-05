@@ -62,7 +62,6 @@ const AuthContext = createContext<AuthContextValue>({
  */
 async function validateUser(user: User): Promise<UserWithClaims> {
     const { claims } = await user.getIdTokenResult(true);
-    console.log(claims);
     return {
         ...user,
         hawkAdmin: Boolean(claims.admin),
