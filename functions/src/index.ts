@@ -84,7 +84,10 @@ exports.fetchOrGenerateTicket = functions.https.onCall(async (_, context) => {
 
             return { qrCodeUrl };
         } catch (error) {
-            console.error("Error generating or uploading QR code:", error);
+            functions.logger.error(
+                "Error generating or uploading QR code:",
+                error
+            );
             throw new functions.https.HttpsError(
                 "internal",
                 "Failed to generate or upload QR code",
