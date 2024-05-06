@@ -113,7 +113,7 @@ export const createTicket = functions.https.onCall(async (_, context) => {
                         {
                             key: "eventHeader",
                             label: "Event Date",
-                            value: "May 25, 2024",
+                            value: "May 17, 2024",
                         },
                     ],
                     primaryFields: [
