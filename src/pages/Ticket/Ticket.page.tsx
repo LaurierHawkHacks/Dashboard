@@ -7,6 +7,7 @@ import { useAuth } from "@/providers/hooks";
 import { Navigate } from "react-router-dom";
 import { useAvailableRoutes } from "@/providers/routes.provider";
 import { pronouns } from "@/data";
+import { handleError } from "@/services/utils";
 
 export const TicketPage = () => {
     const functions = getFunctions();
@@ -29,7 +30,10 @@ export const TicketPage = () => {
 
     const handleCreatePassObject = async (service: "apple" | "google") => {
         try {
-            const createTicket = httpsCallable(functions, service === "apple" ? "createTicket" : "createPassObject");
+            const createTicket = httpsCallable(
+                functions,
+                service === "apple" ? "createTicket" : "createPassObject"
+            );
             const ticketResult = await createTicket({
                 email: currentUser.email,
                 pronouns: user?.pronouns || pronouns[0],
@@ -41,15 +45,24 @@ export const TicketPage = () => {
                 // ^ the pass popping up should be good enough lol
             } else {
                 alert(
-                    `Ticket has been issued but could not generate ${service === "apple" ? "Apple Wallet" : "Google Wallet"} pass.`
+                    `Ticket has been issued but could not generate ${
+                        service === "apple" ? "Apple Wallet" : "Google Wallet"
+                    } pass.`
                 );
             }
         } catch (error) {
-            console.error(`Failed to issue ticket for ${service === "apple" ? "Apple Wallet" : "Google Wallet"}:`, error);
-            alert(`Failed to issue ticket for ${service === "apple" ? "Apple Wallet" : "Google Wallet"}.`);
+            console.error(
+                `Failed to issue ticket for ${
+                    service === "apple" ? "Apple Wallet" : "Google Wallet"
+                }:`,
+                error
+            );
+            handleError(
+                error as Error,
+                `create_${service}_wallet_ticket_error`
+            );
         }
     };
-
 
     return (
         <>
@@ -86,18 +99,21 @@ export const TicketPage = () => {
                             <FiDownload />
                         </button>
                         <div className="flex w-full justify-evenly items-center">
-                        <a
+                            <a
                                 href="#"
                                 onClick={(e) => {
                                     e.preventDefault();
                                     handleCreatePassObject("apple");
                                 }}
-                                style={{ display: 'inline-block', width: '40%' }}
+                                style={{
+                                    display: "inline-block",
+                                    width: "40%",
+                                }}
                             >
                                 <img
                                     src={AppleWalletBadge}
                                     alt="Add to Apple Wallet"
-                                    style={{ width: '100%', height: 'auto' }}
+                                    style={{ width: "100%", height: "auto" }}
                                 />
                             </a>
                             <a
@@ -106,12 +122,15 @@ export const TicketPage = () => {
                                     e.preventDefault();
                                     handleCreatePassObject("google");
                                 }}
-                                style={{ display: 'inline-block', width: '40%' }}
+                                style={{
+                                    display: "inline-block",
+                                    width: "40%",
+                                }}
                             >
                                 <img
                                     src={GoogleWalletBadge}
                                     alt="Add to Google Wallet"
-                                    style={{ width: '100%', height: 'auto' }}
+                                    style={{ width: "100%", height: "auto" }}
                                 />
                             </a>
                         </div>
