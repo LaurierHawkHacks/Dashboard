@@ -365,7 +365,7 @@ export const createPassClass = functions.https.onCall(async (_, context) => {
                                     fields: [
                                         {
                                             fieldPath:
-                                                "object.textModulesData['TYPE']",
+                                                "object.textModulesData['EMAIL']",
                                         },
                                     ],
                                 },
@@ -379,7 +379,7 @@ export const createPassClass = functions.https.onCall(async (_, context) => {
                                     fields: [
                                         {
                                             fieldPath:
-                                                "object.textModulesData['EMAIL']",
+                                                "object.textModulesData['TYPE']",
                                         },
                                     ],
                                 },
