@@ -373,13 +373,33 @@ export const createPassClass = functions.https.onCall(async (_, context) => {
                         },
                     },
                     {
-                        oneItem: {
-                            item: {
+                        threeItems: {
+                            startItem: {
                                 firstValue: {
                                     fields: [
                                         {
                                             fieldPath:
                                                 "object.textModulesData['TYPE']",
+                                        },
+                                    ],
+                                },
+                            },
+                            middleItem: {
+                                firstValue: {
+                                    fields: [
+                                        {
+                                            fieldPath:
+                                                "object.textModulesData['FROM']",
+                                        },
+                                    ],
+                                },
+                            },
+                            endItem: {
+                                firstValue: {
+                                    fields: [
+                                        {
+                                            fieldPath:
+                                                "object.textModulesData['TO']",
                                         },
                                     ],
                                 },
@@ -555,6 +575,16 @@ export const createPassObject = functions.https.onCall(
                     id: "EMAIL",
                     header: "Email",
                     body: `${userEmail}`,
+                },
+                {
+                    id: "FROM",
+                    header: "From",
+                    body: "May 17th",
+                },
+                {
+                    id: "TO",
+                    header: "To",
+                    body: "May 19th",
                 },
             ],
             barcode: {
