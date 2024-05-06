@@ -506,6 +506,8 @@ export const addDefaultClaims = functions.auth.user().onCreate(async (user) => {
             // Default Claims
             admin: false, // Example: set to true for admin users
             phoneVerified: false,
+            rsvpVerified: false,
+            type: "hacker",
         });
         functions.logger.info(`Custom claims added for user: ${uid}`);
     } catch (error) {
