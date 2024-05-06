@@ -1,8 +1,9 @@
 import testQRCode from "../../assets/qrcode.png";
 import { Logo } from "@assets";
 import { FiDownload } from "react-icons/fi";
+import { useEffect, useState } from "react";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { GoogleWalletBadge, AppleWalletBadge } from "@/assets";
+import { GoogleWalletBadge, AppleWalletBadge, LoadingDots } from "@/assets";
 import { useAuth } from "@/providers/hooks";
 import { Navigate } from "react-router-dom";
 import { useAvailableRoutes } from "@/providers/routes.provider";
@@ -12,17 +13,41 @@ import { handleError } from "@/services/utils";
 export const TicketPage = () => {
     const functions = getFunctions();
     const { paths } = useAvailableRoutes();
-
     const { currentUser } = useAuth();
     const user = useAuth().userApp;
-    const email = currentUser?.email;
-    const firstName = user?.firstName || "Unknown";
-    const lastName = user?.lastName || "Unknown";
+    const email = currentUser?.email ?? "";
+    const firstName = user?.firstName ?? "Unknown";
+    const lastName = user?.lastName ?? "Unknown";
+    const [qrCode, setQRCode] = useState<string>(LoadingDots);
+
+    useEffect(() => {
+        if (currentUser) {
+            fetchOrGenerateTicket(currentUser.uid).then((qrCodeUrl) => {
+                setQRCode(qrCodeUrl);
+            });
+        }
+    }, [currentUser]);
+
+    const fetchOrGenerateTicket = async (userId: string): Promise<string> => {
+        const fetchTicket = httpsCallable<
+            { userId: string },
+            { qrCodeUrl?: string }
+        >(functions, "fetchOrGenerateTicket");
+        try {
+            const result = await fetchTicket({
+                userId: userId,
+            });
+            return result.data.qrCodeUrl ?? LoadingDots;
+        } catch (error) {
+            console.error("Error fetching or generating ticket:", error);
+            return LoadingDots;
+        }
+    };
 
     const handleDownload = () => {
         const link = document.createElement("a");
-        link.href = testQRCode;
-        link.download = "qrcode.png"; // Replace with Ticket QR Code
+        link.href = qrCode;
+        link.download = "qrcode.png";
         link.click();
     };
 
@@ -35,14 +60,14 @@ export const TicketPage = () => {
                 service === "apple" ? "createTicket" : "createPassObject"
             );
             const ticketResult = await createTicket({
-                email: currentUser.email,
-                pronouns: user?.pronouns || pronouns[0],
+                email: email,
+                pronouns: Array.isArray(user?.pronouns)
+                    ? user.pronouns.join(", ")
+                    : user?.pronouns ?? "Not specified",
             });
-            const ticketData = ticketResult.data as { url?: string };
+            const ticketData = ticketResult.data;
             if (ticketData.url) {
-                window.location.href = ticketData.url; // Redirects user to download the pass
-                // alert(`Ticket has been issued and your pass is ready to add to ${service === "apple" ? "Apple Wallet" : "Google Wallet"}!`);
-                // ^ the pass popping up should be good enough lol
+                window.location.href = ticketData.url;
             } else {
                 alert(
                     `Ticket has been issued but could not generate ${
@@ -84,11 +109,10 @@ export const TicketPage = () => {
                             {email}
                         </h2>
                     </div>
-
                     <div className="bg-gray-200 rounded-xl h-[2px]"></div>
                     <div className="flex flex-col items-center">
                         <img
-                            src={testQRCode}
+                            src={qrCode}
                             alt="QR Code"
                             className="max-w-[250px]"
                         />
@@ -140,3 +164,4 @@ export const TicketPage = () => {
         </>
     );
 };
+
