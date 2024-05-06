@@ -203,7 +203,7 @@ export const createTicket = functions.https.onCall(async (_, context) => {
 
         return { url: passUrl };
     } catch (error) {
-        console.error("Error creating ticket:", error);
+        functions.logger.error("Error creating ticket:", error);
         throw new functions.https.HttpsError(
             "internal",
             "Failed to create ticket",
@@ -457,7 +457,7 @@ export const createPassObject = functions.https.onCall(
         //     });
         //     functions.logger.info("Pass created successfully", response.data);
         // } catch (error) {
-        //     console.error("Failed to create pass object", error);
+        //     functions.logger.error("Failed to create pass object", error);
         // }
 
         //FOR UPDATING OBJECTS
@@ -470,7 +470,7 @@ export const createPassObject = functions.https.onCall(
 
             functions.logger.info("Pass updated successfully", response.data);
         } catch (error) {
-            console.error("Failed to update object", error);
+            functions.logger.error("Failed to update object", error);
             throw new functions.https.HttpsError(
                 "internal",
                 "Object update failed"
@@ -511,7 +511,7 @@ export const addDefaultClaims = functions.auth.user().onCreate(async (user) => {
         });
         functions.logger.info(`Custom claims added for user: ${uid}`);
     } catch (error) {
-        console.error("Error adding custom claims:", error);
+        functions.logger.error("Error adding custom claims:", error);
     }
 });
 
@@ -542,15 +542,15 @@ export const addAdminRole = functions.https.onCall((data, context) => {
 
 export const updateSocials = functions.https.onCall(async (data, context) => {
     if (!context.auth) {
-        console.log("Authentication required.");
+        functions.logger.info("Authentication required.");
         throw new functions.https.HttpsError(
             "permission-denied",
             "Not authenticated"
         );
     }
 
-    console.log("Updating socials:", data);
-    console.log("User ID in Func:", context.auth.uid);
+    functions.logger.info("Updating socials:", data);
+    functions.logger.info("User ID in Func:", context.auth.uid);
 
     const appsRef = admin.firestore().collection("applications");
     const query = appsRef.where("applicantId", "==", context.auth.uid).limit(1);
@@ -558,7 +558,7 @@ export const updateSocials = functions.https.onCall(async (data, context) => {
     try {
         const querySnapshot = await query.get();
         if (querySnapshot.empty) {
-            console.log("No matching documents.");
+            functions.logger.info("No matching documents.");
             throw new functions.https.HttpsError(
                 "not-found",
                 "Document with the specified applicantId does not exist"
@@ -567,8 +567,8 @@ export const updateSocials = functions.https.onCall(async (data, context) => {
 
         const docRef = querySnapshot.docs[0].ref;
 
-        console.log("Updating socials for application:", docRef.id);
-        console.log("Data in ref:", docRef);
+        functions.logger.info("Updating socials for application:", docRef.id);
+        functions.logger.info("Data in ref:", docRef);
 
         if (data.instagram === undefined) {
             await docRef.set({
@@ -582,10 +582,10 @@ export const updateSocials = functions.https.onCall(async (data, context) => {
             githubUrl: data.githubUrl,
             instagram: data.instagram,
         });
-        console.log("Socials updated:", data);
+        functions.logger.info("Socials updated:", data);
         return { status: "success", data };
     } catch (error) {
-        console.error("Failed to update socials:", error);
+        functions.logger.error("Failed to update socials:", error);
         throw new functions.https.HttpsError(
             "internal",
             "Failed to update socials",
