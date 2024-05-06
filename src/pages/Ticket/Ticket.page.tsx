@@ -111,11 +111,7 @@ export const TicketPage = () => {
                     </div>
                     <div className="bg-gray-200 rounded-xl h-[2px]"></div>
                     <div className="flex flex-col items-center">
-                        <img
-                            src={qrCode}
-                            alt="QR Code"
-                            className="max-w-[250px]"
-                        />
+                        <img src={qrCode} alt="QR Code" className="w-full" />
                         <button
                             className="text-3xl mb-4"
                             onClick={handleDownload}
