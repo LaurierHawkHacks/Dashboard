@@ -17,6 +17,7 @@ import * as jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import { PKPass } from "passkit-generator";
 import axios from "axios";
+import { HttpStatus, response } from "./utils";
 
 const config = functions.config();
 
@@ -540,6 +541,87 @@ export const addAdminRole = functions.https.onCall((data, context) => {
         });
 });
 
+interface Socials {
+    instagram: string;
+    github: string;
+    linkedin: string;
+    discord: string;
+    resumeRef: string;
+    docId: string;
+    uid: string;
+}
+
+export const requestSocials = functions.https.onCall(async (_, context) => {
+    if (!context.auth)
+        return response(HttpStatus.UNAUTHORIZED, { message: "unauthorized" });
+
+    const func = "requestSocials";
+
+    functions.logger.info("Getting socials...");
+    let socials: Socials | undefined;
+    try {
+        const snap = await admin
+            .firestore()
+            .collection("socials")
+            .where("uid", "==", context.auth.uid)
+            .get();
+        socials = snap.docs[0]?.data() as Socials;
+    } catch (e) {
+        functions.logger.error("Failed to get socials.", { error: e, func });
+        return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+            message: "internal (get_socials) ",
+        });
+    }
+
+    if (!socials) {
+        // create a new socials document
+        const app = (
+            await admin
+                .firestore()
+                .collection("applications")
+                .where("applicantId", "==", context.auth.uid)
+                .get()
+        ).docs[0]?.data();
+        const docId = uuidv4();
+
+        if (!app) {
+            functions.logger.info(
+                "Creating new socials with default values..."
+            );
+            // create with default
+            socials = {
+                instagram: "",
+                github: "",
+                linkedin: "",
+                discord: "",
+                resumeRef: "",
+                docId,
+                uid: context.auth.uid,
+            };
+        } else {
+            functions.logger.info(
+                "Creating new socials with selected application values..."
+            );
+            socials = {
+                instagram: "",
+                github: app.githubUrl ?? "",
+                linkedin: app.linkedUrl ?? "",
+                discord: app.discord,
+                resumeRef:
+                    app.participatingAs === "Mentor"
+                        ? app.mentorResumeRef
+                        : app.generalResumeRef,
+                docId,
+                uid: context.auth.uid,
+            };
+        }
+        await admin.firestore().collection("socials").doc(docId).set(socials);
+        functions.logger.info("Socials saved.");
+    }
+
+    return response(HttpStatus.OK, { message: "ok", data: socials });
+});
+
 export const updateSocials = functions.https.onCall(async (data, context) => {
     if (!context.auth) {
         functions.logger.info("Authentication required.");
@@ -552,38 +634,33 @@ export const updateSocials = functions.https.onCall(async (data, context) => {
     functions.logger.info("Updating socials:", data);
     functions.logger.info("User ID in Func:", context.auth.uid);
 
-    const appsRef = admin.firestore().collection("applications");
-    const query = appsRef.where("applicantId", "==", context.auth.uid).limit(1);
-
     try {
-        const querySnapshot = await query.get();
-        if (querySnapshot.empty) {
-            functions.logger.info("No matching documents.");
-            throw new functions.https.HttpsError(
-                "not-found",
-                "Document with the specified applicantId does not exist"
-            );
-        }
+        const doc = await admin
+            .firestore()
+            .collection("socials")
+            .doc(data.docId)
+            .get();
+        if (!doc.exists)
+            return response(HttpStatus.NOT_FOUND, { message: "not found" });
 
-        const docRef = querySnapshot.docs[0].ref;
-
-        functions.logger.info("Updating socials for application:", docRef.id);
-        functions.logger.info("Data in ref:", docRef);
-
-        if (data.instagram === undefined) {
-            await docRef.set({
-                instagram: data.instagram,
+        const socials = doc.data() as Socials;
+        if (socials.uid !== context.auth.uid)
+            return response(HttpStatus.UNAUTHORIZED, {
+                message: "cannot update socials",
             });
-        }
 
-        await docRef.update({
-            discord: data.discord,
-            linkedinUrl: data.linkedinUrl,
-            githubUrl: data.githubUrl,
+        functions.logger.info("Updating socials for application:", doc.id);
+        functions.logger.info("Data in ref:", doc);
+
+        await admin.firestore().collection("socials").doc(doc.id).update({
             instagram: data.instagram,
+            linkedin: data.linkedin,
+            github: data.github,
+            discord: data.discord,
+            resumeRef: data.resumeRef,
         });
         functions.logger.info("Socials updated:", data);
-        return { status: "success", data };
+        return response(HttpStatus.OK, { message: "ok" });
     } catch (error) {
         functions.logger.error("Failed to update socials:", error);
         throw new functions.https.HttpsError(
