@@ -184,7 +184,8 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
             },
             userRoutes,
         ];
-        if (!currentUser) {
+
+        if (!currentUser || !currentUser.emailVerified) {
             setUserRoutes(userRoutes.children);
             setRoutes(availableRoutes);
             return cleanUp;
@@ -226,13 +227,15 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                         element: <VerifyRSVP />,
                     },
                 ];
-                setUserRoutes(userRoutes.children);
-                setRoutes(availableRoutes);
-                return cleanUp;
             }
 
             if (userApp && userApp.accepted && currentUser.rsvpVerified) {
                 userRoutes.children = [
+                    {
+                        index: true,
+                        path: paths.portal,
+                        element: <HomePage />,
+                    },
                     { path: paths.myTeam, element: <MyTeamPage /> },
                     {
                         path: paths.networking,
@@ -241,10 +244,27 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                     { path: paths.schedule, element: <div>schedule</div> },
                     { path: paths.ticket, element: <TicketPage /> },
                 ];
-                setUserRoutes(userRoutes.children);
-                setRoutes(availableRoutes);
-                return cleanUp;
             }
+        }
+
+        if (
+            currentUser.type === "mentor" ||
+            currentUser.type === "speaker" ||
+            currentUser.type === "sponsor"
+        ) {
+            userRoutes.children = [
+                {
+                    index: true,
+                    path: paths.portal,
+                    element: <HomePage />,
+                },
+                {
+                    path: paths.networking,
+                    element: <NetworkingPage />,
+                },
+                { path: paths.schedule, element: <div>schedule</div> },
+                { path: paths.ticket, element: <TicketPage /> },
+            ];
         }
 
         // only default routes
