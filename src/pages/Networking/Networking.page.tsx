@@ -126,7 +126,7 @@ export const NetworkingPage = () => {
                 </h1>
                 <p>{userApp.pronouns}</p>
             </div>
-            <p className="mt-10">Your connections</p>
+            <p className="mt-6">Your connections</p>
             <form className="flex flex-col max-w-md gap-5 mt-12">
                 {mediaTypes.map(({ name, key }) => (
                     <div
@@ -193,11 +193,11 @@ export const NetworkingPage = () => {
                         )}
                     </div>
                     <div className="relative flex items-center w-1/2 gap-4">
-                        <label
-                            htmlFor="file-upload"
-                            className="w-8 h-8 bg-peachWhite rounded-lg flex items-center justify-center hover:cursor-pointer"
-                        >
+                        <div className="w-8 h-8 bg-peachWhite rounded-lg flex items-center justify-center hover:cursor-pointer">
                             <MdOutlineFileDownload className="text-gray-500" />
+                        </div>
+                        <label htmlFor="file-upload" className="sr-only">
+                            Select resume file
                         </label>
                         <input
                             id={`file-${randomId}`}
