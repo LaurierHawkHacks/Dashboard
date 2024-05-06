@@ -46,11 +46,24 @@ export const createTicket = functions.https.onCall(async (_, context) => {
 
     try {
         const userId = context.auth.uid;
-        const userRecord = await admin.auth().getUser(userId);
-        const fullName = userRecord.displayName || "";
-        const names = fullName.split(" ");
-        const firstName = names[0] || "Unknown";
-        const lastName = names[1] || "Unknown";
+
+        const app = (
+            await admin
+                .firestore()
+                .collection("applications")
+                .where("applicantId", "==", userId)
+                .get()
+        ).docs[0]?.data();
+
+        if (!app) {
+            throw new functions.https.HttpsError(
+                "internal",
+                "Object update failed (app)"
+            );
+        }
+
+        const firstName = app.firstName;
+        const lastName = app.lastName;
 
         const ticketsRef = admin.firestore().collection("tickets");
         const ticketDoc = (await ticketsRef.where("userId", "==", userId).get())
@@ -107,7 +120,7 @@ export const createTicket = functions.https.onCall(async (_, context) => {
                         {
                             key: "eventName",
                             label: "Participant",
-                            value: fullName,
+                            value: `${firstName} ${lastName}`,
                         },
                         {
                             key: "teamName",
@@ -314,11 +327,24 @@ export const createPassObject = functions.https.onCall(
             );
         }
         const userId = context.auth.uid;
-        const userRecord = await admin.auth().getUser(userId);
-        const fullName = userRecord.displayName || "";
-        const names = fullName.split(" ");
-        const firstName = names[0] || "Unknown";
-        const lastName = names[1] || "Unknown";
+
+        const app = (
+            await admin
+                .firestore()
+                .collection("applications")
+                .where("applicantId", "==", userId)
+                .get()
+        ).docs[0]?.data();
+
+        if (!app) {
+            throw new functions.https.HttpsError(
+                "internal",
+                "Object update failed (app)"
+            );
+        }
+
+        const firstName = app.firstName;
+        const lastName = app.lastName;
 
         let ticketId = "";
         const ticketsRef = admin.firestore().collection("tickets");
