@@ -1,5 +1,5 @@
 import { useAuth as useAuthProvider } from "@/providers/auth.provider";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MdOutlineEdit, MdOutlineFileDownload } from "react-icons/md";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { LoadingAnimation } from "@/components/LoadingAnimation";
@@ -24,22 +24,21 @@ const allowedFileTypes = [
 ];
 
 interface MediaValues {
-    instagram?: string;
-    linkedinUrl?: string;
-    githubUrl?: string;
-    discord?: string;
-    [key: string]: string | undefined;
+    instagram: string;
+    linkedinUrl: string;
+    githubUrl: string;
+    discord: string;
+    resumeRef: string;
 }
 
 export const NetworkingPage = () => {
-    const userApp = useAuthProvider().userApp;
+    const { userApp } = useAuthProvider();
     const [isLoading, setIsLoading] = useState(true);
     const [editMode, setEditMode] = useState("");
     const [randomId] = useState(Math.random().toString(32));
+    const timeoutRef = useRef<number | null>(null);
 
     const [file, setFile] = useState<File | null>(null);
-
-    console.log("userApp", userApp);
 
     const {
         firstName,
@@ -52,22 +51,35 @@ export const NetworkingPage = () => {
 
     // State to keep track of each media account value
     const [mediaValues, setMediaValues] = useState<MediaValues>({
-        instagram: userApp?.instagram,
-        linkedinUrl: userApp?.linkedinUrl,
-        githubUrl: userApp?.githubUrl,
-        discord: userApp?.discord,
+        instagram: "",
+        linkedinUrl: "",
+        githubUrl: "",
+        discord: "",
+        resumeRef: "",
     });
 
     useEffect(() => {
+        if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+        timeoutRef.current = window.setTimeout(() => setIsLoading(false), 5000);
+
         if (userApp) {
             setMediaValues({
-                instagram: userApp.instagram || "",
-                linkedinUrl: userApp.linkedinUrl || "",
-                githubUrl: userApp.githubUrl || "",
-                discord: userApp.discord || "",
+                instagram: userApp.instagram,
+                linkedinUrl: userApp.linkedinUrl,
+                githubUrl: userApp.githubUrl,
+                discord: userApp.discord,
+                resumeRef:
+                    userApp.participatingAs === "Hacker"
+                        ? userApp.generalResumeRef
+                        : userApp.mentorResumeRef,
             });
+            if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
             setIsLoading(false);
         }
+
+        return () => {
+            if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+        };
     }, [userApp]);
 
     const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
