@@ -102,7 +102,7 @@ const titles: Record<string, Title> = {
     },
     [paths.ticket]: {
         main: "Ticket",
-        sub: 'This is your ticket for the event and will be needed to register (a.k.a., check in) at HawkHacks 2023. Please press "View my ticket" then use the buttons below to add this ticket to your mobile wallet or take a screenshot of the ticket page. Registration begins at 5:30 PM local time near the Main Tent in Wilfrid Laurier University\'s Laz Building.',
+        sub: 'This ticket is required for registration at our HawkHacks sign-in desk.\nKeep this ticket safe - download or add it to your wallet for convenience!',
     },
     [paths.myTeam]: {
         main: "My Team",
