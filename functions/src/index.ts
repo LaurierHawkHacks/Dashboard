@@ -355,7 +355,7 @@ export const createPassClass = functions.https.onCall(async (_, context) => {
                                     fields: [
                                         {
                                             fieldPath:
-                                                'textModulesData["NAME"]',
+                                                "object.textModulesData['NAME']",
                                         },
                                     ],
                                 },
@@ -463,6 +463,7 @@ export const createPassObject = functions.https.onCall(
 
         const firstName = app.firstName;
         const lastName = app.lastName;
+        const fullName = `${firstName} ${lastName}`;
 
         let ticketId = "";
         const ticketsRef = admin.firestore().collection("tickets");
@@ -559,7 +560,6 @@ export const createPassObject = functions.https.onCall(
             barcode: {
                 type: "QR_CODE",
                 value: `${config.fe.url}/ticket/${ticketId}`,
-                alternateText: "QR code goes here",
             },
 
             hexBackgroundColor: "#27393F",
@@ -577,6 +577,8 @@ export const createPassObject = functions.https.onCall(
         };
 
         functions.logger.info("Pass object being sent:", updatedGenericObject);
+        functions.logger.info("user name:", firstName, lastName);
+        functions.logger.info("full name:", fullName);
 
         //FOR POSTING NEW OBJECTS
         // try {
