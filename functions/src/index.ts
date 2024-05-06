@@ -18,7 +18,7 @@ import { v4 as uuidv4 } from "uuid";
 import { PKPass } from "passkit-generator";
 import axios from "axios";
 import { HttpStatus, response } from "./utils";
-const QRCode = require("qrcode");
+import * as QRCode from "qrcode";
 
 const config = functions.config();
 
@@ -37,67 +37,65 @@ const wwdr = config.certs.wwdr_cert;
 const signerKeyPassphrase = config.certs.signer_key_passphrase;
 const teamIdentifier = config.certs.team_id;
 
-exports.fetchOrGenerateTicket = functions.https.onCall(
-    async (data, context) => {
-        if (!context.auth) {
+exports.fetchOrGenerateTicket = functions.https.onCall(async (_, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError(
+            "permission-denied",
+            "User must be authenticated to initiate this operation."
+        );
+    }
+
+    const userId = context.auth.uid;
+    const ticketsRef = admin.firestore().collection("tickets");
+    const ticketQuery = await ticketsRef
+        .where("userId", "==", userId)
+        .limit(1)
+        .get();
+
+    if (ticketQuery.empty) {
+        const ticketId = ticketsRef.doc().id;
+        const qrCodeValue = `https://portal.hawkhacks.ca/tickets/${ticketId}`;
+
+        try {
+            const qrCodeDataURL = await QRCode.toDataURL(qrCodeValue);
+
+            const base64Data = qrCodeDataURL.split(",")[1];
+            const buffer = Buffer.from(base64Data, "base64");
+
+            const storageRef = admin.storage().bucket();
+            const fileRef = storageRef.file(
+                `qrCodes/${userId}/${ticketId}.png`
+            );
+            await fileRef.save(buffer, {
+                metadata: {
+                    contentType: "image/png",
+                },
+            });
+
+            await fileRef.makePublic();
+
+            const qrCodeUrl = fileRef.publicUrl();
+            await ticketsRef.doc(ticketId).set({
+                userId: userId,
+                ticketId: ticketId,
+                qrCodeUrl: qrCodeUrl,
+                timestamp: new Date(),
+            });
+
+            return { qrCodeUrl };
+        } catch (error) {
+            console.error("Error generating or uploading QR code:", error);
             throw new functions.https.HttpsError(
-                "permission-denied",
-                "User must be authenticated to initiate this operation."
+                "internal",
+                "Failed to generate or upload QR code",
+                error instanceof Error ? error.message : "Unknown error"
             );
         }
-
-        const userId = context.auth.uid;
-        const ticketsRef = admin.firestore().collection("tickets");
-        const ticketQuery = await ticketsRef
-            .where("userId", "==", userId)
-            .limit(1)
-            .get();
-
-        if (ticketQuery.empty) {
-            const ticketId = ticketsRef.doc().id;
-            const qrCodeValue = `https://portal.hawkhacks.ca/tickets/${ticketId}`;
-
-            try {
-                const qrCodeDataURL = await QRCode.toDataURL(qrCodeValue);
-
-                const base64Data = qrCodeDataURL.split(",")[1];
-                const buffer = Buffer.from(base64Data, "base64");
-
-                const storageRef = admin.storage().bucket();
-                const fileRef = storageRef.file(
-                    `qrCodes/${userId}/${ticketId}.png`
-                );
-                await fileRef.save(buffer, {
-                    metadata: {
-                        contentType: "image/png",
-                    },
-                });
-
-                await fileRef.makePublic();
-
-                const qrCodeUrl = fileRef.publicUrl();
-                await ticketsRef.doc(ticketId).set({
-                    userId: userId,
-                    ticketId: ticketId,
-                    qrCodeUrl: qrCodeUrl,
-                    timestamp: new Date(),
-                });
-
-                return { qrCodeUrl };
-            } catch (error) {
-                console.error("Error generating or uploading QR code:", error);
-                throw new functions.https.HttpsError(
-                    "internal",
-                    "Failed to generate or upload QR code",
-                    error instanceof Error ? error.message : "Unknown error"
-                );
-            }
-        } else {
-            const ticketData = ticketQuery.docs[0].data();
-            return { qrCodeUrl: ticketData.qrCodeUrl };
-        }
+    } else {
+        const ticketData = ticketQuery.docs[0].data();
+        return { qrCodeUrl: ticketData.qrCodeUrl };
     }
-);
+});
 
 // apple wallet ticket
 export const createTicket = functions.https.onCall(async (_, context) => {
