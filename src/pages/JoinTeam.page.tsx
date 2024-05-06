@@ -91,7 +91,6 @@ export const JoinTeamPage = () => {
             try {
                 const data = await checkInvitation(invitationId);
                 if (data.status === 200) {
-                    console.log(data);
                     setInvitationData(data.data);
                     if (timeoutRef.current)
                         window.clearTimeout(timeoutRef.current);
