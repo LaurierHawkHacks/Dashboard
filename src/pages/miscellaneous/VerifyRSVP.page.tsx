@@ -1,12 +1,15 @@
 import { Button } from "@/components";
 import { useAuth } from "@/providers/auth.provider";
-import { useNotification } from "@/providers/notification.provider";
 import { verifyRSVP } from "@/services/utils";
-import { useEffect, useState } from "react";
+import { useNotification } from "@/providers/notification.provider";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { rsvpText } from "@/data";
 
 export const VerifyRSVP = () => {
     const [isVerifying, setIsVerifying] = useState(false);
+    const [agreedToParticipate, setAgreedToParticipate] = useState(false);
+    const [willAttend, setWillAttend] = useState(false);
     const { showNotification } = useNotification();
     const { currentUser, reloadUser } = useAuth();
     const navigate = useNavigate();
@@ -19,7 +22,7 @@ export const VerifyRSVP = () => {
             showNotification({
                 title: "Error Verifying RSVP",
                 message:
-                    "Please send an email to hello@hawkhacks.ca for us to confirm it for you.",
+                    "Please reach out to us in our tech support channel on Discord.",
             });
         } else {
             await reloadUser();
@@ -27,10 +30,8 @@ export const VerifyRSVP = () => {
     };
 
     useEffect(() => {
-        // we only want to navigate out of the current page if user rsvp was successfully
-        // verified and has been populated in our database
         if (currentUser && currentUser.rsvpVerified) navigate("/");
-    }, [currentUser]);
+    }, [currentUser, navigate]);
 
     return (
         <div className="pt-12 flex justify-center items-center flex-col gap-6">
@@ -38,13 +39,63 @@ export const VerifyRSVP = () => {
                 Please verify your RSVP to get access to the rest of the
                 dashboard!
             </p>
+            <div className="flex flex-col items-start max-w-3xl">
+                <div>
+                    <label className="inline-flex items-center gap-3 mt-3">
+                        <input
+                            type="checkbox"
+                            checked={agreedToParticipate}
+                            onChange={(e) =>
+                                setAgreedToParticipate(e.target.checked)
+                            }
+                            className="form-checkbox h-5 w-5 text-gray-600"
+                        />
+                        <span className="ml-2 text-gray-700 cursor-pointer">
+                            I have read the content below and agree to
+                            participate in the event using my free will and good
+                            judgment.
+                        </span>
+                    </label>
+
+                    <div className="border border-blueGreen p-2 my-8 flex flex-col gap-2 text-gray-500 max-w-3xl max-h-72 overflow-y-scroll">
+                        {rsvpText.map((content, index) => {
+                            return <p key={index}>{content}</p>;
+                        })}
+                    </div>
+                </div>
+                <label className="inline-flex items-center gap-3 mt-3">
+                    <input
+                        type="checkbox"
+                        checked={willAttend}
+                        onChange={(e) => setWillAttend(e.target.checked)}
+                        className="form-checkbox h-5 w-5 text-gray-600"
+                    />
+                    <span className="ml-2 text-gray-700">
+                        I confirm that I will be attending HawkHacks from May
+                        17th to May 19th. I will try to be on the premises for
+                        the vast majority for the duration of the event.
+                    </span>
+                </label>
+            </div>
             <Button
                 onClick={verify}
-                disabled={isVerifying}
-                className="font-bold"
+                disabled={isVerifying || !agreedToParticipate || !willAttend}
+                className="mt-4  px-4 py-2 rounded disabled:bg-gray-300"
             >
                 Verify
             </Button>
+            <p className="text-gray-800 mt-2">
+                Having trouble? Get help in our{" "}
+                <a
+                    href="https://discord.com/invite/GxwvFEn9TB"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sky-600 font-bold underline"
+                >
+                    Discord
+                </a>{" "}
+                support channel.
+            </p>
         </div>
     );
 };
