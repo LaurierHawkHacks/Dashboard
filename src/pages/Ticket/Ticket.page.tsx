@@ -1,4 +1,3 @@
-import testQRCode from "../../assets/qrcode.png";
 import { Logo } from "@assets";
 import { FiDownload } from "react-icons/fi";
 import { useEffect, useState } from "react";
@@ -7,7 +6,6 @@ import { GoogleWalletBadge, AppleWalletBadge, LoadingDots } from "@/assets";
 import { useAuth } from "@/providers/hooks";
 import { Navigate } from "react-router-dom";
 import { useAvailableRoutes } from "@/providers/routes.provider";
-import { pronouns } from "@/data";
 import { handleError } from "@/services/utils";
 
 export const TicketPage = () => {
@@ -19,6 +17,7 @@ export const TicketPage = () => {
     const firstName = user?.firstName ?? "Unknown";
     const lastName = user?.lastName ?? "Unknown";
     const [qrCode, setQRCode] = useState<string>(LoadingDots);
+    const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
         if (currentUser) {
@@ -87,6 +86,7 @@ export const TicketPage = () => {
                 `create_${service}_wallet_ticket_error`
             );
         }
+        setLoading(false);
     };
 
     return (
@@ -159,9 +159,13 @@ export const TicketPage = () => {
                             </a>
                         </div>
                     </div>
+                    {loading && (
+                        <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-75 flex justify-center items-center rounded-xl">
+                            <img src={LoadingDots} alt="Loading..." />
+                        </div>
+                    )}
                 </div>
             </div>
         </>
     );
 };
-
