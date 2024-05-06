@@ -1,8 +1,11 @@
 import { useAuth as useAuthProvider } from "@/providers/auth.provider";
 import { FormEventHandler, useEffect, useRef, useState } from "react";
 import { MdOutlineEdit, MdOutlineFileDownload } from "react-icons/md";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import { LoadingAnimation } from "@/components/LoadingAnimation";
+import { getSocials, updateSocials } from "@/services/utils";
+import { useNotification } from "@/providers/notification.provider";
+import type { Socials } from "@/services/utils/types";
+import { Navigate } from "react-router-dom";
 
 const allowedFileTypes = [
     "image/*", //png, jpg, jpeg, jfif, pjpeg, pjp, gif, webp, bmp, svg
@@ -16,18 +19,10 @@ const allowedFileTypes = [
     "application/vnd.oasis.opendocument.text", //odt
 ];
 
-interface MediaValues {
-    instagram: string;
-    linkedinUrl: string;
-    githubUrl: string;
-    discord: string;
-    resumeRef: string;
-}
-
-const mediaTypes: { name: string; key: keyof MediaValues }[] = [
+const mediaTypes: { name: string; key: keyof Socials }[] = [
     { name: "Instagram", key: "instagram" },
-    { name: "LinkedIn", key: "linkedinUrl" },
-    { name: "GitHub", key: "githubUrl" },
+    { name: "LinkedIn", key: "linkedin" },
+    { name: "GitHub", key: "github" },
     { name: "Discord", key: "discord" },
 ];
 
@@ -37,45 +32,45 @@ export const NetworkingPage = () => {
     const [editMode, setEditMode] = useState("");
     const [randomId] = useState(Math.random().toString(32));
     const timeoutRef = useRef<number | null>(null);
+    const gettinSocialsRef = useRef<boolean>(false);
+    const { showNotification } = useNotification();
+    const [socials, setSocials] = useState<Socials | null>(null);
 
     const [file, setFile] = useState<File | null>(null);
 
-    const {
-        firstName,
-        lastName,
-        pronouns,
-        mentorResumeRef,
-        participatingAs,
-        generalResumeRef,
-    } = userApp || {};
-
     // State to keep track of each media account value
-    const [mediaValues, setMediaValues] = useState<MediaValues>({
+    const [mediaValues, setMediaValues] = useState<Socials>({
         instagram: "",
-        linkedinUrl: "",
-        githubUrl: "",
+        linkedin: "",
+        github: "",
         discord: "",
         resumeRef: "",
+        docId: "",
+        uid: "",
     });
 
     useEffect(() => {
         if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
         timeoutRef.current = window.setTimeout(() => setIsLoading(false), 5000);
 
-        if (userApp) {
-            setMediaValues({
-                instagram: userApp?.instagram ?? "",
-                githubUrl: userApp?.githubUrl ?? "",
-                linkedinUrl: userApp?.linkedinUrl ?? "",
-                discord: userApp?.discord ?? "",
-                resumeRef:
-                    userApp?.participatingAs === "Mentor"
-                        ? userApp?.mentorResumeRef
-                        : userApp?.mentorResumeRef ?? "",
-            });
-            if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
-            setIsLoading(false);
-        }
+        (async () => {
+            // avoid calling the function twice
+            if (gettinSocialsRef.current) return;
+            gettinSocialsRef.current = true;
+            try {
+                const res = await getSocials();
+                setSocials(res.data);
+                setMediaValues(res.data);
+            } catch (e) {
+                showNotification({
+                    title: "Error Getting Socials",
+                    message: (e as Error).message,
+                });
+            } finally {
+                if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+                setIsLoading(false);
+            }
+        })();
 
         return () => {
             if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
@@ -87,49 +82,49 @@ export const NetworkingPage = () => {
         setFile(selectedFiles[0] ?? null);
     };
 
-    const handleInputChange = (key: keyof MediaValues, value: string) => {
+    const handleInputChange = (key: keyof Socials, value: string) => {
         setMediaValues((prev) => ({ ...prev, [key]: value }));
         setEditMode(key);
     };
 
     const handleSubmit: FormEventHandler = async (e) => {
         e.preventDefault();
-        setIsLoading(true);
-        const functions = getFunctions();
         try {
-            const updateMedia = httpsCallable(functions, "updateSocials");
-            await updateMedia(mediaValues && file && participatingAs);
-            setIsLoading(false);
+            await updateSocials(mediaValues);
+            setSocials({ ...mediaValues });
             setEditMode("");
         } catch (e) {
-            console.error(e);
-            setIsLoading(false);
+            showNotification({
+                title: "Failed to update socials",
+                message: (e as Error).message,
+            });
         }
     };
 
     const handleCancel = () => {
         setMediaValues({
-            instagram: userApp?.instagram ?? "",
-            githubUrl: userApp?.githubUrl ?? "",
-            linkedinUrl: userApp?.linkedinUrl ?? "",
-            discord: userApp?.discord ?? "",
-            resumeRef:
-                userApp?.participatingAs === "Mentor"
-                    ? userApp?.mentorResumeRef
-                    : userApp?.mentorResumeRef ?? "",
+            instagram: socials?.instagram ?? "",
+            github: socials?.github ?? "",
+            linkedin: socials?.linkedin ?? "",
+            discord: socials?.discord ?? "",
+            resumeRef: socials?.resumeRef ?? "",
+            docId: socials?.docId ?? "",
+            uid: socials?.uid ?? "",
         });
         setEditMode("");
     };
 
     if (isLoading) return <LoadingAnimation />;
 
+    if (!userApp) return <Navigate to="/" />;
+
     return (
         <div>
             <div className="flex items-center gap-10">
                 <h1 className="font-bold text-2xl">
-                    {firstName} {lastName}
+                    {userApp.firstName} {userApp.lastName}
                 </h1>
-                <p>{pronouns}</p>
+                <p>{userApp.pronouns}</p>
             </div>
             <p className="mt-10">Your connections</p>
             <form className="flex flex-col max-w-md gap-5 mt-12">
@@ -191,7 +186,7 @@ export const NetworkingPage = () => {
                     <div className="mb-2 flex justify-between items-center">
                         <p className="flex-1">Resume</p>
                         {/* UPDATE HERE */}
-                        {(mentorResumeRef || generalResumeRef) && (
+                        {socials && socials.resumeRef && (
                             <p className="bg-green-300 rounded-full px-4 py-1">
                                 Completed
                             </p>
@@ -211,7 +206,7 @@ export const NetworkingPage = () => {
                             accept={allowedFileTypes.join(", ")}
                             onChange={handleFileInput}
                         />
-                        {(mentorResumeRef || generalResumeRef) && (
+                        {socials && socials.resumeRef && (
                             <p className="bg-peachWhite px-4 py-1 w-full rounded-md text-gray-500 overflow-hidden">
                                 {file?.name || "Resume Uploaded"}
                             </p>

@@ -28,3 +28,13 @@ export interface Invitation {
     owner: string; // the name of the owner
     teamName: string;
 }
+
+export interface Socials {
+    instagram: string;
+    github: string;
+    linkedin: string;
+    discord: string;
+    resumeRef: string;
+    docId: string;
+    uid: string;
+}

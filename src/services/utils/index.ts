@@ -10,7 +10,11 @@ import {
     setDoc,
 } from "firebase/firestore";
 import { firestore, functions, storage } from "@/services/firebase";
-import type { UserTicketData } from "@/services/utils/types";
+import type {
+    CloudFunctionResponse,
+    UserTicketData,
+    Socials,
+} from "@/services/utils/types";
 import { ApplicationData } from "@/components/forms/types";
 import { httpsCallable } from "firebase/functions";
 import { getBlob, getMetadata, ref, uploadBytes } from "firebase/storage";
@@ -222,5 +226,35 @@ export async function verifyRSVP() {
             stack: (e as Error).stack,
         });
         return false;
+    }
+}
+
+export async function getSocials() {
+    const fn = httpsCallable<unknown, CloudFunctionResponse<Socials>>(
+        functions,
+        "requestSocials"
+    );
+    try {
+        const res = await fn();
+        const data = res.data;
+        return data;
+    } catch (e) {
+        handleError(e as Error, "error_get_socials");
+        throw e;
+    }
+}
+
+export async function updateSocials(socials: Socials) {
+    const fn = httpsCallable<unknown, CloudFunctionResponse<Socials>>(
+        functions,
+        "updateSocials"
+    );
+    try {
+        const res = await fn(socials);
+        const data = res.data;
+        return data;
+    } catch (e) {
+        handleError(e as Error, "error_update_socials");
+        throw e;
     }
 }
