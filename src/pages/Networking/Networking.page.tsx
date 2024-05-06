@@ -12,7 +12,6 @@ import {
 import { useNotification } from "@/providers/notification.provider";
 import type { Socials } from "@/services/utils/types";
 import { Navigate } from "react-router-dom";
-import { updateProfile } from "firebase/auth";
 
 const allowedFileTypes = [
     "image/*", //png, jpg, jpeg, jfif, pjpeg, pjp, gif, webp, bmp, svg
@@ -187,9 +186,9 @@ export const NetworkingPage = () => {
                                 </p>
                             )}
                         </div>
-                        <div className="relative flex items-center w-1/2">
+                        <div className="relative">
                             <input
-                                className="bg-peachWhite border-0 rounded-lg text-gray-500 flex-grow"
+                                className="bg-peachWhite border-0 rounded-lg text-gray-500 pr-7 w-full"
                                 type="text"
                                 placeholder={`Add your ${name}!`}
                                 value={mediaValues[key]}
@@ -198,7 +197,7 @@ export const NetworkingPage = () => {
                                 }
                             />
                             {mediaValues[key] && (
-                                <MdOutlineEdit className="absolute -right-[5%] text-gray-500 ml-2" />
+                                <MdOutlineEdit className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5" />
                             )}
                         </div>
 
@@ -235,17 +234,17 @@ export const NetworkingPage = () => {
                     <div className="flex items-center gap-4">
                         <button
                             type="button"
-                            className="w-8 h-8 bg-peachWhite rounded-lg flex items-center justify-center hover:cursor-pointer flex-shrink-0"
+                            className="p-2 bg-peachWhite rounded-lg flex items-center justify-center hover:cursor-pointer flex-shrink-0"
                             onClick={() =>
                                 mediaValues.resumeRef &&
                                 getResume(mediaValues.resumeRef)
                             }
                         >
-                            <MdOutlineFileDownload className="text-gray-500" />
+                            <MdOutlineFileDownload className="text-gray-500 w-6 h-6" />
                         </button>
                         <label
                             htmlFor="resume-file-input"
-                            className="flex-grow hover:cursor-pointer"
+                            className="flex-grow rounded-lg px-4 py-2 bg-peachWhite hover:cursor-pointer"
                         >
                             <span>
                                 {file ? file.name : "Select new resume file"}
