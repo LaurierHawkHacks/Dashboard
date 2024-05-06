@@ -2,10 +2,17 @@ import { useAuth as useAuthProvider } from "@/providers/auth.provider";
 import { FormEventHandler, useEffect, useRef, useState } from "react";
 import { MdOutlineEdit, MdOutlineFileDownload } from "react-icons/md";
 import { LoadingAnimation } from "@/components/LoadingAnimation";
-import { getSocials, updateSocials } from "@/services/utils";
+import {
+    getResume,
+    getSocials,
+    updateSocials,
+    uploadGeneralResume,
+    uploadMentorResume,
+} from "@/services/utils";
 import { useNotification } from "@/providers/notification.provider";
 import type { Socials } from "@/services/utils/types";
 import { Navigate } from "react-router-dom";
+import { updateProfile } from "firebase/auth";
 
 const allowedFileTypes = [
     "image/*", //png, jpg, jpeg, jfif, pjpeg, pjp, gif, webp, bmp, svg
@@ -27,10 +34,9 @@ const mediaTypes: { name: string; key: keyof Socials }[] = [
 ];
 
 export const NetworkingPage = () => {
-    const { userApp } = useAuthProvider();
+    const { currentUser, userApp } = useAuthProvider();
     const [isLoading, setIsLoading] = useState(true);
     const [editMode, setEditMode] = useState("");
-    const [randomId] = useState(Math.random().toString(32));
     const timeoutRef = useRef<number | null>(null);
     const gettinSocialsRef = useRef<boolean>(false);
     const { showNotification } = useNotification();
@@ -80,6 +86,40 @@ export const NetworkingPage = () => {
     const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFiles = Array.from(e.target.files || []);
         setFile(selectedFiles[0] ?? null);
+        setEditMode("resume");
+    };
+
+    const submitFile = async () => {
+        if (!file || !currentUser || !userApp) return;
+
+        let ref = "";
+        if (userApp.participatingAs === "Mentor") {
+            ref = await uploadMentorResume(file, currentUser.uid);
+        } else {
+            ref = await uploadGeneralResume(file, currentUser.uid);
+        }
+
+        try {
+            await updateSocials({ ...mediaValues, resumeRef: ref });
+            setSocials(
+                socials
+                    ? {
+                          ...socials,
+                          resumeRef: ref,
+                      }
+                    : null
+            );
+            setMediaValues({
+                ...mediaValues,
+                resumeRef: ref,
+            });
+            setEditMode("");
+        } catch (e) {
+            showNotification({
+                title: "Failed to upload resuem",
+                message: (e as Error).message,
+            });
+        }
     };
 
     const handleInputChange = (key: keyof Socials, value: string) => {
@@ -192,26 +232,54 @@ export const NetworkingPage = () => {
                             </p>
                         )}
                     </div>
-                    <div className="relative flex items-center w-1/2 gap-4">
-                        <div className="w-8 h-8 bg-peachWhite rounded-lg flex items-center justify-center hover:cursor-pointer">
+                    <div className="flex items-center gap-4">
+                        <button
+                            type="button"
+                            className="w-8 h-8 bg-peachWhite rounded-lg flex items-center justify-center hover:cursor-pointer flex-shrink-0"
+                            onClick={() =>
+                                mediaValues.resumeRef &&
+                                getResume(mediaValues.resumeRef)
+                            }
+                        >
                             <MdOutlineFileDownload className="text-gray-500" />
-                        </div>
-                        <label htmlFor="file-upload" className="sr-only">
-                            Select resume file
+                        </button>
+                        <label
+                            htmlFor="resume-file-input"
+                            className="flex-grow hover:cursor-pointer"
+                        >
+                            <span>
+                                {file ? file.name : "Select new resume file"}
+                            </span>
+                            <input
+                                id="resume-file-input"
+                                className="sr-only"
+                                type="file"
+                                accept={allowedFileTypes.join(", ")}
+                                onChange={handleFileInput}
+                            />
                         </label>
-                        <input
-                            id={`file-${randomId}`}
-                            className="hidden"
-                            type="file"
-                            accept={allowedFileTypes.join(", ")}
-                            onChange={handleFileInput}
-                        />
-                        {socials && socials.resumeRef && (
-                            <p className="bg-peachWhite px-4 py-1 w-full rounded-md text-gray-500 overflow-hidden">
-                                {file?.name || "Resume Uploaded"}
-                            </p>
-                        )}
                     </div>
+                    {editMode === "resume" && (
+                        <div className="mt-4 flex gap-2">
+                            <button
+                                type="button"
+                                className="bg-gray-300/30 rounded-lg px-4 py-1"
+                                onClick={() => {
+                                    setFile(null);
+                                    setEditMode("");
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                className="bg-peachWhite text-black rounded-lg px-4 py-1"
+                                onClick={submitFile}
+                            >
+                                Save
+                            </button>
+                        </div>
+                    )}
                 </div>
             </form>
         </div>
