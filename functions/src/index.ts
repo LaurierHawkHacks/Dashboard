@@ -313,6 +313,7 @@ export const createTicket = functions.https.onCall(async (_, context) => {
     }
 });
 
+//Google wallet class
 export const createPassClass = functions.https.onCall(async (_, context) => {
     if (!context.auth) {
         return {
@@ -324,21 +325,23 @@ export const createPassClass = functions.https.onCall(async (_, context) => {
     const baseUrl = "https://walletobjects.googleapis.com/walletobjects/v1";
     const issuerid = config.googlewallet.issuerid;
 
-    const classesRef = admin.firestore().collection("passClasses");
-    const classDoc = await classesRef.doc(issuerid).get();
-    let classId;
-    if (classDoc.exists && classDoc.data()?.classId) {
-        classId = classDoc.data()?.classId;
-    } else {
-        classId = `${issuerid}.hawkhacks-ticket-${uuidv4()}`;
-        await classesRef.doc(issuerid).set(
-            {
-                classId: classId,
-                timestamp: new Date(),
-            },
-            { merge: true }
-        );
-    }
+    // const classesRef = admin.firestore().collection("passClasses");
+    // const classDoc = await classesRef.doc(issuerid).get();
+    // let classId;
+    // if (classDoc.exists && classDoc.data()?.classId) {
+    //     classId = classDoc.data()?.classId;
+    // } else {
+    //     classId = `${issuerid}.hawkhacks-ticket`; //dont put uuidv4 in the classId for pass class it breaks it
+    //     await classesRef.doc(issuerid).set(
+    //         {
+    //             classId: classId,
+    //             timestamp: new Date(),
+    //         },
+    //         { merge: true }
+    //     );
+    // }
+
+    const classId = `${issuerid}.hawkhacks-ticket`; //dont put uuidv4 in the classId for pass class it breaks it
 
     const updatedClass = {
         id: classId,
@@ -352,7 +355,7 @@ export const createPassClass = functions.https.onCall(async (_, context) => {
                                     fields: [
                                         {
                                             fieldPath:
-                                                'textModulesData["from"]',
+                                                'textModulesData["NAME"]',
                                         },
                                     ],
                                 },
@@ -362,7 +365,21 @@ export const createPassClass = functions.https.onCall(async (_, context) => {
                                     fields: [
                                         {
                                             fieldPath:
-                                                "object.textModulesData['to']",
+                                                "object.textModulesData['TYPE']",
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    {
+                        oneItem: {
+                            item: {
+                                firstValue: {
+                                    fields: [
+                                        {
+                                            fieldPath:
+                                                "object.textModulesData['EMAIL']",
                                         },
                                     ],
                                 },
@@ -504,13 +521,13 @@ export const createPassObject = functions.https.onCall(
             subheader: {
                 defaultValue: {
                     language: "en-US",
-                    value: "Hacker",
+                    value: "Wilfrid Laurier University",
                 },
             },
             header: {
                 defaultValue: {
                     language: "en-US",
-                    value: `${firstName} ${lastName}`,
+                    value: "HawkHacks 2024",
                 },
             },
             linksModuleData: {
@@ -524,14 +541,19 @@ export const createPassObject = functions.https.onCall(
             },
             textModulesData: [
                 {
-                    id: "from",
-                    header: "From",
-                    body: "May 12th, 2024",
+                    id: "NAME",
+                    header: "Name",
+                    body: `${firstName} ${lastName}`,
                 },
                 {
-                    id: "to",
-                    header: "To",
-                    body: "May 16th, 2024",
+                    id: "TYPE",
+                    header: "Type",
+                    body: "Hacker",
+                },
+                {
+                    id: "EMAIL",
+                    header: "Email",
+                    body: `${userEmail}`,
                 },
             ],
             barcode: {
@@ -540,7 +562,7 @@ export const createPassObject = functions.https.onCall(
                 alternateText: "QR code goes here",
             },
 
-            hexBackgroundColor: "#006d8f",
+            hexBackgroundColor: "#27393F",
             heroImage: {
                 sourceUri: {
                     uri: "https://hawkhacks.ca/icon.png",
