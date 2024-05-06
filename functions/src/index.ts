@@ -57,7 +57,9 @@ exports.fetchOrGenerateTicket = functions.https.onCall(async (_, context) => {
         const qrCodeValue = `https://portal.hawkhacks.ca/tickets/${ticketId}`;
 
         try {
-            const qrCodeDataURL = await QRCode.toDataURL(qrCodeValue);
+            const qrCodeDataURL = await QRCode.toDataURL(qrCodeValue, {
+                width: 256,
+            });
 
             const base64Data = qrCodeDataURL.split(",")[1];
             const buffer = Buffer.from(base64Data, "base64");
