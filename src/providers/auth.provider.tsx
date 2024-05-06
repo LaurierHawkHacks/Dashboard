@@ -259,7 +259,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                         showNotification({
                             title: "Error Verifying Email",
                             message:
-                                "Please log out and log in again. If problem persists, please contact us via email: 'development@hawkhacks.ca'",
+                                "Please log out and log in again. If problem persists, please contact us in our Discord support channel.",
                         });
                     }
                 }
@@ -288,16 +288,8 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     const reloadUser = async () => {
         if (auth.currentUser) {
             await auth.currentUser.reload();
-            if (auth.currentUser.emailVerified) {
-                const userWithRole = await validateUser(auth.currentUser);
-                setCurrentUser(userWithRole);
-            } else {
-                showNotification({
-                    title: "Email Not Verified",
-                    message:
-                        "It seems that the email has not been verified yet. If you already did, please wait to resend the email.",
-                });
-            }
+            const userWithRole = await validateUser(auth.currentUser);
+            setCurrentUser(userWithRole);
         }
     };
 
