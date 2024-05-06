@@ -1,15 +1,27 @@
-import { BrowserRouter, useRoutes } from "react-router-dom";
+import { BrowserRouter, useNavigate, useRoutes } from "react-router-dom";
 import { LoadingAnimation } from "@/components";
 import { useAvailableRoutes } from "@/providers/routes.provider";
+import { useAuth } from "@/providers/auth.provider";
+import { useEffect } from "react";
 
 const InnerRouter = () => {
-    const { routes } = useAvailableRoutes();
+    const { paths, routes, loadingRoutes } = useAvailableRoutes();
+    const { currentUser, userApp } = useAuth();
     const availableRoutes = useRoutes(routes);
-    return availableRoutes;
-};
+    const navigate = useNavigate();
 
-export const Router = () => {
-    const { loadingRoutes } = useAvailableRoutes();
+    useEffect(() => {
+        if (!currentUser) return;
+
+        if (
+            currentUser.type === "hacker" &&
+            userApp &&
+            userApp.accepted &&
+            !currentUser.rsvpVerified
+        ) {
+            navigate(paths.verifyRSVP);
+        }
+    }, [currentUser, userApp]);
 
     if (loadingRoutes) return <LoadingAnimation />;
 
