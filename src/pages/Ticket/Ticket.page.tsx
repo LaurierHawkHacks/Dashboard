@@ -93,9 +93,27 @@ export const TicketPage = () => {
         setLoading(false);
     };
 
+    //here for testing purposes
+    const handleCreatePassClass = () => {
+        const addPassClass = httpsCallable(functions, "createPassClass");
+        addPassClass({})
+            .then((result) => {
+                console.log("Pass class result:", result.data);
+            })
+            .catch((error) => {
+                console.error("Error creating pass class:", error);
+            });
+    };
+
     return (
         <>
             <div className="flex justify-start">
+                <button
+                    className="p-4 bg-red-50 m-2"
+                    onClick={handleCreatePassClass}
+                >
+                    Create Pass Class
+                </button>
                 <div className="bg-white drop-shadow-xl rounded-xl box-border max-w-[400px] w-full p-8 flex flex-col gap-2">
                     <div className="flex items-center font-bold text-2xl md:text-[30px]">
                         <img
