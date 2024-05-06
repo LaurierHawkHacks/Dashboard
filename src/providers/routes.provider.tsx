@@ -15,7 +15,6 @@ import {
     TicketPage,
     HomePage,
     VerifyEmailPage,
-    UserPage,
 } from "@/pages";
 import { type RouteObject } from "react-router-dom";
 import { useAuth } from "./auth.provider";
@@ -23,9 +22,6 @@ import { ProtectedRoutes } from "@/navigation";
 import { PostSubmissionPage } from "@/pages/miscellaneous/PostSubmission.page";
 import { VerifyRSVP } from "@/pages/miscellaneous/VerifyRSVP.page";
 import { MyTeamPage } from "@/pages/MyTeam.page";
-import { JoinTeamPage } from "@/pages/JoinTeam.page";
-import { isAfter } from "date-fns";
-import { appCloseDate } from "@/data/appCloseDate";
 
 interface PathObject {
     admin: string;
@@ -102,7 +98,7 @@ const titles: Record<string, Title> = {
     },
     [paths.ticket]: {
         main: "Ticket",
-        sub: 'This ticket is required for registration at our HawkHacks sign-in desk.\nKeep this ticket safe - download or add it to your wallet for convenience!',
+        sub: "This ticket is required for registration at our HawkHacks sign-in desk.\nKeep this ticket safe - download or add it to your wallet for convenience!",
     },
     [paths.myTeam]: {
         main: "My Team",
@@ -215,54 +211,40 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                 { path: paths.schedule, element: <div>schedule</div> },
                 { path: paths.ticket, element: <TicketPage /> }
             );
+
             setUserRoutes(userRoutes.children);
             setRoutes(availableRoutes);
             return cleanUp;
         }
 
-        if (!userApp && isAfter(new Date(), new Date(appCloseDate))) {
-            userRoutes.children = [
-                {
-                    index: true,
-                    path: paths.portal,
-                    element: <UserPage />,
-                },
-            ];
-            setUserRoutes(userRoutes.children);
-            setRoutes(availableRoutes);
-            return cleanUp;
-        }
+        // type based
+        if (currentUser.type === "hacker") {
+            if (userApp && userApp.accepted && !currentUser.rsvpVerified) {
+                userRoutes.children = [
+                    {
+                        path: paths.verifyRSVP,
+                        element: <VerifyRSVP />,
+                    },
+                ];
+                setUserRoutes(userRoutes.children);
+                setRoutes(availableRoutes);
+                return cleanUp;
+            }
 
-        if (userApp && userApp.accepted && !currentUser.rsvpVerified) {
-            userRoutes.children = [
-                {
-                    path: paths.verifyRSVP,
-                    element: <VerifyRSVP />,
-                },
-            ];
-            setUserRoutes(userRoutes.children);
-            setRoutes(availableRoutes);
-            return cleanUp;
-        }
-
-        if (userApp && userApp.accepted && currentUser.rsvpVerified) {
-            // enable all routes
-            userRoutes.children = [
-                {
-                    path: paths.networking,
-                    element: <NetworkingPage />,
-                },
-                { path: paths.schedule, element: <div>schedule</div> },
-                { path: paths.ticket, element: <TicketPage /> },
-                { path: paths.myTeam, element: <MyTeamPage /> },
-                {
-                    path: `${paths.joinTeam}/:invitationId`,
-                    element: <JoinTeamPage />,
-                },
-            ];
-            setUserRoutes(userRoutes.children);
-            setRoutes(availableRoutes);
-            return cleanUp;
+            if (userApp && userApp.accepted && currentUser.rsvpVerified) {
+                userRoutes.children = [
+                    { path: paths.myTeam, element: <MyTeamPage /> },
+                    {
+                        path: paths.networking,
+                        element: <NetworkingPage />,
+                    },
+                    { path: paths.schedule, element: <div>schedule</div> },
+                    { path: paths.ticket, element: <TicketPage /> },
+                ];
+                setUserRoutes(userRoutes.children);
+                setRoutes(availableRoutes);
+                return cleanUp;
+            }
         }
 
         // only default routes

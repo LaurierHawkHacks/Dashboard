@@ -22,10 +22,13 @@ import type { User, AuthProvider as FirebaseAuthProvider } from "firebase/auth";
 import type { NotificationOptions } from "@/providers/types";
 import type { ApplicationData } from "@/components/forms/types";
 
+type UserType = "hacker" | "mentor" | "volunteer" | "speaker" | "sponsor";
+
 export interface UserWithClaims extends User {
     hawkAdmin: boolean;
     phoneVerified: boolean;
     rsvpVerified: boolean;
+    type: UserType;
 }
 
 export type ProviderName = "github" | "google" | "apple";
@@ -67,6 +70,7 @@ async function validateUser(user: User): Promise<UserWithClaims> {
         hawkAdmin: Boolean(claims.admin),
         phoneVerified: Boolean(claims.phoneVerified),
         rsvpVerified: Boolean(claims.rsvpVerified),
+        type: (claims?.type as UserType) ?? "hacker",
     };
 }
 
