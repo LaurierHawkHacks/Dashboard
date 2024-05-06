@@ -1,15 +1,8 @@
 import { useAuth as useAuthProvider } from "@/providers/auth.provider";
-import { useEffect, useRef, useState } from "react";
+import { FormEventHandler, useEffect, useRef, useState } from "react";
 import { MdOutlineEdit, MdOutlineFileDownload } from "react-icons/md";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { LoadingAnimation } from "@/components/LoadingAnimation";
-
-const mediaTypes = [
-    { name: "Instagram", key: "instagram" },
-    { name: "LinkedIn", key: "linkedinUrl" },
-    { name: "GitHub", key: "githubUrl" },
-    { name: "Discord", key: "discord" },
-];
 
 const allowedFileTypes = [
     "image/*", //png, jpg, jpeg, jfif, pjpeg, pjp, gif, webp, bmp, svg
@@ -30,6 +23,13 @@ interface MediaValues {
     discord: string;
     resumeRef: string;
 }
+
+const mediaTypes: { name: string; key: keyof MediaValues }[] = [
+    { name: "Instagram", key: "instagram" },
+    { name: "LinkedIn", key: "linkedinUrl" },
+    { name: "GitHub", key: "githubUrl" },
+    { name: "Discord", key: "discord" },
+];
 
 export const NetworkingPage = () => {
     const { userApp } = useAuthProvider();
@@ -64,14 +64,14 @@ export const NetworkingPage = () => {
 
         if (userApp) {
             setMediaValues({
-                instagram: userApp.instagram,
-                linkedinUrl: userApp.linkedinUrl,
-                githubUrl: userApp.githubUrl,
-                discord: userApp.discord,
+                instagram: userApp?.instagram ?? "",
+                githubUrl: userApp?.githubUrl ?? "",
+                linkedinUrl: userApp?.linkedinUrl ?? "",
+                discord: userApp?.discord ?? "",
                 resumeRef:
-                    userApp.participatingAs === "Hacker"
-                        ? userApp.generalResumeRef
-                        : userApp.mentorResumeRef,
+                    userApp?.participatingAs === "Mentor"
+                        ? userApp?.mentorResumeRef
+                        : userApp?.mentorResumeRef ?? "",
             });
             if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
             setIsLoading(false);
@@ -87,12 +87,12 @@ export const NetworkingPage = () => {
         setFile(selectedFiles[0] ?? null);
     };
 
-    const handleInputChange = (key, value) => {
+    const handleInputChange = (key: keyof MediaValues, value: string) => {
         setMediaValues((prev) => ({ ...prev, [key]: value }));
         setEditMode(key);
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit: FormEventHandler = async (e) => {
         e.preventDefault();
         setIsLoading(true);
         const functions = getFunctions();
@@ -109,10 +109,14 @@ export const NetworkingPage = () => {
 
     const handleCancel = () => {
         setMediaValues({
-            instagram: userApp?.instagram || "",
-            linkedinUrl: userApp?.linkedinUrl || "",
-            githubUrl: userApp?.githubUrl || "",
-            discord: userApp?.discord || "",
+            instagram: userApp?.instagram ?? "",
+            githubUrl: userApp?.githubUrl ?? "",
+            linkedinUrl: userApp?.linkedinUrl ?? "",
+            discord: userApp?.discord ?? "",
+            resumeRef:
+                userApp?.participatingAs === "Mentor"
+                    ? userApp?.mentorResumeRef
+                    : userApp?.mentorResumeRef ?? "",
         });
         setEditMode("");
     };
