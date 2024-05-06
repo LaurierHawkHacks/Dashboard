@@ -15,11 +15,7 @@ service cloud.firestore {
     }
 
   match /databases/{database}/documents {
-    // Allow read/write access to the user owns documents
-    // Allow read/write access if
-    // 1. document is new
-    // 2. document is not new and user is owner
-    match /users/{documentId} {
+    match /socials/{documentId} {
       allow read: if isAuthenticated() && (isAdmin() || isOwner(resource.data.id));
       allow write: if isAuthenticated() && isAdmin();
     }
