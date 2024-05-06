@@ -18,9 +18,6 @@ export const TicketPage = () => {
     const firstName = user?.firstName || "Unknown";
     const lastName = user?.lastName || "Unknown";
 
-    console.log("userApp", user);
-    console.log("currentUser: ", currentUser);
-
     const handleDownload = () => {
         const link = document.createElement("a");
         link.href = testQRCode;
