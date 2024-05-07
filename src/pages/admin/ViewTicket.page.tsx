@@ -1,4 +1,3 @@
-import { Button } from "@/components";
 import { useAuth } from "@/providers/auth.provider";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,8 +8,8 @@ import {
 } from "@/services/utils/types";
 import { getExtendedTicketData } from "@/services/utils/ticket";
 import { useNotification } from "@/providers/notification.provider";
-import { getRedeemableItems, getResume, redeemItem } from "@/services/utils";
-import { LoadingAnimation } from "@/components";
+import { getRedeemableItems, redeemItem } from "@/services/utils";
+import { Button, LoadingAnimation, Modal } from "@/components";
 
 export const AdminViewTicketPage = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -23,7 +22,10 @@ export const AdminViewTicketPage = () => {
     );
     const { showNotification } = useNotification();
     const [events, setEvents] = useState<EventItem[]>([]);
-    const [foods, setFoods] = useState<EventItem[]>([]);
+    const [foods, setFoods] = useState<FoodItem[]>([]);
+    const [openConfirm, setOpenConfirm] = useState(false);
+    const [activeEvent, setActiveEvent] = useState<EventItem | null>(null);
+    const [activeFood, setActiveFood] = useState<FoodItem | null>(null);
 
     useEffect(() => {
         if (!ticketId) return;
@@ -78,6 +80,8 @@ export const AdminViewTicketPage = () => {
                 title: "Failed to check event item",
                 message: (e as Error).message,
             });
+        } finally {
+            closeModal();
         }
     };
 
@@ -85,27 +89,35 @@ export const AdminViewTicketPage = () => {
         if (!ticketData) return;
         if (ticketData?.foods.includes(f.id) || !ticketId) return;
 
-        // try {
-        //     const res = await redeemItem(ticketId, e.id, "event");
-        //     if (res.status === 200) {
-        //         showNotification({
-        //             title: "Event Item Checked!",
-        //             message: "",
-        //         });
-        //         ticketData.events.push(e.id);
-        //         setTicketData({ ...ticketData });
-        //     } else {
-        //         showNotification({
-        //             title: "Failed to check event item",
-        //             message: res.message,
-        //         });
-        //     }
-        // } catch (e) {
-        //     showNotification({
-        //         title: "Failed to check event item",
-        //         message: (e as Error).message,
-        //     });
-        // }
+        try {
+            const res = await redeemItem(ticketId, f.id, "food");
+            if (res.status === 200) {
+                showNotification({
+                    title: "Food Item Checked!",
+                    message: "",
+                });
+                ticketData.foods.push(f.id);
+                setTicketData({ ...ticketData });
+            } else {
+                showNotification({
+                    title: "Failed to check food item",
+                    message: res.message,
+                });
+            }
+        } catch (e) {
+            showNotification({
+                title: "Failed to check event item",
+                message: (e as Error).message,
+            });
+        } finally {
+            closeModal();
+        }
+    };
+
+    const closeModal = () => {
+        setActiveEvent(null);
+        setActiveFood(null);
+        setOpenConfirm(false);
     };
 
     if (isLoading) return <LoadingAnimation />;
@@ -114,51 +126,94 @@ export const AdminViewTicketPage = () => {
         return <div>Failed to load ticket. Please ping @Juan in Discord.</div>;
 
     return (
-        <div>
-            <div className="flex items-center gap-10">
-                <h1 className="font-bold text-2xl">
-                    {`${ticketData.firstName} ${ticketData.lastName}`}
-                </h1>
-                <p>{ticketData.pronouns}</p>
-            </div>
+        <>
             <div>
-                <h2 className="font-medium text-lg mb-4">Events</h2>
-                <ul className="divide-y divide-gray-300 space-y-4">
-                    {events.map((e) => (
-                        <li key={e.id}>
-                            <div className="flex items-center gap-4">
-                                <span>{e.title}</span>
-                                <button
-                                    className="p-2 bg-tbrand text-white rounded disabled:bg-gray-400"
-                                    disabled={ticketData.events.includes(e.id)}
-                                    onClick={() => checkEvent(e)}
-                                >
-                                    Check
-                                </button>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
+                <div className="flex items-center gap-10">
+                    <h1 className="font-bold text-2xl">
+                        {`${ticketData.firstName} ${ticketData.lastName}`}
+                    </h1>
+                    <p>{ticketData.pronouns}</p>
+                </div>
+                <div className="mt-12">
+                    <h2 className="font-medium text-xl mb-2">Events</h2>
+                    <ul className="divide-y divide-gray-300 space-y-4">
+                        {events.map((e) => (
+                            <li key={e.id}>
+                                <div className="space-y-2">
+                                    <div>
+                                        <p className="font-medium">
+                                            Title:
+                                            <span className="ml-2 font-normal">
+                                                {e.title}
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <button
+                                        className="p-2 bg-tbrand text-white rounded disabled:bg-gray-400"
+                                        disabled={ticketData.events.includes(
+                                            e.id
+                                        )}
+                                        onClick={() => {
+                                            setActiveEvent(e);
+                                            setOpenConfirm(true);
+                                        }}
+                                    >
+                                        Check
+                                    </button>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+                <div className="mt-12">
+                    <h2 className="font-medium text-xl mb-2">Foods</h2>
+                    <ul className="divide-y divide-gray-300 space-y-4">
+                        {foods.map((f) => (
+                            <li key={f.id}>
+                                <div className="space-y-2">
+                                    <div>
+                                        <p className="font-medium">
+                                            Title:
+                                            <span className="ml-2 font-normal">
+                                                {f.title}
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <button
+                                        className="p-2 bg-tbrand text-white rounded disabled:bg-gray-400"
+                                        disabled={ticketData.foods.includes(
+                                            f.id
+                                        )}
+                                        onClick={() => {
+                                            setActiveFood(f);
+                                            setOpenConfirm(true);
+                                        }}
+                                    >
+                                        Check
+                                    </button>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             </div>
-            <div>
-                <h2>Foods</h2>
-                <ul>
-                    {foods.map((f) => (
-                        <li key={f.id}>
-                            <div>
-                                <span>{f.title}</span>
-                                <button
-                                    className="p-2 bg-tbrand text-white rounded disabled:bg-gray-400"
-                                    disabled={ticketData.foods.includes(f.id)}
-                                    onClick={() => checkFood(f)}
-                                >
-                                    Check
-                                </button>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        </div>
+            <Modal
+                title="Confirm Check"
+                subTitle="This action cannot be undone."
+                open={openConfirm}
+                onClose={closeModal}
+            >
+                <div className="flex items-center justify-center">
+                    <Button
+                        onClick={() => {
+                            if (activeEvent) checkEvent(activeEvent);
+                            else if (activeFood) checkFood(activeFood);
+                        }}
+                    >
+                        Confirm
+                    </Button>
+                </div>
+            </Modal>
+        </>
     );
 };

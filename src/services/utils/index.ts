@@ -262,13 +262,16 @@ export async function updateSocials(socials: Socials) {
     }
 }
 
-export async function getRedeemableItems() {
+export async function getRedeemableItems(): Promise<[EventItem[], FoodItem[]]> {
     try {
         const eventsQ = query(
             collection(firestore, "events"),
-            orderBy("startTimestamp", "asc")
+            orderBy("startTime", "asc")
         );
-        const foodsQ = query(collection(firestore, "foods"));
+        const foodsQ = query(
+            collection(firestore, "foods"),
+            orderBy("time", "asc")
+        );
 
         const [eventSnap, foodSnap] = await Promise.all([
             getDocs(eventsQ),
@@ -276,7 +279,7 @@ export async function getRedeemableItems() {
         ]);
 
         const events: EventItem[] = [];
-        const foods: EventItem[] = [];
+        const foods: FoodItem[] = [];
 
         eventSnap.forEach((doc) => events.push(doc.data() as EventItem));
         foodSnap.forEach((doc) => foods.push(doc.data() as FoodItem));
