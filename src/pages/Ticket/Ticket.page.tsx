@@ -148,13 +148,12 @@ export const TicketPage = () => {
                                 }}
                                 style={{
                                     display: "inline-block",
-                                    width: "40%",
+                                    width: "45%",
                                 }}
                             >
                                 <img
                                     src={GoogleWalletBadge}
                                     alt="Add to Google Wallet"
-                                    style={{ width: "100%", height: "auto" }}
                                 />
                             </a>
                         </div>
