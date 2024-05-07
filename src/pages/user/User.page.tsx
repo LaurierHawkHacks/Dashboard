@@ -1,80 +1,27 @@
-import { Button } from "@/components";
-import { getButtonStyles } from "@/components/Button/Button.styles";
 import { useAuth } from "@/providers/auth.provider";
-import { useAvailableRoutes } from "@/providers/routes.provider";
-import { Link } from "react-router-dom";
-import { isAfter } from "date-fns";
-import { useEffect, useState } from "react";
 import { InfoCallout } from "@/components/InfoCallout/InfoCallout";
-import { appCloseDate } from "@/data/appCloseDate";
 import { Application } from "@/components/Application";
 
 const UserPage = () => {
-    const [showInfo, setShowInfo] = useState(false);
     const { userApp } = useAuth();
-    const { paths: routes } = useAvailableRoutes();
-
-    useEffect(() => {
-        const today = new Date();
-        setShowInfo(isAfter(today, new Date(appCloseDate)));
-    }, []);
 
     return (
         <>
             <div className="items-center gap-8 space-y-4 mb-4">
                 <h3 className="text-md md:text-2xl font-bold">
-                    My Application
+                    Application Status
                 </h3>
-                {!userApp && !showInfo && (
-                    <div className="w-fit">
-                        <InfoCallout text="It seems like you haven't submitted an application yet." />
-                    </div>
-                )}
-                {showInfo && (
-                    <div className="w-fit mb-4">
-                        <InfoCallout text="Applications have now closed for HawkHacks 2024." />
-                    </div>
-                )}
-                <div className="flex gap-4">
-                    {userApp || showInfo ? (
-                        <Button disabled={!!userApp || showInfo}>
-                            {showInfo ? "Applications Closed" : "Submitted"}
-                        </Button>
-                    ) : (
-                        <Link
-                            to={routes.application}
-                            className={getButtonStyles({
-                                intent: "primary",
-                                className: "block w-fit",
-                            })}
-                        >
-                            Apply To HawkHacks!
-                        </Link>
-                    )}
-                    {userApp && !showInfo && (
-                        <Link
-                            to={routes.application}
-                            className={getButtonStyles({
-                                intent: "primary",
-                                className: "block w-fit",
-                            })}
-                        >
-                            Edit/View Submission
-                        </Link>
-                    )}
+                <div className="w-fit mb-4">
+                    {/* gotta explicitly check for "false" because not all apps have the accepted property which means that their apps are in review */}
+                    <InfoCallout
+                        text={
+                            userApp && !userApp.accepted
+                                ? "Unfortunately, due to high volume of applications and limited spots, we are unable to accept your application this year... We encourage you to try again next year."
+                                : "Applications have now closed for HawkHacks 2024."
+                        }
+                    />
                 </div>
             </div>
-            {userApp && !showInfo && (
-                <p className="my-4">
-                    {"Didn't like your submission? "}
-                    <Link
-                        to={`${routes.application}?restart=true`}
-                        className="font-medium text-sky-600 underline"
-                    >
-                        Start a new application here.
-                    </Link>
-                </p>
-            )}
             {userApp && <Application app={userApp} />}
         </>
     );

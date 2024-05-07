@@ -15,6 +15,7 @@ import {
     TicketPage,
     HomePage,
     VerifyEmailPage,
+    UserPage,
 } from "@/pages";
 import { type RouteObject } from "react-router-dom";
 import { useAuth } from "./auth.provider";
@@ -239,6 +240,16 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
 
         // type based
         if (currentUser.type === "hacker") {
+            if (userApp && !userApp.accepted) {
+                userRoutes.children = [
+                    {
+                        index: true,
+                        path: paths.portal,
+                        element: <UserPage />,
+                    },
+                ];
+            }
+
             if (userApp && userApp.accepted && !currentUser.rsvpVerified) {
                 userRoutes.children = [
                     {
