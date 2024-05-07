@@ -1,9 +1,6 @@
 import { useAuth as useAuthProvider } from "@/providers/auth.provider";
 import { FormEventHandler, useEffect, useRef, useState } from "react";
-import {
-    MdOutlineEdit,
-    MdOpenInNew,
-} from "react-icons/md";
+import { MdOutlineEdit, MdOpenInNew, MdWarning } from "react-icons/md";
 import { LoadingAnimation } from "@/components/LoadingAnimation";
 import {
     getResumeURL,
@@ -169,6 +166,12 @@ export const NetworkingPage = () => {
                 <p>{userApp.pronouns}</p>
             </div>
             <p className="mt-6">Your connections</p>
+            <div className="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg mt-6 flex items-center max-w-md">
+                <MdWarning className="mr-4 text-3xl" />
+                <p>
+                    Information you enter on this page will be publicly visible.
+                </p>
+            </div>
             <form className="flex flex-col max-w-md gap-5 mt-12">
                 {mediaTypes.map(({ name, key }) => (
                     <div
