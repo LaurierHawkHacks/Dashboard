@@ -947,6 +947,10 @@ export const getTicketData = functions.https.onCall(async (data) => {
         let firstName = "";
         let lastName = "";
         let pronouns = "";
+        let discord = "";
+        let linkedin = "";
+        let github = "";
+        let resumeRef = "";
 
         if (!app) {
             // grab from user record
@@ -961,6 +965,13 @@ export const getTicketData = functions.https.onCall(async (data) => {
             firstName = app.firstName;
             lastName = app.lastName;
             pronouns = app.pronouns;
+            discord = app.discord ?? "";
+            linkedin = app.linkedinUrl ?? "";
+            github = app.githubUrl ?? "";
+            resumeRef =
+                app.participatingAs === "Mentor"
+                    ? app.mentorResumeRef
+                    : app.generalResumeRef;
         }
 
         // get social ticket
@@ -976,10 +987,10 @@ export const getTicketData = functions.https.onCall(async (data) => {
             functions.logger.info("No socials found, using default data...");
             socials = {
                 instagram: "",
-                linkedin: "",
-                github: "",
-                discord: "",
-                resumeRef: "",
+                linkedin: linkedin ?? "",
+                github: github ?? "",
+                discord: discord ?? "",
+                resumeRef: resumeRef ?? "",
                 docId: "",
             } as Socials;
         }
