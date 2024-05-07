@@ -49,6 +49,7 @@ export const defaultApplication: ApplicationData = {
     linkedinUrl: "",
     githubUrl: "",
     personalWebsiteUrl: "",
+    instagram: "",
 
     email: "",
 };

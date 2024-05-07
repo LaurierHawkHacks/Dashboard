@@ -274,6 +274,10 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                     },
                     { path: paths.myTicket, element: <TicketPage /> },
                     { path: paths.myTeam, element: <MyTeamPage /> },
+                    {
+                        path: `${paths.joinTeam}/:invitationId`,
+                        element: <JoinTeamPage />, // dummy placeholder
+                    },
                 ];
             }
         }
