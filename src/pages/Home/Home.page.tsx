@@ -35,7 +35,7 @@ const Sponsors = sponsors.map((sponsor, i) => {
             rel="noopener noreferrer"
         >
             <img
-                className="w-[4.875rem] lg:w-[6.865rem] aspect-[5/2] object-contain"
+                className="w-[4.875rem] lg:w-[6.865rem] aspect-[5/2] object-contain transition duration-200 hover:scale-105"
                 src={sponsor.image}
                 alt={sponsor.name}
             />
