@@ -2,10 +2,14 @@ import { Button } from "@/components";
 import { useAuth } from "@/providers/auth.provider";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import type { ExtendedTicketData } from "@/services/utils/types";
+import {
+    EventItem,
+    FoodItem,
+    type ExtendedTicketData,
+} from "@/services/utils/types";
 import { getExtendedTicketData } from "@/services/utils/ticket";
 import { useNotification } from "@/providers/notification.provider";
-import { getResume } from "@/services/utils";
+import { getRedeemableItems, getResume, redeemItem } from "@/services/utils";
 import { LoadingAnimation } from "@/components";
 
 export const AdminViewTicketPage = () => {
@@ -18,6 +22,8 @@ export const AdminViewTicketPage = () => {
         null
     );
     const { showNotification } = useNotification();
+    const [events, setEvents] = useState<EventItem[]>([]);
+    const [foods, setFoods] = useState<EventItem[]>([]);
 
     useEffect(() => {
         if (!ticketId) return;
@@ -30,8 +36,11 @@ export const AdminViewTicketPage = () => {
             if (!currentUser.hawkAdmin) return navigate("/ticket/" + ticketId);
 
             const res = await getExtendedTicketData(ticketId);
+            const [e, f] = await getRedeemableItems();
             if (res.status == 200) {
                 setTicketData(res.data);
+                setEvents(e);
+                setFoods(f);
             } else {
                 showNotification({
                     title: "Failed to load ticket",
@@ -44,6 +53,60 @@ export const AdminViewTicketPage = () => {
             if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
         };
     }, [currentUser]);
+
+    const checkEvent = async (e: EventItem) => {
+        if (!ticketData) return;
+        if (ticketData?.events.includes(e.id) || !ticketId) return;
+
+        try {
+            const res = await redeemItem(ticketId, e.id, "event");
+            if (res.status === 200) {
+                showNotification({
+                    title: "Event Item Checked!",
+                    message: "",
+                });
+                ticketData.events.push(e.id);
+                setTicketData({ ...ticketData });
+            } else {
+                showNotification({
+                    title: "Failed to check event item",
+                    message: res.message,
+                });
+            }
+        } catch (e) {
+            showNotification({
+                title: "Failed to check event item",
+                message: (e as Error).message,
+            });
+        }
+    };
+
+    const checkFood = async (f: FoodItem) => {
+        if (!ticketData) return;
+        if (ticketData?.foods.includes(f.id) || !ticketId) return;
+
+        // try {
+        //     const res = await redeemItem(ticketId, e.id, "event");
+        //     if (res.status === 200) {
+        //         showNotification({
+        //             title: "Event Item Checked!",
+        //             message: "",
+        //         });
+        //         ticketData.events.push(e.id);
+        //         setTicketData({ ...ticketData });
+        //     } else {
+        //         showNotification({
+        //             title: "Failed to check event item",
+        //             message: res.message,
+        //         });
+        //     }
+        // } catch (e) {
+        //     showNotification({
+        //         title: "Failed to check event item",
+        //         message: (e as Error).message,
+        //     });
+        // }
+    };
 
     if (isLoading) return <LoadingAnimation />;
 
@@ -59,42 +122,42 @@ export const AdminViewTicketPage = () => {
                 <p>{ticketData.pronouns}</p>
             </div>
             <div>
-                <h2>Events</h2>
-                <ul></ul>
+                <h2 className="font-medium text-lg mb-4">Events</h2>
+                <ul className="divide-y divide-gray-300 space-y-4">
+                    {events.map((e) => (
+                        <li key={e.id}>
+                            <div className="flex items-center gap-4">
+                                <span>{e.title}</span>
+                                <button
+                                    className="p-2 bg-tbrand text-white rounded disabled:bg-gray-400"
+                                    disabled={ticketData.events.includes(e.id)}
+                                    onClick={() => checkEvent(e)}
+                                >
+                                    Check
+                                </button>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
             </div>
             <div>
                 <h2>Foods</h2>
-                <ul></ul>
-            </div>
-            <div className="flex flex-col max-w-md gap-5 mt-12">
-                {Object.keys(ticketData).map((key) => (
-                    <div
-                        className="bg-white shadow-md p-4 rounded-xl flex flex-col"
-                        key={key}
-                    >
-                        <div className="mb-2 flex justify-between items-center">
-                            <p className="flex-1 capitalize">{key}</p>
-                        </div>
-                        {/* @ts-ignore */}
-                        <p>{ticketData[key]}</p>
-                    </div>
-                ))}
-                {ticketData.resumeRef && (
-                    <div className="bg-white shadow-md p-4 rounded-xl flex flex-col">
-                        <div className="mb-2 flex justify-between items-center">
-                            <p className="flex-1 capitalize">Resume</p>
-                        </div>
-                        <div>
-                            <Button
-                                onClick={() => {
-                                    getResume(ticketData.resumeRef);
-                                }}
-                            >
-                                Download
-                            </Button>
-                        </div>
-                    </div>
-                )}
+                <ul>
+                    {foods.map((f) => (
+                        <li key={f.id}>
+                            <div>
+                                <span>{f.title}</span>
+                                <button
+                                    className="p-2 bg-tbrand text-white rounded disabled:bg-gray-400"
+                                    disabled={ticketData.foods.includes(f.id)}
+                                    onClick={() => checkFood(f)}
+                                >
+                                    Check
+                                </button>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
             </div>
         </div>
     );

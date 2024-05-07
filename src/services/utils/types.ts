@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 export interface UserTicketData {
     userId: string;
     firstName: string;
@@ -53,4 +55,18 @@ export interface TicketData {
 export interface ExtendedTicketData extends TicketData {
     foods: string[]; // id of the food items
     events: string[]; // id of the event items
+}
+
+export interface EventItem {
+    id: string;
+    title: string;
+    time: Timestamp;
+    location: string;
+}
+
+export interface FoodItem {
+    id: string;
+    title: string;
+    time: Timestamp;
+    location: string;
 }
