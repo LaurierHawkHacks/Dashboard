@@ -24,9 +24,11 @@ import { VerifyRSVP } from "@/pages/miscellaneous/VerifyRSVP.page";
 import { MyTeamPage } from "@/pages/MyTeam.page";
 import { ViewTicketPage } from "@/pages/miscellaneous/ViewTicket.page";
 import { JoinTeamPage } from "@/pages/JoinTeam.page";
+import { AdminViewTicketPage } from "@/pages/admin/ViewTicket.page";
 
 interface PathObject {
     admin: string;
+    adminViewTicket: string;
     notFound: string;
     login: string;
     portal: string;
@@ -59,6 +61,7 @@ interface RoutesContextValue {
 // this path object provides a common place to define route pathnames
 const paths: PathObject = {
     admin: "/admin",
+    adminViewTicket: "/admin/ticket/:ticketId",
     notFound: "*",
     login: "/login",
     portal: "/",
@@ -212,6 +215,10 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                     {
                         path: paths.admin,
                         element: <AdminPage />,
+                    },
+                    {
+                        path: paths.adminViewTicket,
+                        element: <AdminViewTicketPage />,
                     },
                 ],
             });

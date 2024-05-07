@@ -96,6 +96,8 @@ exports.fetchOrGenerateTicket = functions.https.onCall(async (_, context) => {
                     userId: userId,
                     ticketId: ticketId,
                     qrCodeUrl: qrCodeUrl,
+                    foods: [],
+                    events: [],
                     timestamp: new Date(),
                 });
             } else {
@@ -918,89 +920,134 @@ export const verifyRSVP = functions.https.onCall(async (_, context) => {
     }
 });
 
+async function internalGetTicketData(id: string, extended = false) {
+    functions.logger.info("Checking for ticket data...");
+    const ticketDoc = await admin
+        .firestore()
+        .collection("tickets")
+        .doc(id)
+        .get();
+    if (!ticketDoc.exists) {
+        return response(HttpStatus.NOT_FOUND, { message: "not found" });
+    }
+
+    const ticket = ticketDoc.data() as {
+        userId: string;
+        foods: string[];
+        events: string[];
+    };
+
+    functions.logger.info("Checking for application data...");
+    const app = (
+        await admin
+            .firestore()
+            .collection("applications")
+            .where("applicantId", "==", ticket.userId)
+            .get()
+    ).docs[0]?.data();
+    let firstName = "";
+    let lastName = "";
+    let pronouns = "";
+    let discord = "";
+    let linkedin = "";
+    let github = "";
+    let resumeRef = "";
+
+    if (!app) {
+        // grab from user record
+        functions.logger.info(
+            "No application data, taking name from user record."
+        );
+        const user = await admin.auth().getUser(ticket.userId);
+        const parts = user.displayName?.split(" ") ?? ["", ""];
+        firstName = parts[0];
+        lastName = parts[1];
+    } else {
+        firstName = app.firstName;
+        lastName = app.lastName;
+        pronouns = app.pronouns;
+        discord = app.discord ?? "";
+        linkedin = app.linkedinUrl ?? "";
+        github = app.githubUrl ?? "";
+        resumeRef =
+            app.participatingAs === "Mentor"
+                ? app.mentorResumeRef
+                : app.generalResumeRef;
+    }
+
+    // get social ticket
+    functions.logger.info("Checking for social data...");
+    let socials = (
+        await admin
+            .firestore()
+            .collection("socials")
+            .where("uid", "==", ticket.userId)
+            .get()
+    ).docs[0]?.data();
+    if (!socials) {
+        functions.logger.info("No socials found, using default data...");
+        socials = {
+            instagram: "",
+            linkedin: linkedin ?? "",
+            github: github ?? "",
+            discord: discord ?? "",
+            resumeRef: resumeRef ?? "",
+            docId: "",
+        } as Socials;
+    }
+
+    const data = {
+        firstName,
+        lastName,
+        pronouns,
+        foods: [] as string[],
+        events: [] as string[],
+        ...socials,
+    };
+
+    if (extended) {
+        data.foods = ticket.foods;
+        data.events = ticket.events;
+    }
+
+    return data;
+}
+
 export const getTicketData = functions.https.onCall(async (data) => {
     if (!z.string().uuid().safeParse(data.id).success) {
         return response(HttpStatus.BAD_REQUEST, { message: "bad request" });
     }
 
     try {
-        functions.logger.info("Checking for ticket data...");
-        const ticketDoc = await admin
-            .firestore()
-            .collection("tickets")
-            .doc(data.id)
-            .get();
-        if (!ticketDoc.exists) {
-            return response(HttpStatus.NOT_FOUND, { message: "not found" });
-        }
-
-        const ticket = ticketDoc.data() as { userId: string };
-
-        functions.logger.info("Checking for application data...");
-        const app = (
-            await admin
-                .firestore()
-                .collection("applications")
-                .where("applicantId", "==", ticket.userId)
-                .get()
-        ).docs[0]?.data();
-        let firstName = "";
-        let lastName = "";
-        let pronouns = "";
-        let discord = "";
-        let linkedin = "";
-        let github = "";
-        let resumeRef = "";
-
-        if (!app) {
-            // grab from user record
-            functions.logger.info(
-                "No application data, taking name from user record."
-            );
-            const user = await admin.auth().getUser(ticket.userId);
-            const parts = user.displayName?.split(" ") ?? ["", ""];
-            firstName = parts[0];
-            lastName = parts[1];
-        } else {
-            firstName = app.firstName;
-            lastName = app.lastName;
-            pronouns = app.pronouns;
-            discord = app.discord ?? "";
-            linkedin = app.linkedinUrl ?? "";
-            github = app.githubUrl ?? "";
-            resumeRef =
-                app.participatingAs === "Mentor"
-                    ? app.mentorResumeRef
-                    : app.generalResumeRef;
-        }
-
-        // get social ticket
-        functions.logger.info("Checking for social data...");
-        let socials = (
-            await admin
-                .firestore()
-                .collection("socials")
-                .where("uid", "==", ticket.userId)
-                .get()
-        ).docs[0]?.data();
-        if (!socials) {
-            functions.logger.info("No socials found, using default data...");
-            socials = {
-                instagram: "",
-                linkedin: linkedin ?? "",
-                github: github ?? "",
-                discord: discord ?? "",
-                resumeRef: resumeRef ?? "",
-                docId: "",
-            } as Socials;
-        }
-
+        const ticketData = await internalGetTicketData(data.id);
         return response(HttpStatus.OK, {
             message: "ok",
-            data: { firstName, lastName, pronouns, ...socials },
+            data: ticketData,
         });
     } catch (e) {
         functions.logger.error("Failed to get ticket data.", { error: e });
+        return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+            message: "internal error",
+        });
+    }
+});
+
+export const getExtendedTicketData = functions.https.onCall(async (data) => {
+    if (!z.string().uuid().safeParse(data.id).success) {
+        return response(HttpStatus.BAD_REQUEST, { message: "bad request" });
+    }
+
+    try {
+        const ticketData = await internalGetTicketData(data.id, true);
+
+        return response(HttpStatus.OK, {
+            message: "ok",
+            data: ticketData,
+        });
+    } catch (e) {
+        functions.logger.error("Failed to get extended ticket data.", {
+            error: e,
+        });
         return response(HttpStatus.INTERNAL_SERVER_ERROR, {
             message: "internal error",
         });
