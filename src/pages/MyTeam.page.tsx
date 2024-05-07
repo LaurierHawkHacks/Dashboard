@@ -27,6 +27,7 @@ import {
     XCircleIcon,
 } from "@heroicons/react/24/solid";
 import { Modal } from "@/components/Modal";
+import { useAvailableRoutes } from "@/providers/routes.provider";
 
 type SearchTeamNameFn = (name: string) => Promise<void>;
 
@@ -58,6 +59,7 @@ export const MyTeamPage = () => {
         250
     );
     const loadingTimeoutRef = useRef<number | null>(null);
+    const { paths } = useAvailableRoutes();
 
     const submitNewTeam: FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
@@ -277,6 +279,10 @@ export const MyTeamPage = () => {
                 });
             }
         })();
+    }, []);
+
+    useEffect(() => {
+        window.localStorage.setItem(paths.myTeam, "visited");
     }, []);
 
     if (isLoading) return <LoadingAnimation />;
