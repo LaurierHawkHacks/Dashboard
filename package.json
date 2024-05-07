@@ -12,7 +12,7 @@
         "format:check": "prettier . --check",
         "test": "vitest run --coverage",
         "test:dev": "vitest",
-        "emulators": "firebase emulators:start --project hawkhacks-dashboard --import ./data",
+        "emulators": "firebase emulators:start --project hawkhacks-dashboard --import ./data --export-on-exit",
         "setup": "firebase init emulators",
         "firebase": "firebase",
         "vite": "vite",

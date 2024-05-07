@@ -59,6 +59,18 @@ service cloud.firestore {
         allow write: if isAuthenticated();
     }
 
+    match /events/{eventId} {
+        // Only grant read access if you are owner/admin
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated() && isAdmin();
+    }
+
+    match /foods/{foodId} {
+        // Only grant read access if you are owner/admin
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated() && isAdmin();
+    }
+
     match /applications-dev/{applicationId} {
         allow read, write: if isAuthenticated() && isAdmin();
     }
