@@ -38,3 +38,19 @@ export interface Socials {
     docId: string;
     uid: string;
 }
+
+export interface TicketData {
+    firstName: string;
+    lastName: string;
+    pronouns: string;
+    instagram: string;
+    linkedin: string;
+    github: string;
+    discord: string;
+    resumeRef: string; // gs:// format ref
+}
+
+export interface ExtendedTicketData extends TicketData {
+    foods: string[]; // id of the food items
+    events: string[]; // id of the event items
+}

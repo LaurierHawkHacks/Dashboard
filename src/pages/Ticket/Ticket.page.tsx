@@ -64,7 +64,7 @@ export const TicketPage = () => {
                     ? user.pronouns.join(", ")
                     : user?.pronouns ?? "Not specified",
             });
-            const ticketData = ticketResult.data;
+            const ticketData = ticketResult.data as { url: string };
             if (ticketData.url) {
                 window.location.href = ticketData.url;
             } else {

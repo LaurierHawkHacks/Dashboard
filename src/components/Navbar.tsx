@@ -32,8 +32,8 @@ export const Navbar = () => {
             label: "Networking",
             Icon: TiGroup,
         },
-        [paths.ticket]: {
-            label: "Ticket",
+        [paths.myTicket]: {
+            label: "My Ticket",
             Icon: PiIdentificationBadgeFill,
         },
         [paths.application]: {
