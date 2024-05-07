@@ -28,7 +28,12 @@ const ImportantInfoBlocks = importantDateTimes.map((importantDateTime, i) => {
 
 const Sponsors = sponsors.map((sponsor, i) => {
     return (
-        <a key={i} href={sponsor.link}>
+        <a
+            key={i}
+            href={sponsor.link}
+            target="_blank"
+            rel="noopener noreferrer"
+        >
             <img
                 className="w-[4.875rem] lg:w-[6.865rem] aspect-[5/2] object-contain"
                 src={sponsor.image}
