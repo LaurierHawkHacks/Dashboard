@@ -1,20 +1,44 @@
 import { GoldenHawk, IpadKidHawks } from "@/assets";
 import { Card, Accordion, SocialIcons } from "@components";
-import { faqs, sponsors } from "@data";
+import { faqs, sponsors, importantDateTimes } from "@data";
 
-const HomePage = () => {
-    const Sponsors = sponsors.map((sponsor, i) => {
+const ImportantInfoBlocks = importantDateTimes.map((importantDateTime, i) => {
+    const entries = Object.entries(importantDateTime.events);
+    const timeBlocks = entries.map(([title, time], i) => {
         return (
-            <a key={i} href={sponsor.link}>
-                <img
-                    className="w-[4.875rem] lg:w-[6.865rem] aspect-[5/2] object-contain"
-                    src={sponsor.image}
-                    alt={sponsor.name}
-                />
-            </a>
+            <div key={i} className="flex-item flex flex-col gap-2 items-center">
+                <span className="badge bg-[#FFEEE4] px-[14px] py-[6px] rounded-2xl">
+                    {title}
+                </span>
+                <div>{time}</div>
+            </div>
         );
     });
 
+    return (
+        <div className="dates grid gap-4  p-2 border rounded-lg" key={i}>
+            <span className="max-w-fit">
+                <b className="!text-base">{importantDateTime.date}</b>
+                <div className="text-xs">{importantDateTime.label}</div>
+            </span>
+            <div className="flex flex-wrap gap-4">{timeBlocks}</div>
+        </div>
+    );
+});
+
+const Sponsors = sponsors.map((sponsor, i) => {
+    return (
+        <a key={i} href={sponsor.link}>
+            <img
+                className="w-[4.875rem] lg:w-[6.865rem] aspect-[5/2] object-contain"
+                src={sponsor.image}
+                alt={sponsor.name}
+            />
+        </a>
+    );
+});
+
+const HomePage = () => {
     return (
         <section className="homepage grid gap-4">
             <div className="grid xl:grid-cols-12 gap-4">
@@ -51,39 +75,8 @@ const HomePage = () => {
                     title="Important Information"
                     className="infos xl:col-span-5"
                 >
-                    <div className="text-[#333] text-sm">
-                        <div className="dates grid grid-cols-2 gap-4">
-                            <div className="grid-item space-x-5">
-                                <span className="badge bg-[#FFEEE4] px-[14px] py-[6px] rounded-2xl">
-                                    When?
-                                </span>
-                                <span className="">Date - Date!</span>
-                            </div>
-                            <div className="grid-item space-x-5">
-                                <span className="badge bg-[#FFEEE4] px-[14px] py-[6px] rounded-2xl">
-                                    When?
-                                </span>
-                                <span className="">Date - Date!</span>
-                            </div>
-                            <div className="grid-item space-x-5">
-                                <span className="badge bg-[#FFEEE4] px-[14px] py-[6px] rounded-2xl">
-                                    When?
-                                </span>
-                                <span className="">Date - Date!</span>
-                            </div>
-                            <div className="grid-item space-x-5">
-                                <span className="badge bg-[#FFEEE4] px-[14px] py-[6px] rounded-2xl">
-                                    When?
-                                </span>
-                                <span className="">Date - Date!</span>
-                            </div>
-                        </div>
-                        <p className="mt-6">
-                            Lorem ipsum dolor sit amet consectetur adipisicing
-                            elit. Dicta amet dolore voluptatum quos vel facilis
-                            similique sed commodi quas eius, officia id quaerat
-                            facere deserunt ullam error consequuntur ea modi.
-                        </p>
+                    <div className="text-[#333] text-sm space-y-6">
+                        {ImportantInfoBlocks}
                     </div>
                 </Card>
 
