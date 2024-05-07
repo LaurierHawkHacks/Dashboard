@@ -39,8 +39,7 @@ service cloud.firestore {
     match /applications/{applicationId} {
         // Only grant read access if you are owner/admin
         allow read: if isAuthenticated() && (isAdmin() || isOwner(resource.data.applicantId));
-        allow create: if isAuthenticated();
-        allow update: if isAuthenticated() && isAdmin();
+        allow write: if isAuthenticated() && isAdmin();
     }
 
     // Teams Collection Rules
