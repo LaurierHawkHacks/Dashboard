@@ -178,11 +178,13 @@ export const NetworkingPage = () => {
                                 <p
                                     className={`rounded-full px-4 py-1 ${
                                         editMode === key
-                                            ? "bg-blue-500/60 text-white"
+                                            ? " text-gray-500 italic "
                                             : "bg-green-300"
                                     }`}
                                 >
-                                    {editMode === key ? "Pending" : "Complete"}
+                                    {editMode === key
+                                        ? "Unsaved Changes"
+                                        : "Complete"}
                                 </p>
                             )}
                         </div>
