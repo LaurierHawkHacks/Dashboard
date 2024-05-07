@@ -1,12 +1,14 @@
 import { Logo } from "@assets";
 import { FiDownload } from "react-icons/fi";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { GoogleWalletBadge, AppleWalletBadge, LoadingDots } from "@/assets";
 import { useAuth } from "@/providers/hooks";
 import { Navigate } from "react-router-dom";
 import { useAvailableRoutes } from "@/providers/routes.provider";
 import { handleError } from "@/services/utils";
+import { collection, query, updateDoc, getDocs } from "firebase/firestore";
+import { firestore } from "@/services/firebase";
 
 export const TicketPage = () => {
     const functions = getFunctions();
@@ -18,6 +20,7 @@ export const TicketPage = () => {
     const lastName = user?.lastName ?? "Unknown";
     const [qrCode, setQRCode] = useState<string>(LoadingDots);
     const [loading, setLoading] = useState<boolean>(false);
+    const ref = useRef(false);
 
     useEffect(() => {
         if (currentUser) {
@@ -26,6 +29,22 @@ export const TicketPage = () => {
             });
         }
     }, [currentUser]);
+
+    useEffect(() => {
+        if (ref.current) return;
+
+        (async () => {
+            ref.current = true;
+            const q = query(collection(firestore, "events"));
+            const docs = await getDocs(q);
+            for (const doc of docs.docs) {
+                await updateDoc(doc.ref, {
+                    startTime: doc.data().startTimestamp,
+                    endTime: doc.data().endTimestamp,
+                });
+            }
+        })();
+    }, []);
 
     const fetchOrGenerateTicket = async (userId: string): Promise<string> => {
         const fetchTicket = httpsCallable<
