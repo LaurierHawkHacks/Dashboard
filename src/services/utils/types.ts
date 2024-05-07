@@ -60,8 +60,11 @@ export interface ExtendedTicketData extends TicketData {
 export interface EventItem {
     id: string;
     title: string;
-    time: Timestamp;
+    startTime: Timestamp;
+    endTime: Timestamp;
     location: string;
+    description: string;
+    type: string;
 }
 
 export interface FoodItem {
