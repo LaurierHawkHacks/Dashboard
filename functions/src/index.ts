@@ -1054,6 +1054,53 @@ export const getExtendedTicketData = functions.https.onCall(async (data) => {
     }
 });
 
+export const redeemItem = functions.https.onCall(async (data, context) => {
+    if (!context.auth)
+        return response(HttpStatus.UNAUTHORIZED, { message: "unauthorized" });
+
+    const user = await admin.auth().getUser(context.auth.uid);
+    if (!user.customClaims?.admin)
+        return response(HttpStatus.UNAUTHORIZED, { message: "unauthorized" });
+
+    const validateResults = z
+        .object({
+            ticketId: z.string(),
+            itemId: z.string(),
+            type: z.string().refine((v) => v === "event" || v === "food"),
+        })
+        .safeParse(data);
+    if (!validateResults.success) {
+        functions.logger.error("Bad request", {
+            issues: validateResults.error.issues.map((i) => i.path),
+        });
+        return response(HttpStatus.BAD_REQUEST, { message: "bad request" });
+    }
+
+    const ticket = (
+        await admin.firestore().collection("tickets").doc(data.ticketId).get()
+    ).data();
+    if (!ticket)
+        return response(HttpStatus.NOT_FOUND, { message: "ticket not found" });
+
+    if (data.type === "event") {
+        await admin
+            .firestore()
+            .collection("tickets")
+            .doc(data.ticketId)
+            .update({ events: [...ticket.events, data.itemId] });
+    } else if (data.type === "food") {
+        await admin
+            .firestore()
+            .collection("tickets")
+            .doc(data.ticketId)
+            .update({ foods: [...ticket.foods, data.itemId] });
+    } else {
+        return response(HttpStatus.BAD_REQUEST, { message: "invalid type" });
+    }
+
+    return response(HttpStatus.OK);
+});
+
 export {
     isTeamNameAvailable,
     createTeam,
