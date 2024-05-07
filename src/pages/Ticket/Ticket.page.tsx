@@ -27,6 +27,10 @@ export const TicketPage = () => {
         }
     }, [currentUser]);
 
+    useEffect(() => {
+        window.localStorage.setItem(paths.myTicket, "visited");
+    }, []);
+
     const fetchOrGenerateTicket = async (userId: string): Promise<string> => {
         const fetchTicket = httpsCallable<
             { userId: string },
