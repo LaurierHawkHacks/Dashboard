@@ -118,7 +118,7 @@ export const Navbar = () => {
                         }`}
                     >
                         <ul className="flex flex-col items-start justify-start">
-                            {renderNavItems(true)}
+                            {currentUser && renderNavItems(true)}
                             <a
                                 href="https://discord.com/invite/GxwvFEn9TB"
                                 target="_blank"
@@ -130,13 +130,15 @@ export const Navbar = () => {
                                 </li>
                             </a>
                         </ul>
-                        <button
-                            className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full flex items-center justify-start gap-2 hover:text-black"
-                            type="button"
-                            onClick={logout}
-                        >
-                            Sign out
-                        </button>
+                        {currentUser && (
+                            <button
+                                className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full flex items-center justify-start gap-2 hover:text-black"
+                                type="button"
+                                onClick={logout}
+                            >
+                                Sign out
+                            </button>
+                        )}
                     </div>
                 </>
             ) : (
@@ -176,15 +178,16 @@ export const Navbar = () => {
                                 </li>
                             </a>
                         </ul>
-
-                        <button
-                            className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full flex items-center justify-start gap-2 hover:text-black"
-                            type="button"
-                            onClick={logout}
-                        >
-                            <FiLogOut size={32} />
-                            <span className="hidden md:flex">Sign out</span>
-                        </button>
+                        {currentUser && (
+                            <button
+                                className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full flex items-center justify-start gap-2 hover:text-black"
+                                type="button"
+                                onClick={logout}
+                            >
+                                <FiLogOut size={32} />
+                                <span className="hidden md:flex">Sign out</span>
+                            </button>
+                        )}
                     </aside>
                 </nav>
             )}
