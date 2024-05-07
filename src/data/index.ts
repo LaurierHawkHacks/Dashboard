@@ -9,6 +9,7 @@ export { faqs } from "./faqs";
 export { socialLinks } from "./SocialLinks";
 export { sponsors } from "./sponsors";
 export { rsvpText } from "./rsvpText";
+export { importantDateTimes } from "./importantDateTimes";
 
 export const genders = [
     "Man",
