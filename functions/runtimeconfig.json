@@ -1,0 +1,18 @@
+{
+    "resend": {
+        "key": "re_T36RUvgt_PuBkGsR9sBfTdtHFAP9XDoYr"
+    },
+    "notion": {
+        "databaseid": "17183c079bc64e15b2a00f7ba6874128",
+        "apikey": "secret_3MsaFpSCqP0OkPJ7IWdK1i5bTcVAjqBOPaL55dvGqGh"
+    },
+    "email": {
+        "noreply": "noreply@portal.hawkhacks.ca"
+    },
+    "fe": {
+        "url": "localhost:5173"
+    },
+    "app": {
+        "env": "development"
+    }
+}
