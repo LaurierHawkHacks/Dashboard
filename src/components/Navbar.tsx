@@ -1,7 +1,3 @@
-import { GoHome } from "react-icons/go";
-import { PiCalendarCheckFill } from "react-icons/pi";
-import { TiGroup } from "react-icons/ti";
-import { PiIdentificationBadgeFill } from "react-icons/pi";
 import { RiDiscordLine } from "react-icons/ri";
 import { FiLogOut } from "react-icons/fi";
 import { useState, useEffect } from "react";
@@ -10,8 +6,14 @@ import Hamburger from "hamburger-react";
 import { Link } from "react-router-dom";
 import { Logo } from "@/assets";
 import { useAvailableRoutes } from "@/providers/routes.provider";
-import { CodeBracketIcon } from "@heroicons/react/24/outline";
-import { UserGroupIcon } from "@heroicons/react/24/solid";
+import {
+    CalendarDaysIcon,
+    CodeBracketIcon,
+    HomeIcon,
+    ShareIcon,
+    TicketIcon,
+    UserGroupIcon,
+} from "@heroicons/react/24/outline";
 
 export const Navbar = () => {
     const { logout } = useAuth();
@@ -23,19 +25,19 @@ export const Navbar = () => {
     const navItems = {
         [paths.portal]: {
             label: "Home",
-            Icon: GoHome,
+            Icon: HomeIcon,
         },
         [paths.schedule]: {
             label: "Schedule",
-            Icon: PiCalendarCheckFill,
+            Icon: CalendarDaysIcon,
         },
         [paths.networking]: {
             label: "Networking",
-            Icon: TiGroup,
+            Icon: ShareIcon,
         },
         [paths.myTicket]: {
             label: "My Ticket",
-            Icon: PiIdentificationBadgeFill,
+            Icon: TicketIcon,
         },
         [paths.application]: {
             label: "Application",
