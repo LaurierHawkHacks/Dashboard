@@ -22,6 +22,8 @@ import { ProtectedRoutes } from "@/navigation";
 import { PostSubmissionPage } from "@/pages/miscellaneous/PostSubmission.page";
 import { VerifyRSVP } from "@/pages/miscellaneous/VerifyRSVP.page";
 import { MyTeamPage } from "@/pages/MyTeam.page";
+import { ViewTicketPage } from "@/pages/miscellaneous/ViewTicket.page";
+import { JoinTeamPage } from "@/pages/JoinTeam.page";
 
 interface PathObject {
     admin: string;
@@ -31,13 +33,14 @@ interface PathObject {
     verifyEmail: string;
     schedule: string;
     networking: string;
-    ticket: string;
+    myTicket: string;
     application: string;
     submitted: string;
     verifyRSVP: string;
     myTeam: string;
     joinTeam: string;
     myApp: string;
+    ticket: string;
 }
 
 interface Title {
@@ -62,13 +65,14 @@ const paths: PathObject = {
     verifyEmail: "/verify-email",
     schedule: "/schedule",
     networking: "/networking",
-    ticket: "/ticket",
+    myTicket: "/my-ticket",
     application: "/application",
     submitted: "/submitted",
     verifyRSVP: "/verify-rsvp",
     myTeam: "/my-team",
     joinTeam: "/join-team",
     myApp: "/my-application",
+    ticket: "/ticket/:ticketId",
 };
 
 const titles: Record<string, Title> = {
@@ -96,7 +100,7 @@ const titles: Record<string, Title> = {
         main: "Verify Your RSVP",
         sub: "All checkboxes are required.",
     },
-    [paths.ticket]: {
+    [paths.myTicket]: {
         main: "Ticket",
         sub: "This ticket is required for registration at our HawkHacks sign-in desk.\nKeep this ticket safe - download or add it to your wallet for convenience!",
     },
@@ -107,6 +111,10 @@ const titles: Record<string, Title> = {
     [paths.joinTeam]: {
         main: "Join Team",
         sub: "Awesome, it looks like you have found teammates!",
+    },
+    [paths.ticket]: {
+        main: "View Ticket",
+        sub: "Some good thing here",
     },
 };
 
@@ -179,6 +187,10 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                 element: <LoginPage />,
             },
             {
+                path: paths.ticket,
+                element: <ViewTicketPage />,
+            },
+            {
                 path: paths.notFound,
                 element: <NotFoundPage />,
             },
@@ -210,7 +222,7 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                     element: <NetworkingPage />,
                 },
                 { path: paths.schedule, element: <div>schedule</div> },
-                { path: paths.ticket, element: <TicketPage /> }
+                { path: paths.myTicket, element: <TicketPage /> }
             );
 
             setUserRoutes(userRoutes.children);
@@ -242,7 +254,7 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                         element: <NetworkingPage />,
                     },
                     { path: paths.schedule, element: <div>schedule</div> },
-                    { path: paths.ticket, element: <TicketPage /> },
+                    { path: paths.myTicket, element: <TicketPage /> },
                 ];
             }
         }
@@ -263,7 +275,12 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                     element: <NetworkingPage />,
                 },
                 { path: paths.schedule, element: <div>schedule</div> },
-                { path: paths.ticket, element: <TicketPage /> },
+                { path: paths.myTicket, element: <TicketPage /> },
+                { path: paths.myTeam, element: <MyTeamPage /> },
+                {
+                    path: `${paths.joinTeam}/:invitationId`,
+                    element: <JoinTeamPage />,
+                },
             ];
         }
 

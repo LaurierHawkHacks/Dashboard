@@ -53,7 +53,20 @@ exports.fetchOrGenerateTicket = functions.https.onCall(async (_, context) => {
         .get();
 
     if (ticketQuery.empty) {
-        const ticketId = ticketsRef.doc().id;
+        let ticketId = "";
+        let createTicket = false;
+        const snap = await admin
+            .firestore()
+            .collection("tickets")
+            .where("userId", "==", context.auth.uid)
+            .get();
+        const data = snap.docs[0]?.data();
+        if (!data) {
+            ticketId = uuidv4();
+            createTicket = true;
+        } else {
+            ticketId = data.ticketId;
+        }
         const qrCodeValue = `https://portal.hawkhacks.ca/tickets/${ticketId}`;
 
         try {
@@ -77,12 +90,24 @@ exports.fetchOrGenerateTicket = functions.https.onCall(async (_, context) => {
             await fileRef.makePublic();
 
             const qrCodeUrl = fileRef.publicUrl();
-            await ticketsRef.doc(ticketId).set({
-                userId: userId,
-                ticketId: ticketId,
-                qrCodeUrl: qrCodeUrl,
-                timestamp: new Date(),
-            });
+
+            if (createTicket) {
+                await ticketsRef.doc(ticketId).set({
+                    userId: userId,
+                    ticketId: ticketId,
+                    qrCodeUrl: qrCodeUrl,
+                    timestamp: new Date(),
+                });
+            } else {
+                await admin
+                    .firestore()
+                    .collection("tickets")
+                    .doc(ticketId)
+                    .update({
+                        qrCodeUrl: qrCodeUrl,
+                        timestamp: new Date(),
+                    });
+            }
 
             return { qrCodeUrl };
         } catch (error) {
@@ -147,6 +172,13 @@ export const createTicket = functions.https.onCall(async (_, context) => {
             });
         } else {
             ticketId = ticketDoc.id;
+            await ticketsRef.doc(ticketId).update({
+                userId: userId,
+                ticketId: ticketId,
+                firstName: firstName,
+                lastName: lastName,
+                timestamp: new Date(),
+            });
         }
 
         const passJsonBuffer = Buffer.from(
@@ -428,6 +460,13 @@ export const createPassObject = functions.https.onCall(
             });
         } else {
             ticketId = ticketDoc.id;
+            await ticketsRef.doc(ticketId).update({
+                userId: userId,
+                ticketId: ticketId,
+                firstName: firstName,
+                lastName: lastName,
+                timestamp: new Date(),
+            });
         }
 
         const userEmail = context.auth.token.email || data.email;
@@ -876,6 +915,84 @@ export const verifyRSVP = functions.https.onCall(async (_, context) => {
             status: 200,
             verified: true,
         };
+    }
+});
+
+export const getTicketData = functions.https.onCall(async (data) => {
+    if (!z.string().uuid().safeParse(data.id).success) {
+        return response(HttpStatus.BAD_REQUEST, { message: "bad request" });
+    }
+
+    try {
+        functions.logger.info("Checking for ticket data...");
+        const ticketDoc = await admin
+            .firestore()
+            .collection("tickets")
+            .doc(data.id)
+            .get();
+        if (!ticketDoc.exists) {
+            return response(HttpStatus.NOT_FOUND, { message: "not found" });
+        }
+
+        const ticket = ticketDoc.data() as { userId: string };
+
+        functions.logger.info("Checking for application data...");
+        const app = (
+            await admin
+                .firestore()
+                .collection("applications")
+                .where("applicantId", "==", ticket.userId)
+                .get()
+        ).docs[0]?.data();
+        let firstName = "";
+        let lastName = "";
+        let pronouns = "";
+
+        if (!app) {
+            // grab from user record
+            functions.logger.info(
+                "No application data, taking name from user record."
+            );
+            const user = await admin.auth().getUser(ticket.userId);
+            const parts = user.displayName?.split(" ") ?? ["", ""];
+            firstName = parts[0];
+            lastName = parts[1];
+        } else {
+            firstName = app.firstName;
+            lastName = app.lastName;
+            pronouns = app.pronouns;
+        }
+
+        // get social ticket
+        functions.logger.info("Checking for social data...");
+        let socials = (
+            await admin
+                .firestore()
+                .collection("socials")
+                .where("uid", "==", ticket.userId)
+                .get()
+        ).docs[0]?.data();
+        if (!socials) {
+            functions.logger.info("No socials found, using default data...");
+            socials = {
+                instagram: "",
+                linkedin: "",
+                github: "",
+                discord: "",
+                resumeRef: "",
+                docId: "",
+            } as Socials;
+        }
+
+        return response(HttpStatus.OK, {
+            message: "ok",
+            data: { firstName, lastName, pronouns, ...socials },
+        });
+    } catch (e) {
+        functions.logger.error("Failed to get ticket data.", { error: e });
+        return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+            message: "internal error",
+        });
     }
 });
 

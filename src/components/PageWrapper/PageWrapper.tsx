@@ -7,10 +7,17 @@ import { useAvailableRoutes } from "@/providers/routes.provider";
 export const PageWrapper: FC<ComponentProps> = ({ children }) => {
     const location = useLocation();
     const { titles } = useAvailableRoutes();
-    const title = titles[location.pathname] ?? {
+
+    let title = titles[location.pathname] ?? {
         main: "Wow!",
         sub: "How did you end up here?",
     };
+    if (location.pathname.startsWith("/ticket")) {
+        title = {
+            main: "Networking",
+            sub: "A quick way to connect with new people at HawkHacks!",
+        };
+    }
 
     return (
         <div>
