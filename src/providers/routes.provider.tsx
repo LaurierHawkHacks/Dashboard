@@ -225,12 +225,13 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
             });
             // enable all routes
             userRoutes.children.push(
+                { path: paths.schedule, element: <div>schedule</div> },
                 {
                     path: paths.networking,
                     element: <NetworkingPage />,
                 },
-                { path: paths.schedule, element: <div>schedule</div> },
-                { path: paths.myTicket, element: <TicketPage /> }
+                { path: paths.myTicket, element: <TicketPage /> },
+                { path: paths.myTeam, element: <MyTeamPage /> }
             );
 
             setUserRoutes(userRoutes.children);
@@ -266,21 +267,21 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                         path: paths.portal,
                         element: <HomePage />,
                     },
-                    { path: paths.myTeam, element: <MyTeamPage /> },
+                    { path: paths.schedule, element: <div>schedule</div> },
                     {
                         path: paths.networking,
                         element: <NetworkingPage />,
                     },
-                    { path: paths.schedule, element: <div>schedule</div> },
                     { path: paths.myTicket, element: <TicketPage /> },
+                    { path: paths.myTeam, element: <MyTeamPage /> },
                 ];
             }
         }
 
         if (
-            currentUser.type === "mentor" ||
             currentUser.type === "speaker" ||
-            currentUser.type === "sponsor"
+            currentUser.type === "sponsor" ||
+            (currentUser.type === "mentor" && userApp && userApp.accepted)
         ) {
             userRoutes.children = [
                 {
@@ -288,17 +289,12 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                     path: paths.portal,
                     element: <HomePage />,
                 },
+                { path: paths.schedule, element: <div>schedule</div> },
                 {
                     path: paths.networking,
                     element: <NetworkingPage />,
                 },
-                { path: paths.schedule, element: <div>schedule</div> },
                 { path: paths.myTicket, element: <TicketPage /> },
-                { path: paths.myTeam, element: <MyTeamPage /> },
-                {
-                    path: `${paths.joinTeam}/:invitationId`,
-                    element: <JoinTeamPage />,
-                },
             ];
         }
 
