@@ -19,6 +19,7 @@ export const Navbar = () => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { userRoutes, paths } = useAvailableRoutes();
+    const { currentUser } = useAuth();
     const navItems = {
         [paths.portal]: {
             label: "Home",
@@ -162,7 +163,7 @@ export const Navbar = () => {
 
                     <aside className="flex flex-col items-start justify-between h-[90%]">
                         <ul className="flex flex-col items-start justify-start gap-4 w-full">
-                            {renderNavItems(false)}
+                            {currentUser && renderNavItems(false)}
                             <a
                                 href="https://discord.com/invite/GxwvFEn9TB"
                                 target="_blank"
