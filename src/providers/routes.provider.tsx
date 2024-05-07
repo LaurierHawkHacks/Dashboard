@@ -16,6 +16,7 @@ import {
     HomePage,
     VerifyEmailPage,
     UserPage,
+    SchedulePage,
 } from "@/pages";
 import { type RouteObject } from "react-router-dom";
 import { useAuth } from "./auth.provider";
@@ -186,6 +187,7 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                 path: paths.notFound,
                 element: <NotFoundPage />,
             },
+            
             userRoutes,
         ];
         if (!currentUser) {
@@ -212,7 +214,7 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                     path: paths.networking,
                     element: <NetworkingPage />,
                 },
-                { path: paths.schedule, element: <div>schedule</div> },
+                { path: paths.schedule, element: <SchedulePage/> },
                 { path: paths.ticket, element: <TicketPage /> }
             );
             setUserRoutes(userRoutes.children);
@@ -252,7 +254,7 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                     path: paths.networking,
                     element: <NetworkingPage />,
                 },
-                { path: paths.schedule, element: <div>schedule</div> },
+                { path: paths.schedule, element: <SchedulePage/> },
                 { path: paths.ticket, element: <TicketPage /> },
                 { path: paths.myTeam, element: <MyTeamPage /> },
                 {
