@@ -16,6 +16,7 @@ import {
     HomePage,
     VerifyEmailPage,
     UserPage,
+    SchedulePage,
 } from "@/pages";
 import { type RouteObject } from "react-router-dom";
 import { useAuth } from "./auth.provider";
@@ -198,6 +199,7 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                 path: paths.notFound,
                 element: <NotFoundPage />,
             },
+
             userRoutes,
         ];
 
@@ -226,12 +228,14 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
             // enable all routes
             userRoutes.children.push(
                 { path: paths.schedule, element: <div>schedule</div> },
+                { path: paths.schedule, element: <SchedulePage /> },
+                { path: paths.myTicket, element: <TicketPage /> },
                 {
                     path: paths.networking,
                     element: <NetworkingPage />,
                 },
-                { path: paths.myTicket, element: <TicketPage /> },
-                { path: paths.myTeam, element: <MyTeamPage /> }
+                { path: paths.myTeam, element: <MyTeamPage /> },
+                { path: paths.ticket, element: <TicketPage /> }
             );
 
             setUserRoutes(userRoutes.children);
@@ -267,7 +271,7 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                         path: paths.portal,
                         element: <HomePage />,
                     },
-                    { path: paths.schedule, element: <div>schedule</div> },
+                    { path: paths.schedule, element: <SchedulePage /> },
                     {
                         path: paths.networking,
                         element: <NetworkingPage />,
