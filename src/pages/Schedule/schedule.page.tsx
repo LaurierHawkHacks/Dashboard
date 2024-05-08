@@ -1,58 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useMemo, useEffect, useRef } from "react";
-import { useEpg, Epg, Layout, ProgramItem } from "@nessprim/planby-pro";
+import { useEpg, Epg, Layout, ProgramItem, Theme } from "@nessprim/planby-pro";
 import { formatISO } from "date-fns";
 import { EventItem } from "@/services/utils/types";
 import { getRedeemableItems } from "@/services/utils";
-
-// Define the type for the date ranges
-// type DateRangeKey = "2024-05-17" | "2024-05-18" | "2024-05-19";
-// type DateRanges = Record<DateRangeKey, { start: Date; end: Date }>;
-
-// const theme: Theme = {
-//     primary: {
-//         600: "#ffffff",
-//         900: "#ffffff",
-//     },
-//     grey: {
-//         300: "#fafafa",
-//     },
-//     white: "#4caf50",
-//     green: {
-//         200: "#4caf50",
-//         300: "#4caf50",
-//     },
-//     loader: {
-//         teal: "#80cbc4",
-//         purple: "#ce93d8",
-//         pink: "#f48fb1",
-//         bg: "#ffffff",
-//     },
-//     scrollbar: {
-//         border: "#dddddd",
-//         thumb: {
-//             bg: "#cccccc",
-//         },
-//     },
-//     gradient: {
-//         blue: {
-//             300: "#e3f2fd",
-//             600: "#90caf9",
-//             900: "#42a5f5",
-//         },
-//     },
-//     text: {
-//         grey: {
-//             300: "#222222",
-//             500: "#333333",
-//         },
-//     },
-//     timeline: {
-//         divider: {
-//             bg: "#bdbdbd",
-//         },
-//     },
-// };
 
 import {
     ProgramBox,
@@ -77,7 +28,7 @@ const CustomItem = ({
         });
 
     const { data } = program;
-    const { image, title, since, till } = data;
+    const { image, title, since, till, type } = data;
 
     const sinceTime = formatTime(since, set12HoursTimeFormat()).toLowerCase();
     const tillTime = formatTime(till, set12HoursTimeFormat()).toLowerCase();
@@ -105,6 +56,58 @@ const CustomItem = ({
     );
 };
 
+const lightTheme: Theme = {
+    primary: {
+        600: "#767d8a",
+        900: "#ffffff",
+    },
+    grey: {
+        300: "#f5f5f5",
+    },
+    white: "#ffffff",
+    green: {
+        200: "#e0e0e0",
+        300: "#bdbdbd",
+    },
+    loader: {
+        teal: "#80cbc4",
+        purple: "#ce93d8",
+        pink: "#f48fb1",
+        bg: "#ffffff",
+    },
+    scrollbar: {
+        border: "#e0e0e0",
+        thumb: {
+            bg: "#bdbdbd",
+        },
+    },
+    gradient: {
+        blue: {
+            300: "#d1d5db",
+            600: "#9ca3af",
+            900: "#6b7280",
+        },
+    },
+    text: {
+        grey: {
+            300: "#4b5563",
+            500: "#374151",
+        },
+    },
+    timeline: {
+        divider: {
+            bg: "#e0e0e0",
+        },
+    }
+};
+
+function calculateInitialScrollPositions(startTime) {
+    const startDate = new Date(startTime);
+    const hourWidth = 2900 / 24;
+    const scrollLeft = (startDate.getHours() + startDate.getMinutes() / 60) * hourWidth;
+    return { top: 0, left: scrollLeft };
+}
+
 export const SchedulePage: React.FC = () => {
     const [events, setEvents] = useState<EventItem[]>([]);
     const ref = useRef(false);
@@ -122,26 +125,6 @@ export const SchedulePage: React.FC = () => {
     }, [events]);
 
     const { getEpgProps, getLayoutProps } = useEpg({
-        // epg: [
-        //     {
-        //         channelUuid: "universal-channel",
-        //         id: "event1",
-        //         title: "event 1",
-        //         description: "event 1",
-        //         image: Logo,
-        //         since: new Date(),
-        //         till: addHours(new Date(), 1),
-        //     },
-        //     {
-        //         channelUuid: "universal-channel",
-        //         id: "event2",
-        //         title: "event 2",
-        //         description: "event 2",
-        //         image: Logo,
-        //         since: addHours(new Date(), 0.5),
-        //         till: addHours(new Date(), 1.5),
-        //     },
-        // ],
         epg,
         channels: [
             {
@@ -168,6 +151,7 @@ export const SchedulePage: React.FC = () => {
         startDate: "2024-05-17T00:00:00-04:00",
         endDate: "2024-05-17T23:59:59-04:00",
         height: 600,
+        dayWidth: 2900,
         isBaseTimeFormat: true,
         isCurrentTime: true,
         timezone: {
@@ -183,8 +167,12 @@ export const SchedulePage: React.FC = () => {
             mode: "stack",
         },
         isTimeline: true,
-        isInitialScrollToNow: true,
+        timelineHeight: 60,
+        itemHeight: 70,
+        isInitialScrollToNow: false,
+        initialScrollPositions: epg.length > 0 ? calculateInitialScrollPositions(epg[0].since) : undefined,
         isSidebar: false,
+        theme: lightTheme,
     });
 
     useEffect(() => {
@@ -196,33 +184,11 @@ export const SchedulePage: React.FC = () => {
         })();
     }, []);
 
-    // const DayButtons = () => (
-    //     <div className="flex justify-evenly mb-5">
-    //         {Object.keys(dateRanges).map((day) => (
-    //             <button
-    //                 key={day}
-    //                 className={`px-6 py-3 hover:text-charcoalBlack focus:outline-none
-    //                            ${
-    //                                selectedDay === day
-    //                                    ? "text-2xl border-b-4 border-orange-500 text-charcoalBlack font-bold"
-    //                                    : "text-2xl text-gray-500"
-    //                            }`}
-    //                 onClick={() => handleDayChange(day as DateRangeKey)}
-    //             >
-    //                 {new Date(day).toLocaleDateString(undefined, {
-    //                     weekday: "long",
-    //                 })}
-    //             </button>
-    //         ))}
-    //     </div>
-    // );
-
     return (
-        <div className="bg-white rounded-lg drop-shadow-lg p-6 mb-6 text-gray-900">
-            <h1 className="text-sm pb-9">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6 text-gray-800">
+            <h1 className="text-lg font-semibold mb-4">
                 HawkHacks Hackathon starts at XX:XXPM! All times are in EST.
             </h1>
-            {/* <DayButtons /> */}
             <div>
                 <Epg {...getEpgProps()}>
                     <Layout
@@ -231,6 +197,7 @@ export const SchedulePage: React.FC = () => {
                             <CustomItem
                                 key={program.data.id}
                                 program={program}
+                                onClick={() => {}}
                                 {...rest}
                             />
                         )}
