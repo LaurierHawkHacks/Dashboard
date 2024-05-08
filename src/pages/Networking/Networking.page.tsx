@@ -2,12 +2,10 @@ import { useAuth as useAuthProvider } from "@/providers/auth.provider";
 import { FormEventHandler, useEffect, useRef, useState } from "react";
 import {
     MdOutlineEdit,
-    MdOutlineFileDownload,
     MdOpenInNew,
 } from "react-icons/md";
 import { LoadingAnimation } from "@/components/LoadingAnimation";
 import {
-    getResume,
     getResumeURL,
     getSocials,
     updateSocials,
@@ -260,10 +258,6 @@ export const NetworkingPage = () => {
                                             "noopener,noreferrer"
                                         );
                                     } catch (error) {
-                                        console.error(
-                                            "Failed to fetch resume URL",
-                                            error
-                                        );
                                         showNotification({
                                             title: "Error",
                                             message:
@@ -271,7 +265,6 @@ export const NetworkingPage = () => {
                                         });
                                     }
                                 } else {
-                                    console.error("No resume reference found");
                                     showNotification({
                                         title: "Error",
                                         message: "No resume found to open.",
