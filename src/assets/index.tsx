@@ -10,7 +10,6 @@ import IpadKidHawks from "./ipadKidHawks.svg";
 import GoogleWalletBadge from "./googe-wallet-badge.svg";
 import AppleWalletBadge from "./add-to-apple-wallet-logo.png";
 import LoadingDots from "./loading.svg";
-import WalletBanner from "./wallet-banner.png";
 
 export {
     Logo,
@@ -25,7 +24,6 @@ export {
     GoogleWalletBadge,
     AppleWalletBadge,
     LoadingDots,
-    WalletBanner,
 };
 
 /**
