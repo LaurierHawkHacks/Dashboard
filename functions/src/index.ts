@@ -150,6 +150,7 @@ export const createTicket = functions.https.onCall(async (_, context) => {
         ).docs[0]?.data();
 
         if (!app) {
+            functions.logger.error("Object update failed (app)");
             throw new functions.https.HttpsError(
                 "internal",
                 "Object update failed (app)"
@@ -464,6 +465,7 @@ export const createPassObject = functions.https.onCall(
                 "Not authenticated"
             );
         }
+        const func = "createPassObject";
         const userId = context.auth.uid;
 
         const app = (
@@ -632,7 +634,10 @@ export const createPassObject = functions.https.onCall(
 
             functions.logger.info("Pass updated successfully", response.data);
         } catch (error) {
-            functions.logger.error("Failed to update object", error);
+            functions.logger.error("Failed to update object", {
+                error,
+                func,
+            });
             throw new functions.https.HttpsError(
                 "internal",
                 "Object update failed"
