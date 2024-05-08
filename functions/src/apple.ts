@@ -192,7 +192,7 @@ export const createTicket = functions.https.onCall(async (_, context) => {
 
         return { url: passUrl };
     } catch (error) {
-        functions.logger.error("Error creating ticket:", error);
+        functions.logger.error("Error creating ticket:", { error });
         throw new functions.https.HttpsError(
             "internal",
             "Failed to create ticket",
