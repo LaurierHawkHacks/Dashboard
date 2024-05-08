@@ -454,7 +454,7 @@ export const MyTeamPage = () => {
                         <div className="space-y-4">
                             <h3 className="font-bold">Delete Team?</h3>
                             <p>Are you sure you want to delete your team?</p>
-                            <p>Retype your team name to confirm deleteion.</p>
+                            <p>Retype your team name to confirm deletion.</p>
                         </div>
                         <TextInput
                             label="Confirm Delete Team"
