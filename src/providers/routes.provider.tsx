@@ -26,10 +26,12 @@ import { MyTeamPage } from "@/pages/MyTeam.page";
 import { ViewTicketPage } from "@/pages/miscellaneous/ViewTicket.page";
 import { JoinTeamPage } from "@/pages/JoinTeam.page";
 import { AdminViewTicketPage } from "@/pages/admin/ViewTicket.page";
+import { AdminManageEventsPage } from "@/pages/admin/ManageEvents.page";
 
 interface PathObject {
     admin: string;
     adminViewTicket: string;
+    adminManageEvents: string;
     notFound: string;
     login: string;
     portal: string;
@@ -63,6 +65,7 @@ interface RoutesContextValue {
 const paths: PathObject = {
     admin: "/admin",
     adminViewTicket: "/admin/ticket/:ticketId",
+    adminManageEvents: "/admin/manage",
     notFound: "*",
     login: "/login",
     portal: "/",
@@ -220,6 +223,10 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                     {
                         path: paths.adminViewTicket,
                         element: <AdminViewTicketPage />,
+                    },
+                    {
+                        path: paths.adminManageEvents,
+                        element: <AdminManageEventsPage />,
                     },
                 ],
             });
