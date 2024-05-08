@@ -1,9 +1,14 @@
 import { useAuth as useAuthProvider } from "@/providers/auth.provider";
 import { FormEventHandler, useEffect, useRef, useState } from "react";
-import { MdOutlineEdit, MdOutlineFileDownload } from "react-icons/md";
+import {
+    MdOutlineEdit,
+    MdOutlineFileDownload,
+    MdOpenInNew,
+} from "react-icons/md";
 import { LoadingAnimation } from "@/components/LoadingAnimation";
 import {
     getResume,
+    getResumeURL,
     getSocials,
     updateSocials,
     uploadGeneralResume,
@@ -225,24 +230,56 @@ export const NetworkingPage = () => {
                 {/* RESUME UPLOAD */}
                 <div className="bg-white shadow-md p-4 rounded-xl flex flex-col">
                     <div className="mb-2 flex justify-between items-center">
-                        <p className="flex-1">Resume</p>
-                        {/* UPDATE HERE */}
-                        {socials && socials.resumeRef && (
+                        <span className="flex-1 gap-2">
+                            <p className="">Resume</p>
+                        </span>
+                        {socials && socials.resumeRef ? (
                             <p className="bg-green-300 rounded-full px-4 py-1">
-                                Completed
+                                Resume Uploaded
+                            </p>
+                        ) : (
+                            <p className="bg-red-500 rounded-full px-4 py-1 text-white">
+                                Not Uploaded
                             </p>
                         )}
                     </div>
                     <div className="flex items-center gap-4">
                         <button
+                            title="Open Resume in new tab"
                             type="button"
                             className="p-2 bg-peachWhite rounded-lg flex items-center justify-center hover:cursor-pointer flex-shrink-0"
-                            onClick={() =>
-                                mediaValues.resumeRef &&
-                                getResume(mediaValues.resumeRef)
-                            }
+                            onClick={async () => {
+                                if (mediaValues.resumeRef) {
+                                    try {
+                                        const url = await getResumeURL(
+                                            mediaValues.resumeRef
+                                        );
+                                        window.open(
+                                            url,
+                                            "_blank",
+                                            "noopener,noreferrer"
+                                        );
+                                    } catch (error) {
+                                        console.error(
+                                            "Failed to fetch resume URL",
+                                            error
+                                        );
+                                        showNotification({
+                                            title: "Error",
+                                            message:
+                                                "Failed to open resume. Please try again.",
+                                        });
+                                    }
+                                } else {
+                                    console.error("No resume reference found");
+                                    showNotification({
+                                        title: "Error",
+                                        message: "No resume found to open.",
+                                    });
+                                }
+                            }}
                         >
-                            <MdOutlineFileDownload className="text-gray-500 w-6 h-6" />
+                            <MdOpenInNew className="text-gray-500 w-6 h-6" />
                         </button>
                         <label
                             htmlFor="resume-file-input"
