@@ -180,7 +180,7 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                 },
                 {
                     path: `${paths.joinTeam}/:invitationId`,
-                    element: <div />, // dummy placeholder
+                    element: <JoinTeamPage />, // dummy placeholder
                 },
             ],
         };
