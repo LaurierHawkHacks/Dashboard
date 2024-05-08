@@ -595,7 +595,7 @@ export const createPassObject = functions.https.onCall(
             hexBackgroundColor: "#27393F",
             heroImage: {
                 sourceUri: {
-                    uri: "https://storage.googleapis.com/hawkhacks-dashboard.appspot.com/uploads/wallet-banner.png?GoogleAccessId=firebase-adminsdk-d8rpk%40hawkhacks-dashboard.iam.gserviceaccount.com&Expires=1717646751&Signature=SAZgqLDrkEYKpBBRzp9xmOUMIFWwV6Dcc5NQJe6iG0seqRgrA2W4i9mT867FHZtEpbylCdY5PH%2Bgxoerumyl1t72e3JNFet4MNXw6vWx3PjEbITuTHIyf7%2FSGJ9kkEguAPVNHh%2FGKtrpRJVYtTu7PW%2Fs8bFJho0q8jBbKqSmQ1JkYijPAn9%2FzUuVlN0fDTFh5pHa2n4QFwhGeOpSAL2VczgOxbWlk2PKDJihrdvqi5AVuwGw69wyTNfpvSzRimtUHhFpslzaVf3jkLXVD7lkidDAmp07ENbuAeQkHZsFjdY7v%2BqKYSA3i44n1uZP711CcvaYm2H7RIwrKoB%2BPI9v%2FQ%3D%3D",
+                    uri: "https://storage.googleapis.com/hawkhacks-dashboard.appspot.com/uploads%2Fwallet-banner.png",
                 },
                 contentDescription: {
                     defaultValue: {
