@@ -30,7 +30,7 @@ export const AdminViewTicketPage = () => {
     useEffect(() => {
         if (!ticketId) return;
         if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
-        timeoutRef.current = window.setTimeout(() => setIsLoading(false), 1500);
+        timeoutRef.current = window.setTimeout(() => setIsLoading(false), 5000);
 
         (async () => {
             if (!currentUser) return navigate("/login");
