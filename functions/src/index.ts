@@ -15,8 +15,6 @@ import { z } from "zod";
 import { GoogleAuth } from "google-auth-library";
 import * as jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
-import { PKPass } from "passkit-generator";
-import axios from "axios";
 import { AxiosError } from "axios";
 import { HttpStatus, response } from "./utils";
 import * as QRCode from "qrcode";
@@ -32,288 +30,99 @@ const httpClient = new GoogleAuth({
     scopes: "https://www.googleapis.com/auth/wallet_object.issuer",
 });
 
-const signerCert = config.certs.signer_cert;
-const signerKey = config.certs.signer_key;
-const wwdr = config.certs.wwdr_cert;
-const signerKeyPassphrase = config.certs.signer_key_passphrase;
-const teamIdentifier = config.certs.team_id;
-
-exports.fetchOrGenerateTicket = functions.https.onCall(async (_, context) => {
-    if (!context.auth) {
-        throw new functions.https.HttpsError(
-            "permission-denied",
-            "User must be authenticated to initiate this operation."
-        );
-    }
-
-    const userId = context.auth.uid;
-    const ticketsRef = admin.firestore().collection("tickets");
-    const ticketQuery = await ticketsRef
-        .where("userId", "==", userId)
-        .limit(1)
-        .get();
-
-    if (ticketQuery.empty) {
-        let ticketId = "";
-        let createTicket = false;
-        const snap = await admin
-            .firestore()
-            .collection("tickets")
-            .where("userId", "==", context.auth.uid)
-            .get();
-        const data = snap.docs[0]?.data();
-        if (!data) {
-            ticketId = uuidv4();
-            createTicket = true;
-        } else {
-            ticketId = data.ticketId;
-        }
-        const qrCodeValue = `${config.fe.url}/ticket/${ticketId}`;
-
-        try {
-            const qrCodeDataURL = await QRCode.toDataURL(qrCodeValue, {
-                width: 256,
-            });
-
-            const base64Data = qrCodeDataURL.split(",")[1];
-            const buffer = Buffer.from(base64Data, "base64");
-
-            const storageRef = admin.storage().bucket();
-            const fileRef = storageRef.file(
-                `qrCodes/${userId}/${ticketId}.png`
+export const fetchOrGenerateTicket = functions.https.onCall(
+    async (_, context) => {
+        if (!context.auth) {
+            throw new functions.https.HttpsError(
+                "permission-denied",
+                "User must be authenticated to initiate this operation."
             );
-            await fileRef.save(buffer, {
-                metadata: {
-                    contentType: "image/png",
-                },
-            });
+        }
 
-            await fileRef.makePublic();
+        const userId = context.auth.uid;
+        const ticketsRef = admin.firestore().collection("tickets");
+        const ticketQuery = await ticketsRef
+            .where("userId", "==", userId)
+            .limit(1)
+            .get();
 
-            const qrCodeUrl = fileRef.publicUrl();
-
-            if (createTicket) {
-                await ticketsRef.doc(ticketId).set({
-                    userId: userId,
-                    ticketId: ticketId,
-                    qrCodeUrl: qrCodeUrl,
-                    foods: [],
-                    events: [],
-                    timestamp: new Date(),
-                });
+        if (ticketQuery.empty) {
+            let ticketId = "";
+            let createTicket = false;
+            const snap = await admin
+                .firestore()
+                .collection("tickets")
+                .where("userId", "==", context.auth.uid)
+                .get();
+            const data = snap.docs[0]?.data();
+            if (!data) {
+                ticketId = uuidv4();
+                createTicket = true;
             } else {
-                await admin
-                    .firestore()
-                    .collection("tickets")
-                    .doc(ticketId)
-                    .update({
+                ticketId = data.ticketId;
+            }
+            const qrCodeValue = `${config.fe.url}/ticket/${ticketId}`;
+
+            try {
+                const qrCodeDataURL = await QRCode.toDataURL(qrCodeValue, {
+                    width: 256,
+                });
+
+                const base64Data = qrCodeDataURL.split(",")[1];
+                const buffer = Buffer.from(base64Data, "base64");
+
+                const storageRef = admin.storage().bucket();
+                const fileRef = storageRef.file(
+                    `qrCodes/${userId}/${ticketId}.png`
+                );
+                await fileRef.save(buffer, {
+                    metadata: {
+                        contentType: "image/png",
+                    },
+                });
+
+                await fileRef.makePublic();
+
+                const qrCodeUrl = fileRef.publicUrl();
+
+                if (createTicket) {
+                    await ticketsRef.doc(ticketId).set({
+                        userId: userId,
+                        ticketId: ticketId,
                         qrCodeUrl: qrCodeUrl,
+                        foods: [],
+                        events: [],
                         timestamp: new Date(),
                     });
+                } else {
+                    await admin
+                        .firestore()
+                        .collection("tickets")
+                        .doc(ticketId)
+                        .update({
+                            qrCodeUrl: qrCodeUrl,
+                            timestamp: new Date(),
+                        });
+                }
+
+                return { qrCodeUrl };
+            } catch (error) {
+                functions.logger.error(
+                    "Error generating or uploading QR code:",
+                    error
+                );
+                throw new functions.https.HttpsError(
+                    "internal",
+                    "Failed to generate or upload QR code",
+                    error instanceof Error ? error.message : "Unknown error"
+                );
             }
-
-            return { qrCodeUrl };
-        } catch (error) {
-            functions.logger.error(
-                "Error generating or uploading QR code:",
-                error
-            );
-            throw new functions.https.HttpsError(
-                "internal",
-                "Failed to generate or upload QR code",
-                error instanceof Error ? error.message : "Unknown error"
-            );
-        }
-    } else {
-        const ticketData = ticketQuery.docs[0].data();
-        return { qrCodeUrl: ticketData.qrCodeUrl };
-    }
-});
-
-// apple wallet ticket
-export const createTicket = functions.https.onCall(async (_, context) => {
-    if (!context.auth) {
-        throw new functions.https.HttpsError(
-            "permission-denied",
-            "Not authenticated"
-        );
-    }
-
-    try {
-        const userId = context.auth.uid;
-
-        const app = (
-            await admin
-                .firestore()
-                .collection("applications")
-                .where("applicantId", "==", userId)
-                .get()
-        ).docs[0]?.data();
-
-        if (!app) {
-            functions.logger.error("Object update failed (app)");
-            throw new functions.https.HttpsError(
-                "internal",
-                "Object update failed (app)"
-            );
-        }
-
-        const firstName = app.firstName;
-        const lastName = app.lastName;
-
-        const ticketsRef = admin.firestore().collection("tickets");
-        const ticketDoc = (await ticketsRef.where("userId", "==", userId).get())
-            .docs[0];
-        let ticketId = "";
-        if (!ticketDoc) {
-            ticketId = uuidv4();
-            await ticketsRef.doc(ticketId).set({
-                userId: userId,
-                ticketId: ticketId,
-                firstName: firstName,
-                lastName: lastName,
-                timestamp: new Date(),
-            });
         } else {
-            ticketId = ticketDoc.id;
-            await ticketsRef.doc(ticketId).update({
-                userId: userId,
-                ticketId: ticketId,
-                firstName: firstName,
-                lastName: lastName,
-                timestamp: new Date(),
-            });
+            const ticketData = ticketQuery.docs[0].data();
+            return { qrCodeUrl: ticketData.qrCodeUrl };
         }
-
-        const passJsonBuffer = Buffer.from(
-            JSON.stringify({
-                passTypeIdentifier: "pass.com.dashboard.hawkhacks",
-                formatVersion: 1,
-                teamIdentifier: teamIdentifier,
-                organizationName: "HawkHacks",
-                serialNumber: ticketId,
-                description: "Access to HawkHacks 2024",
-                foregroundColor: "rgb(255, 255, 255)",
-                backgroundColor: "rgb(12, 105, 117)",
-                labelColor: "rgb(255, 255, 255)",
-                logoText: "Welcome to HawkHacks",
-                barcodes: [
-                    {
-                        message: `${config.fe.url}/ticket/${ticketId}`,
-                        format: "PKBarcodeFormatQR",
-                        messageEncoding: "iso-8859-1",
-                    },
-                ],
-                locations: [
-                    {
-                        latitude: 51.50506,
-                        longitude: -0.0196,
-                        relevantText: "Event Entrance",
-                    },
-                ],
-                generic: {
-                    headerFields: [
-                        {
-                            key: "eventHeader",
-                            label: "Event Date",
-                            value: "May 17, 2024",
-                        },
-                    ],
-                    primaryFields: [
-                        {
-                            key: "eventName",
-                            label: "Participant",
-                            value: `${firstName} ${lastName}`,
-                        },
-                        {
-                            key: "teamName",
-                            label: "Team",
-                            value: "Team Here",
-                        },
-                    ],
-                    auxiliaryFields: [
-                        {
-                            key: "location",
-                            label: "Location",
-                            value: "Wilfrid Laurier University",
-                        },
-                        {
-                            key: "startTime",
-                            label: "Start Time",
-                            value: "09:00 AM",
-                        },
-                    ],
-                    backFields: [
-                        {
-                            key: "moreInfo",
-                            label: "More Info",
-                            value: "For more details, visit our website at hawkhacks.ca or contact support@hawkhacks.ca",
-                        },
-                        {
-                            key: "emergencyContact",
-                            label: "Emergency Contact",
-                            value: "911",
-                        },
-                    ],
-                },
-                images: {
-                    logo: {
-                        filename: "logo.png",
-                    },
-                    "logo@2x": {
-                        filename: "logo@2x.png",
-                    },
-                },
-            })
-        );
-
-        const iconResponse = await axios.get("https://hawkhacks.ca/icon.png", {
-            responseType: "arraybuffer",
-        });
-        const icon2xResponse = await axios.get(
-            "https://hawkhacks.ca/icon.png",
-            { responseType: "arraybuffer" }
-        );
-        const iconBuffer = iconResponse.data;
-        const icon2xBuffer = icon2xResponse.data;
-
-        const pass = new PKPass(
-            {
-                "pass.json": passJsonBuffer,
-                "icon.png": iconBuffer,
-                "icon@2x.png": icon2xBuffer,
-            },
-            {
-                signerCert: signerCert,
-                signerKey: signerKey,
-                wwdr: wwdr,
-                signerKeyPassphrase: signerKeyPassphrase,
-            }
-        );
-
-        const buffer = await pass.getAsBuffer();
-
-        const storageRef = admin.storage().bucket();
-        const fileRef = storageRef.file(`passes/${userId}/pass.pkpass`);
-        await fileRef.save(buffer, {
-            metadata: {
-                contentType: "application/vnd.apple.pkpass",
-            },
-        });
-
-        await fileRef.makePublic();
-        const passUrl = fileRef.publicUrl();
-
-        return { url: passUrl };
-    } catch (error) {
-        functions.logger.error("Error creating ticket:", error);
-        throw new functions.https.HttpsError(
-            "internal",
-            "Failed to create ticket",
-            error instanceof Error ? error.message : "Unknown error"
-        );
     }
-});
+);
 
 //Google wallet class
 export const createPassClass = functions.https.onCall(async (_, context) => {
@@ -1239,3 +1048,5 @@ export {
     rejectInvitation,
     checkInvitation,
 } from "./teams";
+
+export { createTicket } from "./apple";
