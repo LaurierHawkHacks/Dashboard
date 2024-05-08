@@ -79,13 +79,23 @@ export const Navbar = () => {
                         >
                             <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
                                 {isMobile ? (
-                                    label
+                                    <>
+                                        <Icon className="w-4 h-4" />
+                                        <span className="relative">
+                                            {label}
+
+                                            <span className="absolute flex h-2 w-2 top-0 right-0 translate-x-full">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                                            </span>
+                                        </span>
+                                    </>
                                 ) : (
                                     <>
                                         <Icon className="w-8 h-8" />
                                         <span className="relative hidden md:flex">
                                             {label}
-                                            <span className="absolute flex h-2 w-2 top-0 -right-2 translate-x-full">
+                                            <span className="absolute flex h-2 w-2 top-0 right-0 translate-x-full">
                                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
                                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
                                             </span>
@@ -101,7 +111,10 @@ export const Navbar = () => {
                     <Link key={label} to={path as string} className="w-full">
                         <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
                             {isMobile ? (
-                                label
+                                <>
+                                    <Icon className="w-4 h-4" />
+                                    <span>{label}</span>
+                                </>
                             ) : (
                                 <>
                                     <Icon className="w-8 h-8" />
@@ -151,7 +164,7 @@ export const Navbar = () => {
                                 : "translate-x-full opacity-0"
                         }`}
                     >
-                        <ul className="flex flex-col items-start justify-start">
+                        <ul className="flex flex-col items-start justify-start divide-y divide-charcoalBlack">
                             {currentUser && renderNavItems(true)}
                             <a
                                 href="https://discord.com/invite/GxwvFEn9TB"
