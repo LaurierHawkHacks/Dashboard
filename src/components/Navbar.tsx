@@ -146,7 +146,7 @@ export const Navbar = () => {
                                 />
                             </Link>
                         </div>
-                        <div className="z-20">
+                        <div>
                             <Hamburger
                                 toggled={isMobileMenuOpen}
                                 toggle={setMobileMenuOpen}
@@ -158,12 +158,21 @@ export const Navbar = () => {
                     </nav>
 
                     <div
-                        className={`fixed right-0 top-0 h-full max-w-full p-10 py-24 bg-gray-200 backdrop-blur-xl transition-all duration-300 ease-in-out ${
+                        className={`fixed z-20 right-0 top-0 h-full max-w-full p-10 py-24 bg-gray-200 backdrop-blur-xl transition-all duration-300 ease-in-out ${
                             isMobileMenuOpen
                                 ? "translate-x-0 opacity-100"
                                 : "translate-x-full opacity-0"
                         }`}
                     >
+                        <div className="absolute right-2 top-2">
+                            <Hamburger
+                                toggled={isMobileMenuOpen}
+                                toggle={setMobileMenuOpen}
+                                size={24}
+                                color="black"
+                                label="Show navigation menu"
+                            />
+                        </div>
                         <ul className="flex flex-col items-start justify-start divide-y divide-charcoalBlack">
                             {currentUser && renderNavItems(true)}
                             <a
