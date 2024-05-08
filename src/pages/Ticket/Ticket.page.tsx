@@ -57,6 +57,7 @@ export const TicketPage = () => {
     if (!currentUser) return <Navigate to={paths.login} />;
 
     const handleCreatePassObject = async (service: "apple" | "google") => {
+        setLoading(true);
         try {
             const createTicket = httpsCallable(
                 functions,
@@ -178,7 +179,7 @@ export const TicketPage = () => {
                         </div>
                     </div>
                     {loading && (
-                        <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-75 flex justify-center items-center rounded-xl">
+                        <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-25 flex justify-center items-center rounded-xl">
                             <img src={LoadingDots} alt="Loading..." />
                         </div>
                     )}
