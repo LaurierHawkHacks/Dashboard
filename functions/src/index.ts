@@ -17,6 +17,7 @@ import * as jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import { PKPass } from "passkit-generator";
 import axios from "axios";
+import { AxiosError } from "axios";
 import { HttpStatus, response } from "./utils";
 import * as QRCode from "qrcode";
 
@@ -625,23 +626,89 @@ export const createPassObject = functions.https.onCall(
         // }
 
         //FOR UPDATING OBJECTS
+        // try {
+        //     const response = await httpClient.request({
+        //         url: `${baseUrl}/genericObject/${objectId}`,
+        //         method: "PATCH",
+        //         data: updatedGenericObject,
+        //     });
+
+        //     functions.logger.info("Pass updated successfully", response.data);
+        // } catch (error) {
+        //     functions.logger.error("Failed to update object", {
+        //         error,
+        //         func,
+        //     });
+        //     throw new functions.https.HttpsError(
+        //         "internal",
+        //         "Object update failed"
+        //     );
+        // }
+
         try {
-            const response = await httpClient.request({
+            // Try to fetch the existing object
+            const existingObjectResponse = await httpClient.request({
                 url: `${baseUrl}/genericObject/${objectId}`,
-                method: "PATCH",
-                data: updatedGenericObject,
+                method: "GET",
             });
 
-            functions.logger.info("Pass updated successfully", response.data);
+            if (existingObjectResponse.data) {
+                // Object exists, update it
+                const updateResponse = await httpClient.request({
+                    url: `${baseUrl}/genericObject/${objectId}`,
+                    method: "PATCH",
+                    data: updatedGenericObject,
+                });
+                functions.logger.info(
+                    "Pass updated successfully",
+                    updateResponse.data,
+                    func
+                );
+            }
         } catch (error) {
-            functions.logger.error("Failed to update object", {
-                error,
-                func,
-            });
-            throw new functions.https.HttpsError(
-                "internal",
-                "Object update failed"
-            );
+            // Object does not exist, create it
+            if (error instanceof AxiosError) {
+                if (error.response && error.response.status === 404) {
+                    try {
+                        const createResponse = await httpClient.request({
+                            url: `${baseUrl}/genericObject`,
+                            method: "POST",
+                            data: updatedGenericObject,
+                        });
+                        functions.logger.info(
+                            "Pass created successfully",
+                            createResponse.data,
+                            func
+                        );
+                    } catch (creationError) {
+                        if (creationError instanceof AxiosError) {
+                            functions.logger.error(
+                                "Failed to create pass object",
+                                creationError.message,
+                                func
+                            );
+                        } else {
+                            functions.logger.error(
+                                "Failed to create pass object",
+                                creationError,
+                                func
+                            );
+                        }
+                    }
+                } else {
+                    functions.logger.error(
+                        "Error fetching pass object",
+                        error.message,
+                        func
+                    );
+                }
+            } else {
+                functions.logger.error(
+                    "An unexpected error occurred",
+                    error,
+                    func
+                );
+            }
         }
 
         const claims = {
