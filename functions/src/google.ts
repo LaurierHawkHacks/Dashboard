@@ -168,6 +168,7 @@ export const createPassObject = functions.https.onCall(
         const func = "createPassObject";
         const userId = context.auth.uid;
 
+        const user = await admin.auth().getUser(userId);
         const app = (
             await admin
                 .firestore()
@@ -176,17 +177,21 @@ export const createPassObject = functions.https.onCall(
                 .get()
         ).docs[0]?.data();
 
+        let firstName = app?.firstName;
+        let lastName = app?.lastName;
         if (!app) {
-            throw new functions.https.HttpsError(
-                "internal",
-                "Object update failed (app)"
+            functions.logger.info(
+                "No application found for user. Will try to get name from user record."
             );
+            const [f, l] = user?.displayName?.split(" ") ?? [
+                user.customClaims?.type ?? "N/A",
+                "N/A",
+            ];
+            firstName = f;
+            lastName = l;
         }
 
-        const firstName = app.firstName;
-        const lastName = app.lastName;
         const fullName = `${firstName} ${lastName}`;
-
         let ticketId = "";
         const ticketsRef = admin.firestore().collection("tickets");
         const ticketDoc = (await ticketsRef.where("userId", "==", userId).get())
