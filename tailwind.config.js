@@ -71,7 +71,7 @@ export default {
             backgroundImage: {
                 "radial-gradient-peach":
                     "radial-gradient(116.17% 116.17% at 50% 1.3%, #F8DFD1 0%, #FFFFFF 100%)",
-                
+
                 "btn-gradient":
                     "linear-gradient(182.75deg, #2B6469 -10.16%, #00CEDB 202.3%)",
 

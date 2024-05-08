@@ -9,7 +9,6 @@ export interface EventData {
     color: string;
 }
 
-
 export const eventsData: EventData[] = [
     {
         date: new Date(2024, 4, 17, 9, 0),
@@ -19,7 +18,7 @@ export const eventsData: EventData[] = [
         location: "Location 1",
         description: "Description 1",
         type: "Type 1",
-        color: "#F0A975" 
+        color: "workshop",
     },
     {
         date: new Date(2024, 4, 17, 10, 0),
@@ -29,7 +28,7 @@ export const eventsData: EventData[] = [
         location: "Location 2",
         description: "Description 2",
         type: "Type 2",
-        color: "#23BCCA"
+        color: "mandatories",
     },
     {
         date: new Date(2024, 4, 18, 12, 0),
@@ -39,8 +38,9 @@ export const eventsData: EventData[] = [
         location: "Location 2",
         description: "Description 2",
         type: "Type 2",
-        color: "#3160D9" 
-    },{
+        color: "activities",
+    },
+    {
         date: new Date(2024, 4, 19, 10, 0),
         title: "Event 4",
         duration: 1.5,
@@ -48,7 +48,7 @@ export const eventsData: EventData[] = [
         location: "Location 2",
         description: "Description 2",
         type: "Type 2",
-        color: "#AB8FF9" 
+        color: "sponsorRelated",
     },
     {
         date: new Date(2024, 4, 19, 12, 0),
@@ -58,7 +58,6 @@ export const eventsData: EventData[] = [
         location: "Location 2",
         description: "Description 2",
         type: "Type 2",
-        color: "#F07584" 
-    }
-    
+        color: "food",
+    },
 ];

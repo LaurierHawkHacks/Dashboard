@@ -17,6 +17,9 @@ dependencies:
   '@heroicons/react':
     specifier: ^2.1.1
     version: 2.1.1(react@18.2.0)
+  '@nessprim/planby-pro':
+    specifier: ^3.10.0
+    version: 3.10.0(@types/react@18.2.21)(react@18.2.0)
   class-variance-authority:
     specifier: ^0.7.0
     version: 0.7.0
@@ -1477,6 +1480,22 @@ packages:
     dependencies:
       lodash: 4.17.21
     dev: true
+
+  /@nessprim/planby-pro@3.10.0(@types/react@18.2.21)(react@18.2.0):
+    resolution: {integrity: sha512-ARMgDAW4alvgbfrckdjduwtRCkr+hNvHdD8eNIHLzZi4TI+IYcgkcQ8HWPws03HwWAsmmQhvvE/K8iAYuZxyIg==, tarball: https://npm.pkg.github.com/download/@nessprim/planby-pro/3.10.0/3fbeea0d30afd00915970f57740dc4f70ee5a94c}
+    engines: {node: '>=10'}
+    peerDependencies:
+      react: '>=16'
+    dependencies:
+      '@emotion/react': 11.11.4(@types/react@18.2.21)(react@18.2.0)
+      '@emotion/styled': 11.11.5(@emotion/react@11.11.4)(@types/react@18.2.21)(react@18.2.0)
+      date-fns: 2.30.0
+      date-fns-tz: 2.0.1(date-fns@2.30.0)
+      react: 18.2.0
+      use-debounce: 7.0.1(react@18.2.0)
+    transitivePeerDependencies:
+      - '@types/react'
+    dev: false
 
   /@nodelib/fs.scandir@2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -3080,6 +3099,14 @@ packages:
       whatwg-mimetype: 4.0.0
       whatwg-url: 14.0.0
     dev: true
+
+  /date-fns-tz@2.0.1(date-fns@2.30.0):
+    resolution: {integrity: sha512-fJCG3Pwx8HUoLhkepdsP7Z5RsucUi+ZBOxyM5d0ZZ6c4SdYustq0VMmOu6Wf7bli+yS/Jwp91TOCqn9jMcVrUA==}
+    peerDependencies:
+      date-fns: 2.x
+    dependencies:
+      date-fns: 2.30.0
+    dev: false
 
   /date-fns@2.30.0:
     resolution: {integrity: sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==}
