@@ -54,6 +54,15 @@ export const NetworkingPage = () => {
         uid: "",
     });
 
+    const firstName =
+        userApp?.firstName ||
+        currentUser?.displayName?.split(" ")[0] ||
+        "Unknown";
+    const lastName =
+        userApp?.lastName ||
+        currentUser?.displayName?.split(" ")[1] ||
+        "Unknown";
+
     useEffect(() => {
         if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
         timeoutRef.current = window.setTimeout(() => setIsLoading(false), 5000);
@@ -155,15 +164,13 @@ export const NetworkingPage = () => {
 
     if (isLoading) return <LoadingAnimation />;
 
-    if (!userApp) return <Navigate to="/" />;
-
     return (
         <div>
             <div className="flex items-center gap-10">
                 <h1 className="font-bold text-2xl">
-                    {userApp.firstName} {userApp.lastName}
+                    {firstName} {lastName}
                 </h1>
-                <p>{userApp.pronouns}</p>
+                {userApp && <p>{userApp.pronouns}</p>}
             </div>
             <p className="mt-6">Your connections</p>
             <div className="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg mt-6 flex items-center max-w-md">
