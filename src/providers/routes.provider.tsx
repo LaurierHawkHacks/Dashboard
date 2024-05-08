@@ -285,7 +285,8 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
         if (
             currentUser.type === "speaker" ||
             currentUser.type === "sponsor" ||
-            (currentUser.type === "mentor" && userApp && userApp.accepted)
+            (currentUser.type === "mentor" && userApp && userApp.accepted) ||
+            (currentUser.type === "volunteer" && userApp && userApp.accepted)
         ) {
             userRoutes.children = [
                 {
