@@ -273,7 +273,7 @@ export const createTeam = functions.https.onCall(async (data, context) => {
     } catch (e) {
         functions.logger.error(
             "Failed to check if requesting user owns/belongs to a team already.",
-            { func }
+            { func, error: e }
         );
         return response(HttpStatus.INTERNAL_SERVER_ERROR, {
             message: "Service down 1202",
