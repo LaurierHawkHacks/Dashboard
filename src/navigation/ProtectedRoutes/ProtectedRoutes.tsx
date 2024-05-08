@@ -61,6 +61,7 @@ export const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
         location.pathname !== routes.verifyRSVP &&
         !session.currentUser.hawkAdmin &&
         session.userApp?.accepted &&
+        session.currentUser?.type === "hacker" &&
         !session.currentUser.rsvpVerified
     ) {
         return <Navigate to={routes.verifyRSVP} />;
