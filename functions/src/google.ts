@@ -26,22 +26,6 @@ export const createPassClass = functions.https.onCall(async (_, context) => {
     const baseUrl = "https://walletobjects.googleapis.com/walletobjects/v1";
     const issuerid = config.googlewallet.issuerid;
 
-    // const classesRef = admin.firestore().collection("passClasses");
-    // const classDoc = await classesRef.doc(issuerid).get();
-    // let classId;
-    // if (classDoc.exists && classDoc.data()?.classId) {
-    //     classId = classDoc.data()?.classId;
-    // } else {
-    //     classId = `${issuerid}.hawkhacks-ticket`; //dont put uuidv4 in the classId for pass class it breaks it
-    //     await classesRef.doc(issuerid).set(
-    //         {
-    //             classId: classId,
-    //             timestamp: new Date(),
-    //         },
-    //         { merge: true }
-    //     );
-    // }
-
     const classId = `${issuerid}.hawkhacks-ticket`; //dont put uuidv4 in the classId for pass class it breaks it
 
     const updatedClass = {
@@ -157,6 +141,7 @@ export const createPassClass = functions.https.onCall(async (_, context) => {
     }
 });
 
+//Google wallet Object
 export const createPassObject = functions.https.onCall(
     async (data, context) => {
         if (!context.auth) {
@@ -191,7 +176,6 @@ export const createPassObject = functions.https.onCall(
             lastName = l;
         }
 
-        const fullName = `${firstName} ${lastName}`;
         let ticketId = "";
         const ticketsRef = admin.firestore().collection("tickets");
         const ticketDoc = (await ticketsRef.where("userId", "==", userId).get())
@@ -217,8 +201,6 @@ export const createPassObject = functions.https.onCall(
         }
 
         const userEmail = context.auth.token.email || data.email;
-
-        // const userName = context.auth.token.name || "No Name Provided";
 
         const objectSuffix = userEmail.replace(/[^\w.-]/g, "_");
         const objectId = `${config.googlewallet.issuerid}.${objectSuffix}`;
@@ -312,42 +294,6 @@ export const createPassObject = functions.https.onCall(
                 },
             },
         };
-
-        functions.logger.info("Pass object being sent:", updatedGenericObject);
-        functions.logger.info("user name:", firstName, lastName);
-        functions.logger.info("full name:", fullName);
-
-        //FOR POSTING NEW OBJECTS
-        // try {
-        //     const response = await httpClient.request({
-        //         url: `${baseUrl}/genericObject`,
-        //         method: "POST",
-        //         data: updatedGenericObject,
-        //     });
-        //     functions.logger.info("Pass created successfully", response.data);
-        // } catch (error) {
-        //     functions.logger.error("Failed to create pass object", error);
-        // }
-
-        //FOR UPDATING OBJECTS
-        // try {
-        //     const response = await httpClient.request({
-        //         url: `${baseUrl}/genericObject/${objectId}`,
-        //         method: "PATCH",
-        //         data: updatedGenericObject,
-        //     });
-
-        //     functions.logger.info("Pass updated successfully", response.data);
-        // } catch (error) {
-        //     functions.logger.error("Failed to update object", {
-        //         error,
-        //         func,
-        //     });
-        //     throw new functions.https.HttpsError(
-        //         "internal",
-        //         "Object update failed"
-        //     );
-        // }
 
         try {
             // Try to fetch the existing object
