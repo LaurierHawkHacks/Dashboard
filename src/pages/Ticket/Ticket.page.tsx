@@ -11,11 +11,16 @@ import { handleError } from "@/services/utils";
 export const TicketPage = () => {
     const functions = getFunctions();
     const { paths } = useAvailableRoutes();
-    const { currentUser } = useAuth();
-    const user = useAuth().userApp;
+    const { currentUser, userApp } = useAuth();
     const email = currentUser?.email ?? "";
-    const firstName = user?.firstName ?? "Unknown";
-    const lastName = user?.lastName ?? "Unknown";
+    const firstName =
+        (userApp?.firstName || currentUser?.displayName?.split(" ")[0]) ??
+        "Unknown";
+    const lastName =
+        userApp?.lastName ||
+        currentUser?.displayName?.split(" ")[1] ||
+        currentUser?.type ||
+        "Unknown";
     const [qrCode, setQRCode] = useState<string>(LoadingDots);
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -65,9 +70,9 @@ export const TicketPage = () => {
             );
             const ticketResult = await createTicket({
                 email: email,
-                pronouns: Array.isArray(user?.pronouns)
-                    ? user.pronouns.join(", ")
-                    : user?.pronouns ?? "Not specified",
+                pronouns: Array.isArray(userApp?.pronouns)
+                    ? userApp.pronouns.join(", ")
+                    : userApp?.pronouns ?? "Not specified",
             });
             const ticketData = ticketResult.data as { url: string };
             if (ticketData.url) {
