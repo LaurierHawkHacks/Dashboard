@@ -67,7 +67,7 @@ exports.fetchOrGenerateTicket = functions.https.onCall(async (_, context) => {
         } else {
             ticketId = data.ticketId;
         }
-        const qrCodeValue = `https://portal.hawkhacks.ca/tickets/${ticketId}`;
+        const qrCodeValue = `${config.fe.url}/ticket/${ticketId}`;
 
         try {
             const qrCodeDataURL = await QRCode.toDataURL(qrCodeValue, {
@@ -197,7 +197,7 @@ export const createTicket = functions.https.onCall(async (_, context) => {
                 logoText: "Welcome to HawkHacks",
                 barcodes: [
                     {
-                        message: `https://${config.fe.url}/ticket/${ticketId}`,
+                        message: `${config.fe.url}/ticket/${ticketId}`,
                         format: "PKBarcodeFormatQR",
                         messageEncoding: "iso-8859-1",
                     },
