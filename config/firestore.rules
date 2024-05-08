@@ -20,6 +20,11 @@ service cloud.firestore {
       allow write: if isAuthenticated() && isAdmin();
     }
 
+    match /user-profiles/{documentId} {
+      allow read: if isAuthenticated() && isAdmin();
+      allow write: if isAuthenticated() && isAdmin();
+    }
+
     // Tickets Collection Rules
     match /tickets/{ticketId} {
         // Only grant read perms to owner/admin
