@@ -215,6 +215,19 @@ export async function getResume(gs: string) {
     }
 }
 
+export async function getResumeURL(gs: string) {
+    const gsRef = ref(storage, gs);
+    try {
+        const blob = await getBlob(gsRef);
+        const blobUrl = URL.createObjectURL(blob);
+        return blobUrl;
+    } catch (e) {
+        logEvent("error", {
+            event: "get_resume_error",
+        });
+    }
+}
+
 export async function verifyRSVP() {
     const verifyFn = httpsCallable(functions, "verifyRSVP");
     try {
