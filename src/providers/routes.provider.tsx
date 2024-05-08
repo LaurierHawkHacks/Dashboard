@@ -227,7 +227,6 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
             });
             // enable all routes
             userRoutes.children.push(
-                { path: paths.schedule, element: <div>schedule</div> },
                 { path: paths.schedule, element: <SchedulePage /> },
                 { path: paths.myTicket, element: <TicketPage /> },
                 {
@@ -297,7 +296,7 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                     path: paths.portal,
                     element: <HomePage />,
                 },
-                { path: paths.schedule, element: <div>schedule</div> },
+                { path: paths.schedule, element: <SchedulePage /> },
                 {
                     path: paths.networking,
                     element: <NetworkingPage />,

@@ -24,6 +24,7 @@
         "@daypilot/daypilot-lite-react": "^3.21.0",
         "@headlessui/react": "^1.7.18",
         "@heroicons/react": "^2.1.1",
+        "@nessprim/planby-pro": "^3.10.0",
         "class-variance-authority": "^0.7.0",
         "date-fns": "^3.6.0",
         "daypilot-pro-react": "https://npm.daypilot.org/daypilot-pro-react/trial/2024.1.5890.tar.gz",
