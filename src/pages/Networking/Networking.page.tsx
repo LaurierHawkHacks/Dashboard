@@ -11,7 +11,6 @@ import {
 } from "@/services/utils";
 import { useNotification } from "@/providers/notification.provider";
 import type { Socials } from "@/services/utils/types";
-import { Navigate } from "react-router-dom";
 
 const allowedFileTypes = [
     "image/*", //png, jpg, jpeg, jfif, pjpeg, pjp, gif, webp, bmp, svg
