@@ -3,7 +3,7 @@ import { FiLogOut } from "react-icons/fi";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/providers/hooks";
 import Hamburger from "hamburger-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Logo } from "@/assets";
 import { useAvailableRoutes } from "@/providers/routes.provider";
 import {
@@ -49,6 +49,8 @@ export const Navbar = () => {
         },
     };
 
+    const location = useLocation();
+
     const updateNavbarState = () => {
         setIsMobile(window.innerWidth <= 768);
     };
@@ -59,6 +61,10 @@ export const Navbar = () => {
             window.removeEventListener("resize", updateNavbarState);
         };
     }, []);
+
+    useEffect(() => {
+        setMobileMenuOpen(false);
+    }, [location]);
 
     const renderNavItems = (isMobile: boolean) => {
         return userRoutes
