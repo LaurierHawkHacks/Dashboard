@@ -403,6 +403,31 @@ export const verifyRSVP = functions.https.onCall(async (_, context) => {
             verified: true,
         };
     } else {
+        const currentDate = new Date();
+        const limitDate = new Date("2024-05-08");
+
+        if (currentDate > limitDate) {
+            const counterDocRef = admin.firestore().collection("rsvpCounter").doc("counter");
+            const counterDoc = await counterDocRef.get();
+
+            if (counterDoc.exists) {
+                const count = counterDoc.data()?.count || 0;
+
+                if (count >= 700) {
+                    functions.logger.info("RSVP limit reached.", { uid: context.auth.uid });
+                    return {
+                        status: 400,
+                        verified: false,
+                        message: "RSVP limit reached.",
+                    };
+                } else {
+                    await counterDocRef.set({ count: count + 1 }, { merge: true });
+                }
+            } else {
+                await counterDocRef.set({ count: 1 });
+            }
+        }
+
         try {
             functions.logger.info("Verifying RSVP. User: " + context.auth.uid);
             // add to custom claims
