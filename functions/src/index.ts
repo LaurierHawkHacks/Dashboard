@@ -401,11 +401,11 @@ export const verifyRSVP = functions.https.onCall(async (_, context) => {
         return {
             status: 200,
             verified: true,
+            message: "RSVP already verified.",
         };
     } else {
         const currentDate = new Date();
-        const limitDate = new Date("2024-05-08");
-
+        const limitDate = new Date("2024-05-08T23:59:00");
         if (currentDate > limitDate) {
             const counterDocRef = admin.firestore().collection("rsvpCounter").doc("counter");
             const counterDoc = await counterDocRef.get();
