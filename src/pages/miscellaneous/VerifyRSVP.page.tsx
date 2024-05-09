@@ -1,4 +1,4 @@
-import { Button } from "@/components";
+import { Button, LoadingAnimation } from "@/components";
 import { useAuth } from "@/providers/auth.provider";
 import { verifyRSVP } from "@/services/utils";
 import { useNotification } from "@/providers/notification.provider";
@@ -27,6 +27,7 @@ export const VerifyRSVP = () => {
         } else {
             await reloadUser();
         }
+        setIsVerifying(false);
     };
 
     useEffect(() => {
@@ -77,13 +78,19 @@ export const VerifyRSVP = () => {
                     </span>
                 </label>
             </div>
-            <Button
-                onClick={verify}
-                disabled={isVerifying || !agreedToParticipate || !willAttend}
-                className="mt-4  px-4 py-2 rounded disabled:bg-gray-300"
-            >
-                Verify
-            </Button>
+            {isVerifying ? (
+                <LoadingAnimation />
+            ) : (
+                <Button
+                    onClick={verify}
+                    disabled={
+                        isVerifying || !agreedToParticipate || !willAttend
+                    }
+                    className="mt-4 font-bold px-4 py-2 rounded bg-blue-500 text-white disabled:bg-gray-300"
+                >
+                    Verify
+                </Button>
+            )}
             <p className="text-gray-800 mt-2">
                 Having trouble? Get help in our{" "}
                 <a
