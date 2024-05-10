@@ -285,7 +285,7 @@ export const SchedulePage: React.FC = () => {
     return (
         <>
             <div className="bg-white rounded-lg shadow-md p-6 mb-6 text-gray-800">
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex justify-between items-center flex-col lg:flex-row mb-4">
                     <h1 className="text-lg mb-4">
                         HawkHacks Hackathon starts at XX:XXPM! All times are in
                         EST.
@@ -294,7 +294,7 @@ export const SchedulePage: React.FC = () => {
                         <input
                             type="text"
                             placeholder="Search for something!"
-                            className="form-input rounded-full px-4 py-3 pl-10 w-96 border-none bg-searchbar text-gray-700"
+                            className="form-input rounded-full px-4 py-3 pl-10 w-full lg:w-96 border-none bg-searchbar text-gray-700"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
