@@ -30,7 +30,7 @@ export {
  * sponsors
  */
 
-import Solana from "./sponsors/solana.png";
+import Avalanche from "./sponsors/Avalanche.png";
 import Near from "./sponsors/near.png";
 import Fantuan from "./sponsors/fantuan.png";
 import SmokesPoutinerie from "./sponsors/smokes.png";
@@ -39,7 +39,7 @@ import Nibiru from "./sponsors/nibiru.png";
 import Distributive from "./sponsors/distributive.png";
 
 export {
-    Solana,
+    Avalanche,
     Near,
     Fantuan,
     SmokesPoutinerie,

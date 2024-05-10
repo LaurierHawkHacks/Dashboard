@@ -1,6 +1,6 @@
 const sponsorLinks = {
     // platinum
-    solana: "https://solana.com/",
+    avalanche: "https://www.avax.network/",
     near: "https://near.org/",
 
     // gold
