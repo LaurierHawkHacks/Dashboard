@@ -60,7 +60,7 @@ export { SlidingHawkBody, SlidingHawkBodyParts };
 /**
  * Perks
  */
-import PerksFantuan from "./perks/fantaun.png";
+import PerksFantuan from "./perks/fantuan.png";
 import PerksIndomie from "./perks/Indofood.svg";
 import PerksSmokes from "./perks/Smokes_Poutinerie.jpg";
 import Perks1Password from "./perks/1Password.svg";
@@ -72,6 +72,12 @@ import PerksRosenfield from "./perks/Rosenfeld.png";
 import PerksCertopus from "./perks/Certopus.svg";
 import PerksNordVPN from "./perks/NordVPN_horizontal.png";
 import PerksIncogni from "./perks/incogni_black.png";
+import PerksNEAR from "./perks/near.png";
+import PerksAvalanche from "./perks/avalanche.png";
+import PerksDistributive from "./perks/distributive.png";
+import PerksNeurelo from "./perks/neurelo.png";
+import PerksMetis from "./perks/metis.png";
+import PerksDeFiBlocks from "./perks/defiblocks.png";
 
 export {
     PerksFantuan,
@@ -86,4 +92,10 @@ export {
     PerksCertopus,
     PerksNordVPN,
     PerksIncogni,
+    PerksNEAR,
+    PerksAvalanche,
+    PerksDistributive,
+    PerksNeurelo,
+    PerksMetis,
+    PerksDeFiBlocks,
 };
