@@ -52,12 +52,12 @@ const PerksPage = () => {
         className="bg-white shadow-md p-4 rounded-xl flex items-center mb-4 opacity-0 transition-opacity duration-300 cursor-pointer"
         onClick={() => openPopup(perk)}
       >
-        <div className="w-52 h-52 mr-6 flex items-center justify-center">
+        <div className="w-52 h-32 mr-6 flex items-center justify-center">
           <img src={perk.image} alt={perk.alt} className="max-w-full max-h-full object-contain" />
         </div>
         <div className="w-2/3">
           <h3 className="font-bold mt-4">{perk.title}</h3>
-          <p className="text-gray-500 mt-2 mb-4">{shortenDescription(perk.description, 100)}</p>
+          <p className="text-gray-500 mt-2 mb-4">{shortenDescription(perk.description, 80)}</p>
         </div>
       </div>
     );
