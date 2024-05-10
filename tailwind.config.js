@@ -46,6 +46,7 @@ export default {
                 activities: "#AB8FF9",
                 sponsorRelated: "#F07584",
                 food: "#F0A975",
+                searchbar: "#FFEEE4",
                 "tbrand-hover": "#0FA3B1",
                 "tbrand-mouse-down": "#1D7882",
                 "tbrand-highlight": "#00CEDB",
