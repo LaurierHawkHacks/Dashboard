@@ -3,7 +3,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-.workshops {
-    background-color: #3160d9 !important;
-}
