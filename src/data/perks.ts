@@ -1,3 +1,18 @@
+import {
+    Perks1Password,
+    PerksBalsamiq,
+    PerksCertopus,
+    PerksEcho3D,
+    PerksFantuan,
+    PerksIncogni,
+    PerksIndomie,
+    PerksNordVPN,
+    PerksRosenfield,
+    PerksSmokes,
+    PerksTaskade,
+    PerksWolfram,
+} from "@/assets";
+
 export interface PerksData {
     image: string;
     title: string;
@@ -14,7 +29,7 @@ const perksData: {
 } = {
     featured: [
         {
-            image: "/src/assets/perks/fantaun.png",
+            image: PerksFantuan,
             title: "Fantuan",
             description:
                 "Fantuan is providing all of our participants with free bubble tea! All you'll have to do to secure some is place a FREE order on the HawkHacks Fantuan store!",
@@ -23,7 +38,7 @@ const perksData: {
             buttonTitle: "Order Now",
         },
         {
-            image: "/src/assets/perks/Indofood.svg",
+            image: PerksIndomie,
             title: "Indomie",
             description:
                 "Indomie has graciously provided all hackers 1 cup noodle (feel free to cook some up during HawkHacks 😉) and 1 pillow pack of ramen. Hackers will have the opportunity to pick up their cup noodle Friday night as a late-night snack, and the pillow pack of ramen will be provided once you check-in at registration.",
@@ -32,7 +47,7 @@ const perksData: {
             buttonTitle: null,
         },
         {
-            image: "/src/assets/perks/smokes_Poutinerie.jpg",
+            image: PerksSmokes,
             title: "Smokes",
             description:
                 "Smokes will be offering various prizes throughout the duration of the HawkHacks weekend, such as stickers, merch, and other goodies!",
@@ -41,7 +56,7 @@ const perksData: {
             buttonTitle: "Visit Website",
         },
         {
-            image: "/src/assets/perks/1password.svg",
+            image: Perks1Password,
             title: "1Password",
             description:
                 "1Password has graciously provided all hackers who attend HawkHacks 1 year free of 1Password Families! (note: offer is valid for new signups only)",
@@ -50,7 +65,7 @@ const perksData: {
             buttonTitle: "Sign Up",
         },
         {
-            image: "/src/assets/perks/Echo3D.webp",
+            image: PerksEcho3D,
             title: "Echo3D",
             description:
                 "Echo3D will give all HawkHack participants a 1-month Pro tier subscription. Recorded workshop about 3D/AR/VR and how to use echo3D, as well as tech support via Discord will be available to hackers during the weekend.",
@@ -61,7 +76,7 @@ const perksData: {
     ],
     food: [
         {
-            image: "/src/assets/perks/fantaun.png",
+            image: PerksFantuan,
             title: "Fantuan",
             description:
                 "Fantuan is providing all of our participants with free bubble tea! All you'll have to do to secure some is place a FREE order on the HawkHacks Fantuan store!",
@@ -70,7 +85,7 @@ const perksData: {
             buttonTitle: "Order Now",
         },
         {
-            image: "/src/assets/perks/Indofood.svg",
+            image: PerksIndomie,
             title: "Indomie",
             description:
                 "Indomie has graciously provided all hackers 1 cup noodle (feel free to cook some up during HawkHacks 😉) and 1 pillow pack of ramen. Hackers will have the opportunity to pick up their cup noodle Friday night as a late-night snack, and the pillow pack of ramen will be provided once you check-in at registration.",
@@ -79,7 +94,7 @@ const perksData: {
             buttonTitle: null,
         },
         {
-            image: "/src/assets/perks/smokes_Poutinerie.jpg",
+            image: PerksSmokes,
             title: "Smokes",
             description:
                 "Smokes will be offering various prizes throughout the duration of the HawkHacks weekend, such as stickers, merch, and other goodies!",
@@ -90,7 +105,7 @@ const perksData: {
     ],
     other: [
         {
-            image: "/src/assets/perks/1password.svg",
+            image: Perks1Password,
             title: "1Password",
             description:
                 "1Password has graciously provided all hackers who attend HawkHacks 1 year free of 1Password Families! (note: offer is valid for new signups only)",
@@ -99,7 +114,7 @@ const perksData: {
             buttonTitle: "Sign Up",
         },
         {
-            image: "/src/assets/perks/Balsamiq.png",
+            image: PerksBalsamiq,
             title: "Balsamiq",
             description:
                 "Balsamiq will be providing all HawkHack attendees 60-day extended trail of Balsamiq Cloud. Balsamiq Cloud is an effortless wireframing tool, a low-fidelity, high-impact tool highly valued by product managers, founders, developers, & UX teams.",
@@ -108,7 +123,7 @@ const perksData: {
             buttonTitle: "Start Trial",
         },
         {
-            image: "/src/assets/perks/Wolfram.svg",
+            image: PerksWolfram,
             title: "Wolfram",
             description:
                 "Wolfram will be providing the top six teams the Wolfram Award, regardless to whether solutions include Wolfram Tech. This award provides a year of Wolfram|One Personal Edition, as well as a one-year subscription to Wolfram|Alpha Pro. Additionally, Wolfram will be giving all HawkHack participants access to Wolfram|One for 30 days.",
@@ -117,7 +132,7 @@ const perksData: {
             buttonTitle: "Explore Wolfram",
         },
         {
-            image: "/src/assets/perks/Echo3D.webp",
+            image: PerksEcho3D,
             title: "Echo3D",
             description:
                 "Echo3D will give all HawkHack participants a 1-month Pro tier subscription. Recorded workshop about 3D/AR/VR and how to use echo3D, as well as tech support via Discord will be available to hackers during the weekend.",
@@ -126,7 +141,7 @@ const perksData: {
             buttonTitle: "Learn More",
         },
         {
-            image: "/src/assets/perks/Taskade.png",
+            image: PerksTaskade,
             title: "Taskade",
             description:
                 "Taskade will provide 40 HawkHack winners with 3-year upgrades to Taskade's starter plan. Taskade will give all HawkHack particpants promo codes for 20% off their plans.",
@@ -135,7 +150,7 @@ const perksData: {
             buttonTitle: null,
         },
         {
-            image: "/src/assets/perks/Rosenfeld.png",
+            image: PerksRosenfield,
             title: "Rosenfeld",
             description:
                 "Rosenfeld will give 20% discount promos when checking out using the provided link for all HawkHacks attendees.",
@@ -144,7 +159,7 @@ const perksData: {
             buttonTitle: "Get 20% Off",
         },
         {
-            image: "/src/assets/perks/Certopus.svg",
+            image: PerksCertopus,
             title: "Certopus",
             description:
                 "Certopus will be providing free-verified e-certificates for all HawkHack attendees who complete their courses.",
@@ -153,7 +168,7 @@ const perksData: {
             buttonTitle: "Get Certified",
         },
         {
-            image: "/src/assets/perks/NordVPN_horizontal.png",
+            image: PerksNordVPN,
             title: "NordVPN & NordPass",
             description:
                 "NordVPN has collaborated with HawkHacks to provide the top 16 victors a full year's access to NordVPN and NordPass.",
@@ -162,7 +177,7 @@ const perksData: {
             buttonTitle: "Get NordVPN & NordPass",
         },
         {
-            image: "/src/assets/perks/incogni_black.png",
+            image: PerksIncogni,
             title: "Incogni",
             description:
                 "Incogni will award our top 16 hackers with one-year subscriptions to their product, Incogni. This product empowers users to regain control of their data, minimize spam, and thwart scam attempts by seamlessly opting them out of data broker databases.",
@@ -174,4 +189,3 @@ const perksData: {
 };
 
 export { perksData };
-
