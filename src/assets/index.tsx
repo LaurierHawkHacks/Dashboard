@@ -56,3 +56,34 @@ import SlidingHawkBody from "./slidingHawk/body.png";
 import SlidingHawkBodyParts from "./slidingHawk/body-parts.svg";
 
 export { SlidingHawkBody, SlidingHawkBodyParts };
+
+/**
+ * Perks
+ */
+import PerksFantuan from "./perks/fantaun.png";
+import PerksIndomie from "./perks/Indofood.svg";
+import PerksSmokes from "./perks/Smokes_Poutinerie.jpg";
+import Perks1Password from "./perks/1Password.svg";
+import PerksEcho3D from "./perks/Echo3D.webp";
+import PerksBalsamiq from "./perks/Balsamiq.png";
+import PerksWolfram from "./perks/Wolfram.svg";
+import PerksTaskade from "./perks/Taskade.png";
+import PerksRosenfield from "./perks/Rosenfeld.png";
+import PerksCertopus from "./perks/Certopus.svg";
+import PerksNordVPN from "./perks/NordVPN_horizontal.png";
+import PerksIncogni from "./perks/incogni_black.png";
+
+export {
+    PerksFantuan,
+    PerksIndomie,
+    PerksSmokes,
+    Perks1Password,
+    PerksEcho3D,
+    PerksBalsamiq,
+    PerksWolfram,
+    PerksTaskade,
+    PerksRosenfield,
+    PerksCertopus,
+    PerksNordVPN,
+    PerksIncogni,
+};
