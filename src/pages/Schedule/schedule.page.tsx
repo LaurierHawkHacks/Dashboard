@@ -203,12 +203,11 @@ export const SchedulePage: React.FC = () => {
     const epg = useMemo(() => {
         const { start, end } = hackathonDays[day];
         return events
-            .filter(
-                (evt) =>
-                    isWithinInterval(evt.startTime, {
-                        start,
-                        end,
-                    }) && isWithinInterval(evt.endTime, { start, end })
+            .filter((evt) =>
+                isWithinInterval(evt.startTime, {
+                    start,
+                    end,
+                })
             )
             .map((e) => ({
                 channelUuid: e.type,
