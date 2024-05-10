@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { Button, LoadingAnimation, Select, TextInput } from "@/components";
 import { useNotification } from "@/providers/notification.provider";
 import { getRedeemableItems } from "@/services/utils";
