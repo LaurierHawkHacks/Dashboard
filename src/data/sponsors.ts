@@ -43,11 +43,6 @@ const sponsors: Sponsor[] = [
         image: Dominos,
     },
     {
-        name: "Nibiru",
-        link: sponsorLinks.nibiru,
-        image: Nibiru,
-    },
-    {
         name: "Distributive",
         link: sponsorLinks.distributive,
         image: Distributive,
