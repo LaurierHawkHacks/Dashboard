@@ -2,7 +2,7 @@ import { Button, LoadingAnimation, Select, TextInput } from "@/components";
 import { useNotification } from "@/providers/notification.provider";
 import { getRedeemableItems } from "@/services/utils";
 import { EventItem, FoodItem } from "@/services/utils/types";
-import { format, isAfter, isDate, parseISO } from "date-fns";
+import { format, isAfter, parseISO } from "date-fns";
 import { Timestamp, doc, setDoc } from "firebase/firestore";
 import { FormEventHandler, useEffect, useRef, useState } from "react";
 import { nanoid } from "nanoid";
