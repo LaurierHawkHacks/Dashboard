@@ -51,15 +51,16 @@ export const VerifyRSVP = () => {
                                 RSVP Limit Reached
                             </p>
                             <p className="text-gray-700 mt-2">
-                                We're sorry, but the RSVP limit has been reached.
-                                If you have any questions or concerns, please reach out to us in our tech support channel on Discord.
+                                {
+                                    "We're sorry, but the RSVP limit has been reached. If you have any questions or concerns, please reach out to us in our tech support channel on Discord."
+                                }
                             </p>
                         </div>
                     ) : (
                         <>
                             <p className="text-lg font-bold">
-                                Please verify your RSVP to get access to the rest of the
-                                dashboard!
+                                Please verify your RSVP to get access to the
+                                rest of the dashboard!
                             </p>
                             <div className="flex flex-col items-start max-w-3xl">
                                 <div>
@@ -68,14 +69,17 @@ export const VerifyRSVP = () => {
                                             type="checkbox"
                                             checked={agreedToParticipate}
                                             onChange={(e) =>
-                                                setAgreedToParticipate(e.target.checked)
+                                                setAgreedToParticipate(
+                                                    e.target.checked
+                                                )
                                             }
                                             className="form-checkbox h-5 w-5 text-gray-600"
                                         />
                                         <span className="ml-2 text-gray-700 cursor-pointer">
-                                            I have read the content below and agree to
-                                            participate in the event using my free will
-                                            and good judgment.
+                                            I have read the content below and
+                                            agree to participate in the event
+                                            using my free will and good
+                                            judgment.
                                         </span>
                                     </label>
 
@@ -95,10 +99,11 @@ export const VerifyRSVP = () => {
                                         className="form-checkbox h-5 w-5 text-gray-600"
                                     />
                                     <span className="ml-2 text-gray-700">
-                                        I confirm that I will be attending HawkHacks
-                                        from May 17th to May 19th. I will try to be on
-                                        the premises for the vast majority for the
-                                        duration of the event.
+                                        I confirm that I will be attending
+                                        HawkHacks from May 17th to May 19th. I
+                                        will try to be on the premises for the
+                                        vast majority for the duration of the
+                                        event.
                                     </span>
                                 </label>
                             </div>
@@ -106,9 +111,10 @@ export const VerifyRSVP = () => {
                             <Button
                                 onClick={verify}
                                 disabled={
-                                    isVerifying || !agreedToParticipate || !willAttend
+                                    isVerifying ||
+                                    !agreedToParticipate ||
+                                    !willAttend
                                 }
-                                className="mt-4 font-bold px-4 py-2 rounded bg-blue-500 text-white disabled:bg-gray-300"
                             >
                                 Verify
                             </Button>
@@ -132,3 +138,4 @@ export const VerifyRSVP = () => {
         </>
     );
 };
+
