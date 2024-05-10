@@ -82,7 +82,7 @@ export const JoinTeamPage = () => {
         if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
         timeoutRef.current = window.setTimeout(() => {
             setIsLoading(false);
-        }, 1500);
+        }, 5000);
 
         if (!invitationId || !currentUser) return;
 
@@ -117,7 +117,7 @@ export const JoinTeamPage = () => {
     // return to home page
     if (!invitationId) return <Navigate to={routes.portal} />;
 
-    if (!invitationData) return <Navigate to={routes.notFound} />;
+    if (!invitationData) return <Navigate to="/not-found" />;
 
     return (
         <div className="h-screen w-screen flex items-center justify-center">
