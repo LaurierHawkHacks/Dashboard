@@ -164,6 +164,7 @@ export const createPassObject = functions.https.onCall(
 
         let firstName = app?.firstName;
         let lastName = app?.lastName;
+        const type = user.customClaims?.type ?? "N/A";
         if (!app) {
             functions.logger.info(
                 "No application found for user. Will try to get name from user record."
@@ -258,7 +259,7 @@ export const createPassObject = functions.https.onCall(
                 {
                     id: "TYPE",
                     header: "Type",
-                    body: "Hacker",
+                    body: type[0].toUpperCase() + type.substring(1),
                 },
                 {
                     id: "EMAIL",
