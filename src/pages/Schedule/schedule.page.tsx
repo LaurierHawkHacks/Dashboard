@@ -389,6 +389,12 @@ export const SchedulePage: React.FC = () => {
                             </p>
                         </div>
                         <div className="grid grid-cols-2">
+                            <p className="font-bold col-span-1">Date</p>
+                            <p className="col-span-1 text-left">
+                                {format(activeProgram.since, "MMM dd")}
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-2">
                             <p className="font-bold col-span-1">Time</p>
                             <p className="col-span-1 text-left">
                                 {format(activeProgram.since, "h:mma")} -{" "}
