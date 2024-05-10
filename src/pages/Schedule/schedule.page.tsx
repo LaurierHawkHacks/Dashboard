@@ -319,8 +319,13 @@ export const SchedulePage: React.FC = () => {
                                         key={event.id}
                                         className="p-4 hover:bg-gray-200 cursor-pointer"
                                         onClick={() => {
-                                            setSearchTerm(event.title);
                                             setShowDropdown(false);
+                                            setActiveProgram({
+                                                ...event,
+                                                since: event.startTime,
+                                                till: event.endTime,
+                                            });
+                                            setOpenProgramDetailModal(true);
                                         }}
                                     >
                                         {event.title} -{" "}
