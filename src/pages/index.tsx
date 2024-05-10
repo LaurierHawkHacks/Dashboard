@@ -8,5 +8,4 @@ export { TicketPage } from "./Ticket/Ticket.page";
 export { HomePage } from "./Home/Home.page";
 export { NetworkingPage } from "./Networking/Networking.page";
 export { SchedulePage } from "./Schedule/schedule.page";
-
-
+export { PerksPage } from "./Perks/Perks.page";
