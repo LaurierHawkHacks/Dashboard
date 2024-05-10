@@ -73,7 +73,13 @@ export const Modal: FC<ModalProps> = ({
                                     >
                                         {subTitle}
                                     </Dialog.Title>
-                                    <div className="mt-4">{children}</div>
+                                    <div
+                                        className={
+                                            title || subTitle ? "mt-4" : ""
+                                        }
+                                    >
+                                        {children}
+                                    </div>
                                 </div>
                             </Dialog.Panel>
                         </Transition.Child>
