@@ -138,20 +138,6 @@ const HomePage = () => {
                 </Card>
             </div>
 
-            <Card title="Free Bbt" className="freeBbt">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Itaque
-                quasi quo minima corrupti consequuntur dolores nulla, excepturi
-                exercitationem quibusdam consectetur culpa ratione architecto
-                qui a. Magni asperiores ea vel possimus?
-            </Card>
-
-            <Card title="Sponsors' Products" className="sponsorsProducts">
-                Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nulla
-                reprehenderit eius temporibus corrupti eveniet impedit
-                voluptatem ducimus explicabo, aspernatur ratione nobis dolores
-                dolorem, atque, eaque ad mollitia quam tempore ex.
-            </Card>
-
             <Card title="FAQ" className="faq">
                 <Accordion faqs={faqs} />
             </Card>
