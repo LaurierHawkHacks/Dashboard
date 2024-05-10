@@ -4,6 +4,7 @@ import { perksData } from '../../data/perks';
 const PerksPage = () => {
   const foodItemsRef = useRef([]);
   const otherItemsRef = useRef([]);
+  const featuredItemsRef = useRef([]);
   const [selectedPerk, setSelectedPerk] = useState(null);
   const [popupStyle, setPopupStyle] = useState({ opacity: 0 });
 
@@ -20,6 +21,7 @@ const PerksPage = () => {
 
     fadeInItems(foodItemsRef.current);
     fadeInItems(otherItemsRef.current);
+    fadeInItems(featuredItemsRef.current);
   }, []);
 
   const openPopup = (perk) => {
@@ -37,34 +39,46 @@ const PerksPage = () => {
       document.body.classList.remove('overflow-hidden');
     }, 300);
   };
-
-  const renderPerk = (perk, ref) => {
-    const shortenDescription = (description, maxLength) => {
-      if (description.length <= maxLength) {
-        return description;
-      }
-      return `${description.slice(0, maxLength)}...`;
-    };
-
-    return (
-      <div
-        ref={(el) => (ref.current[ref.current.length] = el)}
-        className="bg-white shadow-md p-4 rounded-xl flex items-center mb-4 opacity-0 transition-opacity duration-300 cursor-pointer"
-        onClick={() => openPopup(perk)}
-      >
-        <div className="w-52 h-32 mr-6 flex items-center justify-center">
-          <img src={perk.image} alt={perk.alt} className="max-w-full max-h-full object-contain" />
-        </div>
-        <div className="w-2/3">
-          <h3 className="font-bold mt-4">{perk.title}</h3>
-          <p className="text-gray-500 mt-2 mb-4">{shortenDescription(perk.description, 80)}</p>
-        </div>
-      </div>
-    );
+const renderPerk = (perk, ref, index) => {
+  const shortenDescription = (description, maxLength) => {
+    if (description.length <= maxLength) {
+      return description;
+    }
+    return `${description.slice(0, maxLength)}...`;
   };
+
+  const customStyle = index === 1 ? { marginLeft: '32px' } : {}; // Only add extra margin to the second item
+
+  return (
+    <div
+      ref={(el) => (ref.current[ref.current.length] = el)}
+      className="bg-white shadow-md p-4 rounded-xl flex items-center mb-4 opacity-0 transition-opacity duration-300 cursor-pointer"
+      onClick={() => openPopup(perk)}
+      style={{ flexBasis: '33%', marginBottom: '16px', ...customStyle }} // Adjust width and margin for two items per row
+    >
+      <div className="w-40 h-24 mr-4 flex items-center justify-center">
+        <img src={perk.image} alt={perk.alt} className="max-w-full max-h-full object-contain" />
+      </div>
+      <div className="flex-grow">
+        <h3 className="font-bold mt-2">{perk.title}</h3>
+        <p className="text-gray-500 mt-1">{shortenDescription(perk.description, 80)}</p>
+      </div>
+    </div>
+  );
+};
+
 
   return (
     <div>
+      <div className="mb-8">
+        <h2 className="text-xl font-bold mb-4">Featured</h2>
+        <div className="flex flex-wrap justify-start gap-x-32 gap-y-2">
+  {perksData.featured.map((perk, index) => renderPerk(perk, featuredItemsRef))}
+</div>
+
+
+      </div>
+
       <div className="flex gap-32">
         <div className="w-1/3">
           <h2 className="text-xl font-bold mb-4">Food</h2>

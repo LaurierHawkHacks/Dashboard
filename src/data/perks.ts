@@ -1,4 +1,46 @@
 const perksData = {
+    featured: [
+        {
+            image: '/src/assets/perks/fantaun.png',
+            title: 'Fantuan',
+            description: 'Fantuan is providing all of our participants with free bubble tea! All you\'ll have to do to secure some is place a FREE order on the HawkHacks Fantuan store!',
+            link: 'https://order.fantuan.ca/store/Restaurant/ca-22098?shippingType=0&inviteCode=ca09jcqrt&tTraceId=MerchantShare-22098-0-68c98f2f08c048e995841671731611b3&channel=merchant_share',
+            alt: 'Fantuan Delivery',
+            buttonTitle: 'Order Now'
+        },
+        {
+            image: '/src/assets/perks/Indofood.svg',
+            title: 'Indomie',
+            description: 'Indomie has graciously provided all hackers 1 cup noodle (feel free to cook some up during HawkHacks 😉) and 1 pillow pack of ramen. Hackers will have the opportunity to pick up their cup noodle Friday night as a late-night snack, and the pillow pack of ramen will be provided once you check-in at registration.',
+            link: null,
+            alt: 'Indomie',
+            buttonTitle: null
+        },
+        {
+            image: '/src/assets/perks/smokes_Poutinerie.jpg',
+            title: 'Smokes',
+            description: 'Smokes will be offering various prizes throughout the duration of the HawkHacks weekend, such as stickers, merch, and other goodies!',
+            link: 'https://smokespoutinerie.com/?utm_medium=affiliate&utm_term=&utm_content&utm_campaign=hawkhacks24',
+            alt: 'Smokes Poutinerie',
+            buttonTitle: 'Visit Website'
+        },
+        {
+            image: '/src/assets/perks/1password.svg',
+            title: '1Password',
+            description: '1Password has graciously provided all hackers who attend HawkHacks 1 year free of 1Password Families! (note: offer is valid for new signups only)',
+            link: 'https://1password.com',
+            alt: '1Password',
+            buttonTitle: 'Sign Up'
+        },
+        {
+            image: '/src/assets/perks/Echo3D.webp',
+            title: 'Echo3D',
+            description: 'Echo3D will give all HawkHack participants a 1-month Pro tier subscription. Recorded workshop about 3D/AR/VR and how to use echo3D, as well as tech support via Discord will be available to hackers during the weekend.',
+            link: 'https://www.echo3d.com/?utm_medium=affiliate&utm_term=&utm_content&utm_campaign=hawkhacks24',
+            alt: 'Echo3D',
+            buttonTitle: 'Learn More'
+        }
+    ],
     food: [
         {
             image: '/src/assets/perks/fantaun.png',
