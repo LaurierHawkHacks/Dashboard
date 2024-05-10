@@ -24,25 +24,27 @@ import { ProtectedRoutes } from "@/navigation";
 import { PostSubmissionPage } from "@/pages/miscellaneous/PostSubmission.page";
 import { VerifyRSVP } from "@/pages/miscellaneous/VerifyRSVP.page";
 import { MyTeamPage } from "@/pages/MyTeam.page";
+import { ViewTicketPage } from "@/pages/miscellaneous/ViewTicket.page";
 import { JoinTeamPage } from "@/pages/JoinTeam.page";
-import { isAfter } from "date-fns";
-import { appCloseDate } from "@/data/appCloseDate";
+import { AdminViewTicketPage } from "@/pages/admin/ViewTicket.page";
 
 interface PathObject {
     admin: string;
+    adminViewTicket: string;
     notFound: string;
     login: string;
     portal: string;
     verifyEmail: string;
     schedule: string;
     networking: string;
-    ticket: string;
+    myTicket: string;
     application: string;
     submitted: string;
     verifyRSVP: string;
     myTeam: string;
     joinTeam: string;
     myApp: string;
+    ticket: string;
 }
 
 interface Title {
@@ -61,19 +63,21 @@ interface RoutesContextValue {
 // this path object provides a common place to define route pathnames
 const paths: PathObject = {
     admin: "/admin",
+    adminViewTicket: "/admin/ticket/:ticketId",
     notFound: "*",
     login: "/login",
     portal: "/",
     verifyEmail: "/verify-email",
     schedule: "/schedule",
     networking: "/networking",
-    ticket: "/ticket",
+    myTicket: "/my-ticket",
     application: "/application",
     submitted: "/submitted",
     verifyRSVP: "/verify-rsvp",
     myTeam: "/my-team",
     joinTeam: "/join-team",
     myApp: "/my-application",
+    ticket: "/ticket/:ticketId",
 };
 
 const titles: Record<string, Title> = {
@@ -101,9 +105,9 @@ const titles: Record<string, Title> = {
         main: "Verify Your RSVP",
         sub: "All checkboxes are required.",
     },
-    [paths.ticket]: {
+    [paths.myTicket]: {
         main: "Ticket",
-        sub: 'This is your ticket for the event and will be needed to register (a.k.a., check in) at HawkHacks 2023. Please press "View my ticket" then use the buttons below to add this ticket to your mobile wallet or take a screenshot of the ticket page. Registration begins at 5:30 PM local time near the Main Tent in Wilfrid Laurier University\'s Laz Building.\n\n If you have any questions, please contact info@hawkhacks.ca.',
+        sub: "This ticket is required for registration at our HawkHacks sign-in desk.\nKeep this ticket safe - download or add it to your wallet for convenience!",
     },
     [paths.myTeam]: {
         main: "My Team",
@@ -112,6 +116,10 @@ const titles: Record<string, Title> = {
     [paths.joinTeam]: {
         main: "Join Team",
         sub: "Awesome, it looks like you have found teammates!",
+    },
+    [paths.ticket]: {
+        main: "View Ticket",
+        sub: "Some good thing here",
     },
 };
 
@@ -184,13 +192,18 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                 element: <LoginPage />,
             },
             {
+                path: paths.ticket,
+                element: <ViewTicketPage />,
+            },
+            {
                 path: paths.notFound,
                 element: <NotFoundPage />,
             },
             
             userRoutes,
         ];
-        if (!currentUser) {
+
+        if (!currentUser || !currentUser.emailVerified) {
             setUserRoutes(userRoutes.children);
             setRoutes(availableRoutes);
             return cleanUp;
@@ -206,50 +219,83 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                         path: paths.admin,
                         element: <AdminPage />,
                     },
+                    {
+                        path: paths.adminViewTicket,
+                        element: <AdminViewTicketPage />,
+                    },
                 ],
             });
             // enable all routes
             userRoutes.children.push(
+                { path: paths.schedule, element: <SchedulePage /> },
+                { path: paths.myTicket, element: <TicketPage /> },
                 {
                     path: paths.networking,
                     element: <NetworkingPage />,
                 },
-                { path: paths.schedule, element: <SchedulePage/> },
                 { path: paths.ticket, element: <TicketPage /> }
             );
+
             setUserRoutes(userRoutes.children);
             setRoutes(availableRoutes);
             return cleanUp;
         }
 
-        if (!userApp && isAfter(new Date(), new Date(appCloseDate))) {
+        // type based
+        if (currentUser.type === "hacker") {
+            if (userApp && !userApp.accepted) {
+                userRoutes.children = [
+                    {
+                        index: true,
+                        path: paths.portal,
+                        element: <UserPage />,
+                    },
+                ];
+            }
+
+            if (userApp && userApp.accepted && !currentUser.rsvpVerified) {
+                userRoutes.children = [
+                    {
+                        path: paths.verifyRSVP,
+                        element: <VerifyRSVP />,
+                    },
+                ];
+            }
+
+            if (userApp && userApp.accepted && currentUser.rsvpVerified) {
+                userRoutes.children = [
+                    {
+                        index: true,
+                        path: paths.portal,
+                        element: <HomePage />,
+                    },
+                    { path: paths.schedule, element: <SchedulePage /> },
+                    {
+                        path: paths.networking,
+                        element: <NetworkingPage />,
+                    },
+                    { path: paths.myTicket, element: <TicketPage /> },
+                    { path: paths.myTeam, element: <MyTeamPage /> },
+                    {
+                        path: `${paths.joinTeam}/:invitationId`,
+                        element: <JoinTeamPage />, // dummy placeholder
+                    },
+                ];
+            }
+        }
+
+        if (
+            currentUser.type === "speaker" ||
+            currentUser.type === "sponsor" ||
+            (currentUser.type === "mentor" && userApp && userApp.accepted)
+        ) {
             userRoutes.children = [
                 {
                     index: true,
                     path: paths.portal,
-                    element: <UserPage />,
+                    element: <HomePage />,
                 },
-            ];
-            setUserRoutes(userRoutes.children);
-            setRoutes(availableRoutes);
-            return cleanUp;
-        }
-
-        if (userApp && userApp.accepted && !currentUser.rsvpVerified) {
-            userRoutes.children = [
-                {
-                    path: paths.verifyRSVP,
-                    element: <VerifyRSVP />,
-                },
-            ];
-            setUserRoutes(userRoutes.children);
-            setRoutes(availableRoutes);
-            return cleanUp;
-        }
-
-        if (userApp && userApp.accepted && currentUser.rsvpVerified) {
-            // enable all routes
-            userRoutes.children = [
+                { path: paths.schedule, element: <SchedulePage /> },
                 {
                     path: paths.networking,
                     element: <NetworkingPage />,

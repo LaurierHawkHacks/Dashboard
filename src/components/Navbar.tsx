@@ -1,7 +1,3 @@
-import { GoHome } from "react-icons/go";
-import { PiCalendarCheckFill } from "react-icons/pi";
-import { TiGroup } from "react-icons/ti";
-import { PiIdentificationBadgeFill } from "react-icons/pi";
 import { RiDiscordLine } from "react-icons/ri";
 import { FiLogOut } from "react-icons/fi";
 import { useState, useEffect } from "react";
@@ -10,8 +6,14 @@ import Hamburger from "hamburger-react";
 import { Link } from "react-router-dom";
 import { Logo } from "@/assets";
 import { useAvailableRoutes } from "@/providers/routes.provider";
-import { CodeBracketIcon } from "@heroicons/react/24/outline";
-import { UserGroupIcon } from "@heroicons/react/24/solid";
+import {
+    CalendarDaysIcon,
+    CodeBracketIcon,
+    HomeIcon,
+    ShareIcon,
+    TicketIcon,
+    UserGroupIcon,
+} from "@heroicons/react/24/outline";
 
 export const Navbar = () => {
     const { logout } = useAuth();
@@ -19,22 +21,23 @@ export const Navbar = () => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { userRoutes, paths } = useAvailableRoutes();
+    const { currentUser } = useAuth();
     const navItems = {
         [paths.portal]: {
             label: "Home",
-            Icon: GoHome,
+            Icon: HomeIcon,
         },
         [paths.schedule]: {
             label: "Schedule",
-            Icon: PiCalendarCheckFill,
+            Icon: CalendarDaysIcon,
         },
         [paths.networking]: {
             label: "Networking",
-            Icon: TiGroup,
+            Icon: ShareIcon,
         },
-        [paths.ticket]: {
-            label: "Ticket",
-            Icon: PiIdentificationBadgeFill,
+        [paths.myTicket]: {
+            label: "My Ticket",
+            Icon: TicketIcon,
         },
         [paths.application]: {
             label: "Application",
@@ -62,6 +65,38 @@ export const Navbar = () => {
             .filter(({ path }) => !!navItems[path as string])
             .map(({ path }) => {
                 const { label, Icon } = navItems[path as string];
+                if (
+                    (path === paths.myTeam &&
+                        !window.localStorage.getItem(path)) ||
+                    (path === paths.myTicket &&
+                        !window.localStorage.getItem(path))
+                ) {
+                    return (
+                        <Link
+                            key={label}
+                            to={path as string}
+                            className="relative w-full"
+                        >
+                            <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
+                                {isMobile ? (
+                                    label
+                                ) : (
+                                    <>
+                                        <Icon className="w-8 h-8" />
+                                        <span className="relative hidden md:flex">
+                                            {label}
+                                            <span className="absolute flex h-2 w-2 top-0 -right-2 translate-x-full">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                                            </span>
+                                        </span>
+                                    </>
+                                )}
+                            </li>
+                        </Link>
+                    );
+                }
+
                 return (
                     <Link key={label} to={path as string} className="w-full">
                         <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
@@ -117,7 +152,7 @@ export const Navbar = () => {
                         }`}
                     >
                         <ul className="flex flex-col items-start justify-start">
-                            {renderNavItems(true)}
+                            {currentUser && renderNavItems(true)}
                             <a
                                 href="https://discord.com/invite/GxwvFEn9TB"
                                 target="_blank"
@@ -129,13 +164,15 @@ export const Navbar = () => {
                                 </li>
                             </a>
                         </ul>
-                        <button
-                            className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full flex items-center justify-start gap-2 hover:text-black"
-                            type="button"
-                            onClick={logout}
-                        >
-                            Sign out
-                        </button>
+                        {currentUser && (
+                            <button
+                                className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full flex items-center justify-start gap-2 hover:text-black"
+                                type="button"
+                                onClick={logout}
+                            >
+                                Sign out
+                            </button>
+                        )}
                     </div>
                 </>
             ) : (
@@ -162,7 +199,7 @@ export const Navbar = () => {
 
                     <aside className="flex flex-col items-start justify-between h-[90%]">
                         <ul className="flex flex-col items-start justify-start gap-4 w-full">
-                            {renderNavItems(false)}
+                            {currentUser && renderNavItems(false)}
                             <a
                                 href="https://discord.com/invite/GxwvFEn9TB"
                                 target="_blank"
@@ -175,15 +212,16 @@ export const Navbar = () => {
                                 </li>
                             </a>
                         </ul>
-
-                        <button
-                            className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full flex items-center justify-start gap-2 hover:text-black"
-                            type="button"
-                            onClick={logout}
-                        >
-                            <FiLogOut size={32} />
-                            <span className="hidden md:flex">Sign out</span>
-                        </button>
+                        {currentUser && (
+                            <button
+                                className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full flex items-center justify-start gap-2 hover:text-black"
+                                type="button"
+                                onClick={logout}
+                            >
+                                <FiLogOut size={32} />
+                                <span className="hidden md:flex">Sign out</span>
+                            </button>
+                        )}
                     </aside>
                 </nav>
             )}

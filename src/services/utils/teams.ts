@@ -1,7 +1,12 @@
 import { functions } from "@/services/firebase";
 import { handleError } from "@/services/utils";
 import { httpsCallable } from "firebase/functions";
-import type { CloudFunctionResponse, MemberData, TeamData } from "./types";
+import type {
+    CloudFunctionResponse,
+    Invitation,
+    MemberData,
+    TeamData,
+} from "./types";
 
 /**
  * Get the team the authenticated user belongs to.
@@ -161,6 +166,23 @@ export async function rejectInvitation(code: string) {
         return data;
     } catch (e) {
         await handleError(e as Error, "reject_invitation_error");
+        throw e;
+    }
+}
+
+/**
+ * Checks if an invitation exists or not
+ */
+export async function checkInvitation(code: string) {
+    try {
+        const fn = httpsCallable<unknown, CloudFunctionResponse<Invitation>>(
+            functions,
+            "checkInvitation"
+        );
+        const { data } = await fn({ code });
+        return data;
+    } catch (e) {
+        await handleError(e as Error, "check_invitation_error");
         throw e;
     }
 }

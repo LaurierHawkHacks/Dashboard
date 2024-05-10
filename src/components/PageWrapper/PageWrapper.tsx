@@ -7,10 +7,17 @@ import { useAvailableRoutes } from "@/providers/routes.provider";
 export const PageWrapper: FC<ComponentProps> = ({ children }) => {
     const location = useLocation();
     const { titles } = useAvailableRoutes();
-    const title = titles[location.pathname] ?? {
+
+    let title = titles[location.pathname] ?? {
         main: "Wow!",
         sub: "How did you end up here?",
     };
+    if (location.pathname.startsWith("/ticket")) {
+        title = {
+            main: "Networking",
+            sub: "A quick way to connect with new people at HawkHacks!",
+        };
+    }
 
     return (
         <div>
@@ -22,7 +29,7 @@ export const PageWrapper: FC<ComponentProps> = ({ children }) => {
                     <h1 className="text-xl md:text-4xl text-gray-800 font-bold font-sans">
                         {title.main}
                     </h1>
-                    <p className="text-md md:text-2xl text-gray-500 md:mt-4 font-sans whitespace-pre-line">
+                    <p className="text-md md:text-xl text-gray-500 md:mt-4 font-sans whitespace-pre-line">
                         {title.sub}
                     </p>
                     <p className="text-gray-800 mt-2">

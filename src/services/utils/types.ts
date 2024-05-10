@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 export interface UserTicketData {
     userId: string;
     firstName: string;
@@ -22,4 +24,57 @@ export interface CloudFunctionResponse<T> {
     status: number;
     message: string;
     data: T;
+}
+
+export interface Invitation {
+    owner: string; // the name of the owner
+    teamName: string;
+}
+
+export interface Socials {
+    instagram: string;
+    github: string;
+    linkedin: string;
+    discord: string;
+    resumeRef: string;
+    docId: string;
+    uid: string;
+}
+
+export interface TicketData {
+    firstName: string;
+    lastName: string;
+    pronouns: string;
+    instagram: string;
+    linkedin: string;
+    github: string;
+    discord: string;
+    resumeRef: string; // gs:// format ref
+}
+
+export interface ExtendedTicketData extends TicketData {
+    foods: string[]; // id of the food items
+    events: string[]; // id of the event items
+}
+
+export interface EventItem {
+    id: string;
+    title: string;
+    startTime: Timestamp;
+    endTime: Timestamp;
+    location: string;
+    description: string;
+    type: string;
+}
+
+export interface FoodItem {
+    id: string;
+    title: string;
+    time: Timestamp;
+    startTime?: Timestamp;
+    endTime?: Timestamp;
+    location: string;
+    description?: string;
+    type?: string;
+
 }

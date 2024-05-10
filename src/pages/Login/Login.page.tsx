@@ -134,6 +134,11 @@ export const LoginPage = () => {
             if (r.path && r.path.startsWith("/join-team")) return true;
             return r.path === from;
         });
+
+        if (from?.startsWith("/verify-email") && currentUser.emailVerified) {
+            return <Navigate to="/" />;
+        }
+
         return (
             <Navigate
                 to={from && from !== "/" && available ? from : routes.portal}

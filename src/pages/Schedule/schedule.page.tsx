@@ -1,133 +1,277 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useMemo } from 'react';
-import { useEpg, Epg, Layout, Program } from 'planby';
-import { eventsData, EventData } from './EventData';  // Import your event data
+import React, { useState, useMemo, useEffect, useRef } from "react";
+import { useEpg, Epg, Layout, ProgramItem, Theme } from "@nessprim/planby-pro";
+import { endOfDay, formatISO } from "date-fns";
+import { EventItem } from "@/services/utils/types";
+import { getRedeemableItems } from "@/services/utils";
 
-// Define the type for the date ranges
-type DateRangeKey = '2024-05-17' | '2024-05-18' | '2024-05-19';
-type DateRanges = Record<DateRangeKey, { start: Date; end: Date }>;
+import {
+    ProgramBox,
+    ProgramContent,
+    ProgramFlex,
+    ProgramStack,
+    ProgramTitle,
+    ProgramText,
+    ProgramImage,
+    useProgram,
+} from "planby";
 
+const CustomItem = ({
+    program,
+    onClick,
+    ...rest
+}: ProgramItem & { onClick: (program: ProgramItem) => void }) => {
+    const { isLive, isMinWidth, styles, formatTime, set12HoursTimeFormat } =
+        useProgram({
+            program,
+            ...rest,
+        });
 
-export const SchedulePage: React.FC = () => {
-    const channels = useMemo(() => [{
-        logo: ' ',
-        uuid: 'universal-channel', 
-    }], []);
-    
-    const planbyTheme = {
+    const { data } = program;
+    const { image, title, since, till, type } = data;
+
+    const sinceTime = formatTime(since, set12HoursTimeFormat()).toLowerCase();
+    const tillTime = formatTime(till, set12HoursTimeFormat()).toLowerCase();
+
+    return (
+        <ProgramBox
+            width={styles.width}
+            style={styles.position}
+            onClick={() => onClick(program)}
+        >
+            <ProgramContent width={styles.width} isLive={isLive}>
+                <ProgramFlex>
+                    {isLive && isMinWidth && (
+                        <ProgramImage src={image} alt="Preview" />
+                    )}
+                    <ProgramStack>
+                        <ProgramTitle>{title}</ProgramTitle>
+                        <ProgramText>
+                            {sinceTime} - {tillTime}
+                        </ProgramText>
+                    </ProgramStack>
+                </ProgramFlex>
+            </ProgramContent>
+        </ProgramBox>
+    );
+};
+
+const lightTheme: Theme = {
     primary: {
-        600: '#ffffff', 
-        900: '#ffffff', 
+        600: "#767d8a",
+        900: "#ffffff",
     },
     grey: {
-        300: '#fafafa',
-        500: '#cccccc', 
+        300: "#f5f5f5",
     },
-    white: '#4caf50', 
+    white: "#ffffff",
     green: {
-        300: '#4caf50', 
+        200: "#e0e0e0",
+        300: "#bdbdbd",
     },
     loader: {
-        teal: '#80cbc4',
-        purple: '#ce93d8',
-        pink: '#f48fb1',
-        bg: '#ffffff',
+        teal: "#80cbc4",
+        purple: "#ce93d8",
+        pink: "#f48fb1",
+        bg: "#ffffff",
     },
     scrollbar: {
-        border: '#dddddd',
+        border: "#e0e0e0",
         thumb: {
-            bg: '#cccccc',
+            bg: "#bdbdbd",
         },
     },
     gradient: {
         blue: {
-            300: '#e3f2fd', 
-            600: '#90caf9', 
-            900: '#42a5f5', 
+            300: "#d1d5db",
+            600: "#9ca3af",
+            900: "#6b7280",
         },
     },
     text: {
         grey: {
-            300: '#222222',
-            500: '#333333',
+            300: "#4b5563",
+            500: "#374151",
         },
     },
     timeline: {
         divider: {
-            bg: '#bdbdbd', 
+            bg: "#e0e0e0",
         },
     },
+    teal: {
+        100: ""
+    },
+    grid: {
+        item: "#e0e0e0",
+        divider: "#e0e0e0",
+        highlight: ""
+    }
 };
-      
-    const dateRanges: DateRanges = {
-        '2024-05-17': { start: new Date('2024-05-17T00:00:00'), end: new Date('2024-05-17T23:59:59') },
-        '2024-05-18': { start: new Date('2024-05-18T00:00:00'), end: new Date('2024-05-18T23:59:59') },
-        '2024-05-19': { start: new Date('2024-05-19T00:00:00'), end: new Date('2024-05-19T23:59:59') },
-    };
-
-    const [selectedDay, setSelectedDay] = useState<DateRangeKey>('2024-05-17');
-
-
-    const filteredEpg = useMemo(() => eventsData.filter(event =>
-        event.date >= dateRanges[selectedDay].start && event.date <= dateRanges[selectedDay].end
-    ).map((event): Program => ({
-        channelUuid: 'universal-channel',
-        id: event.title.replace(/\s+/g, '-'),
-        title: event.title,
-        description: event.description,
-        image: '',
-        since: event.date.toISOString(),
-        till: new Date(event.date.getTime() + event.duration * 3600000).toISOString(),
-        className: `bg-${event.color}` 
-    })), [selectedDay, eventsData]); 
     
-    
+function calculateInitialScrollPositions(startTime: string | number | Date) {
+    const startDate = new Date(startTime);
+    const hourWidth = 2900 / 24;
+    const scrollLeft = (startDate.getHours() + startDate.getMinutes() / 60) * hourWidth;
+    return { top: 0, left: scrollLeft };
+}
 
-    const handleDayChange = (day: DateRangeKey) => {
-    setSelectedDay(day);
-    };
+export const SchedulePage: React.FC = () => {
 
-    const {
-        getEpgProps,
-        getLayoutProps,
-    } = useEpg({
-        epg: filteredEpg,
-        channels,
-        startDate: dateRanges[selectedDay].start.toISOString(),
-        endDate: dateRanges[selectedDay].end.toISOString(),
-        height: 600,
-        isBaseTimeFormat: true,   
-
+    const [eventsByDay, setEventsByDay] = useState<{ [key: string]: EventItem[] }>({
+        '2024-05-17': [],
+        '2024-05-18': [],
+        '2024-05-19': [],
     });
+
+    //for the day selection button
+    const [selectedDay, setSelectedDay] = useState('2024-05-17');
+    // for the search bar
+    const [searchTerm, setSearchTerm] = useState('');  
+    //dropdown for search bar
+    const [showDropdown, setShowDropdown] = useState(false);
+
+
+    const filteredEvents = useMemo(() => {
+        if (!searchTerm) {
+            setShowDropdown(false);
+            return [];
+        }
+        let allEvents: any[] = [];
+        Object.values(eventsByDay).forEach(dayEvents => {
+            allEvents = allEvents.concat(dayEvents);
+        });
+        const filtered = allEvents.filter(event =>
+            event.title.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setShowDropdown(filtered.length > 0);
+        return filtered;
+    }, [eventsByDay, searchTerm]);
+
+    
+    const epg = useMemo(() => {
+        return eventsByDay[selectedDay].map((e) => ({
+            channelUuid: e.type,
+            id: e.id,
+            title: e.title,
+            description: e.description,
+            since: formatISO(e.startTime.toDate()),
+            till: formatISO(e.endTime.toDate()),
+            image: "",
+        }));
+    }, [eventsByDay, selectedDay, filteredEvents]);
+
+    const { getEpgProps, getLayoutProps } = useEpg({
+        epg,
+        channels: [
+            { logo: "", uuid: "Important" },
+            { logo: "", uuid: "Workshop" },
+            { logo: "", uuid: "Food" },
+            { logo: "", uuid: "Game/Chill" },
+            { logo: "", uuid: "Networking" },
+        ],
+        startDate: `${selectedDay}T00:00:00-04:00`,
+        endDate: `${selectedDay}T23:59:59-04:00`,
+        height: 600,
+        dayWidth: 2900,
+        isBaseTimeFormat: true,
+        isCurrentTime: true,
+        timezone: { enabled: true, mode: "est", zone: "America/Toronto" },
+        grid: { enabled: true },
+        overlap: { enabled: true, mode: "stack" },
+        isTimeline: true,
+        timelineHeight: 60,
+        itemHeight: 70,
+        isInitialScrollToNow: false,
+        initialScrollPositions: epg.length > 0 ? calculateInitialScrollPositions(epg[0].since) : undefined,
+        isSidebar: false,
+        theme: lightTheme,
+    });
+
+      useEffect(() => {
+        const fetchAllData = async () => {
+            const days = ['2024-05-17', '2024-05-18', '2024-05-19'];
+            const eventsByDayTemp = {};
+            for (const day of days) {
+                const [events] = await getRedeemableItems(day);
+                eventsByDayTemp[day] = events;
+            }
+            setEventsByDay(eventsByDayTemp);
+        };
+        fetchAllData();
+    }, []);
 
     const DayButtons = () => (
         <div className="flex justify-evenly mb-5">
-            {Object.keys(dateRanges).map(day => (
+            {Object.keys(eventsByDay).map(day => (
                 <button
                     key={day}
                     className={`px-6 py-3 hover:text-charcoalBlack focus:outline-none
-                               ${selectedDay === day 
-                                 ? 'text-2xl border-b-4 border-orange-500 text-charcoalBlack font-bold' 
-                                 : 'text-2xl text-gray-500'}`}
-                    onClick={() => handleDayChange(day as DateRangeKey)}
+                                ${selectedDay === day 
+                                  ? 'text-2xl border-b-4 border-orange-500 text-charcoalBlack font-bold' 
+                                  : 'text-2xl text-gray-500'}`}
+                    onClick={() => setSelectedDay(day)}
                 >
-                    {new Date(day).toLocaleDateString(undefined, { weekday: 'long'})}
+                    {new Date(day).toLocaleDateString(undefined, { weekday: 'long' })}
                 </button>
             ))}
         </div>
     );
-    
+
     return (
-        <div className="bg-white rounded-lg drop-shadow-lg p-6 mb-6 text-gray-900">
-            <h1 className="text-sm pb-9">HawkHacks Hackathon starts at XX:XXPM! All times are in EST.</h1>
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6 text-gray-800">
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-lg font-semibold">
+                    HawkHacks Hackathon starts at XX:XXPM! All times are in EST.
+                </h1>
+                <div className="relative">
+                    <input
+                        type="text"
+                        placeholder="Search for something!"
+                        className="form-input rounded-full px-4 py-3 pl-10 w-96 border-none bg-search-bar text-gray-700"
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                    />
+                    <svg className="w-4 h-4 absolute left-3 top-4 text-gray-600" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    {showDropdown && (
+                        <div className="absolute z-10 w-full bg-white shadow-lg max-h-60 overflow-auto">
+                            {filteredEvents.map(event => (
+                                <div
+                                    key={event.id}
+                                    className="p-2 hover:bg-gray-200 cursor-pointer"
+                                    onClick={() => {
+                                        setSearchTerm(event.title);
+                                        setShowDropdown(false);
+                                    }}
+                                >
+                                    {event.title} - {new Date(event.startTime.toDate()).toLocaleDateString()}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
             <DayButtons />
             <div>
-                <Epg {...getEpgProps()} theme={planbyTheme}>
-                    <Layout {...getLayoutProps()} />
+                <Epg {...getEpgProps()}>
+                    <Layout
+                        {...getLayoutProps()}
+                        renderProgram={({ program, ...rest }) => (
+                            <CustomItem
+                                key={program.data.id}
+                                program={program}
+                                onClick={() => {
+                                    //something for the modal
+                                }}
+                                {...rest}
+                            />
+                        )}
+                    />
                 </Epg>
             </div>
         </div>
     );
-    
-
 };

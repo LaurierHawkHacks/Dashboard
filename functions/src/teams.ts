@@ -77,6 +77,7 @@ async function internalGetTeamByUser(uid: string): Promise<Team | undefined> {
         .firestore()
         .collection(USER_PROFILES_COLLECTION)
         .where("uid", "==", uid)
+        .where("teamId", "!=", "")
         .get();
     const profile = profileSnap.docs[0]?.data() as UserProfile | undefined;
     if (!profile || !profile.teamId) {
@@ -308,9 +309,10 @@ export const createTeam = functions.https.onCall(async (data, context) => {
             .firestore()
             .collection(USER_PROFILES_COLLECTION)
             .where("uid", "==", context.auth.uid)
+            .where("teamId", "==", "")
             .get();
-        const userProfile = snap.docs[0]?.data() as UserProfile | undefined;
-        if (!userProfile) {
+        const doc = snap.docs[0];
+        if (!doc) {
             functions.logger.info("User profile not found, creating one...", {
                 func,
             });
@@ -325,6 +327,13 @@ export const createTeam = functions.https.onCall(async (data, context) => {
                     uid: context.auth.uid,
                 } as UserProfile);
             functions.logger.info("User profile created.", { func });
+        } else {
+            functions.logger.info("User profile found, updating...", { func });
+            await admin
+                .firestore()
+                .collection(USER_PROFILES_COLLECTION)
+                .doc(doc.id)
+                .update({ teamId });
         }
     } catch (error) {
         functions.logger.error("Failed to check user profile", { error, func });
@@ -463,6 +472,30 @@ export const inviteMember = functions.https.onCall(async (data, context) => {
         );
         return response(HttpStatus.NOT_FOUND, {
             message: "Could not send invitation.",
+        });
+    }
+
+    if (!userRecord.customClaims?.rsvpVerified) {
+        return response(HttpStatus.NOT_FOUND, {
+            message: "Could not send invitation.",
+        });
+    }
+
+    // found out if user already belongs to a team
+    try {
+        const team = await internalGetTeamByUser(userRecord.uid);
+        if (team) {
+            return response(HttpStatus.NOT_FOUND, {
+                message: "Could not send invitation.",
+            });
+        }
+    } catch (e) {
+        functions.logger.error(
+            "Failed to check if invitation is for a user who does not have a team.",
+            { error: e, func }
+        );
+        return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+            message: "Service Down (team-invitation)",
         });
     }
 
@@ -693,6 +726,19 @@ export const removeMembers = functions.https.onCall(async (data, context) => {
         deleteSnap.forEach((doc) => {
             batch.update(doc.ref, { teamId: "" });
         });
+
+        // delete any invitation sent to the members
+        const invitationSnap = await admin
+            .firestore()
+            .collection(INVITATIONS_COLLECTION)
+            .where("email", "in", data.emails)
+            .where("teamId", "==", team.id)
+            .get();
+        invitationSnap.forEach((doc) => {
+            functions.logger.info("invitation:", doc.id);
+            batch.delete(doc.ref);
+        });
+
         await batch.commit();
     } catch (error) {
         functions.logger.error(
@@ -783,7 +829,7 @@ export const validateTeamInvitation = functions.https.onCall(
                 "Checking if invitation is for requesting user",
                 { func }
             );
-            const snap = await admin
+            let snap = await admin
                 .firestore()
                 .collection(INVITATIONS_COLLECTION)
                 .where("invitationId", "==", data.code)
@@ -800,6 +846,24 @@ export const validateTeamInvitation = functions.https.onCall(
                     message: "Invitation does not exists or expired.",
                 });
             }
+
+            // make sure we only add someone who is not in a team
+            snap = await admin
+                .firestore()
+                .collection(USER_PROFILES_COLLECTION)
+                .where("uid", "==", context.auth.uid)
+                .where("teamId", "!=", "")
+                .get();
+            if (snap.size > 0) {
+                functions.logger.info(
+                    "Requesting user belongs to a team already.",
+                    { func }
+                );
+                return response(HttpStatus.BAD_REQUEST, {
+                    message: "Invitation does not exists or expired.",
+                });
+            }
+
             // if we found a member, then it is for the requesting user
             // now we update the status of the member
             functions.logger.info("Updating invitation status", { func });
@@ -932,53 +996,81 @@ export const rejectInvitation = functions.https.onCall(
             });
         }
 
-        // update user profile
-        try {
-            functions.logger.info(
-                "Checking if requesting user has a profile...",
-                { func }
-            );
-            const snap = await admin
-                .firestore()
-                .collection(USER_PROFILES_COLLECTION)
-                .where("uid", "==", context.auth.uid)
-                .get();
-            if (!snap.docs[0]) {
-                functions.logger.info(
-                    "Requesting user has no profile, creating...",
-                    { func }
-                );
-                await admin
-                    .firestore()
-                    .collection(USER_PROFILES_COLLECTION)
-                    .add({
-                        firstName: invitation.firstName,
-                        lastName: invitation.lastName,
-                        email: invitation.email,
-                        teamId: "",
-                        uid: context.auth.uid,
-                    } as UserProfile);
-            } else {
-                functions.logger.info(
-                    "Found user profile, updating teamId...",
-                    { func }
-                );
-                await admin
-                    .firestore()
-                    .collection(USER_PROFILES_COLLECTION)
-                    .doc(snap.docs[0].id)
-                    .update({ teamId: "" });
-            }
-        } catch (error) {
-            functions.logger.error("Failed to update user profile", {
-                func,
-                error,
-            });
-            return response(HttpStatus.INTERNAL_SERVER_ERROR, {
-                message: "Failed to reject invitation.",
-            });
-        }
-
         return response(HttpStatus.OK, { message: "Invitation rejected." });
     }
 );
+
+export const checkInvitation = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        return response(HttpStatus.UNAUTHORIZED, { message: "Unauthorized" });
+    }
+
+    if (!z.string().uuid().safeParse(data.code).success) {
+        return response(HttpStatus.BAD_REQUEST, { message: "Bad Request" });
+    }
+
+    try {
+        const snap = await admin
+            .firestore()
+            .collection(INVITATIONS_COLLECTION)
+            .where("invitationId", "==", data.code)
+            .where("userId", "==", context.auth.uid)
+            .get();
+        const doc = snap.docs[0];
+        if (!doc) {
+            return response(HttpStatus.NOT_FOUND, { message: "Not Found" });
+        }
+
+        // make sure requesting user is not in a team already
+        const profileDoc = (
+            await admin
+                .firestore()
+                .collection(USER_PROFILES_COLLECTION)
+                .where("uid", "==", context.auth.uid)
+                .where("teamId", "!=", "")
+                .get()
+        ).docs[0];
+        if (profileDoc) {
+            return response(HttpStatus.NOT_FOUND, { message: "Not Found" });
+        }
+
+        const teamDoc = await admin
+            .firestore()
+            .collection(TEAMS_COLLECTION)
+            .doc(doc.data().teamId)
+            .get();
+        if (!teamDoc.exists) {
+            return response(HttpStatus.NOT_FOUND, { message: "Not Found" });
+        }
+
+        const team = teamDoc.data() as Team;
+
+        const ownerDetails = (
+            await admin
+                .firestore()
+                .collection(USER_PROFILES_COLLECTION)
+                .where("uid", "==", team.owner)
+                .where("teamId", "==", team.id)
+                .get()
+        ).docs[0]?.data();
+        if (!ownerDetails) {
+            return response(HttpStatus.NOT_FOUND, { message: "Not Found" });
+        }
+
+        return response(HttpStatus.OK, {
+            message: "ok",
+            data: {
+                teamName: team.name,
+                owner: `${ownerDetails.firstName} ${ownerDetails.lastName}`,
+            },
+        });
+    } catch (e) {
+        functions.logger.error("Failed to check invitation.", {
+            error: e,
+            func: "checkInvitation",
+        });
+        return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+            message: "Service Down (invitation) ",
+        });
+    }
+});

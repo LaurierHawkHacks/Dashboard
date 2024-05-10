@@ -27,6 +27,7 @@ import {
     XCircleIcon,
 } from "@heroicons/react/24/solid";
 import { Modal } from "@/components/Modal";
+import { useAvailableRoutes } from "@/providers/routes.provider";
 
 type SearchTeamNameFn = (name: string) => Promise<void>;
 
@@ -58,6 +59,7 @@ export const MyTeamPage = () => {
         250
     );
     const loadingTimeoutRef = useRef<number | null>(null);
+    const { paths } = useAvailableRoutes();
 
     const submitNewTeam: FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
@@ -111,20 +113,31 @@ export const MyTeamPage = () => {
         if (team && team.members.some((m) => m.email === email)) return;
         setDisableAllActions(true);
         try {
-            const { data } = await inviteMember(email);
-            showNotification({
-                title: "Invitation Sent!",
-                message: "",
-            });
-            setEmail("");
-            if (data && team) {
+            const { status, data } = await inviteMember(email);
+            if (status === 201 && data && team) {
                 const newTeam = { ...team };
                 newTeam.members.push(data);
                 setTeam(newTeam);
+                setEmail("");
+                showNotification({
+                    title: "Invitation Sent!",
+                    message: "",
+                });
+            } else if (status === 404) {
+                showNotification({
+                    title: "Error Sending Invitation",
+                    message:
+                        "This email doesn't match our records of accepted hackers. Make sure you've typed their email correctly, and that they've already RSVP'd.",
+                });
+            } else {
+                showNotification({
+                    title: "Error Sending Invitation",
+                    message: "Please try again later.",
+                });
             }
         } catch (e) {
             showNotification({
-                title: "Error Sending Invitations",
+                title: "Error Sending Invitation",
                 message: `Please try again later. (${(e as Error).message})`,
             });
         } finally {
@@ -266,6 +279,10 @@ export const MyTeamPage = () => {
                 });
             }
         })();
+    }, []);
+
+    useEffect(() => {
+        window.localStorage.setItem(paths.myTeam, "visited");
     }, []);
 
     if (isLoading) return <LoadingAnimation />;

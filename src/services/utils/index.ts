@@ -11,7 +11,13 @@ import {
     orderBy,
 } from "firebase/firestore";
 import { firestore, functions, storage } from "@/services/firebase";
-import type { UserTicketData } from "@/services/utils/types";
+import type {
+    CloudFunctionResponse,
+    UserTicketData,
+    Socials,
+    EventItem,
+    FoodItem,
+} from "@/services/utils/types";
 import { ApplicationData } from "@/components/forms/types";
 import { httpsCallable } from "firebase/functions";
 import { getBlob, getMetadata, ref, uploadBytes } from "firebase/storage";
@@ -223,5 +229,96 @@ export async function verifyRSVP() {
             stack: (e as Error).stack,
         });
         return false;
+    }
+}
+
+export async function getSocials() {
+    const fn = httpsCallable<unknown, CloudFunctionResponse<Socials>>(
+        functions,
+        "requestSocials"
+    );
+    try {
+        const res = await fn();
+        const data = res.data;
+        return data;
+    } catch (e) {
+        handleError(e as Error, "error_get_socials");
+        throw e;
+    }
+}
+
+export async function updateSocials(socials: Socials) {
+    const fn = httpsCallable<unknown, CloudFunctionResponse<Socials>>(
+        functions,
+        "updateSocials"
+    );
+    try {
+        const res = await fn(socials);
+        const data = res.data;
+        return data;
+    } catch (e) {
+        handleError(e as Error, "error_update_socials");
+        throw e;
+    }
+}
+
+export async function getRedeemableItems(date: string): Promise<[EventItem[], FoodItem[]]> {
+    try {
+        // Parse the date string and create start/end times for the query
+        const startOfDay = new Date(date);
+        startOfDay.setHours(0, 0, 0, 0);  // Set to start of the day
+        const endOfDay = new Date(date);
+        endOfDay.setHours(23, 59, 59, 999);  // Set to end of the day
+
+        // Firestore queries with time filtering
+        const eventsQ = query(
+            collection(firestore, "events"),
+            where("startTime", ">=", startOfDay),
+            where("startTime", "<=", endOfDay),
+            orderBy("startTime", "asc")
+        );
+        const foodsQ = query(
+            collection(firestore, "foods"),
+            where("time", ">=", startOfDay),
+            where("time", "<=", endOfDay),
+            orderBy("time", "asc")
+        );
+
+        // Fetch the documents from Firestore
+        const [eventSnap, foodSnap] = await Promise.all([
+            getDocs(eventsQ),
+            getDocs(foodsQ),
+        ]);
+
+        const events: EventItem[] = [];
+        const foods: FoodItem[] = [];
+
+        eventSnap.forEach((doc) => events.push(doc.data() as EventItem));
+        foodSnap.forEach((doc) => foods.push(doc.data() as FoodItem));
+
+        return [events, foods];
+    } catch (e) {
+        handleError(e as Error, "error_getting_redeemable_items");
+        throw e;
+    }
+}
+
+
+export async function redeemItem(
+    ticketId: string,
+    itemId: string,
+    type: "event" | "food"
+) {
+    const fn = httpsCallable<unknown, CloudFunctionResponse<void>>(
+        functions,
+        "redeemItem"
+    );
+    try {
+        const res = await fn({ ticketId, itemId, type });
+        const data = res.data;
+        return data;
+    } catch (e) {
+        handleError(e as Error, "error_update_socials");
+        throw e;
     }
 }

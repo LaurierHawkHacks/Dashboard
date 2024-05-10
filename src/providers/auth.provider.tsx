@@ -22,10 +22,13 @@ import type { User, AuthProvider as FirebaseAuthProvider } from "firebase/auth";
 import type { NotificationOptions } from "@/providers/types";
 import type { ApplicationData } from "@/components/forms/types";
 
+type UserType = "hacker" | "mentor" | "volunteer" | "speaker" | "sponsor";
+
 export interface UserWithClaims extends User {
     hawkAdmin: boolean;
     phoneVerified: boolean;
     rsvpVerified: boolean;
+    type: UserType;
 }
 
 export type ProviderName = "github" | "google" | "apple";
@@ -62,12 +65,12 @@ const AuthContext = createContext<AuthContextValue>({
  */
 async function validateUser(user: User): Promise<UserWithClaims> {
     const { claims } = await user.getIdTokenResult(true);
-    console.log(claims);
     return {
         ...user,
         hawkAdmin: Boolean(claims.admin),
         phoneVerified: Boolean(claims.phoneVerified),
         rsvpVerified: Boolean(claims.rsvpVerified),
+        type: (claims?.type as UserType) ?? "hacker",
     };
 }
 
@@ -256,7 +259,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
                         showNotification({
                             title: "Error Verifying Email",
                             message:
-                                "Please log out and log in again. If problem persists, please contact us via email: 'development@hawkhacks.ca'",
+                                "Please log out and log in again. If problem persists, please contact us in our Discord support channel.",
                         });
                     }
                 }
@@ -285,16 +288,8 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     const reloadUser = async () => {
         if (auth.currentUser) {
             await auth.currentUser.reload();
-            if (auth.currentUser.emailVerified) {
-                const userWithRole = await validateUser(auth.currentUser);
-                setCurrentUser(userWithRole);
-            } else {
-                showNotification({
-                    title: "Email Not Verified",
-                    message:
-                        "It seems that the email has not been verified yet. If you already did, please wait to resend the email.",
-                });
-            }
+            const userWithRole = await validateUser(auth.currentUser);
+            setCurrentUser(userWithRole);
         }
     };
 

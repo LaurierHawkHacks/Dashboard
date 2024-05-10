@@ -7,6 +7,9 @@ import CloudLL from "./cloudLL.svg";
 import AirBalloon from "./air-balloon.svg";
 import GoldenHawk from "./goldenHawk.svg";
 import IpadKidHawks from "./ipadKidHawks.svg";
+import GoogleWalletBadge from "./googe-wallet-badge.svg";
+import AppleWalletBadge from "./add-to-apple-wallet-logo.png";
+import LoadingDots from "./loading.svg";
 
 export {
     Logo,
@@ -18,6 +21,9 @@ export {
     AirBalloon,
     GoldenHawk,
     IpadKidHawks,
+    GoogleWalletBadge,
+    AppleWalletBadge,
+    LoadingDots,
 };
 
 /**

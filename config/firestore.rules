@@ -15,11 +15,7 @@ service cloud.firestore {
     }
 
   match /databases/{database}/documents {
-    // Allow read/write access to the user owns documents
-    // Allow read/write access if
-    // 1. document is new
-    // 2. document is not new and user is owner
-    match /users/{documentId} {
+    match /socials/{documentId} {
       allow read: if isAuthenticated() && (isAdmin() || isOwner(resource.data.id));
       allow write: if isAuthenticated() && isAdmin();
     }
@@ -32,12 +28,18 @@ service cloud.firestore {
         allow write: if isAuthenticated() && isAdmin();
     }
 
+    match /passClasses/{passClassId} {
+        // Only grant read perms to owner/admin
+        allow read: if isAuthenticated() && (isAdmin() || isOwner(resource.data.userId));
+        // Only grant write perms to admin
+        allow write: if isAuthenticated() && isAdmin();
+    }
+
     // Applications Collection Rules
     match /applications/{applicationId} {
         // Only grant read access if you are owner/admin
         allow read: if isAuthenticated() && (isAdmin() || isOwner(resource.data.applicantId));
-        allow create: if isAuthenticated();
-        allow update: if isAuthenticated() && isAdmin();
+        allow write: if isAuthenticated() && isAdmin();
     }
 
     // Teams Collection Rules
@@ -54,6 +56,18 @@ service cloud.firestore {
         // Only grant read access if you are owner/admin
         allow read: if isAuthenticated() && (isOwner(resource.data.uid));
         allow write: if isAuthenticated();
+    }
+
+    match /events/{eventId} {
+        // Only grant read access if you are owner/admin
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated() && isAdmin();
+    }
+
+    match /foods/{foodId} {
+        // Only grant read access if you are owner/admin
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated() && isAdmin();
     }
 
     match /applications-dev/{applicationId} {

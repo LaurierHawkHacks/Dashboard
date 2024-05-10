@@ -1,11 +1,14 @@
-import { Button } from "@/components";
+import { Button, LoadingAnimation } from "@/components";
+import { useAuth } from "@/providers/auth.provider";
 import { useNotification } from "@/providers/notification.provider";
 import { useAvailableRoutes } from "@/providers/routes.provider";
 import {
+    checkInvitation,
     rejectInvitation,
     validateTeamInvitation,
 } from "@/services/utils/teams";
-import { useState } from "react";
+import { Invitation } from "@/services/utils/types";
+import { useEffect, useRef, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 export const JoinTeamPage = () => {
@@ -14,6 +17,12 @@ export const JoinTeamPage = () => {
     const navigate = useNavigate();
     const { showNotification } = useNotification();
     const { paths: routes } = useAvailableRoutes();
+    const { currentUser } = useAuth();
+    const [invitationData, setInvitationData] = useState<Invitation | null>(
+        null
+    );
+    const [isLoading, setIsLoading] = useState(true);
+    const timeoutRef = useRef<number | null>(null);
 
     const accept = async () => {
         if (!invitationId) return;
@@ -69,26 +78,66 @@ export const JoinTeamPage = () => {
         }
     };
 
+    useEffect(() => {
+        if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+        timeoutRef.current = window.setTimeout(() => {
+            setIsLoading(false);
+        }, 1500);
+
+        if (!invitationId || !currentUser) return;
+
+        (async () => {
+            // check if invitation exists or not
+            try {
+                const data = await checkInvitation(invitationId);
+                if (data.status === 200) {
+                    setInvitationData(data.data);
+                    if (timeoutRef.current)
+                        window.clearTimeout(timeoutRef.current);
+                    setIsLoading(false);
+                } else if (data.status !== 404) {
+                    showNotification({
+                        title: "Error",
+                        message:
+                            "Please make sure you this link from an invitation or request a new one.",
+                    });
+                }
+            } catch {
+                showNotification({
+                    title: "Error",
+                    message:
+                        "Please make sure you this link from an invitation or request a new one.",
+                });
+            }
+        })();
+    }, [invitationId, currentUser]);
+
+    if (isLoading) return <LoadingAnimation />;
+
     // return to home page
     if (!invitationId) return <Navigate to={routes.portal} />;
+
+    if (!invitationData) return <Navigate to={routes.notFound} />;
 
     return (
         <div className="h-screen w-screen flex items-center justify-center">
             <div className="space-y-6">
                 <h1 className="block text-lg font-bold text-center">
-                    Invitation to join team!
+                    {`${invitationData.owner} invitated to join ${invitationData.teamName}`}
                 </h1>
-                <div className="flex items-center justify-between gap-4">
-                    <Button disabled={disableButtons} onClick={accept}>
-                        Accept
-                    </Button>
-                    <Button
-                        disabled={disableButtons}
-                        onClick={reject}
-                        intent="secondary"
-                    >
-                        Reject
-                    </Button>
+                <div>
+                    <div className="mx-auto flex items-center justify-center gap-12 max-w-lg">
+                        <Button disabled={disableButtons} onClick={accept}>
+                            Accept
+                        </Button>
+                        <Button
+                            disabled={disableButtons}
+                            onClick={reject}
+                            intent="secondary"
+                        >
+                            Reject
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div>
