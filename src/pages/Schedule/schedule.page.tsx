@@ -5,6 +5,8 @@ import { useEpg, Epg, Layout, ProgramItem, Theme } from "@nessprim/planby-pro";
 import { endOfDay, formatISO } from "date-fns";
 import { EventItem } from "@/services/utils/types";
 import { getRedeemableItems } from "@/services/utils";
+import { Modal } from "@/components/Modal";
+import { Button } from "@/components";
 
 import {
     ProgramBox,
@@ -27,7 +29,9 @@ const CustomItem = ({
             program,
             ...rest,
         });
-
+   
+   
+        
     const { data } = program;
     const { image, title, since, till, type } = data;
 
@@ -39,6 +43,7 @@ const CustomItem = ({
             width={styles.width}
             style={styles.position}
             onClick={() => onClick(program)}
+            
         >
             <ProgramContent width={styles.width} isLive={isLive}>
                 <ProgramFlex>
@@ -131,7 +136,27 @@ export const SchedulePage: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');  
     //dropdown for search bar
     const [showDropdown, setShowDropdown] = useState(false);
+    //for modal
+    const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
+    const handleEventClick = (event: EventItem) => {
+        setSelectedEvent(event);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedEvent(null);
+    };
+
+    const handleProgramClick = (programId: string) => {
+        const event = eventsByDay[selectedDay].find(e => e.id === programId);
+        if (event) {
+            handleEventClick(event);
+        }
+    };
+    
 
     const filteredEvents = useMemo(() => {
         if (!searchTerm) {
@@ -177,7 +202,7 @@ export const SchedulePage: React.FC = () => {
         dayWidth: 2900,
         isBaseTimeFormat: true,
         isCurrentTime: true,
-        timezone: { enabled: true, mode: "est", zone: "America/Toronto" },
+        timezone: { enabled: true, mode: "utc", zone: "America/Toronto" },
         grid: { enabled: true },
         overlap: { enabled: true, mode: "stack" },
         isTimeline: true,
@@ -245,6 +270,7 @@ export const SchedulePage: React.FC = () => {
                                     onClick={() => {
                                         setSearchTerm(event.title);
                                         setShowDropdown(false);
+                                        handleEventClick(event);
                                     }}
                                 >
                                     {event.title} - {new Date(event.startTime.toDate()).toLocaleDateString()}
@@ -254,6 +280,17 @@ export const SchedulePage: React.FC = () => {
                     )}
                 </div>
             </div>
+            {/* Modal for Event Details */}
+            {isModalOpen && selectedEvent && (
+                <Modal open={isModalOpen} onClose={handleCloseModal} title={""} subTitle={""}>
+                    <h2>{selectedEvent.title}</h2>
+                    <p>{selectedEvent.description}</p>
+                    <p>Location: {selectedEvent.location}</p>
+                    <p >Start Time: {selectedEvent.startTime.toLocaleString()}</p>
+                    <p>End Time: {selectedEvent.endTime.toLocaleString()}</p>
+                    <Button onClick={() => setIsModalOpen(false)}>Cool!</Button>
+                </Modal>
+            )}
             <DayButtons />
             <div>
                 <Epg {...getEpgProps()}>
@@ -264,7 +301,7 @@ export const SchedulePage: React.FC = () => {
                                 key={program.data.id}
                                 program={program}
                                 onClick={() => {
-                                    //something for the modal
+                                    handleProgramClick(program.data.id);
                                 }}
                                 {...rest}
                             />
