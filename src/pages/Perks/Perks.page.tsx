@@ -56,16 +56,16 @@ const PerksPage = () => {
         };
 
         const isFreeBubbleTea = perk.title.includes("Fantuan");
-
         const perkStyle = isFreeBubbleTea
-            ? {
-                  animation: "pulse 2s infinite",
-                  boxShadow: "0 0 0 0 rgba(255, 204, 0, 0.7)",
-                  borderColor: "#ffcc00",
-                  borderWidth: "2px",
-                  borderStyle: "solid",
-              }
-            : {};
+        ? {
+              animation: "pulse 2s infinite",
+              boxShadow: "0 0 0 0 rgba(255, 204, 0, 0.7)",
+              borderColor: "#0FA3B1",
+              borderWidth: "2px",
+              borderStyle: "solid",
+              background: "#0FA3B1",
+          }
+        : {};
 
 
             return (
@@ -75,11 +75,12 @@ const PerksPage = () => {
                 onClick={() => openPopup(perk)}
                 style={{ flexBasis: "33%", marginBottom: "16px", ...perkStyle }}
               >
-                {isFreeBubbleTea && (
-                  <div className="absolute top-2 left-2 bg-yellow-400 text-white py-1 px-3 rounded-full text-xs font-bold">
-                    FREE Bubble Tea!
-                  </div>
-                )}
+
+              {isFreeBubbleTea && (
+                    <div className="absolute top-2 left-2 bg-[#0FA3B1] text-white py-1 px-3 rounded-full text-xs font-bold">
+                      FREE Bubble Tea!
+                    </div>
+                  )}
                 <div className="w-40 h-24 mr-4 flex items-center justify-center">
                   <img
                     src={perk.image}
