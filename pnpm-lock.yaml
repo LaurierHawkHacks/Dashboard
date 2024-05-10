@@ -5,12 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
-  '@daypilot/daypilot-lite-javascript':
-    specifier: ^3.21.0
-    version: 3.21.0
-  '@daypilot/daypilot-lite-react':
-    specifier: ^3.21.0
-    version: 3.21.0(react-dom@18.2.0)(react@18.2.0)
   '@headlessui/react':
     specifier: ^1.7.18
     version: 1.7.18(react-dom@18.2.0)(react@18.2.0)
@@ -26,9 +20,6 @@ dependencies:
   date-fns:
     specifier: ^3.6.0
     version: 3.6.0
-  daypilot-pro-react:
-    specifier: https://npm.daypilot.org/daypilot-pro-react/trial/2024.1.5890.tar.gz
-    version: '@npm.daypilot.org/daypilot-pro-react/trial/2024.1.5890.tar.gz(react-dom@18.2.0)(react@18.2.0)'
   firebase:
     specifier: ^10.5.2
     version: 10.5.2
@@ -464,21 +455,6 @@ packages:
       enabled: 2.0.0
       kuler: 2.0.0
     dev: true
-
-  /@daypilot/daypilot-lite-javascript@3.21.0:
-    resolution: {integrity: sha512-H661HSL56hR4D+9ABwjVVha6m7uWVXDqeS4KunxDy2iLNDl50Vqa9wapQr34fyovjwZij6l7mzGRNgGblE4TYg==}
-    dev: false
-
-  /@daypilot/daypilot-lite-react@3.21.0(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-JrxaLxqvllZ5irG0sgVNqfhv718P/0UJBObGl2YT4+iLKZDEI29j5P6eat8MJUWYXTSzZHFnZS76DcLRJzKdmw==}
-    peerDependencies:
-      react: '>=16.0.0'
-      react-dom: '>=16.0.0'
-    dependencies:
-      create-react-class: 15.7.0
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-    dev: false
 
   /@emotion/babel-plugin@11.11.0:
     resolution: {integrity: sha512-m4HEDZleaaCH+XgDDsPF15Ht6wTLsgDTeR3WYj9Q/k76JtWhrJjcP4+/XlG8LGT/Rol9qUfOIztXeA84ATpqPQ==}
@@ -3022,13 +2998,6 @@ packages:
       crc-32: 1.2.2
       readable-stream: 3.6.2
     dev: true
-
-  /create-react-class@15.7.0:
-    resolution: {integrity: sha512-QZv4sFWG9S5RUvkTYWbflxeZX+JG7Cz0Tn33rQBJ+WFQTqTfUTjMjiv9tnfXazjsO5r0KhPs+AqCjyrQX6h2ng==}
-    dependencies:
-      loose-envify: 1.4.0
-      object-assign: 4.1.1
-    dev: false
 
   /cross-env@5.2.1:
     resolution: {integrity: sha512-1yHhtcfAd1r4nwQgknowuUNfIT9E8dOMMspC36g45dN+iD1blloi7xp8X/xAIDnjHWyt1uQ8PHk2fkNaym7soQ==}
@@ -6101,6 +6070,7 @@ packages:
   /object-assign@4.1.1:
     resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
     engines: {node: '>=0.10.0'}
+    dev: true
 
   /object-hash@3.0.0:
     resolution: {integrity: sha512-RSn9F68PjH9HqtltsSnqYC1XXoWe9Bju5+213R98cNGttag9q9yAOTzdbsqvIa7aNm5WffBZFpWYr2aWrklWAw==}
@@ -8555,18 +8525,4 @@ packages:
 
   /zod@3.22.4:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
-    dev: false
-
-  '@npm.daypilot.org/daypilot-pro-react/trial/2024.1.5890.tar.gz(react-dom@18.2.0)(react@18.2.0)':
-    resolution: {tarball: https://npm.daypilot.org/daypilot-pro-react/trial/2024.1.5890.tar.gz}
-    id: '@npm.daypilot.org/daypilot-pro-react/trial/2024.1.5890.tar.gz'
-    name: daypilot-pro-react
-    version: 2024.1.5890
-    peerDependencies:
-      react: '>=16.0.0'
-      react-dom: '>=16.0.0'
-    dependencies:
-      create-react-class: 15.7.0
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
     dev: false
