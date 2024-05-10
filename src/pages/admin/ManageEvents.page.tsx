@@ -2,11 +2,12 @@ import { Button, LoadingAnimation, Select, TextInput } from "@/components";
 import { useNotification } from "@/providers/notification.provider";
 import { getRedeemableItems } from "@/services/utils";
 import { EventItem, FoodItem } from "@/services/utils/types";
-import { format } from "date-fns";
+import { format, isAfter, parseISO } from "date-fns";
 import { Timestamp, doc, setDoc } from "firebase/firestore";
 import { FormEventHandler, useEffect, useRef, useState } from "react";
 import { nanoid } from "nanoid";
 import { firestore } from "@/services/firebase";
+import { z } from "zod";
 
 type KeyOfEventItem = keyof EventItem;
 type KeyOfFoodItem = keyof FoodItem;
@@ -22,8 +23,8 @@ export const AdminManageEventsPage = () => {
         location: "",
         type: "",
         id: "",
-        startTime: Timestamp.now(),
-        endTime: Timestamp.now(),
+        startTime: "",
+        endTime: "",
     });
     const [newFood, setNewFood] = useState<FoodItem>({
         title: "",
@@ -58,14 +59,9 @@ export const AdminManageEventsPage = () => {
         })();
     }, []);
 
-    const handleEventChange = (key: KeyOfEventItem, value: string | Date) => {
+    const handleEventChange = (key: KeyOfEventItem, value: string) => {
         const event = { ...newEvent };
-        if (key === "startTime" || key === "endTime") {
-            event[key] = Timestamp.fromDate(value as Date);
-        } else {
-            //@ts-ignore
-            event[key] = value;
-        }
+        event[key] = value;
         setNewEvent(event);
     };
 
@@ -82,6 +78,35 @@ export const AdminManageEventsPage = () => {
 
     const submitNewEvent: FormEventHandler = async (e) => {
         e.preventDefault();
+
+        // validate inputs
+        const res = z
+            .object({
+                title: z.string().min(1),
+                description: z.string(),
+                location: z.string().min(1),
+                type: z.string().min(1),
+                startTime: z.string().min(1),
+                endTime: z.string().min(1),
+            })
+            .safeParse(newEvent);
+        if (!res.success) {
+            showNotification({
+                title: "Missing fields in event input",
+                message: res.error.issues.map((i) => i.path).join("\n"),
+            });
+            return;
+        }
+
+        if (
+            !isAfter(parseISO(newEvent.endTime), parseISO(newEvent.startTime))
+        ) {
+            showNotification({
+                title: "Invalid date range",
+                message: "End date cannot be before start date.",
+            });
+            return;
+        }
 
         // generate new id
         const id = nanoid(16);
@@ -172,45 +197,29 @@ export const AdminManageEventsPage = () => {
                             "Networking",
                         ]}
                         initialValue={newEvent.type}
+                        onChange={(v) => {
+                            handleEventChange("type", v);
+                        }}
                     />
-                    <div>
-                        <label
-                            htmlFor="start-event-time-picker"
-                            className="block"
-                        >
-                            Start Date (EST)
-                        </label>
-                        <input
-                            type="datetime-local"
-                            id="start-event-time-picker"
-                            className="block"
-                            onChange={(e) =>
-                                handleEventChange(
-                                    "startTime",
-                                    new Date(e.target.value)
-                                )
-                            }
-                        />
-                    </div>
-                    <div>
-                        <label
-                            htmlFor="end-event-time-picker"
-                            className="block"
-                        >
-                            End Date (EST)
-                        </label>
-                        <input
-                            type="datetime-local"
-                            id="end-event-time-picker"
-                            className="block"
-                            onChange={(e) =>
-                                handleEventChange(
-                                    "endTime",
-                                    new Date(e.target.value)
-                                )
-                            }
-                        />
-                    </div>
+                    <TextInput
+                        label="Start Date (EST)"
+                        placeholder="2024-05-17T19:00:00"
+                        description="Example May 17, 2024 7:PM would be 2024-05-17T19:00:00"
+                        id="start-date-input"
+                        onChange={(e) => {
+                            handleEventChange("startTime", e.target.value);
+                        }}
+                    />
+                    <TextInput
+                        label="End Date (EST)"
+                        placeholder="2024-05-17T19:00:00"
+                        description="Example May 17, 2024 7:PM would be 2024-05-17T19:00:00"
+                        id="end-date-input"
+                        value={newEvent.endTime}
+                        onChange={(e) => {
+                            handleEventChange("endTime", e.target.value);
+                        }}
+                    />
                     <Button type="submit">Save</Button>
                 </form>
                 <form
@@ -271,14 +280,14 @@ export const AdminManageEventsPage = () => {
                                 <p className="font-medium">Start:</p>
                                 <p>
                                     {format(
-                                        evt.startTime.toDate(),
+                                        evt.startTime,
                                         "MMM dd, yyyy (hh:mma)"
                                     )}
                                 </p>
                                 <p className="font-medium">End:</p>
                                 <p>
                                     {format(
-                                        evt.endTime.toDate(),
+                                        evt.endTime,
                                         "MMM dd, yyyy (hh:mma)"
                                     )}
                                 </p>

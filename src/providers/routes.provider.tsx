@@ -16,6 +16,8 @@ import {
     HomePage,
     VerifyEmailPage,
     UserPage,
+    SchedulePage,
+    PerksPage,
 } from "@/pages";
 import { type RouteObject } from "react-router-dom";
 import { useAuth } from "./auth.provider";
@@ -46,6 +48,7 @@ interface PathObject {
     joinTeam: string;
     myApp: string;
     ticket: string;
+    perks: string;
 }
 
 interface Title {
@@ -80,6 +83,7 @@ const paths: PathObject = {
     joinTeam: "/join-team",
     myApp: "/my-application",
     ticket: "/ticket/:ticketId",
+    perks: "/perks",
 };
 
 const titles: Record<string, Title> = {
@@ -122,6 +126,10 @@ const titles: Record<string, Title> = {
     [paths.ticket]: {
         main: "View Ticket",
         sub: "Some good thing here",
+    },
+    [paths.perks]: {
+        main: "Perks",
+        sub: "Explore the amazing perks available at HawkHacks!",
     },
 };
 
@@ -201,6 +209,7 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                 path: paths.notFound,
                 element: <NotFoundPage />,
             },
+
             userRoutes,
         ];
 
@@ -232,13 +241,13 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
             });
             // enable all routes
             userRoutes.children.push(
-                { path: paths.schedule, element: <div>schedule</div> },
+                { path: paths.schedule, element: <SchedulePage /> },
+                { path: paths.myTicket, element: <TicketPage /> },
                 {
                     path: paths.networking,
                     element: <NetworkingPage />,
                 },
-                { path: paths.myTicket, element: <TicketPage /> },
-                { path: paths.myTeam, element: <MyTeamPage /> }
+                { path: paths.perks, element: <PerksPage /> }
             );
 
             setUserRoutes(userRoutes.children);
@@ -274,13 +283,14 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                         path: paths.portal,
                         element: <HomePage />,
                     },
-                    { path: paths.schedule, element: <div>schedule</div> },
+                    { path: paths.schedule, element: <SchedulePage /> },
                     {
                         path: paths.networking,
                         element: <NetworkingPage />,
                     },
                     { path: paths.myTicket, element: <TicketPage /> },
                     { path: paths.myTeam, element: <MyTeamPage /> },
+                    { path: paths.perks, element: <PerksPage /> },
                     {
                         path: `${paths.joinTeam}/:invitationId`,
                         element: <JoinTeamPage />, // dummy placeholder
@@ -301,12 +311,13 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                     path: paths.portal,
                     element: <HomePage />,
                 },
-                { path: paths.schedule, element: <div>schedule</div> },
+                { path: paths.schedule, element: <SchedulePage /> },
                 {
                     path: paths.networking,
                     element: <NetworkingPage />,
                 },
                 { path: paths.myTicket, element: <TicketPage /> },
+                { path: paths.perks, element: <PerksPage /> },
             ];
         }
 

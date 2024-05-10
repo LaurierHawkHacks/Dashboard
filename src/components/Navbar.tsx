@@ -1,5 +1,6 @@
 import { RiDiscordLine } from "react-icons/ri";
 import { FiLogOut } from "react-icons/fi";
+import { RxStar  } from "react-icons/rx";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/providers/hooks";
 import Hamburger from "hamburger-react";
@@ -47,6 +48,10 @@ export const Navbar = () => {
             label: "My Team",
             Icon: UserGroupIcon,
         },
+        [paths.perks]: {
+            label: "Perks",
+            Icon: RxStar,
+        },
     };
 
     const location = useLocation();
@@ -75,6 +80,8 @@ export const Navbar = () => {
                     (path === paths.myTeam &&
                         !window.localStorage.getItem(path)) ||
                     (path === paths.myTicket &&
+                        !window.localStorage.getItem(path)) ||
+                    (path === paths.perks &&
                         !window.localStorage.getItem(path))
                 ) {
                     return (

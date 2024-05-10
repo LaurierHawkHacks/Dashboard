@@ -3,6 +3,7 @@ import forms from "@tailwindcss/forms";
 /** @type {import('tailwindcss').Config} */
 export default {
     content: ["./index.html", "./src/**/*.{ts,tsx}"],
+    important: true,
     theme: {
         extend: {
             fontFamily: {
@@ -40,6 +41,12 @@ export default {
                 mutedYellow: "#FFE976",
                 stonePurple: "#D49DFF",
                 tbrand: "#32848C",
+                workshops: "#3160D9",
+                mandatories: "#23BCCA",
+                activities: "#AB8FF9",
+                sponsorRelated: "#F07584",
+                food: "#F0A975",
+                searchbar: "#FFEEE4",
                 "tbrand-hover": "#0FA3B1",
                 "tbrand-mouse-down": "#1D7882",
                 "tbrand-highlight": "#00CEDB",
@@ -66,7 +73,7 @@ export default {
             backgroundImage: {
                 "radial-gradient-peach":
                     "radial-gradient(116.17% 116.17% at 50% 1.3%, #F8DFD1 0%, #FFFFFF 100%)",
-                
+
                 "btn-gradient":
                     "linear-gradient(182.75deg, #2B6469 -10.16%, #00CEDB 202.3%)",
 

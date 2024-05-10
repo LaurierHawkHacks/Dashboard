@@ -1,11 +1,10 @@
 import { sponsorLinks } from "./sponsorLinks";
 import {
-    Solana,
+    Avalanche,
     Near,
     Fantuan,
     SmokesPoutinerie,
     Dominos,
-    Nibiru,
     Distributive,
 } from "@assets";
 
@@ -17,9 +16,9 @@ interface Sponsor {
 
 const sponsors: Sponsor[] = [
     {
-        name: "Solana",
-        link: sponsorLinks.solana,
-        image: Solana,
+        name: "Avalanche",
+        link: sponsorLinks.avalanche,
+        image: Avalanche,
     },
     {
         name: "Near",
@@ -41,11 +40,6 @@ const sponsors: Sponsor[] = [
         name: "Dominos",
         link: sponsorLinks.domino,
         image: Dominos,
-    },
-    {
-        name: "Nibiru",
-        link: sponsorLinks.nibiru,
-        image: Nibiru,
     },
     {
         name: "Distributive",
