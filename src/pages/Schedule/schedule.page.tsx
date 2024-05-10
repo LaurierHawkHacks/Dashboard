@@ -313,11 +313,11 @@ export const SchedulePage: React.FC = () => {
                             />
                         </svg>
                         {showDropdown && (
-                            <div className="absolute z-10 w-full bg-white shadow-lg max-h-60 overflow-auto">
+                            <div className="absolute border top-full translate-y-2 z-10 w-full bg-white shadow-xl max-h-60 overflow-auto rounded-lg">
                                 {filteredEvents.map((event) => (
                                     <div
                                         key={event.id}
-                                        className="p-2 hover:bg-gray-200 cursor-pointer"
+                                        className="p-4 hover:bg-gray-200 cursor-pointer"
                                         onClick={() => {
                                             setSearchTerm(event.title);
                                             setShowDropdown(false);
