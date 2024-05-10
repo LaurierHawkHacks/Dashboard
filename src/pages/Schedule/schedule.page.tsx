@@ -179,7 +179,7 @@ export const SchedulePage: React.FC = () => {
     const [activeProgram, setActiveProgram] = useState<Program | null>(null);
     const [openProgramDetailModal, setOpenProgramDetailModal] = useState(false);
     // for the search bar
-    const [searchTerm, setSearchTerm] = useState('');  
+    const [searchTerm, setSearchTerm] = useState("");
     //dropdown for search bar
     const [showDropdown, setShowDropdown] = useState(false);
 
@@ -190,10 +190,10 @@ export const SchedulePage: React.FC = () => {
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let allEvents: any[] = [];
-        Object.values(events).forEach(dayEvents => {
+        Object.values(events).forEach((dayEvents) => {
             allEvents = allEvents.concat(dayEvents);
         });
-        const filtered = allEvents.filter(event =>
+        const filtered = allEvents.filter((event) =>
             event.title.toLowerCase().includes(searchTerm.toLowerCase())
         );
         setShowDropdown(filtered.length > 0);
@@ -285,41 +285,52 @@ export const SchedulePage: React.FC = () => {
     return (
         <>
             <div className="bg-white rounded-lg shadow-md p-6 mb-6 text-gray-800">
-
                 <div className="flex justify-between items-center mb-4">
-                <h1 className="text-lg mb-4">
-                    HawkHacks Hackathon starts at XX:XXPM! All times are in EST.
-                </h1>
-                <div className="relative">
-                    <input
-                        type="text"
-                        placeholder="Search for something!"
-                        className="form-input rounded-full px-4 py-3 pl-10 w-96 border-none bg-searchbar text-gray-700"
-                        value={searchTerm}
-                        onChange={e => setSearchTerm(e.target.value)}
-                    />
-                    <svg className="w-4 h-4 absolute left-3 top-4 text-gray-600" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    {showDropdown && (
-                        <div className="absolute z-10 w-full bg-white shadow-lg max-h-60 overflow-auto">
-                            {filteredEvents.map(event => (
-                                <div
-                                    key={event.id}
-                                    className="p-2 hover:bg-gray-200 cursor-pointer"
-                                    onClick={() => {
-                                        setSearchTerm(event.title);
-                                        setShowDropdown(false);
-                                 
-                                    }}
-                                >
-                                    {event.title} - {new Date(event.startTime.toDate()).toLocaleDateString()}
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                    <h1 className="text-lg mb-4">
+                        HawkHacks Hackathon starts at XX:XXPM! All times are in
+                        EST.
+                    </h1>
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder="Search for something!"
+                            className="form-input rounded-full px-4 py-3 pl-10 w-96 border-none bg-searchbar text-gray-700"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <svg
+                            className="w-4 h-4 absolute left-3 top-4 text-gray-600"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            />
+                        </svg>
+                        {showDropdown && (
+                            <div className="absolute z-10 w-full bg-white shadow-lg max-h-60 overflow-auto">
+                                {filteredEvents.map((event) => (
+                                    <div
+                                        key={event.id}
+                                        className="p-2 hover:bg-gray-200 cursor-pointer"
+                                        onClick={() => {
+                                            setSearchTerm(event.title);
+                                            setShowDropdown(false);
+                                        }}
+                                    >
+                                        {event.title} -{" "}
+                                        {format(event.startTime, "hh:mma")}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </div>
                 <div>
                     <div className="grid grid-cols-3">
                         <DayButton active={day === 0} onClick={() => setDay(0)}>
