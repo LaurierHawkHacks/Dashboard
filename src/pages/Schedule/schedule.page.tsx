@@ -286,8 +286,7 @@ export const SchedulePage: React.FC = () => {
             <div className="bg-white rounded-lg shadow-md p-6 mb-6 text-gray-800">
                 <div className="flex justify-between items-center flex-col lg:flex-row mb-4">
                     <h1 className="text-lg mb-4">
-                        HawkHacks Hackathon starts at XX:XXPM! All times are in
-                        EST.
+                        HawkHacks Hackathon starts at 6PM! All times are in EST.
                     </h1>
                     <div className="relative">
                         <input
