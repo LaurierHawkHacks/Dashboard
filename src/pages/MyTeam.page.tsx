@@ -33,7 +33,7 @@ type SearchTeamNameFn = (name: string) => Promise<void>;
 
 export const MyTeamPage = () => {
     const [team, setTeam] = useState<TeamData | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [teamName, setTeamName] = useState("");
     const [isTeamNameTaken, setIsTeamNameTaken] = useState(false);
     const [invalidTeamName, setInvalidTeamName] = useState(false);
@@ -63,6 +63,8 @@ export const MyTeamPage = () => {
 
     const submitNewTeam: FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
+
         const res = await z.string().min(1).safeParseAsync(teamName);
         if (res.success) {
             // try to create the new team
@@ -89,6 +91,8 @@ export const MyTeamPage = () => {
                         (e as Error).message
                     })`,
                 });
+            } finally {
+                setIsLoading(false);
             }
         } else {
             setInvalidTeamName(true);
@@ -109,6 +113,7 @@ export const MyTeamPage = () => {
     };
 
     const sendInvitation = async () => {
+        setIsLoading(true);
         // do not allow to send another invitation to someone who is already in the team
         if (team && team.members.some((m) => m.email === email)) return;
         setDisableAllActions(true);
@@ -141,11 +146,14 @@ export const MyTeamPage = () => {
                 message: `Please try again later. (${(e as Error).message})`,
             });
         } finally {
+            setIsLoading(false);
             setDisableAllActions(false);
         }
     };
 
     const handleDeleteTeam = async () => {
+        setIsLoading(true);
+
         try {
             setDisableAllActions(true);
             const res = await deleteTeam();
@@ -166,19 +174,22 @@ export const MyTeamPage = () => {
                     title: "Oh no... Something went wrong",
                     message: res.message,
                 });
-            }
+            } 
         } catch (e) {
             showNotification({
                 title: "Error Deleting Team",
                 message: `Please try again later. (${(e as Error).message})`,
             });
         } finally {
+            setIsLoading(false);
             setDisableAllActions(false);
         }
     };
 
     const handleTeamNameUpdate = async () => {
+        setIsLoading(true);
         const res = await z.string().min(1).safeParseAsync(teamName);
+        
         if (res.success) {
             setDisableAllActions(true);
             try {
@@ -209,6 +220,7 @@ export const MyTeamPage = () => {
                     })`,
                 });
             } finally {
+                setIsLoading(false);
                 setDisableAllActions(false);
             }
         } else {
