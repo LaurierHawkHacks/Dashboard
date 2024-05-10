@@ -252,7 +252,7 @@ export const SchedulePage: React.FC = () => {
                   addMinutes(parseISO(epg[epg.length - 1].till), 1)
               ).slice(0, -6)
             : "2024-05-18T00:00:00",
-        dayWidth: 2900,
+        dayWidth: 5000,
         isBaseTimeFormat: true,
         isCurrentTime: false,
         isLine: false,
@@ -390,7 +390,8 @@ export const SchedulePage: React.FC = () => {
                         <div className="grid grid-cols-2">
                             <p className="font-bold col-span-1">Date</p>
                             <p className="col-span-1 text-left">
-                                {format(activeProgram.since, "MMM dd")}
+                                {format(activeProgram.since, "MMM dd")} -{" "}
+                                {format(activeProgram.till, "MMM dd")}
                             </p>
                         </div>
                         <div className="grid grid-cols-2">
