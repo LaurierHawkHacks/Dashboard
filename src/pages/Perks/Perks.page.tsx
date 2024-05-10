@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { PerksData, perksData } from "../../data/perks";
 import { Modal } from "@/components";
 import { getButtonStyles } from "@/components/Button/Button.styles";
+import { useAvailableRoutes } from "@/providers/routes.provider";
 
 const PerksPage = () => {
     const foodItemsRef = useRef([]);
@@ -9,24 +10,32 @@ const PerksPage = () => {
     const featuredItemsRef = useRef([]);
     const [selectedPerk, setSelectedPerk] = useState<PerksData | null>(null);
     const [isPopup, setIsPopup] = useState(false);
+    const { paths } = useAvailableRoutes();
+    useEffect(() => {
+        window.localStorage.setItem(paths.perks, 'visited');
+    }, []);
 
     useEffect(() => {
-        //@ts-ignore
-        const fadeInItems = (items) => {
-            //@ts-ignore
-            items.forEach((item, index) => {
-                if (item) {
-                    setTimeout(() => {
-                        item.classList.add("opacity-100");
-                    }, 175 * index);
-                }
-            });
-        };
-
-        fadeInItems(foodItemsRef.current);
-        fadeInItems(otherItemsRef.current);
-        fadeInItems(featuredItemsRef.current);
-    }, []);
+      const fadeInItems = (items, delay) => {
+          items.forEach((item, index) => {
+              if (item) {
+                  setTimeout(() => {
+                      item.classList.add("opacity-100");
+                  }, delay + 75 * index);
+              }
+          });
+      };
+  
+      let currentDelay = 0;
+  
+      fadeInItems(featuredItemsRef.current, currentDelay);
+      currentDelay += featuredItemsRef.current.length * 75;
+  
+      fadeInItems(foodItemsRef.current, currentDelay);
+      currentDelay += foodItemsRef.current.length * 75;
+  
+      fadeInItems(otherItemsRef.current, currentDelay);
+  }, []);
 
     const openPopup = (perk: PerksData) => {
         setSelectedPerk(perk);
@@ -57,34 +66,35 @@ const PerksPage = () => {
               }
             : {};
 
-        return (
-            <div
+
+            return (
+              <div
                 ref={(el) => (ref.current[ref.current.length] = el)}
-                className="bg-white shadow-md p-4 rounded-xl flex items-center mb-4 opacity-0 transition-transform hover:scale-105 duration-300 cursor-pointer transform"
+                className="bg-white shadow-md p-4 rounded-xl flex items-center mb-4 transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer"
                 onClick={() => openPopup(perk)}
                 style={{ flexBasis: "33%", marginBottom: "16px", ...perkStyle }}
-            >
+              >
                 {isFreeBubbleTea && (
-                    <div className="absolute top-2 left-2 bg-yellow-400 text-white py-1 px-3 rounded-full text-xs font-bold">
-                        FREE Bubble Tea!
-                    </div>
+                  <div className="absolute top-2 left-2 bg-yellow-400 text-white py-1 px-3 rounded-full text-xs font-bold">
+                    FREE Bubble Tea!
+                  </div>
                 )}
                 <div className="w-40 h-24 mr-4 flex items-center justify-center">
-                    <img
-                        src={perk.image}
-                        alt={perk.alt}
-                        className="max-w-full max-h-full object-contain"
-                    />
+                  <img
+                    src={perk.image}
+                    alt={perk.alt}
+                    className="max-w-full max-h-full object-contain"
+                  />
                 </div>
                 <div className="flex-grow">
-                    <h3 className="font-bold mt-2">{perk.title}</h3>
-                    <p className="text-gray-500 mt-1">
-                        {shortenDescription(perk.description, 80)}
-                    </p>
+                  <h3 className="font-bold mt-2 cursor-default">{perk.title}</h3>
+                  <p className="text-gray-500 mt-1 cursor-default">
+                    {shortenDescription(perk.description, 80)}
+                  </p>
                 </div>
-            </div>
-        );
-    };
+              </div>
+            );
+          };
 
     return (
         <div>
