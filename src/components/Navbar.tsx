@@ -80,6 +80,8 @@ export const Navbar = () => {
                     (path === paths.myTeam &&
                         !window.localStorage.getItem(path)) ||
                     (path === paths.myTicket &&
+                        !window.localStorage.getItem(path)) ||
+                    (path === paths.perks &&
                         !window.localStorage.getItem(path))
                 ) {
                     return (
