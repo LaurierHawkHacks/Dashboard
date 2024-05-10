@@ -25,7 +25,7 @@ export const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
             <Navigate
                 to={
                     adminOnly
-                        ? routes.notFound
+                        ? "/not-found"
                         : routes.login + `?from=${location.pathname}`
                 }
             />
