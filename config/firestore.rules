@@ -25,6 +25,11 @@ service cloud.firestore {
       allow write: if isAuthenticated() && isAdmin();
     }
 
+    // RSVP Counter Collection Rules
+    match /rsvpCounter/{counterId} {
+        allow read, write: if isAuthenticated() && isAdmin();
+    }
+
     // Tickets Collection Rules
     match /tickets/{ticketId} {
         // Only grant read perms to owner/admin
