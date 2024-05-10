@@ -2,11 +2,12 @@ import { Button, LoadingAnimation, Select, TextInput } from "@/components";
 import { useNotification } from "@/providers/notification.provider";
 import { getRedeemableItems } from "@/services/utils";
 import { EventItem, FoodItem } from "@/services/utils/types";
-import { format } from "date-fns";
+import { format, isAfter, isDate, parseISO } from "date-fns";
 import { Timestamp, doc, setDoc } from "firebase/firestore";
 import { FormEventHandler, useEffect, useRef, useState } from "react";
 import { nanoid } from "nanoid";
 import { firestore } from "@/services/firebase";
+import { z } from "zod";
 
 type KeyOfEventItem = keyof EventItem;
 type KeyOfFoodItem = keyof FoodItem;
@@ -77,6 +78,35 @@ export const AdminManageEventsPage = () => {
 
     const submitNewEvent: FormEventHandler = async (e) => {
         e.preventDefault();
+
+        // validate inputs
+        const res = z
+            .object({
+                title: z.string().min(1),
+                description: z.string(),
+                location: z.string().min(1),
+                type: z.string().min(1),
+                startTime: z.string().min(1),
+                endTime: z.string().min(1),
+            })
+            .safeParse(newEvent);
+        if (!res.success) {
+            showNotification({
+                title: "Missing fields in event input",
+                message: res.error.issues.map((i) => i.path).join("\n"),
+            });
+            return;
+        }
+
+        if (
+            !isAfter(parseISO(newEvent.endTime), parseISO(newEvent.startTime))
+        ) {
+            showNotification({
+                title: "Invalid date range",
+                message: "End date cannot be before start date.",
+            });
+            return;
+        }
 
         // generate new id
         const id = nanoid(16);
@@ -167,6 +197,9 @@ export const AdminManageEventsPage = () => {
                             "Networking",
                         ]}
                         initialValue={newEvent.type}
+                        onChange={(v) => {
+                            handleEventChange("type", v);
+                        }}
                     />
                     <TextInput
                         label="Start Date (EST)"
