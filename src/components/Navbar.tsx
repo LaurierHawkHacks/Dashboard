@@ -1,5 +1,6 @@
 import { RiDiscordLine } from "react-icons/ri";
 import { FiLogOut } from "react-icons/fi";
+import { RxStar  } from "react-icons/rx";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/providers/hooks";
 import Hamburger from "hamburger-react";
@@ -46,6 +47,10 @@ export const Navbar = () => {
         [paths.myTeam]: {
             label: "My Team",
             Icon: UserGroupIcon,
+        },
+        [paths.perks]: {
+            label: "Perks",
+            Icon: RxStar,
         },
     };
 
