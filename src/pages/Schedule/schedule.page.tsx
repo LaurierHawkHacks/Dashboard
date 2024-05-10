@@ -402,10 +402,10 @@ export const SchedulePage: React.FC = () => {
                             </p>
                         </div>
                         <div className="grid grid-cols-2 space-y-2 sm:space-y-0">
-                            <p className="font-bold col-span-2 sm:col-span-1">
+                            <p className="font-bold col-span-2">
                                 Event Details
                             </p>
-                            <p className="col-span-2 sm:col-span-1 text-left">
+                            <p className="col-span-2 text-left">
                                 {activeProgram.description ||
                                     "Oh... looks like there are no details for this event."}
                             </p>
