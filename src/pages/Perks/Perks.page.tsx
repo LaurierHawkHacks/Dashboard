@@ -113,7 +113,7 @@ const PerksPage = () => {
                 rel="noopener noreferrer"
                 className="inline-block bg-blue-500 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-300"
               >
-                Learn More
+                {selectedPerk.buttonTitle || 'Learn More'}
               </a>
             )}
           </div>
