@@ -5,7 +5,6 @@ import {
     Fantuan,
     SmokesPoutinerie,
     Dominos,
-    Nibiru,
     Distributive,
 } from "@assets";
 
