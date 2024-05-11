@@ -86,7 +86,6 @@ export const JoinTeamPage = () => {
                 const data = await checkInvitation(invitationId);
                 if (data.status === 200) {
                     setInvitationData(data.data);
-                    setIsLoading(false);
                 } else if (data.status !== 404) {
                     showNotification({
                         title: "Error",
@@ -100,6 +99,8 @@ export const JoinTeamPage = () => {
                     message:
                         "Please make sure you this link from an invitation or request a new one.",
                 });
+            } finally {
+                setIsLoading(false);
             }
         })();
     }, [invitationId, currentUser]);
