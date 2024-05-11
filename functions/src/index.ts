@@ -385,31 +385,7 @@ export const logEvent = functions.https.onCall((data, context) => {
     }
 });
 
-export const getRVSPStatus = functions.https.onCall(async (_, context) => {
-    if (!context.auth) {
-        throw new functions.https.HttpsError(
-            "permission-denied",
-            "Not authenticated"
-        );
-    }
 
-    functions.logger.info("Getting RSVP status.", { uid: context.auth.uid });
-
-    const user = await admin.auth().getUser(context.auth.uid);
-    if (user.customClaims?.rsvpVerified) {
-        return {
-            status: 200,
-            verified: true,
-            message: "RSVP verified.",
-        };
-    } else {
-        return {
-            status: 200,
-            verified: false,
-            message: "RSVP not verified.",
-        };
-    }
-});
 
 export const verifyRSVP = functions.https.onCall(async (_, context) => {
     if (!context.auth) {
