@@ -116,7 +116,7 @@ export const JoinTeamPage = () => {
         <div className="h-screen w-screen flex items-center justify-center">
             <div className="space-y-6">
                 <h1 className="block text-lg font-bold text-center">
-                    {`${invitationData.owner} invited to join ${invitationData.teamName}`}
+                    {`${invitationData.owner} invited you to join ${invitationData.teamName}`}
                 </h1>
                 <div>
                     <div className="mx-auto flex items-center justify-center gap-12 max-w-lg">
