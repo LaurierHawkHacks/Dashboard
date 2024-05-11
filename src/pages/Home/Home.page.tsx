@@ -1,6 +1,8 @@
 import { GoldenHawk, IpadKidHawks } from "@/assets";
 import { Card, Accordion, SocialIcons } from "@components";
 import { faqs, sponsors, importantDateTimes } from "@data";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { useEffect, useState } from "react";
 
 const ImportantInfoBlocks = importantDateTimes.map((importantDateTime, i) => {
     const entries = Object.entries(importantDateTime.events);
@@ -44,6 +46,25 @@ const Sponsors = sponsors.map((sponsor, i) => {
 });
 
 const HomePage = () => {
+    const [rsvpStatus, setRsvpStatus] = useState("Not RSVP'd");
+    const functions = getFunctions();
+
+    useEffect(() => {
+        const fetchRSVPStatus = async () => {
+            const fetchRSVPStatus = httpsCallable(functions, "getRVSPStatus");
+            try {
+                const result = await fetchRSVPStatus();
+                console.log("RSVP status:", result.data);
+                setRsvpStatus(result.data ? "RSVP'd" : "Not RSVP'd");
+            } catch (error) {
+                console.error("Error fetching RSVP status:", error);
+                setRsvpStatus("Error fetching status");
+            }
+        };
+
+        fetchRSVPStatus();
+    }, [functions]);
+
     return (
         <section className="homepage grid gap-4">
             <div className="grid xl:grid-cols-12 gap-4">
@@ -74,6 +95,17 @@ const HomePage = () => {
                             alt=""
                         />
                     </div>
+                </Card>
+
+                <Card title="RSVP Status" className="xl:col-span-5">
+                    <span className="flex flex-col gap-2">
+                        <p className="text-[#333] text-sm">
+                            RSVP status: <b>{rsvpStatus}</b>
+                        </p>
+                        <button className="p-2 bg-white rounded-md">
+                            Not able to make it?
+                        </button>
+                    </span>
                 </Card>
 
                 <Card
