@@ -1,8 +1,7 @@
 import { GoldenHawk, IpadKidHawks } from "@/assets";
 import { Card, Accordion, SocialIcons } from "@components";
 import { faqs, sponsors, importantDateTimes } from "@data";
-import { getFunctions, httpsCallable } from "firebase/functions";
-import { useEffect, useState } from "react";
+import { useAuth } from "@/providers/auth.provider";
 
 const ImportantInfoBlocks = importantDateTimes.map((importantDateTime, i) => {
     const entries = Object.entries(importantDateTime.events);
@@ -46,24 +45,7 @@ const Sponsors = sponsors.map((sponsor, i) => {
 });
 
 const HomePage = () => {
-    const [rsvpStatus, setRsvpStatus] = useState("Not RSVP'd");
-    const functions = getFunctions();
-
-    useEffect(() => {
-        const fetchRSVPStatus = async () => {
-            const fetchRSVPStatus = httpsCallable(functions, "getRVSPStatus");
-            try {
-                const result = await fetchRSVPStatus();
-                console.log("RSVP status:", result.data);
-                setRsvpStatus(result.data ? "RSVP'd" : "Not RSVP'd");
-            } catch (error) {
-                console.error("Error fetching RSVP status:", error);
-                setRsvpStatus("Error fetching status");
-            }
-        };
-
-        fetchRSVPStatus();
-    }, [functions]);
+    const { currentUser } = useAuth();
 
     return (
         <section className="homepage grid gap-4">
@@ -100,7 +82,12 @@ const HomePage = () => {
                 <Card title="RSVP Status" className="xl:col-span-5">
                     <span className="flex flex-col gap-2">
                         <p className="text-[#333] text-sm">
-                            RSVP status: <b>{rsvpStatus}</b>
+                            RSVP status:{" "}
+                            <b>
+                                {currentUser?.rsvpVerified
+                                    ? "RSVP'd"
+                                    : "Not RSVP'd"}
+                            </b>
                         </p>
                     </span>
                 </Card>
