@@ -2,7 +2,8 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { v4 as uuidv4 } from "uuid";
 import { PKPass } from "passkit-generator";
-import axios from "axios";
+import * as fs from 'fs';
+import * as path from 'path';
 
 const config = functions.config();
 
@@ -21,7 +22,6 @@ export const createTicket = functions.https.onCall(async (_, context) => {
         );
     }
 
-    try {
         const userId = context.auth.uid;
 
         const user = await admin.auth().getUser(userId);
@@ -82,7 +82,7 @@ export const createTicket = functions.https.onCall(async (_, context) => {
                 foregroundColor: "rgb(255, 255, 255)",
                 backgroundColor: "rgb(12, 105, 117)",
                 labelColor: "rgb(255, 255, 255)",
-                logoText: "Welcome to HawkHacks",
+                logoText: "HawkHacks",
                 barcodes: [
                     {
                         message: `${config.fe.url}/ticket/${ticketId}`,
@@ -126,7 +126,7 @@ export const createTicket = functions.https.onCall(async (_, context) => {
                         {
                             key: "startTime",
                             label: "Start Time",
-                            value: "09:00 AM",
+                            value: "6:00 PM",
                         },
                     ],
                     backFields: [
@@ -153,21 +153,18 @@ export const createTicket = functions.https.onCall(async (_, context) => {
             })
         );
 
-        const iconResponse = await axios.get("https://hawkhacks.ca/icon.png", {
-            responseType: "arraybuffer",
-        });
-        const icon2xResponse = await axios.get(
-            "https://hawkhacks.ca/icon.png",
-            { responseType: "arraybuffer" }
-        );
-        const iconBuffer = iconResponse.data;
-        const icon2xBuffer = icon2xResponse.data;
+        const iconBuffer = fs.readFileSync(path.join(__dirname + "/assets", 'icon.png'));
+        const icon2xBuffer = fs.readFileSync(path.join(__dirname + "/assets", 'icon@2x.png'));
+        const ipadKidHawk = fs.readFileSync(path.join(__dirname + "/assets", 'thumbnail@3x.png'));
 
         const pass = new PKPass(
             {
                 "pass.json": passJsonBuffer,
                 "icon.png": iconBuffer,
                 "icon@2x.png": icon2xBuffer,
+                "logo.png": iconBuffer,
+                "logo@2x.png": icon2xBuffer,
+                "thumbnail@3x.png": ipadKidHawk,
             },
             {
                 signerCert: signerCert,
@@ -191,12 +188,5 @@ export const createTicket = functions.https.onCall(async (_, context) => {
         const passUrl = fileRef.publicUrl();
 
         return { url: passUrl };
-    } catch (error) {
-        functions.logger.error("Error creating ticket:", { error });
-        throw new functions.https.HttpsError(
-            "internal",
-            "Failed to create ticket",
-            error instanceof Error ? error.message : "Unknown error"
-        );
-    }
+
 });
