@@ -118,7 +118,7 @@ export const MyTeamPage = () => {
         if (team && team.members.some((m) => m.email === email)) return;
         setDisableAllActions(true);
         try {
-            const { status, data } = await inviteMember(email);
+            const { status, data, message } = await inviteMember(email);
             if (status === 201 && data && team) {
                 const newTeam = { ...team };
                 newTeam.members.push(data);
@@ -128,11 +128,10 @@ export const MyTeamPage = () => {
                     title: "Invitation Sent!",
                     message: "",
                 });
-            } else if (status === 404) {
+            } else if (status >= 400 && status < 500) {
                 showNotification({
                     title: "Error Sending Invitation",
-                    message:
-                        "This email doesn't match our records of accepted hackers. Make sure you've typed their email correctly, and that they've already RSVP'd.",
+                    message,
                 });
             } else {
                 showNotification({
@@ -174,7 +173,7 @@ export const MyTeamPage = () => {
                     title: "Oh no... Something went wrong",
                     message: res.message,
                 });
-            } 
+            }
         } catch (e) {
             showNotification({
                 title: "Error Deleting Team",
@@ -189,7 +188,7 @@ export const MyTeamPage = () => {
     const handleTeamNameUpdate = async () => {
         setIsLoading(true);
         const res = await z.string().min(1).safeParseAsync(teamName);
-        
+
         if (res.success) {
             setDisableAllActions(true);
             try {

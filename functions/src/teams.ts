@@ -439,7 +439,8 @@ export const inviteMember = functions.https.onCall(async (data, context) => {
                 { func }
             );
             return response(HttpStatus.BAD_REQUEST, {
-                message: "No team found",
+                message:
+                    "No team found. To send a team invitation you need to first create a team.",
             });
         }
     } catch (error) {
@@ -471,7 +472,7 @@ export const inviteMember = functions.https.onCall(async (data, context) => {
             { error, func }
         );
         return response(HttpStatus.NOT_FOUND, {
-            message: "Could not send invitation.",
+            message: "The email you have entered does not match.",
         });
     }
 
@@ -486,7 +487,7 @@ export const inviteMember = functions.https.onCall(async (data, context) => {
         const team = await internalGetTeamByUser(userRecord.uid);
         if (team) {
             return response(HttpStatus.NOT_FOUND, {
-                message: "Could not send invitation.",
+                message: "Hacker already in another team.",
             });
         }
     } catch (e) {
@@ -522,7 +523,8 @@ export const inviteMember = functions.https.onCall(async (data, context) => {
                 { func }
             );
             return response(HttpStatus.BAD_REQUEST, {
-                message: "Invalid request",
+                message:
+                    "This email doesn't match our records of RSVP'd hackers. Make sure you've typed their email correctly, and that they've already RSVP'd.",
             });
         } else if (!app) {
             functions.logger.info("Invitee did not apply to HawkHacks", {
