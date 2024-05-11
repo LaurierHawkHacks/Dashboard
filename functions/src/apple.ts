@@ -2,8 +2,7 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { v4 as uuidv4 } from "uuid";
 import { PKPass } from "passkit-generator";
-import * as fs from 'fs';
-import * as path from 'path';
+import axios from "axios";
 
 const config = functions.config();
 
@@ -22,6 +21,7 @@ export const createTicket = functions.https.onCall(async (_, context) => {
         );
     }
 
+    try {
         const userId = context.auth.uid;
 
         const user = await admin.auth().getUser(userId);
@@ -153,9 +153,21 @@ export const createTicket = functions.https.onCall(async (_, context) => {
             })
         );
 
-        const iconBuffer = fs.readFileSync(path.join(__dirname + "/assets", 'icon.png'));
-        const icon2xBuffer = fs.readFileSync(path.join(__dirname + "/assets", 'icon@2x.png'));
-        const ipadKidHawk = fs.readFileSync(path.join(__dirname + "/assets", 'thumbnail@3x.png'));
+        const iconResponse = await axios.get("https://hawkhacks.ca/icon.png", {
+            responseType: "arraybuffer",
+        });
+        const icon2xResponse = await axios.get(
+            "https://hawkhacks.ca/icon.png",
+            { responseType: "arraybuffer" }
+        );
+        const iconBuffer = iconResponse.data;
+        const icon2xBuffer = icon2xResponse.data;
+
+        const ipadHawkResponse = await axios.get(
+            "https://portal.hawkhacks.ca/thumbnail@3x.png",
+            { responseType: "arraybuffer" }
+        );
+        const ipadHawk = ipadHawkResponse.data;
 
         const pass = new PKPass(
             {
@@ -164,7 +176,7 @@ export const createTicket = functions.https.onCall(async (_, context) => {
                 "icon@2x.png": icon2xBuffer,
                 "logo.png": iconBuffer,
                 "logo@2x.png": icon2xBuffer,
-                "thumbnail@3x.png": ipadKidHawk,
+                "thumbnail@3x.png": ipadHawk,
             },
             {
                 signerCert: signerCert,
@@ -188,5 +200,12 @@ export const createTicket = functions.https.onCall(async (_, context) => {
         const passUrl = fileRef.publicUrl();
 
         return { url: passUrl };
-
+    } catch (error) {
+        functions.logger.error("Error creating ticket:", { error });
+        throw new functions.https.HttpsError(
+            "internal",
+            "Failed to create ticket",
+            error instanceof Error ? error.message : "Unknown error"
+        );
+    }
 });
