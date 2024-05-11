@@ -102,9 +102,6 @@ const HomePage = () => {
                         <p className="text-[#333] text-sm">
                             RSVP status: <b>{rsvpStatus}</b>
                         </p>
-                        <button className="p-2 bg-white rounded-md">
-                            Not able to make it?
-                        </button>
                     </span>
                 </Card>
 
