@@ -119,7 +119,7 @@ const perksData: {
             image: PerksIncogni,
             title: "Incogni",
             description:
-                "Incogni will award our top 16 hackers with one-year subscriptions to their product, Incogni. This product empowers users to regain control of their data, minimize spam, and thwart scam attempts by seamlessly opting them out of data broker databases.",
+                "As well as contributing greatly to the prize pool, Incogni is providing all participants with a 50% coupon for Incogni to all participants!",
             link: "https://incogni.com/?utm_medium=affiliate&utm_term=&utm_content&utm_campaign=hawkhacks24",
             alt: "Incogni",
             buttonTitle: "Redeem Now",
@@ -127,7 +127,7 @@ const perksData: {
         {
             image: PerksDeFiBlocks,
             title: "DeFi Blocks",
-            description: "DeFi Blocks is one of our titular sponsors - come back soon to see what they’re giving away!",
+            description: "Come back soon to see what they’re giving away!",
             link: null,
             alt: "DeFi Blocks",
             buttonTitle: null,
@@ -154,7 +154,7 @@ const perksData: {
             image: PerksTaskade,
             title: "Taskade",
             description:
-                "As well as contributing to the winner prize pool, Taskade is giving all hackers promo codes for 20% off their starter tier! ",
+                "As well as contributing to the winner prize pool, Taskade is giving all hackers promo codes for 20% off their starter tier! Once you sign up for free, contact Taskade directly with your username, email, and the exact event details to redeem.",
             link: "https://www.taskade.com/?utm_medium=affiliate&utm_term=&utm_content&utm_campaign=hawkhacks24",
             alt: "Taskade",
             buttonTitle: "Redeem Now",
@@ -163,7 +163,7 @@ const perksData: {
             image: PerksBalsamiq,
             title: "Balsamiq",
             description:
-                "Balsamiq is providing all HawkHack attendees with a 60-day extended trial of Balsamiq Cloud - their effortless wireframing too valued by product managers, founders, developers, & UX teams. Make sure to use code “BQHACK60” after creating an account!",
+                "Balsamiq is providing all HawkHack attendees with a 60-day extended trial of Balsamiq Cloud - their effortless wireframing tool valued by product managers, founders, developers, & UX teams. Make sure to use code “BQHACK60” after creating an account!",
             link: "https://balsamiq.com/?utm_medium=affiliate&utm_term=&utm_content&utm_campaign=hawkhacks24",
             alt: "Balsamiq",
             buttonTitle: "Redeem Now",
