@@ -8,7 +8,7 @@ import {
     validateTeamInvitation,
 } from "@/services/utils/teams";
 import { Invitation } from "@/services/utils/types";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 export const JoinTeamPage = () => {
@@ -22,7 +22,6 @@ export const JoinTeamPage = () => {
         null
     );
     const [isLoading, setIsLoading] = useState(true);
-    const timeoutRef = useRef<number | null>(null);
 
     const accept = async () => {
         if (!invitationId) return;
@@ -79,11 +78,6 @@ export const JoinTeamPage = () => {
     };
 
     useEffect(() => {
-        if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
-        timeoutRef.current = window.setTimeout(() => {
-            setIsLoading(false);
-        }, 5000);
-
         if (!invitationId || !currentUser) return;
 
         (async () => {
@@ -92,8 +86,6 @@ export const JoinTeamPage = () => {
                 const data = await checkInvitation(invitationId);
                 if (data.status === 200) {
                     setInvitationData(data.data);
-                    if (timeoutRef.current)
-                        window.clearTimeout(timeoutRef.current);
                     setIsLoading(false);
                 } else if (data.status !== 404) {
                     showNotification({
