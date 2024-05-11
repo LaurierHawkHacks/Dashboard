@@ -49,7 +49,7 @@ const perksData: {
                 "To have an edge when competing in Avalanche’s prize category/bounty, we recommend you check out the Avalanche Academy before arriving. They have numerous free courses including \"Avalanche Fundamentals\" and \"Blockchain and Subnet Architecture\" with official certifications. Showing these course certificates at the Avalanche Booth may win you a little something extra! 😉",
             link: "https://academy.avax.network/?utm_source=ambassador-dao",
             alt: "Avalanche",
-            buttonTitle: "Get Your Certificate",
+            buttonTitle: "Complete Your Certificate",
         },
         {
             image: PerksDistributive,
@@ -84,7 +84,7 @@ const perksData: {
                 "Fantuan is providing all our participants with free bubble tea! All you have to do to secure some is place a FREE pre-order on the HawkHacks Fantuan store!",
             link: "https://order.fantuan.ca/store/Restaurant/ca-22098?shippingType=0&inviteCode=ca09jcqrt&tTraceId=MerchantShare-22098-0-68c98f2f08c048e995841671731611b3&channel=merchant_share",
             alt: "Fantuan Delivery",
-            buttonTitle: "Order Now",
+            buttonTitle: "Pre-Order Now",
         },
         {
             image: PerksIndomie,
@@ -93,7 +93,7 @@ const perksData: {
                 "Indomie is graciously providing all hackers with 1 cup of ramen (feel free to cook some up during HawkHacks 😉) and 1 pillow pack of ramen. Hackers can pick up their cup noodles Friday night as a late-night snack, and the pillow pack of ramen will be provided at registration.",
             link: "https://indomieonline.ca/?utm_medium=affiliate&utm_term=&utm_content&utm_campaign=hawkhacks24",
             alt: "Indomie",
-            buttonTitle: "Learn More",
+            buttonTitle: "Shop Now",
         },
         {
             image: PerksSmokes,
@@ -113,7 +113,7 @@ const perksData: {
                 "As well as contributing greatly to the prize pool, NordVPN is providing a 74% coupon for NordVPN, NordPass, and NordLocker to all participants!",
             link: "https://nordvpn.com/hackathons/?utm_medium=affiliate&utm_term=&utm_content&utm_campaign=hawkhacks24",
             alt: "NordVPN & NordPass",
-            buttonTitle: "Get NordVPN & NordPass",
+            buttonTitle: "Redeem Now",
         },
         {
             image: PerksIncogni,
@@ -122,7 +122,7 @@ const perksData: {
                 "Incogni will award our top 16 hackers with one-year subscriptions to their product, Incogni. This product empowers users to regain control of their data, minimize spam, and thwart scam attempts by seamlessly opting them out of data broker databases.",
             link: "https://incogni.com/?utm_medium=affiliate&utm_term=&utm_content&utm_campaign=hawkhacks24",
             alt: "Incogni",
-            buttonTitle: "null",
+            buttonTitle: "Redeem Now",
         },
         {
             image: PerksDeFiBlocks,
@@ -139,7 +139,7 @@ const perksData: {
                 "As well as contributing to the winner prize pool, 1Password is graciously providing all participants 1 year free of 1Password Families to new users!",
             link: "https://start.1password.com/signup/plan?c=HACK-TG35J694",
             alt: "1Password",
-            buttonTitle: "Sign Up",
+            buttonTitle: "Redeem Now",
         },
         {
             image: PerksWolfram,
@@ -148,7 +148,7 @@ const perksData: {
                 "As well as contributing to the winner prize pool, Wolfram is giving all HawkHack participants access to Wolfram|One for 30 days.",
             link: "https://account.wolfram.com/redeem/zHawkHacks424",
             alt: "Wolfram",
-            buttonTitle: "Explore Wolfram",
+            buttonTitle: "Redeem Now",
         },
         {
             image: PerksTaskade,
@@ -157,7 +157,7 @@ const perksData: {
                 "As well as contributing to the winner prize pool, Taskade is giving all hackers promo codes for 20% off their starter tier! ",
             link: "https://www.taskade.com/?utm_medium=affiliate&utm_term=&utm_content&utm_campaign=hawkhacks24",
             alt: "Taskade",
-            buttonTitle: "Sign Up",
+            buttonTitle: "Redeem Now",
         },
         {
             image: PerksBalsamiq,
@@ -166,7 +166,7 @@ const perksData: {
                 "Balsamiq is providing all HawkHack attendees with a 60-day extended trial of Balsamiq Cloud - their effortless wireframing too valued by product managers, founders, developers, & UX teams. Make sure to use code “BQHACK60” after creating an account!",
             link: "https://balsamiq.com/?utm_medium=affiliate&utm_term=&utm_content&utm_campaign=hawkhacks24",
             alt: "Balsamiq",
-            buttonTitle: "Start Trial",
+            buttonTitle: "Redeem Now",
         },
         {
             image: PerksEcho3D,
@@ -175,7 +175,7 @@ const perksData: {
                 "Echo3D is giving all hackers a 1-month Pro-Tier subscription to Echo3D to all HawkHacks participants. Tech support will be available via Discord during the weekend.",
             link: "https://console.echo3d.com/#/auth/register-promo?code=April2024echo944",
             alt: "Echo3D",
-            buttonTitle: "Try Now",
+            buttonTitle: "Redeem Now",
         },
         {
             image: PerksRosenfield,
@@ -184,7 +184,7 @@ const perksData: {
                 "Rosenfeld will give 20% discount promos when checking out using the provided link for all participants.",
             link: "https://rosenfeldmedia.com/hawkhacks",
             alt: "Rosenfeld",
-            buttonTitle: "Get 20% Off",
+            buttonTitle: "Shop Now",
         },
         {
             image: PerksCertopus,
