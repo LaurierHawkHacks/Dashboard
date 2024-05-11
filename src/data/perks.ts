@@ -46,7 +46,7 @@ const perksData: {
             image: PerksAvalanche,
             title: "Avalanche",
             description:
-                "To have an edge when competing in Avalanche’s prize category/bounty, we recommend you check out the Avalanche Academy before arriving. They have numerous free courses including 'Avalanche Fundamentals' and 'Blockchain and Subnet Architecture' with official certifications. Showing these course certificates at the Avalanche Booth may win you a little something extra! 😉",
+                "To have an edge when competing in Avalanche’s prize category/bounty, we recommend you check out the Avalanche Academy before arriving. They have numerous free courses including \"Avalanche Fundamentals\" and \"Blockchain and Subnet Architecture\" with official certifications. Showing these course certificates at the Avalanche Booth may win you a little something extra! 😉",
             link: "https://academy.avax.network/?utm_source=ambassador-dao",
             alt: "Avalanche",
             buttonTitle: "Get Your Certificate",
@@ -81,7 +81,7 @@ const perksData: {
             image: PerksFantuan,
             title: "Fantuan",
             description:
-                "Fantuan is providing all our participants with free bubble tea! All you'll have to do to secure some is place a FREE order on the HawkHacks Fantuan store!",
+                "Fantuan is providing all our participants with free bubble tea! All you have to do to secure some is place a FREE pre-order on the HawkHacks Fantuan store!",
             link: "https://order.fantuan.ca/store/Restaurant/ca-22098?shippingType=0&inviteCode=ca09jcqrt&tTraceId=MerchantShare-22098-0-68c98f2f08c048e995841671731611b3&channel=merchant_share",
             alt: "Fantuan Delivery",
             buttonTitle: "Order Now",
@@ -90,7 +90,7 @@ const perksData: {
             image: PerksIndomie,
             title: "Indomie",
             description:
-                "Indomie has graciously provided all hackers 1 cup noodle (feel free to cook some up during HawkHacks 😉) and 1 pillow pack of ramen. Hackers will have the opportunity to pick up their cup noodle Friday night as a late-night snack, and the pillow pack of ramen will be provided once you check-in at registration.",
+                "Indomie is graciously providing all hackers with 1 cup of ramen (feel free to cook some up during HawkHacks 😉) and 1 pillow pack of ramen. Hackers can pick up their cup noodles Friday night as a late-night snack, and the pillow pack of ramen will be provided at registration.",
             link: null,
             alt: "Indomie",
             buttonTitle: null,
@@ -99,7 +99,7 @@ const perksData: {
             image: PerksSmokes,
             title: "Smokes",
             description:
-                "Smokes will be offering various prizes throughout the duration of the HawkHacks weekend, such as stickers, merch, and other goodies!",
+                "Smokes is offering various prizes throughout HawkHacks, such as stickers, merch, and other goodies!",
             link: "https://smokespoutinerie.com/?utm_medium=affiliate&utm_term=&utm_content&utm_campaign=hawkhacks24",
             alt: "Smokes Poutinerie",
             buttonTitle: "Learn More",
@@ -110,7 +110,7 @@ const perksData: {
             image: PerksNordVPN,
             title: "NordVPN & NordPass",
             description:
-                "NordVPN has collaborated with HawkHacks to provide the top 16 victors a full year's access to NordVPN and NordPass.",
+                "NordVPN has collaborated with HawkHacks to provide the top 16 victors a full year’s access to NordVPN and NordPass",
             link: "https://nordvpn.com/hackathons/?utm_medium=affiliate&utm_term=&utm_content&utm_campaign=hawkhacks24",
             alt: "NordVPN & NordPass",
             buttonTitle: "Get NordVPN & NordPass",
@@ -136,7 +136,7 @@ const perksData: {
             image: Perks1Password,
             title: "1Password",
             description:
-                "1Password has graciously provided all hackers who attend HawkHacks 1 year free of 1Password Families! (note: offer is valid for new signups only)",
+                "As well as contributing to the winner prize pool, 1Password is graciously providing all hackers 1 year free of 1Password Families to new 1Password users!",
             link: "https://1password.com",
             alt: "1Password",
             buttonTitle: "Sign Up",
@@ -145,7 +145,7 @@ const perksData: {
             image: PerksWolfram,
             title: "Wolfram",
             description:
-                "Wolfram will be providing the top six teams the Wolfram Award, regardless of whether solutions include Wolfram Tech. This award provides a year of Wolfram|One Personal Edition, as well as a one-year subscription to Wolfram|Alpha Pro. Additionally, Wolfram will be giving all HawkHack participants access to Wolfram|One for 30 days.",
+                "As well as contributing to the winner prize pool, Wolfram is giving all HawkHack participants access to Wolfram|One for 30 days.",
             link: "https://www.wolframalpha.com/?utm_medium=affiliate&utm_term=&utm_content&utm_campaign=hawkhacks24",
             alt: "Wolfram",
             buttonTitle: "Explore Wolfram",
@@ -154,7 +154,7 @@ const perksData: {
             image: PerksTaskade,
             title: "Taskade",
             description:
-                "Taskade will provide 40 HawkHack winners with 3-year upgrades to Taskade's starter plan. Taskade will give all HawkHack participants promo codes for 20% off their plans.",
+                "As well as contributing to the winner prize pool, Taskade is giving all hackers promo codes for 20% off their starter tier! ",
             link: null,
             alt: "Taskade",
             buttonTitle: null,
@@ -163,7 +163,7 @@ const perksData: {
             image: PerksBalsamiq,
             title: "Balsamiq",
             description:
-                "Balsamiq will be providing all HawkHack attendees 60-day extended trial of Balsamiq Cloud. Balsamiq Cloud is an effortless wireframing tool, a low-fidelity, high-impact tool highly valued by product managers, founders, developers, & UX teams.",
+                "Balsamiq is providing all HawkHack attendees with a 60-day extended trial of Balsamiq Cloud.- their effortless wireframing too valued by product managers, founders, developers, & UX teams.",
             link: "https://balsamiq.com/?utm_medium=affiliate&utm_term=&utm_content&utm_campaign=hawkhacks24",
             alt: "Balsamiq",
             buttonTitle: "Start Trial",
@@ -172,7 +172,7 @@ const perksData: {
             image: PerksEcho3D,
             title: "Echo3D",
             description:
-                "Echo3D will give all HawkHack participants a 1-month Pro tier subscription. Recorded workshop about 3D/AR/VR and how to use echo3D, as well as tech support via Discord will be available to hackers during the weekend.",
+                "Echo3D is giving all hackers a 1-month Pro-Tier subscription to Echo3D. Tech support will be available via Discord during the weekend.",
             link: "https://www.echo3d.com/?utm_medium=affiliate&utm_term=&utm_content&utm_campaign=hawkhacks24",
             alt: "Echo3D",
             buttonTitle: "Learn More",
@@ -181,7 +181,7 @@ const perksData: {
             image: PerksRosenfield,
             title: "Rosenfeld",
             description:
-                "Rosenfeld will give 20% discount promos when checking out using the provided link for all HawkHacks attendees.",
+                "Rosenfeld will give 20% discount promos when checking out using the provided link for all HawkHacks attendees. ",
             link: "https://rosenfeldmedia.com/?utm_medium=affiliate&utm_term=&utm_content&utm_campaign=hawkhacks24",
             alt: "Rosenfeld",
             buttonTitle: "Get 20% Off",
@@ -190,7 +190,7 @@ const perksData: {
             image: PerksCertopus,
             title: "Certopus",
             description:
-                "Certopus will be providing free-verified e-certificates for all HawkHack attendees who complete their courses.",
+                "Certopus is providing free-verified e-certificates for all HawkHack attendees who complete their courses.",
             link: null,
             alt: "Certopus",
             buttonTitle: "Get Certified",
