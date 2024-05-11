@@ -1037,6 +1037,7 @@ export const checkInvitation = functions.https.onCall(async (data, context) => {
             .collection(INVITATIONS_COLLECTION)
             .where("invitationId", "==", data.code)
             .where("userId", "==", context.auth.uid)
+            .where("status", "==", "pending")
             .get();
         const doc = snap.docs[0];
         if (!doc) {
