@@ -239,7 +239,7 @@ export const Navbar = () => {
                         Welcome, <span className="ml-1 font-bold"> {firstName} </span> !
                     </div>
 
-                    <aside className="flex flex-col items-start justify-between h-[90%]">
+                    <aside className="flex flex-col items-start justify-between h-[83%]">
                         <ul className="flex flex-col items-start justify-start gap-4 w-full">
                             {currentUser && renderNavItems(false)}
                             <a
