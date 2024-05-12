@@ -30,22 +30,24 @@ export {
  * sponsors
  */
 
-import Avalanche from "./sponsors/Avalanche.png";
+import Avalanche from "./sponsors/avalanche.png";
 import Near from "./sponsors/near.png";
-import Fantuan from "./sponsors/fantuan.png";
-import SmokesPoutinerie from "./sponsors/smokes.png";
-import Dominos from "./sponsors/dominos.png";
-import Nibiru from "./sponsors/nibiru.png";
 import Distributive from "./sponsors/distributive.png";
+import SmokesPoutinerie from "./sponsors/smokes.png";
+import Neurelo from "./sponsors/neurelo.png";
+import Metis from "./sponsors/metis.png";
+import Fantuan from "./sponsors/fantuan.png";
+import Dominos from "./sponsors/dominos.png";
 
 export {
     Avalanche,
     Near,
-    Fantuan,
-    SmokesPoutinerie,
-    Dominos,
-    Nibiru,
     Distributive,
+    SmokesPoutinerie,
+    Neurelo,
+    Metis,
+    Fantuan,
+    Dominos,
 };
 
 /**
