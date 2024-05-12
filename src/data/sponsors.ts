@@ -2,10 +2,12 @@ import { sponsorLinks } from "./sponsorLinks";
 import {
     Avalanche,
     Near,
-    Fantuan,
-    SmokesPoutinerie,
-    Dominos,
     Distributive,
+    SmokesPoutinerie,
+    Neurelo,
+    Metis,
+    Fantuan,
+    Dominos,
 } from "@assets";
 
 interface Sponsor {
@@ -25,11 +27,10 @@ const sponsors: Sponsor[] = [
         link: sponsorLinks.near,
         image: Near,
     },
-
     {
-        name: "Fantuan Delivery",
-        link: sponsorLinks.fantuan,
-        image: Fantuan,
+        name: "Distributive",
+        link: sponsorLinks.distributive,
+        image: Distributive,
     },
     {
         name: "Smoke Poutinerie",
@@ -37,15 +38,26 @@ const sponsors: Sponsor[] = [
         image: SmokesPoutinerie,
     },
     {
-        name: "Dominos",
-        link: sponsorLinks.domino,
-        image: Dominos,
+        name: "Neurelo",
+        link: sponsorLinks.neurelo,
+        image: Neurelo,
     },
     {
-        name: "Distributive",
-        link: sponsorLinks.distributive,
-        image: Distributive,
+        name: "Metis",
+        link: sponsorLinks.metis,
+        image: Metis,
     },
+    {
+        name: "Fantuan Delivery",
+        link: sponsorLinks.fantuan,
+        image: Fantuan,
+    },
+    {
+        name: "Dominos",
+        link: sponsorLinks.dominos,
+        image: Dominos,
+    },
+
 ];
 
 export { sponsors };
