@@ -143,12 +143,12 @@ const HomePage = () => {
                         </div>
 
                         <a
-                            className="mt-auto hover:underline"
+                            className="mt-auto hover:underline font-bold"
                             href="https://hawkhacks.ca/"
                             target="_blank"
                             rel="noreferrer"
                         >
-                            Check out all our sponsors ✨
+                            Check out all our sponsors! ✨
                         </a>
                     </div>
                 </Card>
