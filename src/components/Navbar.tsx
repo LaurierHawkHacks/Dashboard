@@ -60,6 +60,9 @@ export const Navbar = () => {
         setIsMobile(window.innerWidth <= 768);
     };
 
+    const userName = currentUser?.displayName?.split(" ") ?? ["", ""];
+    const firstName = userName[0];
+
     useEffect(() => {
         window.addEventListener("resize", updateNavbarState);
         return () => {
@@ -230,6 +233,10 @@ export const Navbar = () => {
                                 HawkHacks
                             </span>
                         </Link>
+                    </div>
+
+                    <div className="flex items-left justify-left p-4">
+                        Welcome, <span className="ml-1 font-bold"> {firstName} </span> !
                     </div>
 
                     <aside className="flex flex-col items-start justify-between h-[90%]">
