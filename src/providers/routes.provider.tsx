@@ -258,7 +258,8 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
 
         // type based
         if (currentUser.type === "hacker") {
-            if (userApp && !userApp.accepted) {
+            // no application or not accepted
+            if (!userApp || !userApp.accepted) {
                 userRoutes.children = [
                     {
                         index: true,
