@@ -49,6 +49,7 @@ interface PathObject {
     myApp: string;
     ticket: string;
     perks: string;
+    location: string;
 }
 
 interface Title {
@@ -84,6 +85,7 @@ const paths: PathObject = {
     myApp: "/my-application",
     ticket: "/ticket/:ticketId",
     perks: "/perks",
+    location: "/location",
 };
 
 const titles: Record<string, Title> = {
@@ -293,6 +295,7 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                     { path: paths.myTicket, element: <TicketPage /> },
                     { path: paths.myTeam, element: <MyTeamPage /> },
                     { path: paths.perks, element: <PerksPage /> },
+
                     {
                         path: `${paths.joinTeam}/:invitationId`,
                         element: <JoinTeamPage />, // dummy placeholder

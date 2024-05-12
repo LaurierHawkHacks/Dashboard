@@ -1,5 +1,5 @@
 import { RiDiscordLine } from "react-icons/ri";
-import { FiLogOut } from "react-icons/fi";
+import { FiLogOut, FiMapPin } from "react-icons/fi";
 import { RxStar } from "react-icons/rx";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/providers/hooks";
@@ -53,6 +53,11 @@ export const Navbar = () => {
             label: "Perks",
             Icon: RxStar,
         },
+        [paths.location]: {
+            label: "Location",
+            Icon: FiMapPin,
+            externalLink: "https://www.google.com/maps/place/Your+Location/",
+        },
     };
 
     const location = useLocation();
@@ -61,7 +66,10 @@ export const Navbar = () => {
         setIsMobile(window.innerWidth <= 768);
     };
 
-    const firstName = userApp?.firstName || currentUser?.displayName?.split(" ")[0] || "Unknown";
+    const firstName =
+        userApp?.firstName ||
+        currentUser?.displayName?.split(" ")[0] ||
+        "Unknown";
 
     useEffect(() => {
         window.addEventListener("resize", updateNavbarState);
@@ -84,8 +92,7 @@ export const Navbar = () => {
                         !window.localStorage.getItem(path)) ||
                     (path === paths.myTicket &&
                         !window.localStorage.getItem(path)) ||
-                    (path === paths.perks &&
-                        !window.localStorage.getItem(path))
+                    (path === paths.perks && !window.localStorage.getItem(path))
                 ) {
                     return (
                         <Link
@@ -198,10 +205,21 @@ export const Navbar = () => {
                                 className="w-full"
                             >
                                 <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
+                                    Location
+                                </li>
+                            </a>
+                            <a
+                                href="https://discord.com/invite/GxwvFEn9TB"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full"
+                            >
+                                <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
                                     Discord Support
                                 </li>
                             </a>
                         </ul>
+
                         {currentUser && (
                             <button
                                 className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full flex items-center justify-start gap-2 hover:text-black"
@@ -236,12 +254,24 @@ export const Navbar = () => {
                     </div>
 
                     <div className="flex items-left justify-left p-4">
-                        Welcome, <span className="ml-1 font-bold"> {firstName} </span> !
+                        Welcome,{" "}
+                        <span className="ml-1 font-bold"> {firstName} </span> !
                     </div>
 
                     <aside className="flex flex-col items-start justify-between h-[83%] overflow-y-auto">
                         <ul className="flex flex-col items-start justify-start gap-4 w-full">
                             {currentUser && renderNavItems(false)}
+                            <a
+                                href="https://maps.app.goo.gl/Fxic5XJBzZjHP4Yt5"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full"
+                            >
+                                <li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
+                                    <FiMapPin size={32} />
+                                    Location
+                                </li>
+                            </a>
                             <a
                                 href="https://discord.com/invite/GxwvFEn9TB"
                                 target="_blank"
