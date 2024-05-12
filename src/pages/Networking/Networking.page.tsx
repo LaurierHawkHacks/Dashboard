@@ -285,9 +285,9 @@ export const NetworkingPage = () => {
                         </button>
                         <label
                             htmlFor="resume-file-input"
-                            className="flex-grow rounded-lg px-4 py-2 bg-peachWhite hover:cursor-pointer"
+                            className="flex-grow rounded-lg px-4 py-2 bg-peachWhite hover:cursor-pointer overflow-hidden"
                         >
-                            <span>
+                            <span className="block overflow-hidden text-ellipsis whitespace-nowrap">
                                 {file ? file.name : "Select new resume file"}
                             </span>
                             <input
