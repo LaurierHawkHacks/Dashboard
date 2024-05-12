@@ -247,7 +247,8 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                     path: paths.networking,
                     element: <NetworkingPage />,
                 },
-                { path: paths.perks, element: <PerksPage /> }
+                { path: paths.perks, element: <PerksPage /> },
+                { path: paths.myTeam, element: <MyTeamPage /> }
             );
 
             setUserRoutes(userRoutes.children);

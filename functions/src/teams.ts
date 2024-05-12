@@ -1097,3 +1097,62 @@ export const checkInvitation = functions.https.onCall(async (data, context) => {
         });
     }
 });
+
+export const getUserInvitations = functions.https.onCall(async (_, context) => {
+    if (!context.auth)
+        return response(HttpStatus.UNAUTHORIZED, { message: "unauthorized" });
+
+    const func = "getUserInvitations";
+
+    try {
+        const team = await internalGetTeamByUser(context.auth.uid);
+        if (team) return response(HttpStatus.OK, { data: [] });
+    } catch (error) {
+        functions.logger.error("Failed to get requesting user's team.", {
+            error,
+            func,
+        });
+        return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+            message: "Could not get user team invitations",
+        });
+    }
+
+    try {
+        const snap = await admin
+            .firestore()
+            .collection(INVITATIONS_COLLECTION)
+            .where("userId", "==", context.auth.uid)
+            .where("status", "==", "pending")
+            .get();
+        const invitations = [];
+        const docs = snap.docs;
+        for (const doc of docs) {
+            const data = doc.data() as Invitation;
+            const snap = await admin
+                .firestore()
+                .collection(TEAMS_COLLECTION)
+                .doc(data.teamId)
+                .get();
+            const team = snap.data();
+            if (team) {
+                invitations.push({
+                    id: data.invitationId,
+                    owner: "",
+                    teamName: team.name,
+                });
+            } else {
+                functions.logger.info("No team found with id:", data.teamId);
+            }
+        }
+
+        return response(HttpStatus.OK, { data: invitations });
+    } catch (error) {
+        functions.logger.error("Failed to get user team invitations", {
+            error,
+            func,
+        });
+        return response(HttpStatus.INTERNAL_SERVER_ERROR, {
+            message: "Could not get user team invitations",
+        });
+    }
+});

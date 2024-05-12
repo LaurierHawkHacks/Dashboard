@@ -385,8 +385,6 @@ export const logEvent = functions.https.onCall((data, context) => {
     }
 });
 
-
-
 export const verifyRSVP = functions.https.onCall(async (_, context) => {
     if (!context.auth) {
         throw new functions.https.HttpsError(
@@ -682,6 +680,7 @@ export {
     validateTeamInvitation,
     rejectInvitation,
     checkInvitation,
+    getUserInvitations,
 } from "./teams";
 
 export { createTicket } from "./apple";
