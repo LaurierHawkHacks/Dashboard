@@ -385,109 +385,6 @@ export const logEvent = functions.https.onCall((data, context) => {
     }
 });
 
-export const verifyRSVP = functions.https.onCall(async (_, context) => {
-    if (!context.auth) {
-        throw new functions.https.HttpsError(
-            "permission-denied",
-            "Not authenticated"
-        );
-    }
-
-    functions.logger.info("Verify RSVP called.", { uid: context.auth.uid });
-
-    // only verify once
-    const user = await admin.auth().getUser(context.auth.uid);
-    if (user.customClaims?.rsvpVerified) {
-        return {
-            status: 200,
-            verified: true,
-            message: "RSVP already verified.",
-        };
-    } else if (user.customClaims?.isTestAccount) {
-        const counterDocRef = admin
-            .firestore()
-            .collection("rsvpCounter-dev")
-            .doc("counter");
-        const counterDoc = await counterDocRef.get();
-
-        if (counterDoc.exists) {
-            const count = counterDoc.data()?.count || 0;
-
-            if (count >= 5) {
-                functions.logger.info("RSVP limit reached.", {
-                    uid: context.auth.uid,
-                });
-                return {
-                    status: 400,
-                    verified: false,
-                    message: "RSVP limit reached.",
-                };
-            } else {
-                await counterDocRef.set({ count: count + 1 }, { merge: true });
-            }
-        } else {
-            await counterDocRef.set({ count: 1 });
-        }
-        await admin.auth().setCustomUserClaims(user.uid, {
-            ...user.customClaims,
-            rsvpVerified: true,
-        });
-
-        return {
-            status: 200,
-            verified: true,
-        };
-    } else {
-        const counterDocRef = admin
-            .firestore()
-            .collection("rsvpCounter")
-            .doc("counter");
-        const counterDoc = await counterDocRef.get();
-
-        if (counterDoc.exists) {
-            const count = counterDoc.data()?.count || 0;
-
-            if (count >= 700) {
-                functions.logger.info("RSVP limit reached.", {
-                    uid: context.auth.uid,
-                });
-                return {
-                    status: 400,
-                    verified: false,
-                    message: "RSVP limit reached.",
-                };
-            } else {
-                await counterDocRef.set({ count: count + 1 }, { merge: true });
-            }
-        } else {
-            await counterDocRef.set({ count: 1 });
-        }
-
-        try {
-            functions.logger.info("Verifying RSVP. User: " + context.auth.uid);
-            // add to custom claims
-            await admin.auth().setCustomUserClaims(user.uid, {
-                ...user.customClaims,
-                rsvpVerified: true,
-            });
-        } catch (e) {
-            functions.logger.error("Error verifying RSVP.", {
-                uid: context.auth.uid,
-                error: (e as Error).message,
-            });
-            throw new functions.https.HttpsError(
-                "internal",
-                "Service down. 1101"
-            );
-        }
-
-        return {
-            status: 200,
-            verified: true,
-        };
-    }
-});
-
 async function internalGetTicketData(id: string, extended = false) {
     functions.logger.info("Checking for ticket data...");
     const ticketDoc = await admin
@@ -686,3 +583,10 @@ export {
 export { createTicket } from "./apple";
 
 export { createPassClass, createPassObject } from "./google";
+
+export {
+    verifyRSVP,
+    withdrawRSVP,
+    joinWaitlist,
+    expiredSpotCleanup,
+} from "./rsvp";
