@@ -27,6 +27,7 @@ export interface CloudFunctionResponse<T> {
 }
 
 export interface Invitation {
+    id: string; // invitation id
     owner: string; // the name of the owner
     teamName: string;
 }

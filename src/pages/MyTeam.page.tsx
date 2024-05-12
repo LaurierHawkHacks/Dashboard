@@ -7,12 +7,15 @@ import {
     createTeam,
     deleteTeam,
     getTeamByUser,
+    getUserInviations,
     inviteMember,
     isTeamNameAvailable,
     removeMembers,
     updateTeamName,
+    validateTeamInvitation,
+    rejectInvitation,
 } from "@/services/utils/teams";
-import { type TeamData } from "@/services/utils/types";
+import { Invitation, type TeamData } from "@/services/utils/types";
 import { type FormEventHandler, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import {
@@ -33,6 +36,7 @@ type SearchTeamNameFn = (name: string) => Promise<void>;
 
 export const MyTeamPage = () => {
     const [team, setTeam] = useState<TeamData | null>(null);
+    const [invitations, setInvitations] = useState<Invitation[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [teamName, setTeamName] = useState("");
     const [isTeamNameTaken, setIsTeamNameTaken] = useState(false);
@@ -43,7 +47,9 @@ export const MyTeamPage = () => {
     const [disableAllActions, setDisableAllActions] = useState(false);
     const [isEditingTeamName, setIsEditingTeamName] = useState(false);
     const [openTeammatesDialog, setOpenTeammatesDialog] = useState(false);
+    const [openInvitations, setOpenInvitations] = useState(false);
     const [confirmDelete, setConfirmDelete] = useState("");
+    const [reloadTeam, setReloadTeam] = useState(false);
     // holds ths emails of the members to be removed
     const [toBeRemovedTeammates, setToBeRemovedTeammates] = useState<string[]>(
         []
@@ -267,6 +273,56 @@ export const MyTeamPage = () => {
         }
     };
 
+    const accept = async (invitationId: string) => {
+        setDisableAllActions(true);
+        try {
+            const res = await validateTeamInvitation(invitationId);
+            if (res.status === 200) {
+                showNotification({
+                    title: "Joined Team",
+                    message: "Hope you have a blast with your new team!",
+                });
+                setReloadTeam(!reloadTeam);
+            } else {
+                showNotification({
+                    title: "Error Joining Team",
+                    message: res.message,
+                });
+            }
+        } catch (e) {
+            showNotification({
+                title: "Error Joining Team",
+                message: (e as Error).message,
+            });
+        }
+        setDisableAllActions(false);
+    };
+
+    const reject = async (invitationId: string) => {
+        setDisableAllActions(true);
+        try {
+            const res = await rejectInvitation(invitationId);
+            if (res.status === 200) {
+                showNotification({
+                    title: "Team Inviation Rejected",
+                    message: "",
+                });
+                setReloadTeam(!reloadTeam);
+            } else {
+                showNotification({
+                    title: "Error Rejecting Invitation",
+                    message: res.message,
+                });
+            }
+        } catch (e) {
+            showNotification({
+                title: "Error Rejecting Invitation",
+                message: (e as Error).message,
+            });
+        }
+        setDisableAllActions(false);
+    };
+
     useEffect(() => {
         if (loadingTimeoutRef.current !== null)
             window.clearTimeout(loadingTimeoutRef.current);
@@ -276,21 +332,29 @@ export const MyTeamPage = () => {
         );
         if (!currentUser) return;
         (async () => {
-            try {
-                const res = await getTeamByUser();
+            const [teamRes, invitationRes] = await Promise.allSettled([
+                getTeamByUser(),
+                getUserInviations(),
+            ]);
+            if (teamRes.status === "fulfilled") {
+                const res = teamRes.value;
                 setTeam(res.data);
-                if (loadingTimeoutRef.current !== null)
-                    window.clearTimeout(loadingTimeoutRef.current);
-                setIsLoading(false);
-            } catch {
+            } else {
                 showNotification({
                     title: "Could not get team",
                     message:
                         "Yikes, something went wrong. Try again later; if the error continues, shoot us a message on our Discord tech-support channel.",
                 });
             }
+            if (invitationRes.status === "fulfilled") {
+                const res = invitationRes.value;
+                setInvitations(res.data);
+            }
+            if (loadingTimeoutRef.current !== null)
+                window.clearTimeout(loadingTimeoutRef.current);
+            setIsLoading(false);
         })();
-    }, []);
+    }, [reloadTeam]);
 
     useEffect(() => {
         window.localStorage.setItem(paths.myTeam, "visited");
@@ -300,35 +364,102 @@ export const MyTeamPage = () => {
 
     if (!team)
         return (
-            <div className="space-y-4">
-                <div className="w-fit text-lg space-y-2">
-                    <InfoCallout text="It looks like you are not enrolled in a team. Create one below, or enroll in an existing team by receiving an invitation from the team owner." />
+            <>
+                <div className="space-y-4">
+                    <div className="w-fit text-lg space-y-2">
+                        <InfoCallout text="It looks like you are not enrolled in a team. Create one below, or enroll in an existing team by receiving an invitation from the team owner." />
+                    </div>
+                    <div className="space-y-4 lg:space-y-0 lg:flex gap-4">
+                        <div className="max-w-lg flex-1 p-4 shadow-basic rounded-lg">
+                            <form
+                                className="mt-6 space-y-4"
+                                onSubmit={submitNewTeam}
+                            >
+                                <TextInput
+                                    label="Team Name"
+                                    id="team-name-input"
+                                    description={
+                                        invalidTeamName
+                                            ? "The entered team name is not valid."
+                                            : !isTeamNameTaken
+                                            ? "Enter an awesome team name."
+                                            : "The team name has been taken. Please choose another one."
+                                    }
+                                    invalid={invalidTeamName || isTeamNameTaken}
+                                    required
+                                    value={teamName}
+                                    onChange={(e) => {
+                                        setInvalidTeamName(false);
+                                        setTeamName(e.target.value);
+                                        debounce(e.target.value);
+                                    }}
+                                />
+                                <Button type="submit">Create Team</Button>
+                            </form>
+                            {/* invitations */}
+                        </div>
+                        <div>
+                            <Button
+                                onClick={() =>
+                                    !disableAllActions &&
+                                    setOpenInvitations(true)
+                                }
+                                intent="secondary"
+                                className="relative"
+                            >
+                                View Invitations
+                                {invitations.length ? (
+                                    <span className="absolute flex h-2 w-2 top-0 right-0 -translate-y-full translate-x-full">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                                    </span>
+                                ) : null}
+                            </Button>
+                        </div>
+                    </div>
                 </div>
-                <div className="max-w-lg p-4 shadow-basic rounded-lg">
-                    <form className="mt-6 space-y-4" onSubmit={submitNewTeam}>
-                        <TextInput
-                            label="Team Name"
-                            id="team-name-input"
-                            description={
-                                invalidTeamName
-                                    ? "The entered team name is not valid."
-                                    : !isTeamNameTaken
-                                    ? "Enter an awesome team name."
-                                    : "The team name has been taken. Please choose another one."
-                            }
-                            invalid={invalidTeamName || isTeamNameTaken}
-                            required
-                            value={teamName}
-                            onChange={(e) => {
-                                setInvalidTeamName(false);
-                                setTeamName(e.target.value);
-                                debounce(e.target.value);
-                            }}
-                        />
-                        <Button type="submit">Create Team</Button>
-                    </form>
-                </div>
-            </div>
+                <Modal
+                    open={openInvitations}
+                    title="Invitations"
+                    subTitle="Here you can accept/reject team invitations"
+                    onClose={() =>
+                        !disableAllActions && setOpenInvitations(false)
+                    }
+                >
+                    <ul className="max-h-96 overflow-y-auto space-y-4">
+                        {invitations.map((i) => (
+                            <li
+                                key={i.id}
+                                className="rounded-lg p-4 hover:bg-gray-100 transition"
+                            >
+                                <p>
+                                    Invitation to join{" "}
+                                    <span className="font-bold">
+                                        {i.teamName}
+                                    </span>
+                                </p>
+                                <div className="flex gap-2 mt-4">
+                                    <Button
+                                        onClick={() => accept(i.id)}
+                                        disabled={disableAllActions}
+                                        className="p-2 bg-tbrand"
+                                    >
+                                        Accept
+                                    </Button>
+                                    <Button
+                                        onClick={() => reject(i.id)}
+                                        disabled={disableAllActions}
+                                        intent="secondary"
+                                        className="p-2"
+                                    >
+                                        Reject
+                                    </Button>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </Modal>
+            </>
         );
 
     return (

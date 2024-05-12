@@ -186,3 +186,20 @@ export async function checkInvitation(code: string) {
         throw e;
     }
 }
+
+/**
+ * Facilitate users to accept team invitations when they didn't receive an email
+ */
+export async function getUserInviations() {
+    try {
+        const fn = httpsCallable<unknown, CloudFunctionResponse<Invitation[]>>(
+            functions,
+            "getUserInvitations"
+        );
+        const { data } = await fn();
+        return data;
+    } catch (e) {
+        await handleError(e as Error, "get_user_invitations_errro");
+        throw e;
+    }
+}
