@@ -32,6 +32,14 @@ service cloud.firestore {
     match /rsvpCounter-dev/{counterId} {
         allow read, write: if isAuthenticated() && isAdmin();
     }
+    match /waitlist/{docId} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated() && isAdmin();
+    }
+    match /spots/{docId} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated() && isAdmin();
+    }
 
     // Tickets Collection Rules
     match /tickets/{ticketId} {

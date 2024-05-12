@@ -74,3 +74,12 @@ export interface FoodItem {
     time: Timestamp;
     location: string;
 }
+
+export interface WaitlistDoc {
+    uid: string;
+    joinAt: Timestamp;
+}
+
+export interface SpotDoc extends WaitlistDoc {
+    expiresAt: Timestamp;
+}

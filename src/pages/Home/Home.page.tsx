@@ -3,6 +3,8 @@ import { Card, Accordion, SocialIcons, Button, Modal } from "@components";
 import { faqs, sponsors, importantDateTimes } from "@data";
 import { useAuth } from "@/providers/auth.provider";
 import { useState } from "react";
+import { useNotification } from "@/providers/notification.provider";
+import { withdrawRSVP } from "@/services/utils";
 
 const ImportantInfoBlocks = importantDateTimes.map((importantDateTime, i) => {
     const entries = Object.entries(importantDateTime.events);
@@ -46,9 +48,36 @@ const Sponsors = sponsors.map((sponsor, i) => {
 });
 
 const HomePage = () => {
-    const { currentUser } = useAuth();
+    const { currentUser, logout } = useAuth();
     const [disableAllActions, setDisableAllActions] = useState(false);
-    const [openDismissRSVPWarning, setOpenDismissRSVPWarning] = useState(false);
+    const [openDismissRSVPWarning, setOpenWithdrawRSVP] = useState(false);
+    const { showNotification } = useNotification();
+
+    const withdraw = async () => {
+        setDisableAllActions(true);
+        try {
+            const res = await withdrawRSVP();
+            if (res.status === 200) {
+                showNotification({
+                    title: "Your RSVP has been withdrawn",
+                    message: "",
+                });
+                // remove lingering claims
+                await logout();
+            } else {
+                showNotification({
+                    title: "Looks like something went wrong",
+                    message: `Please contact us in our Discord support channel. (${res.message})`,
+                });
+            }
+        } catch (error) {
+            showNotification({
+                title: "Error Withdrawing RSVP",
+                message: (error as Error).message,
+            });
+        }
+        setDisableAllActions(false);
+    };
 
     return (
         <>
@@ -97,8 +126,7 @@ const HomePage = () => {
                         </span>
                         <Button
                             onClick={() =>
-                                !disableAllActions &&
-                                setOpenDismissRSVPWarning(true)
+                                !disableAllActions && setOpenWithdrawRSVP(true)
                             }
                             intent="secondary"
                             className="rounded-lg mt-4 border-gray-300"
@@ -174,16 +202,26 @@ const HomePage = () => {
                 </Card>
             </section>
             <Modal
-                title="Dismissing RSVP!"
+                title="Withdraw RSVP!"
                 subTitle="You will have to get into the waitlist to RSVP again."
                 open={openDismissRSVPWarning}
-                onClose={() =>
-                    !disableAllActions && setOpenDismissRSVPWarning(false)
-                }
+                onClose={() => !disableAllActions && setOpenWithdrawRSVP(false)}
             >
-                <div className="flex gap-4">
-                    <Button>Nah, I think I will make it somehow</Button>
-                    <Button intent="secondary">Dismiss</Button>
+                <div className="flex gap-4 justify-center">
+                    <Button
+                        intent="secondary"
+                        disabled={disableAllActions}
+                        onClick={() => setOpenWithdrawRSVP(false)}
+                    >
+                        cancel
+                    </Button>
+                    <Button
+                        onClick={() => withdraw()}
+                        disabled={disableAllActions}
+                        intent="danger"
+                    >
+                        Withdraw
+                    </Button>
                 </div>
             </Modal>
         </>
