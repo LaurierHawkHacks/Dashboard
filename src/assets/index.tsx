@@ -30,7 +30,7 @@ export {
  * sponsors
  */
 
-import Avalanche from "./sponsors/avalanche.png";
+import Avalanche from "./sponsors/Avalanche.png";
 import Near from "./sponsors/near.png";
 import Distributive from "./sponsors/distributive.png";
 import SmokesPoutinerie from "./sponsors/smokes.png";
