@@ -11,6 +11,12 @@ import {
 } from "@/services/utils";
 import { useNotification } from "@/providers/notification.provider";
 import type { Socials } from "@/services/utils/types";
+import {
+    Cog6ToothIcon,
+    TrashIcon,
+    XMarkIcon,
+} from "@heroicons/react/24/outline";
+import { Button, Modal, Select } from "@/components";
 
 const allowedFileTypes = [
     "image/*", //png, jpg, jpeg, jfif, pjpeg, pjp, gif, webp, bmp, svg
@@ -39,6 +45,7 @@ export const NetworkingPage = () => {
     const gettinSocialsRef = useRef<boolean>(false);
     const { showNotification } = useNotification();
     const [socials, setSocials] = useState<Socials | null>(null);
+    const [openResumeSettings, setOpenResumeSettings] = useState(false);
 
     const [file, setFile] = useState<File | null>(null);
 
@@ -164,164 +171,226 @@ export const NetworkingPage = () => {
     if (isLoading) return <LoadingAnimation />;
 
     return (
-        <div>
-            <div className="flex items-center gap-10">
-                <h1 className="font-bold text-2xl">
-                    {firstName} {lastName}
-                </h1>
-                {userApp && <p>{userApp.pronouns}</p>}
-            </div>
-            <p className="mt-6">Your connections</p>
-            <div className="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg mt-6 flex items-center max-w-md">
-                <MdWarning className="mr-4 text-3xl" />
-                <p>
-                    Information you enter on this page will be publicly visible.
-                </p>
-            </div>
-            <form className="flex flex-col max-w-md gap-5 mt-12">
-                {mediaTypes.map(({ name, key }) => (
-                    <div
-                        key={key}
-                        className="bg-white shadow-md p-4 rounded-xl flex flex-col"
-                    >
+        <>
+            <div>
+                <div className="flex items-center gap-10">
+                    <h1 className="font-bold text-2xl">
+                        {firstName} {lastName}
+                    </h1>
+                    {userApp && <p>{userApp.pronouns}</p>}
+                </div>
+                <p className="mt-6">Your connections</p>
+                <div className="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg mt-6 flex items-center max-w-md">
+                    <MdWarning className="mr-4 text-3xl" />
+                    <p>
+                        Information you enter on this page will be publicly
+                        visible.
+                    </p>
+                </div>
+                <form className="flex flex-col max-w-md gap-5 mt-12">
+                    {mediaTypes.map(({ name, key }) => (
+                        <div
+                            key={key}
+                            className="bg-white shadow-md p-4 rounded-xl flex flex-col"
+                        >
+                            <div className="mb-2 flex justify-between items-center">
+                                <p className="flex-1">{name}</p>
+                                {mediaValues[key] && (
+                                    <p
+                                        className={`rounded-full px-4 py-1 ${
+                                            editMode === key
+                                                ? " text-gray-500 italic "
+                                                : "bg-green-300"
+                                        }`}
+                                    >
+                                        {editMode === key
+                                            ? "Unsaved Changes"
+                                            : "Complete"}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="relative">
+                                <input
+                                    className="bg-peachWhite border-0 rounded-lg text-gray-500 pr-7 w-full"
+                                    type="text"
+                                    placeholder={`Add your ${name}!`}
+                                    value={mediaValues[key]}
+                                    onChange={(e) =>
+                                        handleInputChange(key, e.target.value)
+                                    }
+                                />
+                                {mediaValues[key] && (
+                                    <MdOutlineEdit className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5" />
+                                )}
+                            </div>
+
+                            {editMode === key && (
+                                <div className="mt-2 flex gap-2">
+                                    <button
+                                        className="bg-gray-300/30 rounded-lg px-4 py-1"
+                                        onClick={handleCancel}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        className="bg-peachWhite text-black rounded-lg px-4 py-1"
+                                        onClick={handleSubmit}
+                                    >
+                                        Save
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+
+                    {/* RESUME UPLOAD */}
+                    <div className="bg-white shadow-md p-4 rounded-xl flex flex-col">
                         <div className="mb-2 flex justify-between items-center">
-                            <p className="flex-1">{name}</p>
-                            {mediaValues[key] && (
-                                <p
-                                    className={`rounded-full px-4 py-1 ${
-                                        editMode === key
-                                            ? " text-gray-500 italic "
-                                            : "bg-green-300"
-                                    }`}
-                                >
-                                    {editMode === key
-                                        ? "Unsaved Changes"
-                                        : "Complete"}
+                            <span className="flex-1 gap-2">
+                                <p className="">Resume</p>
+                            </span>
+                            {socials && socials.resumeRef ? (
+                                <p className="bg-green-300 rounded-full px-4 py-1">
+                                    Resume Uploaded
+                                </p>
+                            ) : (
+                                <p className="bg-red-500 rounded-full px-4 py-1 text-white">
+                                    Not Uploaded
                                 </p>
                             )}
                         </div>
-                        <div className="relative">
-                            <input
-                                className="bg-peachWhite border-0 rounded-lg text-gray-500 pr-7 w-full"
-                                type="text"
-                                placeholder={`Add your ${name}!`}
-                                value={mediaValues[key]}
-                                onChange={(e) =>
-                                    handleInputChange(key, e.target.value)
-                                }
-                            />
-                            {mediaValues[key] && (
-                                <MdOutlineEdit className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5" />
-                            )}
-                        </div>
-
-                        {editMode === key && (
-                            <div className="mt-2 flex gap-2">
+                        <div>
+                            <div className="flex items-center gap-4">
                                 <button
+                                    title="Open Resume in new tab"
+                                    type="button"
+                                    className="p-2 bg-peachWhite rounded-lg flex items-center justify-center hover:cursor-pointer flex-shrink-0"
+                                    onClick={async () => {
+                                        if (mediaValues.resumeRef) {
+                                            try {
+                                                const url = await getResumeURL(
+                                                    mediaValues.resumeRef
+                                                );
+                                                window.open(
+                                                    url,
+                                                    "_blank",
+                                                    "noopener,noreferrer"
+                                                );
+                                            } catch (error) {
+                                                showNotification({
+                                                    title: "Error",
+                                                    message:
+                                                        "Failed to open resume. Please try again.",
+                                                });
+                                            }
+                                        } else {
+                                            showNotification({
+                                                title: "Error",
+                                                message:
+                                                    "No resume found to open.",
+                                            });
+                                        }
+                                    }}
+                                >
+                                    <MdOpenInNew className="text-gray-500 w-6 h-6" />
+                                </button>
+                                <button
+                                    title="Open Resume in new tab"
+                                    type="button"
+                                    className="p-2 bg-peachWhite rounded-lg flex items-center justify-center hover:cursor-pointer flex-shrink-0"
+                                    onClick={() => setOpenResumeSettings(true)}
+                                >
+                                    <Cog6ToothIcon className="text-gray-500 w-6 h-6" />
+                                </button>
+                                <label
+                                    htmlFor="resume-file-input"
+                                    className="relative flex-grow rounded-lg px-4 py-2 bg-peachWhite hover:cursor-pointer overflow-hidden"
+                                >
+                                    <span className="block overflow-hidden text-ellipsis whitespace-nowrap pr-6">
+                                        {file
+                                            ? file.name
+                                            : "Select new resume file"}
+                                    </span>
+                                    <input
+                                        id="resume-file-input"
+                                        className="sr-only"
+                                        type="file"
+                                        accept={allowedFileTypes.join(", ")}
+                                        onChange={handleFileInput}
+                                    />
+                                    {file && (
+                                        <button
+                                            type="button"
+                                            className="absolute top-0 right-0 -translate-x-1/2 translate-y-1/2 -mt-1 group"
+                                            onClick={() => {
+                                                setEditMode("");
+                                                setFile(null);
+                                            }}
+                                        >
+                                            <XMarkIcon className="w-6 h-6 transition group-hover:text-red-500" />
+                                        </button>
+                                    )}
+                                </label>
+                            </div>
+                        </div>
+                        {editMode === "resume" && (
+                            <div className="mt-4 flex gap-2">
+                                <button
+                                    type="button"
                                     className="bg-gray-300/30 rounded-lg px-4 py-1"
-                                    onClick={handleCancel}
+                                    onClick={() => {
+                                        setFile(null);
+                                        setEditMode("");
+                                    }}
                                 >
                                     Cancel
                                 </button>
                                 <button
+                                    type="button"
                                     className="bg-peachWhite text-black rounded-lg px-4 py-1"
-                                    onClick={handleSubmit}
+                                    onClick={submitFile}
                                 >
                                     Save
                                 </button>
                             </div>
                         )}
                     </div>
-                ))}
-
-                {/* RESUME UPLOAD */}
-                <div className="bg-white shadow-md p-4 rounded-xl flex flex-col">
-                    <div className="mb-2 flex justify-between items-center">
-                        <span className="flex-1 gap-2">
-                            <p className="">Resume</p>
-                        </span>
-                        {socials && socials.resumeRef ? (
-                            <p className="bg-green-300 rounded-full px-4 py-1">
-                                Resume Uploaded
-                            </p>
-                        ) : (
-                            <p className="bg-red-500 rounded-full px-4 py-1 text-white">
-                                Not Uploaded
-                            </p>
-                        )}
+                </form>
+            </div>
+            <Modal
+                open={openResumeSettings}
+                title="Resume Settings"
+                subTitle=""
+                onClose={() => setOpenResumeSettings(false)}
+            >
+                <div className="space-y-4">
+                    <div>
+                        <Select
+                            initialValue=""
+                            options={["private", "public"]}
+                            label="Resume Visibility"
+                        />
                     </div>
-                    <div className="flex items-center gap-4">
-                        <button
-                            title="Open Resume in new tab"
-                            type="button"
-                            className="p-2 bg-peachWhite rounded-lg flex items-center justify-center hover:cursor-pointer flex-shrink-0"
-                            onClick={async () => {
-                                if (mediaValues.resumeRef) {
-                                    try {
-                                        const url = await getResumeURL(
-                                            mediaValues.resumeRef
-                                        );
-                                        window.open(
-                                            url,
-                                            "_blank",
-                                            "noopener,noreferrer"
-                                        );
-                                    } catch (error) {
-                                        showNotification({
-                                            title: "Error",
-                                            message:
-                                                "Failed to open resume. Please try again.",
-                                        });
-                                    }
-                                } else {
-                                    showNotification({
-                                        title: "Error",
-                                        message: "No resume found to open.",
-                                    });
-                                }
-                            }}
-                        >
-                            <MdOpenInNew className="text-gray-500 w-6 h-6" />
-                        </button>
-                        <label
-                            htmlFor="resume-file-input"
-                            className="flex-grow rounded-lg px-4 py-2 bg-peachWhite hover:cursor-pointer overflow-hidden"
-                        >
-                            <span className="block overflow-hidden text-ellipsis whitespace-nowrap">
-                                {file ? file.name : "Select new resume file"}
+                    <div>
+                        <button>
+                            Remove Resume{" "}
+                            <span>
+                                <TrashIcon className="w-8 h-8" />
                             </span>
-                            <input
-                                id="resume-file-input"
-                                className="sr-only"
-                                type="file"
-                                accept={allowedFileTypes.join(", ")}
-                                onChange={handleFileInput}
-                            />
-                        </label>
+                        </button>
                     </div>
-                    {editMode === "resume" && (
-                        <div className="mt-4 flex gap-2">
-                            <button
-                                type="button"
-                                className="bg-gray-300/30 rounded-lg px-4 py-1"
-                                onClick={() => {
-                                    setFile(null);
-                                    setEditMode("");
-                                }}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="button"
-                                className="bg-peachWhite text-black rounded-lg px-4 py-1"
-                                onClick={submitFile}
-                            >
-                                Save
-                            </button>
-                        </div>
-                    )}
+
+                    <div className="flex justify-end gap-4">
+                        <Button
+                            intent="secondary"
+                            onClick={() => setOpenResumeSettings(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button>Save</Button>
+                    </div>
                 </div>
-            </form>
-        </div>
+            </Modal>
+        </>
     );
 };
