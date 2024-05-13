@@ -200,14 +200,10 @@ export const VerifyRSVP = () => {
             ) : (
                 <div className="pt-12 flex justify-center items-center flex-col gap-6">
                     {rsvpLimitReached ? (
-                        <div className="text-center space-y-2">
+                        <div className="text-center space-y-4 max-w-2xl mx-auto">
                             {inWaitlist && !spotAvailable && (
                                 <div className="flex justify-center flex-col">
                                     <InfoCallout text="Thanks for joining the waitlist. Once there is an available spot, you will receive an email. You can always come back to here to check." />
-                                    <p className="font-bold">
-                                        You are {ordinalSuffix(waitlistPos)} in
-                                        line.
-                                    </p>
                                 </div>
                             )}
                             {expiredSpot && (
@@ -215,13 +211,46 @@ export const VerifyRSVP = () => {
                                     <InfoCallout text="Your spot has expired. Please join the waitlist again." />
                                 </div>
                             )}
-                            <p className="text-lg font-bold text-red-500">
-                                RSVP Limit Reached
-                            </p>
+                            {!inWaitlist && (
+                                <>
+                                    <p className="text-lg font-bold text-red-500">
+                                        RSVP Limit Reached
+                                    </p>
+                                    <p className="text-gray-700">
+                                        Sorry, but the RSVP limit has been
+                                        reached.
+                                        <br />
+                                        Join the waitlist incase someone revokes
+                                        their RSVP!
+                                    </p>
+                                </>
+                            )}
+                            {inWaitlist && (
+                                <>
+                                    <p className="font-bold">
+                                        You are {ordinalSuffix(waitlistPos)} in
+                                        line.
+                                    </p>
+                                    <p>
+                                        Once you receive your email, you&apos;ll
+                                        have{" "}
+                                        <span className="font-bold">
+                                            24 hours to RSVP
+                                        </span>{" "}
+                                        before we move on to the next person in
+                                        line. Keep checking this page for your
+                                        live spot on the waitlist to ensure you
+                                        don&apos;t miss it -{" "}
+                                        <span className="font-bold">
+                                            you will not get another chance.
+                                        </span>
+                                    </p>
+                                </>
+                            )}
                             <p className="text-gray-700">
-                                {
-                                    "We're sorry, but the RSVP limit has been reached. If you have any questions or concerns, please reach out to us in our tech support channel on Discord."
-                                }
+                                If you have any questions or concerns, please
+                                reach out to us in our tech support channel on
+                                Discord.
                             </p>
                             {!inWaitlist && (
                                 <Button
