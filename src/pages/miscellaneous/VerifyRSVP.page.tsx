@@ -18,6 +18,21 @@ import { firestore } from "@/services/firebase";
 import { SpotDoc } from "@/services/utils/types";
 import { isAfter } from "date-fns";
 
+function ordinalSuffix(i: number) {
+    const j = i % 10;
+    const k = i % 100;
+    if (j === 1 && k !== 11) {
+        return i + "st";
+    }
+    if (j === 2 && k !== 12) {
+        return i + "nd";
+    }
+    if (j === 3 && k !== 13) {
+        return i + "rd";
+    }
+    return i + "th";
+}
+
 export const VerifyRSVP = () => {
     const [isVerifying, setIsVerifying] = useState(false);
     const [agreedToParticipate, setAgreedToParticipate] = useState(false);
@@ -32,6 +47,7 @@ export const VerifyRSVP = () => {
     const [inWaitlist, setInWaitlist] = useState(false);
     const [expiredSpot, setExpiredSpot] = useState(false);
     const [refreshRSVPStatus, setRefreshRSVPStatus] = useState(false);
+    const [waitlistPos, setWaitlistPos] = useState(0);
 
     const verify = async () => {
         setIsVerifying(true);
@@ -95,7 +111,7 @@ export const VerifyRSVP = () => {
                 );
                 const waitlistQ = query(
                     collection(firestore, "waitlist"),
-                    where("uid", "==", currentUser.uid)
+                    orderBy("joinAt", "asc")
                 );
                 const [snap, waitSnap] = await Promise.allSettled([
                     getDocs(q),
@@ -117,8 +133,18 @@ export const VerifyRSVP = () => {
                 }
 
                 if (waitSnap.status === "fulfilled") {
-                    const inWaitlist = waitSnap.value.size > 0;
+                    let inWaitlist = false;
+                    let position = 1;
+                    for (const doc of waitSnap.value.docs) {
+                        const data = doc.data();
+                        if (data.uid === currentUser.uid) {
+                            inWaitlist = true;
+                            break;
+                        }
+                        position += 1;
+                    }
                     setInWaitlist(inWaitlist);
+                    setWaitlistPos(position);
                 } else {
                     console.error(waitSnap.reason);
                 }
@@ -145,7 +171,24 @@ export const VerifyRSVP = () => {
                 setSpotAvailable(true);
             }
         });
-        return unsub;
+
+        // listen to waitlist position
+        const unsubWaitlist = onSnapshot(
+            collection(firestore, "waitlist"),
+            (snap) => {
+                let posDiff = 0;
+                snap.docChanges().forEach((change) => {
+                    if (change.type === "removed") {
+                        posDiff += 1;
+                    }
+                });
+                setWaitlistPos((curr) => curr - posDiff);
+            }
+        );
+        return () => {
+            unsub();
+            unsubWaitlist();
+        };
     }, [currentUser, inWaitlist]);
 
     if (isLoading) return <LoadingAnimation />;
@@ -159,8 +202,12 @@ export const VerifyRSVP = () => {
                     {rsvpLimitReached ? (
                         <div className="text-center space-y-2">
                             {inWaitlist && !spotAvailable && (
-                                <div className="flex justify-center">
+                                <div className="flex justify-center flex-col">
                                     <InfoCallout text="Thanks for joining the waitlist. Once there is an available spot, you will receive an email. You can always come back to here to check." />
+                                    <p className="font-bold">
+                                        You are {ordinalSuffix(waitlistPos)} in
+                                        line.
+                                    </p>
                                 </div>
                             )}
                             {expiredSpot && (
@@ -176,12 +223,14 @@ export const VerifyRSVP = () => {
                                     "We're sorry, but the RSVP limit has been reached. If you have any questions or concerns, please reach out to us in our tech support channel on Discord."
                                 }
                             </p>
-                            <Button
-                                onClick={join}
-                                disabled={isLoading || inWaitlist}
-                            >
-                                Join waitlist
-                            </Button>
+                            {!inWaitlist && (
+                                <Button
+                                    onClick={join}
+                                    disabled={isLoading || inWaitlist}
+                                >
+                                    Join waitlist
+                                </Button>
+                            )}
                         </div>
                     ) : (
                         <>
