@@ -113,17 +113,18 @@ const HomePage = () => {
                         </div>
                     </Card>
 
-                    <Card title="RSVP Status" className="xl:col-span-5">
-                        <span className="flex flex-col gap-2">
-                            <p className="text-[#333] text-sm">
-                                RSVP status:{" "}
-                                <b>
-                                    {currentUser?.rsvpVerified
-                                        ? "RSVP'd"
-                                        : "Not RSVP'd"}
-                                </b>
-                            </p>
-                        </span>
+                <Card title="RSVP Status" className="xl:col-span-5">
+                    <span className="flex flex-col gap-2">
+                        <p className="text-lg">
+                            RSVP status:{" "}
+                            <span className="font-bold">
+                                {currentUser?.rsvpVerified
+                                    ? "RSVP'd"
+                                    : "Not RSVP'd"}
+                                <span className="capitalize">{` (${currentUser?.type})`}</span>
+                            </span>
+                        </p>
+                    </span>
                         <Button
                             onClick={() =>
                                 !disableAllActions && setOpenWithdrawRSVP(true)
@@ -133,7 +134,7 @@ const HomePage = () => {
                         >
                             Not able to make it?
                         </Button>
-                    </Card>
+                </Card>
 
                     <Card
                         title="Important Information"
