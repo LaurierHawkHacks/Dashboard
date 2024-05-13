@@ -22,7 +22,8 @@ export const Navbar = () => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { userRoutes, paths } = useAvailableRoutes();
-    const { currentUser } = useAuth();
+    const { currentUser, userApp } = useAuth();
+
     const navItems = {
         [paths.portal]: {
             label: "Home",
@@ -60,8 +61,7 @@ export const Navbar = () => {
         setIsMobile(window.innerWidth <= 768);
     };
 
-    const userName = currentUser?.displayName?.split(" ") ?? ["", ""];
-    const firstName = userName[0];
+    const firstName = userApp?.firstName || currentUser?.displayName?.split(" ")[0] || "Unknown";
 
     useEffect(() => {
         window.addEventListener("resize", updateNavbarState);
