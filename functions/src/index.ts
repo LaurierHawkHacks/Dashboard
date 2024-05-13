@@ -588,5 +588,6 @@ export {
     verifyRSVP,
     withdrawRSVP,
     joinWaitlist,
-    expiredSpotCleanup,
+    // expiredSpotCleanup,
+    // moveToSpots,
 } from "./rsvp";

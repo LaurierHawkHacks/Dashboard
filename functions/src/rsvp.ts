@@ -499,37 +499,46 @@ export const joinWaitlist = functions.https.onCall(async (_, context) => {
     return response(HttpStatus.OK);
 });
 
-export const expiredSpotCleanup = functions.pubsub
-    .schedule("every 1 minutes")
-    .onRun(async () => {
-        functions.logger.info("Start expired spot clean up");
-        const batch = admin.firestore().batch();
-        let snap = await admin
-            .firestore()
-            .collection(SPOTS_COLLECTION)
-            .where("expiresAt", "<", Timestamp.now())
-            .get();
-        const count = snap.size;
-        snap.forEach((doc) => {
-            batch.delete(doc.ref);
-        });
-        snap = await admin
-            .firestore()
-            .collection(WAITLIST_COLLECTION)
-            .orderBy("joinAt", "asc")
-            .limit(count)
-            .get();
-        // 24 hours in milliseconds
-        const oneDayInMs = 86400000;
-        snap.forEach((doc) => {
-            const expires = Timestamp.now().toDate();
-            expires.setTime(expires.getTime() + oneDayInMs);
-            const expiresAt = Timestamp.fromDate(expires);
-            batch.create(
-                admin.firestore().collection(SPOTS_COLLECTION).doc(doc.id),
-                { ...doc.data(), expiresAt }
-            );
-            batch.delete(doc.ref);
-        });
-        await batch.commit();
-    });
+// export const expiredSpotCleanup = functions.pubsub
+//     .schedule("every 1 minutes")
+//     .onRun(async () => {
+//         functions.logger.info("Start expired spot clean up");
+//         const batch = admin.firestore().batch();
+//         const snap = await admin
+//             .firestore()
+//             .collection(SPOTS_COLLECTION)
+//             .where("expiresAt", "<", Timestamp.now())
+//             .get();
+//         const count = snap.size;
+//         snap.forEach((doc) => {
+//             batch.delete(doc.ref);
+//         });
+//         const spots = (await admin.firestore().collection(SPOTS_COLLECTION).doc(SPOTS_COUNTER_DOCUMENT).get()).data()?.count ?? 0;
+//         batch.update(admin.firestore().collection(SPOTS_COLLECTION).doc(SPOTS_COUNTER_DOCUMENT), { count: spots + count });
+//         await batch.commit();
+//     });
+//
+// export const moveToSpots = functions.pubsub.schedule("every 1 minutes").onRun(async () => {
+//     const spots = (await admin.firestore().collection(SPOTS_COLLECTION).doc(SPOTS_COUNTER_DOCUMENT).get()).data()?.count ?? 0;
+//     const  snap = await admin
+//         .firestore()
+//         .collection(WAITLIST_COLLECTION)
+//         .orderBy("joinAt", "asc")
+//         .limit(spots)
+//         .get();
+//     const batch = admin.firestore().batch();
+//     // 24 hours in milliseconds
+//     const oneDayInMs = 86400000;
+//     snap.forEach((doc) => {
+//         const expires = Timestamp.now().toDate();
+//         expires.setTime(expires.getTime() + oneDayInMs);
+//         const expiresAt = Timestamp.fromDate(expires);
+//         batch.create(
+//             admin.firestore().collection(SPOTS_COLLECTION).doc(doc.id),
+//             { ...doc.data(), expiresAt }
+//         );
+//         batch.delete(doc.ref);
+//     });
+//     batch.update(admin.firestore().collection(SPOTS_COLLECTION).doc(SPOTS_COUNTER_DOCUMENT), { count: 0 });
+//     await batch.commit();
+// });
