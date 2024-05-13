@@ -7,10 +7,10 @@ import { useEffect, useRef, useState } from "react";
 import { rsvpText } from "@/data";
 import { InfoCallout } from "@/components/InfoCallout/InfoCallout";
 import {
-    Timestamp,
     collection,
     getDocs,
     onSnapshot,
+    orderBy,
     query,
     where,
 } from "firebase/firestore";
@@ -30,6 +30,8 @@ export const VerifyRSVP = () => {
     const timeoutRef = useRef<number | null>(null);
     const [spotAvailable, setSpotAvailable] = useState(false);
     const [inWaitlist, setInWaitlist] = useState(false);
+    const [expiredSpot, setExpiredSpot] = useState(false);
+    const [refreshRSVPStatus, setRefreshRSVPStatus] = useState(false);
 
     const verify = async () => {
         setIsVerifying(true);
@@ -48,6 +50,7 @@ export const VerifyRSVP = () => {
                 });
             }
         }
+        setRefreshRSVPStatus(!refreshRSVPStatus);
     };
 
     const join = async () => {
@@ -57,6 +60,7 @@ export const VerifyRSVP = () => {
             if (res.status === 200) {
                 setRsvpLimitReached(true);
                 setInWaitlist(true);
+                setExpiredSpot(false);
             } else {
                 showNotification({
                     title: "Error joining waitlist",
@@ -87,7 +91,7 @@ export const VerifyRSVP = () => {
                 const q = query(
                     collection(firestore, "spots"),
                     where("uid", "==", currentUser.uid),
-                    where("expiresAt", ">", Timestamp.now())
+                    orderBy("expiresAt", "desc")
                 );
                 const waitlistQ = query(
                     collection(firestore, "waitlist"),
@@ -99,8 +103,15 @@ export const VerifyRSVP = () => {
                 ]);
                 if (snap.status === "fulfilled") {
                     const canRSVP = snap.value.size > 0;
-                    setSpotAvailable(canRSVP);
-                    setRsvpLimitReached(!canRSVP);
+                    const data = snap.value.docs[0]?.data() as SpotDoc;
+                    if (data && isAfter(new Date(), data.expiresAt.toDate())) {
+                        setSpotAvailable(false);
+                        setRsvpLimitReached(true);
+                        setExpiredSpot(true);
+                    } else {
+                        setSpotAvailable(canRSVP);
+                        setRsvpLimitReached(!canRSVP);
+                    }
                 } else {
                     console.error(snap.reason);
                 }
@@ -117,7 +128,7 @@ export const VerifyRSVP = () => {
                 console.error(error);
             }
         })();
-    }, [currentUser]);
+    }, [currentUser, refreshRSVPStatus]);
 
     useEffect(() => {
         if (!currentUser || currentUser.rsvpVerified || !inWaitlist) return;
@@ -150,6 +161,11 @@ export const VerifyRSVP = () => {
                             {inWaitlist && !spotAvailable && (
                                 <div className="flex justify-center">
                                     <InfoCallout text="Thanks for joining the waitlist. Once there is an available spot, you will receive an email. You can always come back to here to check." />
+                                </div>
+                            )}
+                            {expiredSpot && (
+                                <div className="flex justify-center">
+                                    <InfoCallout text="Your spot has expired. Please join the waitlist again." />
                                 </div>
                             )}
                             <p className="text-lg font-bold text-red-500">

@@ -160,6 +160,7 @@ export const verifyRSVP = functions.https.onCall(async (_, context) => {
                 .firestore()
                 .collection(SPOTS_COLLECTION)
                 .where("uid", "==", user.uid)
+                .orderBy("expiresAt", "desc")
                 .get();
             if (!spotSnap.size) {
                 functions.logger.info(
@@ -196,6 +197,7 @@ export const verifyRSVP = functions.https.onCall(async (_, context) => {
                         tx.delete(waitlist.ref);
                     }
                 });
+                functions.logger.info("Spot removed.", { func: "verifyRSVP" });
                 return {
                     status: 400,
                     verified: false,
@@ -319,7 +321,7 @@ export const joinWaitlist = functions.https.onCall(async (_, context) => {
 });
 
 export const expiredSpotCleanup = functions.pubsub
-    .schedule("every 30 minutes")
+    .schedule("every 1 minutes")
     .onRun(async () => {
         functions.logger.info("Start expired spot clean up");
         const batch = admin.firestore().batch();
