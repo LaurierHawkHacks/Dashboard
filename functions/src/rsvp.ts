@@ -279,7 +279,7 @@ export const joinWaitlist = functions.https.onCall(async (_, context) => {
         if (user.customClaims.hasJoinedWaitlist) {
             return response(HttpStatus.BAD_REQUEST, {
                 message:
-                    "It seems like you were in the waitlist in the past and didn't secure your spot in time, sorry!",
+                    "It seems like you previously waitlisted and didn't secure your spot in time, sorry!",
             });
         }
 
