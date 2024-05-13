@@ -318,12 +318,11 @@ export const VerifyRSVP = () => {
                                                 className="form-checkbox h-5 w-5 text-gray-600"
                                             />
                                             <span className="ml-2 text-gray-700">
-                                                I confirm that I will be
-                                                attending HawkHacks from May
-                                                17th to May 19th. I will try to
-                                                be on the premises for the vast
-                                                majority for the duration of the
-                                                event.
+                                        I confirm that I will be attending
+                                        HawkHacks <strong>in person</strong>{" "}
+                                        from May 17th to May 19th. I will try to
+                                        be on the premises for the vast majority
+                                        for the duration of the event.
                                             </span>
                                         </label>
                                     </div>
