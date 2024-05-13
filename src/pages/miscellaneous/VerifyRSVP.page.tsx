@@ -319,7 +319,10 @@ export const VerifyRSVP = () => {
                                             />
                                             <span className="ml-2 text-gray-700">
                                         I confirm that I will be attending
-                                        HawkHacks <strong>in person</strong>{" "}
+                                        HawkHacks{" "}
+                                        <span className="font-bold uppercase underline">
+                                            in person
+                                        </span>{" "}
                                         from May 17th to May 19th. I will try to
                                         be on the premises for the vast majority
                                         for the duration of the event.
