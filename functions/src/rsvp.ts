@@ -499,25 +499,48 @@ export const joinWaitlist = functions.https.onCall(async (_, context) => {
     return response(HttpStatus.OK);
 });
 
-// export const expiredSpotCleanup = functions.pubsub
-//     .schedule("every 1 minutes")
-//     .onRun(async () => {
-//         functions.logger.info("Start expired spot clean up");
-//         const batch = admin.firestore().batch();
-//         const snap = await admin
-//             .firestore()
-//             .collection(SPOTS_COLLECTION)
-//             .where("expiresAt", "<", Timestamp.now())
-//             .get();
-//         const count = snap.size;
-//         snap.forEach((doc) => {
-//             batch.delete(doc.ref);
-//         });
-//         const spots = (await admin.firestore().collection(SPOTS_COLLECTION).doc(SPOTS_COUNTER_DOCUMENT).get()).data()?.count ?? 0;
-//         batch.update(admin.firestore().collection(SPOTS_COLLECTION).doc(SPOTS_COUNTER_DOCUMENT), { count: spots + count });
-//         await batch.commit();
-//     });
-//
+export const expiredSpotCleanup = functions.pubsub
+    .schedule("every 1 minutes")
+    .onRun(async () => {
+        functions.logger.info("Start expired spot clean up");
+        const snap = await admin
+            .firestore()
+            .collection(SPOTS_COLLECTION)
+            .where("expiresAt", "<", Timestamp.now())
+            .get();
+        const count = snap.size;
+        functions.logger.info(`Found ${count} expired spots.`);
+        const { sent } = (
+            await admin
+                .firestore()
+                .collection("expired-spots-record")
+                .doc("email-record")
+                .get()
+        ).data() ?? { sent: false };
+        if (count > 0 && !sent) {
+            await resend.emails.send({
+                to: config.exec.jc.email,
+                from: NOREPLY_EMAIL,
+                subject: "[HawkHacks] Found expired spots",
+                html: `<p>There are ${count} expired spots.</p>`,
+            });
+            await admin
+                .firestore()
+                .collection("expired-spots-record")
+                .doc("email-record")
+                .set({ sent: true });
+        } else {
+            functions.logger.info("No expired spots found.");
+        }
+        // const batch = admin.firestore().batch();
+        // snap.forEach((doc) => {
+        // batch.delete(doc.ref);
+        // });
+        // const spots = (await admin.firestore().collection(SPOTS_COLLECTION).doc(SPOTS_COUNTER_DOCUMENT).get()).data()?.count ?? 0;
+        // batch.update(admin.firestore().collection(SPOTS_COLLECTION).doc(SPOTS_COUNTER_DOCUMENT), { count: spots + count });
+        // await batch.commit();
+    });
+
 // export const moveToSpots = functions.pubsub.schedule("every 1 minutes").onRun(async () => {
 //     const spots = (await admin.firestore().collection(SPOTS_COLLECTION).doc(SPOTS_COUNTER_DOCUMENT).get()).data()?.count ?? 0;
 //     const  snap = await admin
