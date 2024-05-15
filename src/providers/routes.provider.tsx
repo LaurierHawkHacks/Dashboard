@@ -327,7 +327,11 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                 { path: paths.myTicket, element: <TicketPage /> },
                 { path: paths.perks, element: <PerksPage /> },
             ];
-        } else {
+        } else if (
+            (currentUser.type === "mentor" ||
+                currentUser.type === "volunteer") &&
+            !currentUser.rsvpVerified
+        ) {
             userRoutes.children = [
                 {
                     index: true,
