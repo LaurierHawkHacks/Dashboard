@@ -327,6 +327,14 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                 { path: paths.myTicket, element: <TicketPage /> },
                 { path: paths.perks, element: <PerksPage /> },
             ];
+        } else {
+            userRoutes.children = [
+                {
+                    index: true,
+                    path: paths.portal,
+                    element: <UserPage />,
+                },
+            ];
         }
 
         if (currentUser.type === "guest") {
