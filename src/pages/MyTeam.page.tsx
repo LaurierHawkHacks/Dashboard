@@ -31,8 +31,11 @@ import {
 } from "@heroicons/react/24/solid";
 import { Modal } from "@/components/Modal";
 import { useAvailableRoutes } from "@/providers/routes.provider";
+import { isBefore } from "date-fns";
 
 type SearchTeamNameFn = (name: string) => Promise<void>;
+
+const teamNameUpdateCloseDate = "2024-05-17T00:00:00";
 
 export const MyTeamPage = () => {
     const [team, setTeam] = useState<TeamData | null>(null);
@@ -530,22 +533,28 @@ export const MyTeamPage = () => {
                     <div className="w-full h-fit lg:max-w-[30rem]">
                         <div className="relative">
                             <h3 className="font-bold">Team Name</h3>
-                            {team.isOwner && (
-                                <button
-                                    aria-label="edit team name"
-                                    className="absolute group right-2 top-1/2 -translate-y-1/2"
-                                    onClick={() =>
-                                        setIsEditingTeamName(!isEditingTeamName)
-                                    }
-                                >
-                                    {!isEditingTeamName && (
-                                        <PencilIcon className="w-7 h-7 text-charcoalBlack/70 transition group-hover:text-charcoalBlack" />
-                                    )}
-                                    {isEditingTeamName && (
-                                        <XCircleOutlineIcon className="w-8 h-8 text-charcoalBlack/70 transition group-hover:text-charcoalBlack" />
-                                    )}
-                                </button>
-                            )}
+                            {team.isOwner &&
+                                isBefore(
+                                    new Date(),
+                                    teamNameUpdateCloseDate
+                                ) && (
+                                    <button
+                                        aria-label="edit team name"
+                                        className="absolute group right-2 top-1/2 -translate-y-1/2"
+                                        onClick={() =>
+                                            setIsEditingTeamName(
+                                                !isEditingTeamName
+                                            )
+                                        }
+                                    >
+                                        {!isEditingTeamName && (
+                                            <PencilIcon className="w-7 h-7 text-charcoalBlack/70 transition group-hover:text-charcoalBlack" />
+                                        )}
+                                        {isEditingTeamName && (
+                                            <XCircleOutlineIcon className="w-8 h-8 text-charcoalBlack/70 transition group-hover:text-charcoalBlack" />
+                                        )}
+                                    </button>
+                                )}
                         </div>
                         {/* separator */}
                         <div className="h-[1px] bg-gray-200 my-4"></div>

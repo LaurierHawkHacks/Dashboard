@@ -659,6 +659,12 @@ export const updateTeamName = functions.https.onCall(async (data, context) => {
         return response(HttpStatus.UNAUTHORIZED, { message: "Unauthorized" });
     }
 
+    if (config.teams.allow.update_team_name !== "true") {
+        return response(HttpStatus.BAD_REQUEST, {
+            message: "Team name update is not available.",
+        });
+    }
+
     if (!z.string().min(1).safeParse(data.name)) {
         return response(HttpStatus.BAD_REQUEST, { message: "Invalid payload" });
     }
