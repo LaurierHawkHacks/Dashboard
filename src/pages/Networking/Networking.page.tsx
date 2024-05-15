@@ -1,6 +1,6 @@
 import { useAuth as useAuthProvider } from "@/providers/auth.provider";
 import { FormEventHandler, useEffect, useRef, useState } from "react";
-import { MdOutlineEdit, MdOpenInNew, MdWarning } from "react-icons/md";
+import { MdOutlineEdit, MdOpenInNew, MdWarning, MdOutlineRemoveCircleOutline } from "react-icons/md";
 import { LoadingAnimation } from "@/components/LoadingAnimation";
 import {
     getResumeURL,
@@ -211,7 +211,7 @@ export const NetworkingPage = () => {
                                 }
                             />
                             {mediaValues[key] && (
-                                <MdOutlineEdit className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5" />
+                                <MdOutlineEdit className="text-gray-500 absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5" />
                             )}
                         </div>
 
@@ -250,7 +250,24 @@ export const NetworkingPage = () => {
                             </p>
                         )}
                     </div>
+
                     <div className="flex items-center gap-4">
+                        <label
+                            htmlFor="resume-file-input"
+                            className="flex-grow rounded-lg px-4 py-2 bg-peachWhite hover:cursor-pointer overflow-hidden"
+                        >
+                            <span className="block overflow-hidden text-ellipsis whitespace-nowrap">
+                                {file ? file.name : "Select new resume file"}
+                            </span>
+                            <input
+                                id="resume-file-input"
+                                className="sr-only"
+                                type="file"
+                                accept={allowedFileTypes.join(", ")}
+                                onChange={handleFileInput}
+                            />
+                        </label>
+
                         <button
                             title="Open Resume in new tab"
                             type="button"
@@ -283,21 +300,47 @@ export const NetworkingPage = () => {
                         >
                             <MdOpenInNew className="text-gray-500 w-6 h-6" />
                         </button>
-                        <label
-                            htmlFor="resume-file-input"
-                            className="flex-grow rounded-lg px-4 py-2 bg-peachWhite hover:cursor-pointer overflow-hidden"
+
+                        <button 
+                            title="Remove Resume"
+                            type="button"
+                            className="p-2 bg-peachWhite rounded-lg flex items-center justify-center hover:cursor-pointer flex-shrink-0"
+                            onClick={async () => {
+                                if (mediaValues.resumeRef) {
+                                    try {
+                                        await updateSocials({
+                                            ...mediaValues,
+                                            resumeRef: "",
+                                        });
+                                        setSocials(
+                                            socials
+                                                ? {
+                                                    ...socials,
+                                                    resumeRef: "",
+                                                }
+                                            : null
+                                        );
+                                        setMediaValues({
+                                            ...mediaValues,
+                                            resumeRef: "",
+                                        });
+                                    } catch (error) {
+                                        showNotification({
+                                            title: "Error",
+                                            message:
+                                                "Failed to remove resume. Please try again.",
+                                        });
+                                    }
+                                } else {
+                                    showNotification({
+                                        title: "Error",
+                                        message: "No resume found to remove.",
+                                    });
+                                }
+                            }}
                         >
-                            <span className="block overflow-hidden text-ellipsis whitespace-nowrap">
-                                {file ? file.name : "Select new resume file"}
-                            </span>
-                            <input
-                                id="resume-file-input"
-                                className="sr-only"
-                                type="file"
-                                accept={allowedFileTypes.join(", ")}
-                                onChange={handleFileInput}
-                            />
-                        </label>
+                            <MdOutlineRemoveCircleOutline className="text-red-500 w-6 h-6" />
+                        </button>
                     </div>
                     {editMode === "resume" && (
                         <div className="mt-4 flex gap-2">
