@@ -329,6 +329,12 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
             ];
         }
 
+        if (currentUser.type === "guest") {
+            userRoutes.children = [
+                { index: true, path: paths.myTicket, element: <TicketPage /> },
+            ];
+        }
+
         // only default routes
         setUserRoutes(userRoutes.children);
         setRoutes(availableRoutes);

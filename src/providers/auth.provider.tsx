@@ -22,7 +22,13 @@ import type { User, AuthProvider as FirebaseAuthProvider } from "firebase/auth";
 import type { NotificationOptions } from "@/providers/types";
 import type { ApplicationData } from "@/components/forms/types";
 
-type UserType = "hacker" | "mentor" | "volunteer" | "speaker" | "sponsor";
+type UserType =
+    | "hacker"
+    | "mentor"
+    | "volunteer"
+    | "speaker"
+    | "sponsor"
+    | "guest";
 
 export interface UserWithClaims extends User {
     hawkAdmin: boolean;
