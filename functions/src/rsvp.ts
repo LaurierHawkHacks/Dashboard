@@ -499,97 +499,97 @@ export const joinWaitlist = functions.https.onCall(async (_, context) => {
     return response(HttpStatus.OK);
 });
 
-export const expiredSpotCleanup = functions.pubsub
-    .schedule("every 2 minutes")
-    .onRun(async () => {
-        functions.logger.info("Start expired spot clean up");
-        const snap = await admin
-            .firestore()
-            .collection(SPOTS_COLLECTION)
-            .where("expiresAt", "<", Timestamp.now())
-            .get();
-        functions.logger.info(`Found ${snap.size} expired spots.`);
-        if (snap.size) {
-            for (let i = 0; i < snap.size; i++) {
-                const expiredSpotDoc = snap.docs[i];
-                const data = expiredSpotDoc.data();
-                const user = await admin.auth().getUser(data.uid);
-                await admin.firestore().runTransaction(async (tx) => {
-                    const counterDoc = await tx.get(
-                        admin
-                            .firestore()
-                            .collection(SPOTS_COLLECTION)
-                            .doc(SPOTS_COUNTER_DOCUMENT)
-                    );
-                    const waitlistSnap = await tx.get(
-                        admin
-                            .firestore()
-                            .collection(WAITLIST_COLLECTION)
-                            .orderBy("joinAt", "asc")
-                            .limit(1)
-                    );
-                    const waitlistDoc = waitlistSnap.docs[i];
-                    if (waitlistDoc) {
-                        const expires = Timestamp.now().toDate();
-                        // 24 hours in milliseconds
-                        const oneDayInMs = 86400000;
-                        expires.setTime(expires.getTime() + oneDayInMs);
-                        const expiresAt = Timestamp.fromDate(expires);
-                        // create new spot
-                        tx.create(
-                            admin
-                                .firestore()
-                                .collection(SPOTS_COLLECTION)
-                                .doc(waitlistDoc.id),
-                            {
-                                ...waitlistDoc.data(),
-                                expiresAt,
-                            }
-                        );
-                        // delete expired spot
-                        tx.delete(expiredSpotDoc.ref);
-                        // delete waitlist
-                        tx.delete(
-                            admin
-                                .firestore()
-                                .collection(WAITLIST_COLLECTION)
-                                .doc(waitlistDoc.id)
-                        );
-                    } else {
-                        tx.update(
-                            admin
-                                .firestore()
-                                .collection(SPOTS_COLLECTION)
-                                .doc(SPOTS_COUNTER_DOCUMENT),
-                            {
-                                count:
-                                    (counterDoc.data() ?? { count: 0 }).count +
-                                    1,
-                            }
-                        );
-                    }
-                });
-                const app = (
-                    await admin
-                        .firestore()
-                        .collection("applications")
-                        .where("applicantId", "==", user.uid)
-                        .get()
-                ).docs[0]?.data();
-                await sendSpotAvailableEmail(
-                    app?.firstName ?? user.displayName ?? "",
-                    user.email
-                ).catch((error) =>
-                    functions.logger.error(
-                        "Failed to send notification email about new available spot.",
-                        { error }
-                    )
-                );
-            }
-        } else {
-            functions.logger.info("No expired spots found.");
-        }
-    });
+// export const expiredSpotCleanup = functions.pubsub
+//     .schedule("every 2 minutes")
+//     .onRun(async () => {
+//         functions.logger.info("Start expired spot clean up");
+//         const snap = await admin
+//             .firestore()
+//             .collection(SPOTS_COLLECTION)
+//             .where("expiresAt", "<", Timestamp.now())
+//             .get();
+//         functions.logger.info(`Found ${snap.size} expired spots.`);
+//         if (snap.size) {
+//             for (let i = 0; i < snap.size; i++) {
+//                 const expiredSpotDoc = snap.docs[i];
+//                 const data = expiredSpotDoc.data();
+//                 const user = await admin.auth().getUser(data.uid);
+//                 await admin.firestore().runTransaction(async (tx) => {
+//                     const counterDoc = await tx.get(
+//                         admin
+//                             .firestore()
+//                             .collection(SPOTS_COLLECTION)
+//                             .doc(SPOTS_COUNTER_DOCUMENT)
+//                     );
+//                     const waitlistSnap = await tx.get(
+//                         admin
+//                             .firestore()
+//                             .collection(WAITLIST_COLLECTION)
+//                             .orderBy("joinAt", "asc")
+//                             .limit(1)
+//                     );
+//                     const waitlistDoc = waitlistSnap.docs[i];
+//                     if (waitlistDoc) {
+//                         const expires = Timestamp.now().toDate();
+//                         // 24 hours in milliseconds
+//                         const oneDayInMs = 86400000;
+//                         expires.setTime(expires.getTime() + oneDayInMs);
+//                         const expiresAt = Timestamp.fromDate(expires);
+//                         // create new spot
+//                         tx.create(
+//                             admin
+//                                 .firestore()
+//                                 .collection(SPOTS_COLLECTION)
+//                                 .doc(waitlistDoc.id),
+//                             {
+//                                 ...waitlistDoc.data(),
+//                                 expiresAt,
+//                             }
+//                         );
+//                         // delete expired spot
+//                         tx.delete(expiredSpotDoc.ref);
+//                         // delete waitlist
+//                         tx.delete(
+//                             admin
+//                                 .firestore()
+//                                 .collection(WAITLIST_COLLECTION)
+//                                 .doc(waitlistDoc.id)
+//                         );
+//                     } else {
+//                         tx.update(
+//                             admin
+//                                 .firestore()
+//                                 .collection(SPOTS_COLLECTION)
+//                                 .doc(SPOTS_COUNTER_DOCUMENT),
+//                             {
+//                                 count:
+//                                     (counterDoc.data() ?? { count: 0 }).count +
+//                                     1,
+//                             }
+//                         );
+//                     }
+//                 });
+//                 const app = (
+//                     await admin
+//                         .firestore()
+//                         .collection("applications")
+//                         .where("applicantId", "==", user.uid)
+//                         .get()
+//                 ).docs[0]?.data();
+//                 await sendSpotAvailableEmail(
+//                     app?.firstName ?? user.displayName ?? "",
+//                     user.email
+//                 ).catch((error) =>
+//                     functions.logger.error(
+//                         "Failed to send notification email about new available spot.",
+//                         { error }
+//                     )
+//                 );
+//             }
+//         } else {
+//             functions.logger.info("No expired spots found.");
+//         }
+//     });
 
 // export const moveToSpots = functions.pubsub.schedule("every 1 minutes").onRun(async () => {
 //     const spots = (await admin.firestore().collection(SPOTS_COLLECTION).doc(SPOTS_COUNTER_DOCUMENT).get()).data()?.count ?? 0;

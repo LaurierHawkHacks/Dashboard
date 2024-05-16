@@ -481,7 +481,6 @@ async function internalGetTicketData(id: string, extended = false) {
     return data;
 }
 
-
 export const getTicketData = functions.https.onCall(async (data) => {
     if (!z.string().uuid().safeParse(data.id).success) {
         return response(HttpStatus.BAD_REQUEST, { message: "bad request" });
@@ -592,6 +591,6 @@ export {
     verifyRSVP,
     withdrawRSVP,
     joinWaitlist,
-    expiredSpotCleanup,
+    // expiredSpotCleanup,
     // moveToSpots,
 } from "./rsvp";
