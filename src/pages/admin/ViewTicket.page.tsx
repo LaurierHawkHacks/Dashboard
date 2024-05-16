@@ -135,6 +135,18 @@ export const AdminViewTicketPage = () => {
                     <p>{ticketData.pronouns}</p>
                 </div>
                 <div className="mt-12">
+                    <h2 className="font-medium text-xl mb-2">Allergies</h2>
+                    {ticketData.allergies.length > 0 ? (
+                        <ul className="list-disc list-inside">
+                            {ticketData.allergies.map((allergy, index) => (
+                                <li key={index}>{allergy}</li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>No known allergies</p>
+                    )}
+                </div>
+                <div className="mt-12">
                     <h2 className="font-medium text-xl mb-2">Events</h2>
                     <ul className="divide-y divide-gray-300 space-y-4">
                         {events.map((e) => (
