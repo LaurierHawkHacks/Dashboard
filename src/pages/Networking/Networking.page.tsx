@@ -190,18 +190,21 @@ export const NetworkingPage = () => {
                 await updateSocials({
                     ...mediaValues,
                     resumeRef: "",
+                    resumeVisibility: "Public",
                 });
                 setSocials(
                     socials
                         ? {
                               ...socials,
                               resumeRef: "",
+                              resumeVisibility: "Public",
                           }
                         : null
                 );
                 setMediaValues({
                     ...mediaValues,
                     resumeRef: "",
+                    resumeVisibility: "Public",
                 });
                 setFile(null);
                 setIsResumeSettingsOpened(false);
@@ -250,6 +253,7 @@ export const NetworkingPage = () => {
                 message: "",
             });
             setIsResumeSettingsOpened(false);
+            setEditMode("");
         } catch (error) {
             showNotification({
                 title: "Error",
@@ -434,6 +438,18 @@ export const NetworkingPage = () => {
                                 >
                                     Save
                                 </button>
+                            </div>
+                        )}
+                        {mediaValues.resumeRef && (
+                            <div className="mt-2">
+                                <p className="text-sm text-gray-500">
+                                    {
+                                        visibilityDescription[
+                                            socials?.resumeVisibility ??
+                                                "Public"
+                                        ]
+                                    }
+                                </p>
                             </div>
                         )}
                     </div>
