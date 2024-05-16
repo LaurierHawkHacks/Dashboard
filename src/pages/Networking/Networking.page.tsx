@@ -322,48 +322,52 @@ export const NetworkingPage = () => {
                                     onChange={handleFileInput}
                                 />
                             </label>
-
-                            <button
-                                title="Open Resume in new tab"
-                                type="button"
-                                className="p-2 bg-peachWhite rounded-lg flex items-center justify-center hover:cursor-pointer flex-shrink-0"
-                                onClick={async () => {
-                                    if (mediaValues.resumeRef) {
-                                        try {
-                                            const url = await getResumeURL(
-                                                mediaValues.resumeRef
-                                            );
-                                            window.open(
-                                                url,
-                                                "_blank",
-                                                "noopener,noreferrer"
-                                            );
-                                        } catch (error) {
-                                            showNotification({
-                                                title: "Error",
-                                                message:
-                                                    "Failed to open resume. Please try again.",
-                                            });
-                                        }
-                                    } else {
-                                        showNotification({
-                                            title: "Error",
-                                            message: "No resume found to open.",
-                                        });
-                                    }
-                                }}
-                            >
-                                <MdOpenInNew className="text-gray-500 w-6 h-6" />
-                            </button>
-
-                            <button
-                                title="Remove Resume"
-                                type="button"
-                                className="p-2 bg-peachWhite rounded-lg flex items-center justify-center hover:cursor-pointer flex-shrink-0"
-                                onClick={openResumeSettings}
-                            >
-                                <Cog6ToothIcon className="w-6 h-6 text-gray-500" />
-                            </button>
+                            {mediaValues.resumeRef && (
+                                <>
+                                    <button
+                                        title="Open Resume in new tab"
+                                        type="button"
+                                        className="p-2 bg-peachWhite rounded-lg flex items-center justify-center hover:cursor-pointer flex-shrink-0"
+                                        onClick={async () => {
+                                            if (mediaValues.resumeRef) {
+                                                try {
+                                                    const url =
+                                                        await getResumeURL(
+                                                            mediaValues.resumeRef
+                                                        );
+                                                    window.open(
+                                                        url,
+                                                        "_blank",
+                                                        "noopener,noreferrer"
+                                                    );
+                                                } catch (error) {
+                                                    showNotification({
+                                                        title: "Error",
+                                                        message:
+                                                            "Failed to open resume. Please try again.",
+                                                    });
+                                                }
+                                            } else {
+                                                showNotification({
+                                                    title: "Error",
+                                                    message:
+                                                        "No resume found to open.",
+                                                });
+                                            }
+                                        }}
+                                    >
+                                        <MdOpenInNew className="text-gray-500 w-6 h-6" />
+                                    </button>
+                                    <button
+                                        title="Resume Settings"
+                                        type="button"
+                                        className="p-2 bg-peachWhite rounded-lg flex items-center justify-center hover:cursor-pointer flex-shrink-0"
+                                        onClick={openResumeSettings}
+                                    >
+                                        <Cog6ToothIcon className="w-6 h-6 text-gray-500" />
+                                    </button>
+                                </>
+                            )}
                         </div>
                         {editMode === "resume" && (
                             <div className="mt-4 flex gap-2">
