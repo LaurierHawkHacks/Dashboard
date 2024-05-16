@@ -461,7 +461,7 @@ export const NetworkingPage = () => {
                 open={isResumeSettingsOpened}
                 onClose={closeResumeSettings}
             >
-                <div className="space-y-4">
+                <div className="space-y-12">
                     <div>
                         <Select
                             label="Resume Visibility"
@@ -501,7 +501,7 @@ export const NetworkingPage = () => {
                     </div>
                     <div>
                         <button
-                            className="border-2 rounded-lg border-red-400 w-full flex px-2 py-4 gap-4 transition hover:bg-red-600/5 text-red-500 font-medium"
+                            className="border-2 rounded-lg border-red-400 w-full flex p-2 gap-4 transition hover:bg-red-600/5 text-red-500 font-medium"
                             onClick={removeResume}
                         >
                             <span>
