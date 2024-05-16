@@ -276,7 +276,7 @@ export const SchedulePage: React.FC = () => {
         if (ref.current) return;
         (async () => {
             ref.current = true;
-            const [ev] = await getRedeemableItems();
+            const ev = await getRedeemableItems();
             setEvents(ev);
         })();
     }, []);

@@ -1,20 +1,18 @@
 import { Button, LoadingAnimation, Select, TextInput } from "@/components";
 import { useNotification } from "@/providers/notification.provider";
 import { getRedeemableItems } from "@/services/utils";
-import { EventItem, FoodItem } from "@/services/utils/types";
+import { EventItem } from "@/services/utils/types";
 import { format, isAfter, parseISO } from "date-fns";
-import { Timestamp, deleteDoc, doc, setDoc } from "firebase/firestore";
+import { deleteDoc, doc, setDoc } from "firebase/firestore";
 import { FormEventHandler, useEffect, useRef, useState } from "react";
 import { nanoid } from "nanoid";
 import { firestore } from "@/services/firebase";
 import { z } from "zod";
 
 type KeyOfEventItem = keyof EventItem;
-type KeyOfFoodItem = keyof FoodItem;
 
 export const AdminManageEventsPage = () => {
     const [events, setEvents] = useState<EventItem[]>([]);
-    const [foods, setFoods] = useState<FoodItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const { showNotification } = useNotification();
     const [newEvent, setNewEvent] = useState<EventItem>({
@@ -27,18 +25,9 @@ export const AdminManageEventsPage = () => {
         endTime: "",
     });
 
-    const [newFood, setNewFood] = useState<FoodItem>({
-        title: "",
-        location: "",
-        time: Timestamp.now(),
-        id: "",
-    });
-
     const [isEditingEvent, setIsEditingEvent] = useState(false);
-    const [isEditingFood, setIsEditingFood] = useState(false);
 
     const eventFormRef = useRef<HTMLFormElement>(null);
-    const foodFormRef = useRef<HTMLFormElement>(null);
     const foodMobileRef = useRef<HTMLDivElement>(null);
 
     const timeoutRef = useRef<number | null>(null);
@@ -52,9 +41,8 @@ export const AdminManageEventsPage = () => {
 
         (async () => {
             try {
-                const [evts, fds] = await getRedeemableItems();
+                const evts = await getRedeemableItems();
                 setEvents(evts);
-                setFoods(fds);
             } catch (e) {
                 showNotification({
                     title: "Error Loading Items",
@@ -71,17 +59,6 @@ export const AdminManageEventsPage = () => {
         const event = { ...newEvent };
         event[key] = value;
         setNewEvent(event);
-    };
-
-    const handleFoodChange = (key: KeyOfFoodItem, value: string | Date) => {
-        const food = { ...newFood };
-        if (key === "time") {
-            food[key] = Timestamp.fromDate(value as Date);
-        } else {
-            //@ts-ignore
-            food[key] = value;
-        }
-        setNewFood(food);
     };
 
     const submitNewEvent: FormEventHandler = async (e) => {
@@ -131,7 +108,6 @@ export const AdminManageEventsPage = () => {
             if (!isEditingEvent) {
                 setEvents([...events, newEvent]);
             }
-
         } catch (e) {
             console.error(e);
             showNotification({
@@ -154,55 +130,11 @@ export const AdminManageEventsPage = () => {
         setIsEditingEvent(false);
     };
 
-    const submitNewFood: FormEventHandler = async (e) => {
-        e.preventDefault();
-
-        // generate new id
-        const id = isEditingFood ? newFood.id : nanoid(16);
-        newFood.id = id;
-
-        try {
-            const docRef = doc(firestore, "foods", id);
-            await setDoc(docRef, newFood);
-            showNotification({
-                title: "Food Item Saved",
-                message: "",
-            });
-
-            if (!isEditingFood) {
-                setFoods([...foods, newFood]);
-            }
-
-        } catch (e) {
-            console.error(e);
-            showNotification({
-                title: "Failed to save food item",
-                message:
-                    "Please open the console and send a screenshot of the error to Engineering.",
-            });
-        }
-
-        setNewFood({
-            title: "",
-            location: "",
-            time: Timestamp.now(),
-            id: "",
-        });
-
-        setIsEditingFood(false);
-    };
-
     const handleEditEvent = (evt: EventItem) => {
         setNewEvent(evt);
         setIsEditingEvent(true);
         eventFormRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-
-    const handleEditFood = (food: FoodItem) => {
-        setNewFood(food);
-        setIsEditingFood(true);
-        foodFormRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
+    };
 
     const handleDeleteEvent = async (id: string) => {
         try {
@@ -212,29 +144,13 @@ export const AdminManageEventsPage = () => {
                 title: "Event Deleted",
                 message: "",
             });
-        } catch(e) {
+        } catch (e) {
             console.error(e);
             showNotification({
                 title: "Nooooo...it can't delete event :pepecry:",
-                message: "Please open the console and send a screenshot of the error to Engineering."
-            })
-        }
-    };
-
-    const handleDeleteFood = async (id: string) => {
-        try {
-            await deleteDoc(doc(firestore, "foods", id));
-            setFoods(foods.filter((food) => food.id !== id));
-            showNotification({
-                title: "Food Deleted",
-                message: "",
+                message:
+                    "Please open the console and send a screenshot of the error to Engineering.",
             });
-        } catch(e) {
-            console.error(e);
-            showNotification({
-                title: "Nooooo...it can't delete foodie :pepecry:",
-                message: "Please open the console and send a screenshot of the error to Engineering."
-            })
         }
     };
 
@@ -249,15 +165,7 @@ export const AdminManageEventsPage = () => {
             endTime: "",
         });
 
-        setNewFood({
-            title: "",
-            location: "",
-            time: Timestamp.now(),
-            id: "",
-        });
-
         setIsEditingEvent(false);
-        setIsEditingFood(false);
     };
 
     const scrollToFood = () => {
@@ -342,72 +250,32 @@ export const AdminManageEventsPage = () => {
                     />
 
                     <div className="flex space-x-2">
-                        <Button type="submit">{isEditingEvent ? "Update" : "Save"}</Button>
-                        
+                        <Button type="submit">
+                            {isEditingEvent ? "Update" : "Save"}
+                        </Button>
+
                         {isEditingEvent && (
-                            <Button type="button" onClick={handleCancelEdit} className="bg-red-500"> Cancel </Button>
-                        )}
-                    </div>
-                </form>
-
-                <form
-                    ref={foodFormRef}
-                    className="col-span-2 md:col-span-1 space-y-4"
-                    onSubmit={submitNewFood}
-                >
-                    <h1 className="mb-4 text-xl font-bold">
-                        {isEditingFood ? "Edit food item" : "Add new food item"}
-                    </h1>
-
-                    <TextInput
-                        label="Title"
-                        id="new-food-input"
-                        value={newFood.title}
-                        onChange={(e) =>
-                            handleFoodChange("title", e.target.value)
-                        }
-                    />
-
-                    <TextInput
-                        label="Location"
-                        id="food-location-input"
-                        value={newFood.location}
-                        onChange={(e) =>
-                            handleFoodChange("location", e.target.value)
-                        }
-                    />
-                    
-                    <div>
-                        <label htmlFor="food-time-picker" className="block">
-                            Time (EST)
-                        </label>
-                        <input
-                            type="datetime-local"
-                            id="food-time-picker"
-                            className="block"
-                            onChange={(e) =>
-                                handleFoodChange(
-                                    "time",
-                                    new Date(e.target.value)
-                                )
-                            }
-                        />
-                    </div>
-
-                    <div className="flex space-x-2">
-                        <Button type="submit">{isEditingFood ? "Update" : "Save"}</Button>
-                        
-                        {isEditingFood && (
-                            <Button type="button" onClick={handleCancelEdit} className="bg-red-500"> Cancel </Button>
+                            <Button
+                                type="button"
+                                onClick={handleCancelEdit}
+                                className="bg-red-500"
+                            >
+                                {" "}
+                                Cancel{" "}
+                            </Button>
                         )}
                     </div>
                 </form>
             </div>
-            
+
             <hr className="my-8" />
 
-            <span className="underline"> ⚠️ Please note when updating events or foods, you must refresh the page to see the changes. </span>
-            
+            <span className="underline">
+                {" "}
+                ⚠️ Please note when updating events or foods, you must refresh
+                the page to see the changes.{" "}
+            </span>
+
             <div className="mt-4 text-center lg:hidden">
                 <Button onClick={scrollToFood}> Go to Food </Button>
                 <p> (ur welcome) </p>
@@ -418,25 +286,38 @@ export const AdminManageEventsPage = () => {
                     <h1 className="mb-4 text-xl font-bold">Events</h1>
                     <ul className="space-y-4">
                         {events.map((evt) => (
-                            <li key={evt.id} className="bg-white p-6 shadow-lg rounded-lg">
+                            <li
+                                key={evt.id}
+                                className="bg-white p-6 shadow-lg rounded-lg"
+                            >
                                 <div className="mb-4">
-                                    <p className="font-semibold text-lg underline">Title:</p>
+                                    <p className="font-semibold text-lg underline">
+                                        Title:
+                                    </p>
                                     <p>{evt.title}</p>
                                 </div>
                                 <div className="mb-4">
-                                    <p className="font-semibold text-lg underline">Description:</p>
+                                    <p className="font-semibold text-lg underline">
+                                        Description:
+                                    </p>
                                     <p>{evt.description}</p>
                                 </div>
                                 <div className="mb-4">
-                                    <p className="font-semibold text-lg underline">Location:</p>
+                                    <p className="font-semibold text-lg underline">
+                                        Location:
+                                    </p>
                                     <p>{evt.location}</p>
                                 </div>
                                 <div className="mb-4">
-                                    <p className="font-semibold text-lg underline">Type:</p>
+                                    <p className="font-semibold text-lg underline">
+                                        Type:
+                                    </p>
                                     <p>{evt.type}</p>
                                 </div>
                                 <div className="mb-4">
-                                    <p className="font-semibold text-lg underline">Start:</p>
+                                    <p className="font-semibold text-lg underline">
+                                        Start:
+                                    </p>
                                     <p>
                                         {format(
                                             evt.startTime,
@@ -445,7 +326,9 @@ export const AdminManageEventsPage = () => {
                                     </p>
                                 </div>
                                 <div className="mb-4">
-                                    <p className="font-semibold text-lg underline">End:</p>
+                                    <p className="font-semibold text-lg underline">
+                                        End:
+                                    </p>
                                     <p>
                                         {format(
                                             evt.endTime,
@@ -454,40 +337,19 @@ export const AdminManageEventsPage = () => {
                                     </p>
                                 </div>
                                 <div className="flex space-x-4">
-                                    <Button onClick={() => handleEditEvent(evt)}>Edit</Button>
-                                    <Button onClick={() => handleDeleteEvent(evt.id)} className="bg-red-500">Delete</Button>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-                
-                <div className="col-span-2 lg:col-span-1">
-                    <div ref={foodMobileRef}></div>
-                    <h1 className="mb-4 font-bold text-xl">Foods</h1>
-                    <ul className="space-y-4">
-                        {foods.map((food) => (
-                            <li key={food.id} className="bg-white p-6 shadow-lg rounded-lg">
-                                <div className="mb-4">
-                                    <p className="font-semibold text-lg underline">Title:</p>
-                                    <p>{food.title}</p>
-                                </div>
-                                <div className="mb-4">
-                                    <p className="font-semibold text-lg underline">Location:</p>
-                                    <p>{food.location}</p>
-                                </div>
-                                <div className="mb-4">
-                                    <p className="font-semibold text-lg underline">Time:</p>
-                                    <p>
-                                        {format(
-                                            food.time.toDate(),
-                                            "MMM dd, yyyy (hh:mma)"
-                                        )}
-                                    </p>
-                                </div>
-                                <div className="flex space-x-4">
-                                    <Button onClick={() => handleEditFood(food)}>Edit</Button>
-                                    <Button onClick={() => handleDeleteFood(food.id)} className="bg-red-500">Delete</Button>
+                                    <Button
+                                        onClick={() => handleEditEvent(evt)}
+                                    >
+                                        Edit
+                                    </Button>
+                                    <Button
+                                        onClick={() =>
+                                            handleDeleteEvent(evt.id)
+                                        }
+                                        className="bg-red-500"
+                                    >
+                                        Delete
+                                    </Button>
                                 </div>
                             </li>
                         ))}

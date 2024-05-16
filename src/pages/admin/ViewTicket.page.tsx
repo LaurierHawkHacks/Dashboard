@@ -1,11 +1,7 @@
 import { useAuth } from "@/providers/auth.provider";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-    EventItem,
-    FoodItem,
-    type ExtendedTicketData,
-} from "@/services/utils/types";
+import { EventItem, type ExtendedTicketData } from "@/services/utils/types";
 import { getExtendedTicketData } from "@/services/utils/ticket";
 import { useNotification } from "@/providers/notification.provider";
 import { getRedeemableItems, redeemItem } from "@/services/utils";
@@ -22,10 +18,8 @@ export const AdminViewTicketPage = () => {
     );
     const { showNotification } = useNotification();
     const [events, setEvents] = useState<EventItem[]>([]);
-    const [foods, setFoods] = useState<FoodItem[]>([]);
     const [openConfirm, setOpenConfirm] = useState(false);
     const [activeEvent, setActiveEvent] = useState<EventItem | null>(null);
-    const [activeFood, setActiveFood] = useState<FoodItem | null>(null);
 
     useEffect(() => {
         if (!ticketId) return;
@@ -38,11 +32,10 @@ export const AdminViewTicketPage = () => {
             if (!currentUser.hawkAdmin) return navigate("/ticket/" + ticketId);
 
             const res = await getExtendedTicketData(ticketId);
-            const [e, f] = await getRedeemableItems();
+            const e = await getRedeemableItems();
             if (res.status == 200) {
                 setTicketData(res.data);
                 setEvents(e);
-                setFoods(f);
             } else {
                 showNotification({
                     title: "Failed to load ticket",
@@ -85,38 +78,8 @@ export const AdminViewTicketPage = () => {
         }
     };
 
-    const checkFood = async (f: FoodItem) => {
-        if (!ticketData) return;
-        if (ticketData?.foods.includes(f.id) || !ticketId) return;
-
-        try {
-            const res = await redeemItem(ticketId, f.id, "food");
-            if (res.status === 200) {
-                showNotification({
-                    title: "Food Item Checked!",
-                    message: "",
-                });
-                ticketData.foods.push(f.id);
-                setTicketData({ ...ticketData });
-            } else {
-                showNotification({
-                    title: "Failed to check food item",
-                    message: res.message,
-                });
-            }
-        } catch (e) {
-            showNotification({
-                title: "Failed to check event item",
-                message: (e as Error).message,
-            });
-        } finally {
-            closeModal();
-        }
-    };
-
     const closeModal = () => {
         setActiveEvent(null);
-        setActiveFood(null);
         setOpenConfirm(false);
     };
 
@@ -177,37 +140,6 @@ export const AdminViewTicketPage = () => {
                         ))}
                     </ul>
                 </div>
-                <div className="mt-12">
-                    <h2 className="font-medium text-xl mb-2">Foods</h2>
-                    <ul className="divide-y divide-gray-300 space-y-4">
-                        {foods.map((f) => (
-                            <li key={f.id}>
-                                <div className="space-y-2">
-                                    <div>
-                                        <p className="font-medium">
-                                            Title:
-                                            <span className="ml-2 font-normal">
-                                                {f.title}
-                                            </span>
-                                        </p>
-                                    </div>
-                                    <button
-                                        className="p-2 bg-tbrand text-white rounded disabled:bg-gray-400"
-                                        disabled={ticketData.foods.includes(
-                                            f.id
-                                        )}
-                                        onClick={() => {
-                                            setActiveFood(f);
-                                            setOpenConfirm(true);
-                                        }}
-                                    >
-                                        Check
-                                    </button>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
             </div>
             <Modal
                 title="Confirm Check"
@@ -219,7 +151,6 @@ export const AdminViewTicketPage = () => {
                     <Button
                         onClick={() => {
                             if (activeEvent) checkEvent(activeEvent);
-                            else if (activeFood) checkFood(activeFood);
                         }}
                     >
                         Confirm
@@ -229,3 +160,4 @@ export const AdminViewTicketPage = () => {
         </>
     );
 };
+

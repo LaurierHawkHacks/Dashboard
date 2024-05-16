@@ -16,7 +16,6 @@ import type {
     UserTicketData,
     Socials,
     EventItem,
-    FoodItem,
 } from "@/services/utils/types";
 import { ApplicationData } from "@/components/forms/types";
 import { httpsCallable } from "firebase/functions";
@@ -282,29 +281,17 @@ export async function updateSocials(socials: Socials) {
     }
 }
 
-export async function getRedeemableItems(): Promise<[EventItem[], FoodItem[]]> {
+export async function getRedeemableItems() {
     try {
         const eventsQ = query(
             collection(firestore, "events"),
             orderBy("startTime", "asc")
         );
-        const foodsQ = query(
-            collection(firestore, "foods"),
-            orderBy("time", "asc")
-        );
-
-        const [eventSnap, foodSnap] = await Promise.all([
-            getDocs(eventsQ),
-            getDocs(foodsQ),
-        ]);
-
+        const eventSnap = await getDocs(eventsQ);
         const events: EventItem[] = [];
-        const foods: FoodItem[] = [];
-
         eventSnap.forEach((doc) => events.push(doc.data() as EventItem));
-        foodSnap.forEach((doc) => foods.push(doc.data() as FoodItem));
 
-        return [events, foods];
+        return events;
     } catch (e) {
         handleError(e as Error, "error_getting_redeemable_items");
         throw e;
