@@ -1,6 +1,6 @@
 import { RiDiscordLine } from "react-icons/ri";
 import { FiLogOut } from "react-icons/fi";
-import { RxStar  } from "react-icons/rx";
+import { RxStar } from "react-icons/rx";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/providers/hooks";
 import Hamburger from "hamburger-react";
@@ -239,7 +239,7 @@ export const Navbar = () => {
                         Welcome, <span className="ml-1 font-bold"> {firstName} </span> !
                     </div>
 
-                    <aside className="flex flex-col items-start justify-between h-[83%]">
+                    <aside className="flex flex-col items-start justify-between h-[83%] overflow-y-auto">
                         <ul className="flex flex-col items-start justify-start gap-4 w-full">
                             {currentUser && renderNavItems(false)}
                             <a
