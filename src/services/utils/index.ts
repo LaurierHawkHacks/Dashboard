@@ -301,14 +301,14 @@ export async function getRedeemableItems() {
 export async function redeemItem(
     ticketId: string,
     itemId: string,
-    type: "event" | "food"
+    action: "check" | "uncheck"
 ) {
-    const fn = httpsCallable<unknown, CloudFunctionResponse<void>>(
+    const fn = httpsCallable<unknown, CloudFunctionResponse<string[]>>(
         functions,
         "redeemItem"
     );
     try {
-        const res = await fn({ ticketId, itemId, type });
+        const res = await fn({ ticketId, itemId, action });
         const data = res.data;
         return data;
     } catch (e) {

@@ -539,7 +539,7 @@ export const redeemItem = functions.https.onCall(async (data, context) => {
         .object({
             ticketId: z.string(),
             itemId: z.string(),
-            type: z.string().refine((v) => v === "event" || v === "food"),
+            action: z.string().refine((v) => v === "check" || "uncheck"),
         })
         .safeParse(data);
     if (!validateResults.success) {
@@ -555,23 +555,24 @@ export const redeemItem = functions.https.onCall(async (data, context) => {
     if (!ticket)
         return response(HttpStatus.NOT_FOUND, { message: "ticket not found" });
 
-    if (data.type === "event") {
+    let events = [];
+    if (data.action === "check") {
+        events = [...ticket.events, data.itemId];
         await admin
             .firestore()
             .collection("tickets")
             .doc(data.ticketId)
-            .update({ events: [...ticket.events, data.itemId] });
-    } else if (data.type === "food") {
-        await admin
-            .firestore()
-            .collection("tickets")
-            .doc(data.ticketId)
-            .update({ foods: [...ticket.foods, data.itemId] });
+            .update({ events });
     } else {
-        return response(HttpStatus.BAD_REQUEST, { message: "invalid type" });
+        events = ticket.events.filter((evt: string) => evt !== data.itemId);
+        await admin
+            .firestore()
+            .collection("tickets")
+            .doc(data.ticketId)
+            .update({ events });
     }
 
-    return response(HttpStatus.OK);
+    return response(HttpStatus.OK, { data: events });
 });
 
 export {

@@ -7,6 +7,7 @@ import { getExtendedTicketData } from "@/services/utils/ticket";
 import { useNotification } from "@/providers/notification.provider";
 import { getRedeemableItems, redeemItem } from "@/services/utils";
 import { Button, LoadingAnimation, Modal } from "@/components";
+import { getButtonStyles } from "@/components/Button/Button.styles";
 
 const categories = ["Important", "Workshop", "Game/Chill", "Food"];
 
@@ -23,6 +24,9 @@ export const AdminViewTicketPage = () => {
     const [events, setEvents] = useState<EventItem[]>([]);
     const [openConfirm, setOpenConfirm] = useState(false);
     const [activeEvent, setActiveEvent] = useState<EventItem | null>(null);
+    const [activeAction, setActiveAction] = useState<"check" | "uncheck">(
+        "check"
+    );
 
     useEffect(() => {
         if (!ticketId) return;
@@ -53,17 +57,19 @@ export const AdminViewTicketPage = () => {
     }, [currentUser]);
 
     const checkEvent = async (e: EventItem) => {
-        if (!ticketData) return;
-        if (ticketData?.events.includes(e.id) || !ticketId) return;
+        if (!ticketData || !ticketId) return;
 
         try {
-            const res = await redeemItem(ticketId, e.id, "event");
+            const res = await redeemItem(ticketId, e.id, activeAction);
             if (res.status === 200) {
                 showNotification({
-                    title: "Event Item Checked!",
+                    title:
+                        activeAction === "check"
+                            ? "Event Item Checked!"
+                            : "Event Item Unchecked!",
                     message: "",
                 });
-                ticketData.events.push(e.id);
+                ticketData.events = res.data;
                 setTicketData({ ...ticketData });
             } else {
                 showNotification({
@@ -141,40 +147,58 @@ export const AdminViewTicketPage = () => {
                                             e.type.toLowerCase() ===
                                             category.toLowerCase()
                                     )
-                                    .map((e) => (
-                                        <li key={e.id}>
-                                            <div className="space-y-2">
-                                                <div>
-                                                    <p className="font-medium">
-                                                        Title:
-                                                        <span className="ml-2 font-normal">
-                                                            {e.title}
-                                                        </span>
-                                                    </p>
+                                    .map((e) => {
+                                        const checked =
+                                            ticketData.events.includes(e.id);
+                                        return (
+                                            <li key={e.id}>
+                                                <div className="space-y-2">
+                                                    <div>
+                                                        <p className="font-medium">
+                                                            Title:
+                                                            <span className="ml-2 font-normal">
+                                                                {e.title}
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                    <button
+                                                        className={getButtonStyles(
+                                                            {
+                                                                className:
+                                                                    "p-2",
+                                                                intent: checked
+                                                                    ? "secondary"
+                                                                    : "primary",
+                                                            }
+                                                        )}
+                                                        onClick={() => {
+                                                            setActiveEvent(e);
+                                                            setActiveAction(
+                                                                checked
+                                                                    ? "uncheck"
+                                                                    : "check"
+                                                            );
+                                                            setOpenConfirm(
+                                                                true
+                                                            );
+                                                        }}
+                                                    >
+                                                        {checked
+                                                            ? "Uncheck"
+                                                            : "Check"}
+                                                    </button>
                                                 </div>
-                                                <button
-                                                    className="p-2 bg-tbrand text-white rounded disabled:bg-gray-400"
-                                                    disabled={ticketData.events.includes(
-                                                        e.id
-                                                    )}
-                                                    onClick={() => {
-                                                        setActiveEvent(e);
-                                                        setOpenConfirm(true);
-                                                    }}
-                                                >
-                                                    Check
-                                                </button>
-                                            </div>
-                                        </li>
-                                    ))}
+                                            </li>
+                                        );
+                                    })}
                             </ul>
                         </Tab.Panel>
                     ))}
                 </Tab.Panels>
             </Tab.Group>
             <Modal
-                title="Confirm Check"
-                subTitle="This action cannot be undone."
+                title="Check/Unchek Event"
+                subTitle="Please confirm"
                 open={openConfirm}
                 onClose={closeModal}
             >
