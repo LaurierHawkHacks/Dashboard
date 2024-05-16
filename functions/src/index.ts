@@ -270,7 +270,9 @@ export const updateSocials = functions.https.onCall(async (data, context) => {
         functions.logger.info("Updating socials for application:", doc.id);
         functions.logger.info("Data in ref:", doc);
 
-        await admin.firestore().collection("socials").doc(doc.id).update({
+        const db = admin.firestore();
+        db.settings({ ignoreUndefinedProperties: true });
+        await db.collection("socials").doc(doc.id).update({
             instagram: data.instagram,
             linkedin: data.linkedin,
             github: data.github,
