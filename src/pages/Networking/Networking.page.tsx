@@ -15,8 +15,8 @@ import {
     uploadMentorResume,
 } from "@/services/utils";
 import { useNotification } from "@/providers/notification.provider";
-import type { Socials } from "@/services/utils/types";
-import { Modal } from "@/components";
+import type { ResumeVisibility, Socials } from "@/services/utils/types";
+import { Modal, Select } from "@/components";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 
 const allowedFileTypes = [
@@ -38,6 +38,18 @@ const mediaTypes: { name: string; key: keyof Socials }[] = [
     { name: "Discord", key: "discord" },
 ];
 
+const visibilityOptions: ResumeVisibility[] = [
+    "Public",
+    "Sponsors Only",
+    "Private",
+];
+
+const visibilityDescription = {
+    Public: "Your resume will be visible to anyone who scans your ticket QR code.",
+    Private: "Your resume will only be visible to you.",
+    "Sponsors Only": "Your resume will only be visible to our sponsors.",
+};
+
 export const NetworkingPage = () => {
     const { currentUser, userApp } = useAuthProvider();
     const [isLoading, setIsLoading] = useState(true);
@@ -47,6 +59,9 @@ export const NetworkingPage = () => {
     const { showNotification } = useNotification();
     const [socials, setSocials] = useState<Socials | null>(null);
     const [isResumeSettingsOpened, setIsResumeSettingsOpened] = useState(false);
+    const [newVisibility, setNewVisibility] = useState<ResumeVisibility>(
+        socials?.resumeVisibility ?? "Public"
+    );
 
     const [file, setFile] = useState<File | null>(null);
 
@@ -210,6 +225,37 @@ export const NetworkingPage = () => {
 
     const closeResumeSettings = () => {
         setIsResumeSettingsOpened(false);
+    };
+
+    const saveResumeSettings = async () => {
+        try {
+            await updateSocials({
+                ...mediaValues,
+                resumeVisibility: newVisibility,
+            });
+            setSocials(
+                socials
+                    ? {
+                          ...socials,
+                          resumeVisibility: newVisibility,
+                      }
+                    : null
+            );
+            setMediaValues({
+                ...mediaValues,
+                resumeVisibility: newVisibility,
+            });
+            showNotification({
+                title: "Resume Settings Saved",
+                message: "",
+            });
+            setIsResumeSettingsOpened(false);
+        } catch (error) {
+            showNotification({
+                title: "Error",
+                message: "Failed to save resume settings. Please try again.",
+            });
+        }
     };
 
     if (isLoading) return <LoadingAnimation />;
@@ -399,7 +445,44 @@ export const NetworkingPage = () => {
                 open={isResumeSettingsOpened}
                 onClose={closeResumeSettings}
             >
-                <div>
+                <div className="space-y-4">
+                    <div>
+                        <Select
+                            label="Resume Visibility"
+                            initialValue={socials?.resumeVisibility ?? "Public"}
+                            options={visibilityOptions}
+                            onChange={(value) => {
+                                if (value !== newVisibility)
+                                    setEditMode("resume-visibility");
+                                setNewVisibility(value as ResumeVisibility);
+                            }}
+                        />
+                        <p>{visibilityDescription[newVisibility]}</p>
+                        {editMode === "resume-visibility" && (
+                            <div className="mt-4 flex gap-2">
+                                <button
+                                    type="button"
+                                    className="bg-gray-300/30 rounded-lg px-4 py-1"
+                                    onClick={() => {
+                                        setNewVisibility(
+                                            socials?.resumeVisibility ??
+                                                "Public"
+                                        );
+                                        setEditMode("");
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    className="bg-peachWhite text-black rounded-lg px-4 py-1"
+                                    onClick={saveResumeSettings}
+                                >
+                                    Save
+                                </button>
+                            </div>
+                        )}
+                    </div>
                     <div>
                         <button
                             className="border-2 rounded-lg border-red-400 w-full flex px-2 py-4 gap-4 transition hover:bg-red-600/5 text-red-500 font-medium"

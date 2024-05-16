@@ -273,6 +273,7 @@ export const updateSocials = functions.https.onCall(async (data, context) => {
             github: data.github,
             discord: data.discord,
             resumeRef: data.resumeRef,
+            resumeVisibility: data.resumeVisibility,
         });
         functions.logger.info("Socials updated:", data);
         return response(HttpStatus.OK, { message: "ok" });
