@@ -74,6 +74,7 @@ export const NetworkingPage = () => {
         resumeRef: "",
         docId: "",
         uid: "",
+        resumeVisibility: "Public",
     });
 
     const firstName =
