@@ -113,28 +113,31 @@ const HomePage = () => {
                         </div>
                     </Card>
 
-                <Card title="RSVP Status" className="xl:col-span-5">
-                    <span className="flex flex-col gap-2">
-                        <p className="text-lg">
-                            RSVP status:{" "}
-                            <span className="font-bold">
-                                {currentUser?.rsvpVerified
-                                    ? "RSVP'd"
-                                    : "Not RSVP'd"}
-                                <span className="capitalize">{` (${currentUser?.type})`}</span>
-                            </span>
-                        </p>
-                    </span>
-                        <Button
-                            onClick={() =>
-                                !disableAllActions && setOpenWithdrawRSVP(true)
-                            }
-                            intent="secondary"
-                            className="rounded-lg mt-4 border-gray-300"
-                        >
-                            Not able to make it?
-                        </Button>
-                </Card>
+                    <Card title="RSVP Status" className="xl:col-span-5">
+                        <span className="flex flex-col gap-2">
+                            <p className="text-lg">
+                                RSVP status:{" "}
+                                <span className="font-bold">
+                                    {currentUser?.rsvpVerified
+                                        ? "RSVP'd"
+                                        : "Not RSVP'd"}
+                                    <span className="capitalize">{` (${currentUser?.type})`}</span>
+                                </span>
+                            </p>
+                        </span>
+                        {currentUser && currentUser.type === "hacker" && (
+                            <Button
+                                onClick={() =>
+                                    !disableAllActions &&
+                                    setOpenWithdrawRSVP(true)
+                                }
+                                intent="secondary"
+                                className="rounded-lg mt-4 border-gray-300"
+                            >
+                                Not able to make it?
+                            </Button>
+                        )}
+                    </Card>
 
                     <Card
                         title="Important Information"
