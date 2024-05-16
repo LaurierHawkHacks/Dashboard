@@ -32,6 +32,8 @@ export interface Invitation {
     teamName: string;
 }
 
+export type ResumeVisibility = "Public" | "Private" | "Sponsors Only";
+
 export interface Socials {
     instagram: string;
     github: string;
@@ -40,6 +42,7 @@ export interface Socials {
     resumeRef: string;
     docId: string;
     uid: string;
+    resumeVisibility?: ResumeVisibility;
 }
 
 export interface TicketData {
@@ -58,7 +61,6 @@ export interface ExtendedTicketData extends TicketData {
     events: string[]; // id of the event items
     allergies: string[]; // list of allergies
 }
-
 
 export interface EventItem {
     id: string;
