@@ -164,6 +164,7 @@ interface Socials {
     resumeRef: string;
     docId: string;
     uid: string;
+    resumeVisibility: "Public" | "Private" | "Sponsors Only";
 }
 
 export const requestSocials = functions.https.onCall(async (_, context) => {
@@ -212,6 +213,7 @@ export const requestSocials = functions.https.onCall(async (_, context) => {
                 resumeRef: "",
                 docId,
                 uid: context.auth.uid,
+                resumeVisibility: "Public",
             };
         } else {
             functions.logger.info(
@@ -228,6 +230,7 @@ export const requestSocials = functions.https.onCall(async (_, context) => {
                         : app.generalResumeRef,
                 docId,
                 uid: context.auth.uid,
+                resumeVisibility: "Public",
             };
         }
         await admin.firestore().collection("socials").doc(docId).set(socials);
@@ -461,6 +464,7 @@ async function internalGetTicketData(id: string, extended = false) {
             discord: discord ?? "",
             resumeRef: resumeRef ?? "",
             docId: "",
+            resumeVisibility: "Public",
         } as Socials;
     }
 

@@ -24,6 +24,7 @@ export const ViewTicketPage = () => {
     const timeoutRef = useRef<number | null>(null);
     const [ticketData, setTicketData] = useState<TicketData | null>(null);
     const { showNotification } = useNotification();
+    const [showResume, setShowResume] = useState(false);
 
     useEffect(() => {
         if (!ticketId) return;
@@ -40,6 +41,13 @@ export const ViewTicketPage = () => {
                 const res = await getTicketData(ticketId);
                 if (res.status === 200) {
                     setTicketData(res.data);
+                    setShowResume(
+                        !res.data.resumeVisibility ||
+                            res.data.resumeVisibility === "Public" ||
+                            (res.data.resumeVisibility === "Sponsors Only" &&
+                                currentUser !== null &&
+                                currentUser.type === "sponsor")
+                    );
                 } else {
                     showNotification({
                         title: "Failed to load ticket",
@@ -84,7 +92,7 @@ export const ViewTicketPage = () => {
                         </div>
                     ) : null
                 )}
-                {ticketData.resumeRef && (
+                {ticketData.resumeRef && showResume && (
                     <div className="bg-white shadow-md p-4 rounded-xl flex flex-col">
                         <div className="mb-2 flex justify-between items-center">
                             <p className="flex-1 capitalize">Resume</p>

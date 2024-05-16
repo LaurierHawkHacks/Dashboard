@@ -54,6 +54,7 @@ export interface TicketData {
     github: string;
     discord: string;
     resumeRef: string; // gs:// format ref
+    resumeVisibility?: ResumeVisibility;
 }
 
 export interface ExtendedTicketData extends TicketData {
