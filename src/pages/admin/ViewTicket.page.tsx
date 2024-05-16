@@ -1,3 +1,4 @@
+import { Tab } from "@headlessui/react";
 import { useAuth } from "@/providers/auth.provider";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -6,6 +7,8 @@ import { getExtendedTicketData } from "@/services/utils/ticket";
 import { useNotification } from "@/providers/notification.provider";
 import { getRedeemableItems, redeemItem } from "@/services/utils";
 import { Button, LoadingAnimation, Modal } from "@/components";
+
+const categories = ["Important", "Workshop", "Game/Chill", "Food"];
 
 export const AdminViewTicketPage = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -109,38 +112,66 @@ export const AdminViewTicketPage = () => {
                         <p>No known allergies</p>
                     )}
                 </div>
-                <div className="mt-12">
-                    <h2 className="font-medium text-xl mb-2">Events</h2>
-                    <ul className="divide-y divide-gray-300 space-y-4">
-                        {events.map((e) => (
-                            <li key={e.id}>
-                                <div className="space-y-2">
-                                    <div>
-                                        <p className="font-medium">
-                                            Title:
-                                            <span className="ml-2 font-normal">
-                                                {e.title}
-                                            </span>
-                                        </p>
-                                    </div>
-                                    <button
-                                        className="p-2 bg-tbrand text-white rounded disabled:bg-gray-400"
-                                        disabled={ticketData.events.includes(
-                                            e.id
-                                        )}
-                                        onClick={() => {
-                                            setActiveEvent(e);
-                                            setOpenConfirm(true);
-                                        }}
-                                    >
-                                        Check
-                                    </button>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
             </div>
+            <Tab.Group as="div" className="mt-12">
+                <Tab.List className="flex gap-1 rounded-lg p-1">
+                    {categories.map((category) => (
+                        <Tab
+                            key={category}
+                            className={({ selected }) =>
+                                `p-4 rounded-lg border-2 border-tbrand ${
+                                    selected ? "bg-tbrand text-white" : ""
+                                }`
+                            }
+                        >
+                            {category}
+                        </Tab>
+                    ))}
+                </Tab.List>
+                <Tab.Panels>
+                    {categories.map((category, idx) => (
+                        <Tab.Panel key={idx}>
+                            <h2 className="font-medium text-xl my-4">
+                                {category}
+                            </h2>
+                            <ul className="divide-y divide-gray-300 space-y-4">
+                                {events
+                                    .filter(
+                                        (e) =>
+                                            e.type.toLowerCase() ===
+                                            category.toLowerCase()
+                                    )
+                                    .map((e) => (
+                                        <li key={e.id}>
+                                            <div className="space-y-2">
+                                                <div>
+                                                    <p className="font-medium">
+                                                        Title:
+                                                        <span className="ml-2 font-normal">
+                                                            {e.title}
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                                <button
+                                                    className="p-2 bg-tbrand text-white rounded disabled:bg-gray-400"
+                                                    disabled={ticketData.events.includes(
+                                                        e.id
+                                                    )}
+                                                    onClick={() => {
+                                                        setActiveEvent(e);
+                                                        setOpenConfirm(true);
+                                                    }}
+                                                >
+                                                    Check
+                                                </button>
+                                            </div>
+                                        </li>
+                                    ))}
+                            </ul>
+                        </Tab.Panel>
+                    ))}
+                </Tab.Panels>
+            </Tab.Group>
             <Modal
                 title="Confirm Check"
                 subTitle="This action cannot be undone."
@@ -160,4 +191,3 @@ export const AdminViewTicketPage = () => {
         </>
     );
 };
-
