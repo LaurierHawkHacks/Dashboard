@@ -178,81 +178,81 @@ export const withdrawRSVP = functions.https.onCall(async (_, context) => {
         await admin.auth().revokeRefreshTokens(user.uid);
 
         // move next in waitlist to spots
-        const snap = await admin
-            .firestore()
-            .collection(WAITLIST_COLLECTION)
-            .orderBy("joinAt", "asc")
-            .limit(1)
-            .get();
-        if (snap.size) {
-            functions.logger.info("Next user in waitlist found");
-            const doc = snap.docs[0];
-            const user = await admin.auth().getUser(doc.data().uid);
-            await admin.firestore().runTransaction(async (tx) => {
-                const expires = Timestamp.now().toDate();
-                // 24 hours in milliseconds
-                const oneDayInMs = 86400000;
-                expires.setTime(expires.getTime() + oneDayInMs);
-                const expiresAt = Timestamp.fromDate(expires);
-                tx.create(
-                    admin.firestore().collection(SPOTS_COLLECTION).doc(doc.id),
-                    {
-                        ...doc.data(),
-                        expiresAt,
-                    }
-                );
-                tx.delete(
-                    admin
-                        .firestore()
-                        .collection(WAITLIST_COLLECTION)
-                        .doc(doc.id)
-                );
-            });
-            const app = (
-                await admin
-                    .firestore()
-                    .collection("applications")
-                    .where("applicantId", "==", user.uid)
-                    .get()
-            ).docs[0]?.data();
-            await sendSpotAvailableEmail(
-                app?.firstName ?? user.displayName ?? "",
-                user.email
-            ).catch((error) =>
-                functions.logger.error(
-                    "Failed to send notification email about new available spot.",
-                    { error }
-                )
-            );
-        } else {
-            functions.logger.info(
-                "No user in waitlist, adding empty spot to counter"
-            );
-            // record the number of spots that are available when no one is in the waitlist
-            const counterDoc = await admin
-                .firestore()
-                .collection(SPOTS_COLLECTION)
-                .doc(SPOTS_COUNTER_DOCUMENT)
-                .get();
-            const counterData = counterDoc.data();
-            if (counterDoc.exists && counterData) {
-                functions.logger.info("Spot counter found");
-                await admin
-                    .firestore()
-                    .collection(SPOTS_COLLECTION)
-                    .doc(SPOTS_COUNTER_DOCUMENT)
-                    .update({
-                        count: counterData.count + 1,
-                    });
-            } else {
-                functions.logger.info("Spot counter not found, creating...");
-                await admin
-                    .firestore()
-                    .collection(SPOTS_COLLECTION)
-                    .doc(SPOTS_COUNTER_DOCUMENT)
-                    .set({ count: 1 });
-            }
-        }
+        // const snap = await admin
+        //     .firestore()
+        //     .collection(WAITLIST_COLLECTION)
+        //     .orderBy("joinAt", "asc")
+        //     .limit(1)
+        //     .get();
+        // if (snap.size) {
+        //     functions.logger.info("Next user in waitlist found");
+        //     const doc = snap.docs[0];
+        //     const user = await admin.auth().getUser(doc.data().uid);
+        //     await admin.firestore().runTransaction(async (tx) => {
+        //         const expires = Timestamp.now().toDate();
+        //         // 24 hours in milliseconds
+        //         const oneDayInMs = 86400000;
+        //         expires.setTime(expires.getTime() + oneDayInMs);
+        //         const expiresAt = Timestamp.fromDate(expires);
+        //         tx.create(
+        //             admin.firestore().collection(SPOTS_COLLECTION).doc(doc.id),
+        //             {
+        //                 ...doc.data(),
+        //                 expiresAt,
+        //             }
+        //         );
+        //         tx.delete(
+        //             admin
+        //                 .firestore()
+        //                 .collection(WAITLIST_COLLECTION)
+        //                 .doc(doc.id)
+        //         );
+        //     });
+        //     const app = (
+        //         await admin
+        //             .firestore()
+        //             .collection("applications")
+        //             .where("applicantId", "==", user.uid)
+        //             .get()
+        //     ).docs[0]?.data();
+        //     await sendSpotAvailableEmail(
+        //         app?.firstName ?? user.displayName ?? "",
+        //         user.email
+        //     ).catch((error) =>
+        //         functions.logger.error(
+        //             "Failed to send notification email about new available spot.",
+        //             { error }
+        //         )
+        //     );
+        // } else {
+        //     functions.logger.info(
+        //         "No user in waitlist, adding empty spot to counter"
+        //     );
+        //     // record the number of spots that are available when no one is in the waitlist
+        //     const counterDoc = await admin
+        //         .firestore()
+        //         .collection(SPOTS_COLLECTION)
+        //         .doc(SPOTS_COUNTER_DOCUMENT)
+        //         .get();
+        //     const counterData = counterDoc.data();
+        //     if (counterDoc.exists && counterData) {
+        //         functions.logger.info("Spot counter found");
+        //         await admin
+        //             .firestore()
+        //             .collection(SPOTS_COLLECTION)
+        //             .doc(SPOTS_COUNTER_DOCUMENT)
+        //             .update({
+        //                 count: counterData.count + 1,
+        //             });
+        //     } else {
+        //         functions.logger.info("Spot counter not found, creating...");
+        //         await admin
+        //             .firestore()
+        //             .collection(SPOTS_COLLECTION)
+        //             .doc(SPOTS_COUNTER_DOCUMENT)
+        //             .set({ count: 1 });
+        //     }
+        // }
     } catch (error) {
         functions.logger.error("Failed to unverified rsvp", { error });
         return response(HttpStatus.INTERNAL_SERVER_ERROR, {
