@@ -267,7 +267,6 @@ export const updateSocials = functions.https.onCall(async (data, context) => {
                 message: "cannot update socials",
             });
 
-        functions.logger.info("Payload", { data });
         functions.logger.info("Updating socials for application:", doc.id);
         functions.logger.info("Data in ref:", doc);
 
