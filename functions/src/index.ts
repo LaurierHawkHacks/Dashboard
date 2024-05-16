@@ -267,6 +267,7 @@ export const updateSocials = functions.https.onCall(async (data, context) => {
                 message: "cannot update socials",
             });
 
+        functions.logger.info("Payload", { data });
         functions.logger.info("Updating socials for application:", doc.id);
         functions.logger.info("Data in ref:", doc);
 
@@ -281,7 +282,7 @@ export const updateSocials = functions.https.onCall(async (data, context) => {
         functions.logger.info("Socials updated:", data);
         return response(HttpStatus.OK, { message: "ok" });
     } catch (error) {
-        functions.logger.error("Failed to update socials:", error);
+        functions.logger.error("Failed to update socials", { error });
         throw new functions.https.HttpsError(
             "internal",
             "Failed to update socials",
