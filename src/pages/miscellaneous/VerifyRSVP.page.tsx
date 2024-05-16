@@ -1,6 +1,6 @@
 import { Button, LoadingAnimation } from "@/components";
 import { useAuth } from "@/providers/auth.provider";
-import { verifyRSVP, joinWaitlist } from "@/services/utils";
+import { verifyRSVP } from "@/services/utils";
 import { useNotification } from "@/providers/notification.provider";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
@@ -69,29 +69,29 @@ export const VerifyRSVP = () => {
         setRefreshRSVPStatus(!refreshRSVPStatus);
     };
 
-    const join = async () => {
-        setIsLoading(true);
-        try {
-            const res = await joinWaitlist();
-            if (res.status === 200) {
-                setRsvpLimitReached(true);
-                setInWaitlist(true);
-                setExpiredSpot(false);
-            } else {
-                showNotification({
-                    title: "Error joining waitlist",
-                    message: res.message,
-                });
-            }
-        } catch (error) {
-            showNotification({
-                title: "Error joining waitlist",
-                message: (error as Error).message,
-            });
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    // const join = async () => {
+    //     setIsLoading(true);
+    //     try {
+    //         const res = await joinWaitlist();
+    //         if (res.status === 200) {
+    //             setRsvpLimitReached(true);
+    //             setInWaitlist(true);
+    //             setExpiredSpot(false);
+    //         } else {
+    //             showNotification({
+    //                 title: "Error joining waitlist",
+    //                 message: res.message,
+    //             });
+    //         }
+    //     } catch (error) {
+    //         showNotification({
+    //             title: "Error joining waitlist",
+    //             message: (error as Error).message,
+    //         });
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    // };
 
     useEffect(() => {
         if (currentUser && currentUser.rsvpVerified) navigate("/");
@@ -219,9 +219,9 @@ export const VerifyRSVP = () => {
                                     <p className="text-gray-700">
                                         Sorry, but the RSVP limit has been
                                         reached.
-                                        <br />
-                                        Join the waitlist incase someone revokes
-                                        their RSVP!
+                                        {/* <br /> */}
+                                        {/* Join the waitlist incase someone revokes */}
+                                        {/* their RSVP! */}
                                     </p>
                                 </>
                             )}
@@ -252,14 +252,14 @@ export const VerifyRSVP = () => {
                                 reach out to us in our tech support channel on
                                 Discord.
                             </p>
-                            {!inWaitlist && (
-                                <Button
-                                    onClick={join}
-                                    disabled={isLoading || inWaitlist}
-                                >
-                                    Join waitlist
-                                </Button>
-                            )}
+                            {/* {!inWaitlist && ( */}
+                            {/*     <Button */}
+                            {/*         onClick={join} */}
+                            {/*         disabled={isLoading || inWaitlist} */}
+                            {/*     > */}
+                            {/*         Join waitlist */}
+                            {/*     </Button> */}
+                            {/* )} */}
                         </div>
                     ) : (
                         <>
@@ -318,14 +318,15 @@ export const VerifyRSVP = () => {
                                                 className="form-checkbox h-5 w-5 text-gray-600"
                                             />
                                             <span className="ml-2 text-gray-700">
-                                        I confirm that I will be attending
-                                        HawkHacks{" "}
-                                        <span className="font-bold uppercase underline">
-                                            in person
-                                        </span>{" "}
-                                        from May 17th to May 19th. I will try to
-                                        be on the premises for the vast majority
-                                        for the duration of the event.
+                                                I confirm that I will be
+                                                attending HawkHacks{" "}
+                                                <span className="font-bold uppercase underline">
+                                                    in person
+                                                </span>{" "}
+                                                from May 17th to May 19th. I
+                                                will try to be on the premises
+                                                for the vast majority for the
+                                                duration of the event.
                                             </span>
                                         </label>
                                     </div>
