@@ -417,6 +417,7 @@ async function internalGetTicketData(id: string, extended = false) {
     let linkedin = "";
     let github = "";
     let resumeRef = "";
+    let allergies: string[] = [];
 
     if (!app) {
         // grab from user record
@@ -438,6 +439,7 @@ async function internalGetTicketData(id: string, extended = false) {
             app.participatingAs === "Mentor"
                 ? app.mentorResumeRef
                 : app.generalResumeRef;
+        allergies = app.allergies ?? [];
     }
 
     // get social ticket
@@ -467,6 +469,7 @@ async function internalGetTicketData(id: string, extended = false) {
         pronouns,
         foods: [] as string[],
         events: [] as string[],
+        allergies,
         ...socials,
     };
 
@@ -477,6 +480,7 @@ async function internalGetTicketData(id: string, extended = false) {
 
     return data;
 }
+
 
 export const getTicketData = functions.https.onCall(async (data) => {
     if (!z.string().uuid().safeParse(data.id).success) {

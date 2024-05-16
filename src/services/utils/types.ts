@@ -56,7 +56,9 @@ export interface TicketData {
 export interface ExtendedTicketData extends TicketData {
     foods: string[]; // id of the food items
     events: string[]; // id of the event items
+    allergies: string[]; // list of allergies
 }
+
 
 export interface EventItem {
     id: string;
