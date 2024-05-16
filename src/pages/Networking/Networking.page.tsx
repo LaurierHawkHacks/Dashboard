@@ -166,6 +166,40 @@ export const NetworkingPage = () => {
         setEditMode("");
     };
 
+    const removeResume = async () => {
+        if (mediaValues.resumeRef) {
+            try {
+                await updateSocials({
+                    ...mediaValues,
+                    resumeRef: "",
+                });
+                setSocials(
+                    socials
+                        ? {
+                              ...socials,
+                              resumeRef: "",
+                          }
+                        : null
+                );
+                setMediaValues({
+                    ...mediaValues,
+                    resumeRef: "",
+                });
+                setFile(null);
+            } catch (error) {
+                showNotification({
+                    title: "Error",
+                    message: "Failed to remove resume. Please try again.",
+                });
+            }
+        } else {
+            showNotification({
+                title: "Error",
+                message: "No resume found to remove.",
+            });
+        }
+    };
+
     if (isLoading) return <LoadingAnimation />;
 
     return (
@@ -310,40 +344,7 @@ export const NetworkingPage = () => {
                             title="Remove Resume"
                             type="button"
                             className="p-2 bg-peachWhite rounded-lg flex items-center justify-center hover:cursor-pointer flex-shrink-0"
-                            onClick={async () => {
-                                if (mediaValues.resumeRef) {
-                                    try {
-                                        await updateSocials({
-                                            ...mediaValues,
-                                            resumeRef: "",
-                                        });
-                                        setSocials(
-                                            socials
-                                                ? {
-                                                      ...socials,
-                                                      resumeRef: "",
-                                                  }
-                                                : null
-                                        );
-                                        setMediaValues({
-                                            ...mediaValues,
-                                            resumeRef: "",
-                                        });
-                                        setFile(null);
-                                    } catch (error) {
-                                        showNotification({
-                                            title: "Error",
-                                            message:
-                                                "Failed to remove resume. Please try again.",
-                                        });
-                                    }
-                                } else {
-                                    showNotification({
-                                        title: "Error",
-                                        message: "No resume found to remove.",
-                                    });
-                                }
-                            }}
+                            onClick={removeResume}
                         >
                             <MdOutlineRemoveCircleOutline className="text-red-500 w-6 h-6" />
                         </button>
