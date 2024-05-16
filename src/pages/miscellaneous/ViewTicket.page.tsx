@@ -32,7 +32,12 @@ export const ViewTicketPage = () => {
         timeoutRef.current = window.setTimeout(() => setIsLoading(false), 1500);
 
         (async () => {
-            if (currentUser && currentUser.hawkAdmin) {
+            if (
+                currentUser &&
+                (currentUser.hawkAdmin ||
+                    (currentUser.type === "volunteer" &&
+                        currentUser.rsvpVerified))
+            ) {
                 if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
                 navigate("/admin/ticket/" + ticketId);
             } else {

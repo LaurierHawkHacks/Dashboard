@@ -46,7 +46,13 @@ export const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
         }
     }
 
-    if (adminOnly && !session.currentUser.hawkAdmin) {
+    if (
+        adminOnly &&
+        ((location.pathname.startsWith("/admin/ticket") &&
+            session.currentUser.type === "volunteer" &&
+            session.currentUser.rsvpVerified) ||
+            !session.currentUser.hawkAdmin)
+    ) {
         // redirect to not found page if user is not authorized to view
         return <Navigate to={routes.notFound} />;
     }
