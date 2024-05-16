@@ -1,6 +1,11 @@
 import { useAuth as useAuthProvider } from "@/providers/auth.provider";
 import { FormEventHandler, useEffect, useRef, useState } from "react";
-import { MdOutlineEdit, MdOpenInNew, MdWarning, MdOutlineRemoveCircleOutline } from "react-icons/md";
+import {
+    MdOutlineEdit,
+    MdOpenInNew,
+    MdWarning,
+    MdOutlineRemoveCircleOutline,
+} from "react-icons/md";
 import { LoadingAnimation } from "@/components/LoadingAnimation";
 import {
     getResumeURL,
@@ -301,7 +306,7 @@ export const NetworkingPage = () => {
                             <MdOpenInNew className="text-gray-500 w-6 h-6" />
                         </button>
 
-                        <button 
+                        <button
                             title="Remove Resume"
                             type="button"
                             className="p-2 bg-peachWhite rounded-lg flex items-center justify-center hover:cursor-pointer flex-shrink-0"
@@ -315,15 +320,16 @@ export const NetworkingPage = () => {
                                         setSocials(
                                             socials
                                                 ? {
-                                                    ...socials,
-                                                    resumeRef: "",
-                                                }
-                                            : null
+                                                      ...socials,
+                                                      resumeRef: "",
+                                                  }
+                                                : null
                                         );
                                         setMediaValues({
                                             ...mediaValues,
                                             resumeRef: "",
                                         });
+                                        setFile(null);
                                     } catch (error) {
                                         showNotification({
                                             title: "Error",
