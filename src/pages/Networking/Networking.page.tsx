@@ -96,6 +96,8 @@ export const NetworkingPage = () => {
             gettinSocialsRef.current = true;
             try {
                 const res = await getSocials();
+                const data = res.data;
+                if (!data.resumeVisibility) data.resumeVisibility = "Public";
                 setSocials(res.data);
                 setMediaValues(res.data);
             } catch (e) {
