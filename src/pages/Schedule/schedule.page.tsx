@@ -25,6 +25,8 @@ import { cva } from "class-variance-authority";
 import { Modal } from "@/components";
 import { useEventsStore } from "@/stores/events.store";
 import { useShallow } from "zustand/react/shallow";
+import { Timestamp, doc, getDoc } from "firebase/firestore";
+import { firestore } from "@/services/firebase";
 
 const programStyles = cva(["!border-none !bg-gradient-to-r"], {
     variants: {
@@ -176,6 +178,13 @@ const DayButton = ({
 export const SchedulePage: React.FC = () => {
     const events = useEventsStore(useShallow((state) => state.events));
     const setEvents = useEventsStore((state) => state.setEvents);
+    const isLocalCacheUpToDate = useEventsStore(
+        (state) => state.isLocalCacheUpToDate
+    );
+    const setIsLocalCacheUpToDate = useEventsStore(
+        (state) => state.setIsLocalCacheUpToDate
+    );
+    const cacheEvents = useEventsStore((state) => state.cacheEvents);
     const [day, setDay] = useState(0);
     const [activeProgram, setActiveProgram] = useState<Program | null>(null);
     const [openProgramDetailModal, setOpenProgramDetailModal] = useState(false);
@@ -274,10 +283,32 @@ export const SchedulePage: React.FC = () => {
     });
 
     useEffect(() => {
-        if (events.length > 0) return;
+        if (events.length > 0 || isLocalCacheUpToDate) return;
+
         (async () => {
-            const ev = await getRedeemableItems();
-            setEvents(ev);
+            const lastUpdated = window.localStorage.getItem(
+                "events-last-updated"
+            );
+            const snap = await getDoc(
+                doc(firestore, "events", "event-last-updated-tracker")
+            );
+            const data = snap.data() as { timestamp: Timestamp };
+            window.localStorage.setItem(
+                "events-last-updated",
+                data.timestamp.seconds.toString()
+            );
+            setIsLocalCacheUpToDate(true);
+            if (lastUpdated !== data.timestamp.seconds.toString()) {
+                // get new batch of events
+                const ev = await getRedeemableItems();
+                setEvents(ev);
+                cacheEvents(ev);
+            } else {
+                const ev = JSON.parse(
+                    window.localStorage.getItem("events") ?? "[]"
+                );
+                setEvents(ev);
+            }
         })();
     }, []);
 

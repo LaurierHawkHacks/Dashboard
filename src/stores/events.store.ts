@@ -6,6 +6,10 @@ export interface EventStore {
     addEvent: (event: EventItem) => void;
     removeEvent: (id: string) => void;
     setEvents: (events: EventItem[]) => void;
+
+    isLocalCacheUpToDate: boolean;
+    setIsLocalCacheUpToDate: (val: boolean) => void;
+    cacheEvents: (events: EventItem[]) => void;
 }
 
 export const useEventsStore = create<EventStore>((set) => ({
@@ -25,4 +29,15 @@ export const useEventsStore = create<EventStore>((set) => ({
             state.events = events;
             return state;
         }),
+
+    isLocalCacheUpToDate: false,
+    setIsLocalCacheUpToDate: (val) =>
+        set((state) => {
+            state.isLocalCacheUpToDate = val;
+            return state;
+        }),
+
+    cacheEvents: (events) => {
+        window.localStorage.setItem("events", JSON.stringify(events));
+    },
 }));
