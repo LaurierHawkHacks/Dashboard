@@ -26,6 +26,10 @@ export interface PerksData {
     link: string | null;
     alt: string;
     buttonTitle: string | null;
+    actions?: {
+        link: string;
+        title: string;
+    }[];
 }
 
 const perksData: {
@@ -42,6 +46,18 @@ const perksData: {
             link: null,
             alt: "NEAR",
             buttonTitle: null,
+            actions: [
+                {
+                    link: `${import.meta.env.VITE_BASE_URL}/NEAR_Track.pdf`,
+                    title: "NEAR at HawkHacks",
+                },
+                {
+                    link: `${
+                        import.meta.env.VITE_BASE_URL
+                    }/TENAMINTxGamingDao.pdf`,
+                    title: "TENAMINT x GamingDAO",
+                },
+            ],
         },
         {
             image: PerksAvalanche,

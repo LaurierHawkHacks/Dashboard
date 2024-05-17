@@ -13,30 +13,33 @@ const PerksPage = () => {
     const [isPopup, setIsPopup] = useState(false);
     const { paths } = useAvailableRoutes();
     useEffect(() => {
-        window.localStorage.setItem(paths.perks, 'visited');
+        window.localStorage.setItem(paths.perks, "visited");
     }, []);
 
     useEffect(() => {
-      const fadeInItems = (items, delay) => {
-          items.forEach((item, index) => {
-              if (item) {
-                  setTimeout(() => {
-                      item.classList.add("opacity-100");
-                  }, delay + 75 * index);
-              }
-          });
-      };
-  
-      let currentDelay = 0;
-  
-      fadeInItems(featuredItemsRef.current, currentDelay);
-      currentDelay += featuredItemsRef.current.length * 75;
-  
-      fadeInItems(foodItemsRef.current, currentDelay);
-      currentDelay += foodItemsRef.current.length * 75;
-  
-      fadeInItems(otherItemsRef.current, currentDelay);
-  }, []);
+        const fadeInItems = (items, delay) => {
+            items.forEach((item, index) => {
+                if (item) {
+                    setTimeout(
+                        () => {
+                            item.classList.add("opacity-100");
+                        },
+                        delay + 75 * index
+                    );
+                }
+            });
+        };
+
+        let currentDelay = 0;
+
+        fadeInItems(featuredItemsRef.current, currentDelay);
+        currentDelay += featuredItemsRef.current.length * 75;
+
+        fadeInItems(foodItemsRef.current, currentDelay);
+        currentDelay += foodItemsRef.current.length * 75;
+
+        fadeInItems(otherItemsRef.current, currentDelay);
+    }, []);
 
     const openPopup = (perk: PerksData) => {
         setSelectedPerk(perk);
@@ -57,46 +60,46 @@ const PerksPage = () => {
 
         const isFreeBubbleTea = perk.title.includes("Fantuan");
         const perkStyle = isFreeBubbleTea
-        ? {
-              animation: "pulse 2s infinite",
-              boxShadow: "0 0 0 0 rgba(255, 204, 0, 0.7)",
-              borderColor: "#0FA3B1",
-              borderWidth: "2px",
-              borderStyle: "solid",
-              background: "#0FA3B1",
-          }
-        : {};
+            ? {
+                  animation: "pulse 2s infinite",
+                  boxShadow: "0 0 0 0 rgba(255, 204, 0, 0.7)",
+                  borderColor: "#0FA3B1",
+                  borderWidth: "2px",
+                  borderStyle: "solid",
+                  background: "#0FA3B1",
+              }
+            : {};
 
-
-            return (
-              <div
+        return (
+            <div
                 ref={(el) => (ref.current[ref.current.length] = el)}
                 className="bg-white shadow-md p-4 rounded-xl flex items-center mb-4 transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer"
                 onClick={() => openPopup(perk)}
                 style={{ flexBasis: "33%", marginBottom: "16px", ...perkStyle }}
-              >
-
-              {isFreeBubbleTea && (
+            >
+                {isFreeBubbleTea && (
                     <div className="absolute top-2 left-2 bg-[#0FA3B1] text-white py-1 px-3 rounded-full text-xs font-bold">
-                      FREE Bubble Tea!
+                        FREE Bubble Tea!
                     </div>
-                  )}
+                )}
                 <div className="w-40 h-24 mr-4 flex items-center justify-center">
-                  <img
-                    src={perk.image}
-                    alt={perk.alt}
-                    className="max-w-full max-h-full object-contain"
-                  />
+                    <img
+                        src={perk.image}
+                        alt={perk.alt}
+                        className="max-w-full max-h-full object-contain"
+                    />
                 </div>
                 <div className="flex-grow">
-                  <h3 className="font-bold mt-2 cursor-default">{perk.title}</h3>
-                  <p className="text-gray-500 mt-1 cursor-default">
-                    {shortenDescription(perk.description, 80)}
-                  </p>
+                    <h3 className="font-bold mt-2 cursor-default">
+                        {perk.title}
+                    </h3>
+                    <p className="text-gray-500 mt-1 cursor-default">
+                        {shortenDescription(perk.description, 80)}
+                    </p>
                 </div>
-              </div>
-            );
-          };
+            </div>
+        );
+    };
 
     return (
         <div>
@@ -147,6 +150,23 @@ const PerksPage = () => {
                                 {selectedPerk.buttonTitle || "Learn More"}
                             </a>
                         )}
+                        <div className="flex gap-4">
+                            {selectedPerk.actions &&
+                                selectedPerk.actions.map((action, idx) => (
+                                    <a
+                                        key={idx}
+                                        href={action.link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={getButtonStyles({
+                                            className:
+                                                "p-3 bg-tbrand rounded-lg",
+                                        })}
+                                    >
+                                        {action.title}
+                                    </a>
+                                ))}
+                        </div>
                     </div>
                 )}
             </Modal>
