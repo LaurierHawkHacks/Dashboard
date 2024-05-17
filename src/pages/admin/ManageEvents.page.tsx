@@ -8,11 +8,16 @@ import { FormEventHandler, useEffect, useRef, useState } from "react";
 import { nanoid } from "nanoid";
 import { firestore } from "@/services/firebase";
 import { z } from "zod";
+import { useEventsStore } from "@/stores/events.store";
+import { useShallow } from "zustand/react/shallow";
 
 type KeyOfEventItem = keyof EventItem;
 
 export const AdminManageEventsPage = () => {
-    const [events, setEvents] = useState<EventItem[]>([]);
+    const events = useEventsStore(useShallow((state) => state.events));
+    const setEvents = useEventsStore((state) => state.setEvents);
+    const addEvent = useEventsStore((state) => state.addEvent);
+    const removeEvent = useEventsStore((state) => state.removeEvent);
     const [isLoading, setIsLoading] = useState(true);
     const { showNotification } = useNotification();
     const [newEvent, setNewEvent] = useState<EventItem>({
@@ -33,6 +38,11 @@ export const AdminManageEventsPage = () => {
     const timeoutRef = useRef<number | null>(null);
 
     useEffect(() => {
+        if (events.length > 0) {
+            setIsLoading(false);
+            return;
+        }
+
         const timeout = 5000; // 5 seconds
         if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
         timeoutRef.current = window.setTimeout(() => {
@@ -106,7 +116,7 @@ export const AdminManageEventsPage = () => {
             });
 
             if (!isEditingEvent) {
-                setEvents([...events, newEvent]);
+                addEvent(newEvent);
             }
         } catch (e) {
             console.error(e);
@@ -139,7 +149,7 @@ export const AdminManageEventsPage = () => {
     const handleDeleteEvent = async (id: string) => {
         try {
             await deleteDoc(doc(firestore, "events", id));
-            setEvents(events.filter((evt) => evt.id !== id));
+            removeEvent(id);
             showNotification({
                 title: "Event Deleted",
                 message: "",
