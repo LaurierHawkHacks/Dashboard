@@ -192,7 +192,7 @@ export const Navbar = () => {
                             />
                         </div>
                         <ul className="flex flex-col items-start justify-start divide-y divide-charcoalBlack">
-                        {currentUser && (currentUser.type === "mentor" || currentUser.type === "volunteer") && renderNavItems(true)}
+                        {currentUser && (currentUser.type === "mentor" || currentUser.type === "volunteer" || (currentUser.type === 'hacker' && currentUser.rsvpVerified)) && renderNavItems(true)}
 
                             <a
                                 href="https://maps.app.goo.gl/Fxic5XJBzZjHP4Yt5"
@@ -257,7 +257,7 @@ export const Navbar = () => {
 
                     <aside className="flex flex-col items-start justify-between h-[83%] overflow-y-auto">
                         <ul className="flex flex-col items-start justify-start gap-4 w-full">
-                        {currentUser && (currentUser.type === "mentor" || currentUser.type === "volunteer") && renderNavItems(true)}
+                        {currentUser && (currentUser.type === "mentor" || currentUser.type === "volunteer" || (currentUser.type === 'hacker' && currentUser.rsvpVerified)) && renderNavItems(true)}
                             <a
                                 href="https://maps.app.goo.gl/Fxic5XJBzZjHP4Yt5"
                                 target="_blank"
