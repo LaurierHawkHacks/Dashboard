@@ -78,7 +78,7 @@ export const MyTeamPage = () => {
         setIsLoading(true);
 
         const res = await z.string().min(1).safeParseAsync(teamName);
-        if (res.success) {
+        if (res.success && isBefore(new Date(), teamEditCloseDate)) {
             // try to create the new team
             try {
                 const res = await createTeam(teamName);
