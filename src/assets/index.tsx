@@ -80,6 +80,7 @@ import PerksDistributive from "./perks/distributive.png";
 import PerksNeurelo from "./perks/neurelo.png";
 import PerksMetis from "./perks/metis.png";
 import PerksDeFiBlocks from "./perks/defiblocks.png";
+import PerksMLH from "./perks/mlh.png";
 
 export {
     PerksFantuan,
@@ -100,4 +101,5 @@ export {
     PerksNeurelo,
     PerksMetis,
     PerksDeFiBlocks,
+    PerksMLH,
 };

@@ -17,6 +17,7 @@ import {
     PerksNeurelo,
     PerksMetis,
     PerksDeFiBlocks,
+    PerksMLH,
 } from "@/assets";
 
 export interface PerksData {
@@ -92,6 +93,15 @@ const perksData: {
             link: "https://github.com/metis-edu/Bounties/blob/main/Loyalty%20Program%20/instructions.md",
             alt: "Metis",
             buttonTitle: "View Bounty",
+        },
+        {
+            image: PerksMLH,
+            title: "MLH",
+            description:
+                "The prizes just keep coming! MLH, in collaboration with their partners, are hosting some really cool additional prize categories at HawkHacks. Check them out below!",
+            link: "https://hack.mlh.io/hawkhacks-62/prizes",
+            alt: "MLH",
+            buttonTitle: "View Prizes",
         },
     ],
     food: [
