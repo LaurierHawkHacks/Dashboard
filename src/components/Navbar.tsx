@@ -53,11 +53,6 @@ export const Navbar = () => {
             label: "Perks",
             Icon: RxStar,
         },
-        [paths.location]: {
-            label: "Location",
-            Icon: FiMapPin,
-            externalLink: "https://www.google.com/maps/place/Your+Location/",
-        },
     };
 
     const location = useLocation();
@@ -199,7 +194,7 @@ export const Navbar = () => {
                         <ul className="flex flex-col items-start justify-start divide-y divide-charcoalBlack">
                             {currentUser && renderNavItems(true)}
                             <a
-                                href="https://discord.com/invite/GxwvFEn9TB"
+                                href="https://maps.app.goo.gl/Fxic5XJBzZjHP4Yt5"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-full"
@@ -208,6 +203,7 @@ export const Navbar = () => {
                                     Location
                                 </li>
                             </a>
+                            {currentUser && renderNavItems(true)}
                             <a
                                 href="https://discord.com/invite/GxwvFEn9TB"
                                 target="_blank"
