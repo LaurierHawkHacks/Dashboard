@@ -74,10 +74,10 @@ const perksData: {
             image: PerksMetis,
             title: "Metis",
             description:
-                "Metis is one of our titular sponsors - come back soon to see what they’re giving away!",
-            link: null,
+                "Check out Metis's bounty to win $2.5k in stables and Metis tokens.",
+            link: "https://github.com/metis-edu/Bounties/blob/main/Loyalty%20Program%20/instructions.md",
             alt: "Metis",
-            buttonTitle: null,
+            buttonTitle: "View Bounty",
         },
     ],
     food: [
@@ -202,4 +202,3 @@ const perksData: {
 };
 
 export { perksData };
-
