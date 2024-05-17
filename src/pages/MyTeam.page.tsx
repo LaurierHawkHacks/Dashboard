@@ -39,7 +39,6 @@ type SearchTeamNameFn = (name: string) => Promise<void>;
 const teamEditCloseDate = "2024-05-17T00:00:00";
 
 export const MyTeamPage = () => {
-    // const [team, setTeam] = useState<TeamData | null>(null);
     const team = useUserStore((state) => state.team);
     const setTeam = useUserStore((state) => state.setTeam);
     const updateTeamNameState = useUserStore((state) => state.updateTeamName);
@@ -75,6 +74,7 @@ export const MyTeamPage = () => {
 
     const submitNewTeam: FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
+        if (!isBefore(new Date(), teamEditCloseDate)) return;
         setIsLoading(true);
 
         const res = await z.string().min(1).safeParseAsync(teamName);
