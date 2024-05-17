@@ -15,7 +15,7 @@ import {
     validateTeamInvitation,
     rejectInvitation,
 } from "@/services/utils/teams";
-import { Invitation, type TeamData } from "@/services/utils/types";
+import { Invitation } from "@/services/utils/types";
 import { type FormEventHandler, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import {
@@ -32,13 +32,17 @@ import {
 import { Modal } from "@/components/Modal";
 import { useAvailableRoutes } from "@/providers/routes.provider";
 import { isBefore } from "date-fns";
+import { useUserStore } from "@/stores/user.store";
 
 type SearchTeamNameFn = (name: string) => Promise<void>;
 
 const teamNameUpdateCloseDate = "2024-05-17T00:00:00";
 
 export const MyTeamPage = () => {
-    const [team, setTeam] = useState<TeamData | null>(null);
+    // const [team, setTeam] = useState<TeamData | null>(null);
+    const team = useUserStore((state) => state.team);
+    const setTeam = useUserStore((state) => state.setTeam);
+    const updateTeamNameState = useUserStore((state) => state.updateTeamName);
     const [invitations, setInvitations] = useState<Invitation[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [teamName, setTeamName] = useState("");
@@ -52,7 +56,6 @@ export const MyTeamPage = () => {
     const [openTeammatesDialog, setOpenTeammatesDialog] = useState(false);
     const [openInvitations, setOpenInvitations] = useState(false);
     const [confirmDelete, setConfirmDelete] = useState("");
-    const [reloadTeam, setReloadTeam] = useState(false);
     // holds ths emails of the members to be removed
     const [toBeRemovedTeammates, setToBeRemovedTeammates] = useState<string[]>(
         []
@@ -209,7 +212,7 @@ export const MyTeamPage = () => {
                             "You have until May 16th to change the team name again.",
                     });
                     // want to set the new team name in the team object
-                    setTeam((t) => (t ? { ...t, teamName } : null));
+                    updateTeamNameState(teamName);
                     setTeamName("");
                     setIsEditingTeamName(false);
                     setInvalidTeamName(false);
@@ -276,6 +279,30 @@ export const MyTeamPage = () => {
         }
     };
 
+    const fetchTeam = async () => {
+        const [teamRes, invitationRes] = await Promise.allSettled([
+            getTeamByUser(),
+            getUserInviations(),
+        ]);
+        if (teamRes.status === "fulfilled") {
+            const res = teamRes.value;
+            setTeam(res.data);
+        } else {
+            showNotification({
+                title: "Could not get team",
+                message:
+                    "Yikes, something went wrong. Try again later; if the error continues, shoot us a message on our Discord tech-support channel.",
+            });
+        }
+        if (invitationRes.status === "fulfilled") {
+            const res = invitationRes.value;
+            setInvitations(res.data);
+        }
+        if (loadingTimeoutRef.current !== null)
+            window.clearTimeout(loadingTimeoutRef.current);
+        setIsLoading(false);
+    };
+
     const accept = async (invitationId: string) => {
         setDisableAllActions(true);
         try {
@@ -285,7 +312,7 @@ export const MyTeamPage = () => {
                     title: "Joined Team",
                     message: "Hope you have a blast with your new team!",
                 });
-                setReloadTeam(!reloadTeam);
+                await fetchTeam();
             } else {
                 showNotification({
                     title: "Error Joining Team",
@@ -310,7 +337,7 @@ export const MyTeamPage = () => {
                     title: "Team Inviation Rejected",
                     message: "",
                 });
-                setReloadTeam(!reloadTeam);
+                await fetchTeam();
             } else {
                 showNotification({
                     title: "Error Rejecting Invitation",
@@ -327,6 +354,11 @@ export const MyTeamPage = () => {
     };
 
     useEffect(() => {
+        if (team) {
+            // cached team data
+            return;
+        }
+
         if (loadingTimeoutRef.current !== null)
             window.clearTimeout(loadingTimeoutRef.current);
         loadingTimeoutRef.current = window.setTimeout(
@@ -334,30 +366,8 @@ export const MyTeamPage = () => {
             1500
         );
         if (!currentUser) return;
-        (async () => {
-            const [teamRes, invitationRes] = await Promise.allSettled([
-                getTeamByUser(),
-                getUserInviations(),
-            ]);
-            if (teamRes.status === "fulfilled") {
-                const res = teamRes.value;
-                setTeam(res.data);
-            } else {
-                showNotification({
-                    title: "Could not get team",
-                    message:
-                        "Yikes, something went wrong. Try again later; if the error continues, shoot us a message on our Discord tech-support channel.",
-                });
-            }
-            if (invitationRes.status === "fulfilled") {
-                const res = invitationRes.value;
-                setInvitations(res.data);
-            }
-            if (loadingTimeoutRef.current !== null)
-                window.clearTimeout(loadingTimeoutRef.current);
-            setIsLoading(false);
-        })();
-    }, [reloadTeam]);
+        fetchTeam();
+    }, []);
 
     useEffect(() => {
         window.localStorage.setItem(paths.myTeam, "visited");
