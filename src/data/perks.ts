@@ -42,19 +42,17 @@ const perksData: {
             image: PerksNEAR,
             title: "NEAR",
             description:
-                "Providing 2 category podiums totalling to a $8,050 prize pool!",
+                "Providing 2 category podiums totalling to a $8,050 prize pool! Click below to see how to win.",
             link: null,
             alt: "NEAR",
             buttonTitle: null,
             actions: [
                 {
-                    link: `${import.meta.env.VITE_BASE_URL}/NEAR_Track.pdf`,
+                    link: "/NEAR_Track.pdf",
                     title: "NEAR at HawkHacks",
                 },
                 {
-                    link: `${
-                        import.meta.env.VITE_BASE_URL
-                    }/TENAMINTxGamingDao.pdf`,
+                    link: "/TENAMINTxGamingDao.pdf",
                     title: "TENAMINT x GamingDAO",
                 },
             ],
