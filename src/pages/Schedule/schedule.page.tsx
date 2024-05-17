@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
     useEpg,
     Epg,
@@ -20,10 +20,11 @@ import {
     isWithinInterval,
     parseISO,
 } from "date-fns";
-import { EventItem } from "@/services/utils/types";
 import { getRedeemableItems } from "@/services/utils";
 import { cva } from "class-variance-authority";
 import { Modal } from "@/components";
+import { useEventsStore } from "@/stores/events.store";
+import { useShallow } from "zustand/react/shallow";
 
 const programStyles = cva(["!border-none !bg-gradient-to-r"], {
     variants: {
@@ -173,8 +174,8 @@ const DayButton = ({
 };
 
 export const SchedulePage: React.FC = () => {
-    const [events, setEvents] = useState<EventItem[]>([]);
-    const ref = useRef(false);
+    const events = useEventsStore(useShallow((state) => state.events));
+    const setEvents = useEventsStore((state) => state.setEvents);
     const [day, setDay] = useState(0);
     const [activeProgram, setActiveProgram] = useState<Program | null>(null);
     const [openProgramDetailModal, setOpenProgramDetailModal] = useState(false);
@@ -273,9 +274,8 @@ export const SchedulePage: React.FC = () => {
     });
 
     useEffect(() => {
-        if (ref.current) return;
+        if (events.length > 0) return;
         (async () => {
-            ref.current = true;
             const ev = await getRedeemableItems();
             setEvents(ev);
         })();
