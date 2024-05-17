@@ -36,7 +36,7 @@ import { useUserStore } from "@/stores/user.store";
 
 type SearchTeamNameFn = (name: string) => Promise<void>;
 
-const teamNameUpdateCloseDate = "2024-05-17T00:00:00";
+const teamEditCloseDate = "2024-05-17T00:00:00";
 
 export const MyTeamPage = () => {
     // const [team, setTeam] = useState<TeamData | null>(null);
@@ -487,15 +487,19 @@ export const MyTeamPage = () => {
                                     : "My Teammates"}
                             </h3>
                             {/* members length has to be less than 3 because the logged in user is not in the list */}
-                            {team.isOwner && team.members.length < 3 && (
-                                <button
-                                    aria-label="add teammates"
-                                    className="absolute group right-2 top-1/2 -translate-y-1/2"
-                                    onClick={() => setOpenInviteDialog(true)}
-                                >
-                                    <PlusCircleIcon className="w-8 h-8 text-charcoalBlack/70 transition group-hover:text-charcoalBlack" />
-                                </button>
-                            )}
+                            {team.isOwner &&
+                                team.members.length < 3 &&
+                                isBefore(new Date(), teamEditCloseDate) && (
+                                    <button
+                                        aria-label="add teammates"
+                                        className="absolute group right-2 top-1/2 -translate-y-1/2"
+                                        onClick={() =>
+                                            setOpenInviteDialog(true)
+                                        }
+                                    >
+                                        <PlusCircleIcon className="w-8 h-8 text-charcoalBlack/70 transition group-hover:text-charcoalBlack" />
+                                    </button>
+                                )}
                         </div>
                         {/* separator */}
                         <hr className="h-[1px] bg-gray-200 my-4" />
@@ -530,24 +534,25 @@ export const MyTeamPage = () => {
                                     </li>
                                 ))}
                         </ul>
-                        {team && team.isOwner && (
-                            <div className="mt-8 flex items-center justify-end">
-                                <Button
-                                    onClick={() => setOpenTeammatesDialog(true)}
-                                >
-                                    Edit Team
-                                </Button>
-                            </div>
-                        )}
+                        {team &&
+                            team.isOwner &&
+                            isBefore(new Date(), teamEditCloseDate) && (
+                                <div className="mt-8 flex items-center justify-end">
+                                    <Button
+                                        onClick={() =>
+                                            setOpenTeammatesDialog(true)
+                                        }
+                                    >
+                                        Edit Team
+                                    </Button>
+                                </div>
+                            )}
                     </div>
                     <div className="w-full h-fit lg:max-w-[30rem]">
                         <div className="relative">
                             <h3 className="font-bold">Team Name</h3>
                             {team.isOwner &&
-                                isBefore(
-                                    new Date(),
-                                    teamNameUpdateCloseDate
-                                ) && (
+                                isBefore(new Date(), teamEditCloseDate) && (
                                     <button
                                         aria-label="edit team name"
                                         className="absolute group right-2 top-1/2 -translate-y-1/2"
@@ -610,32 +615,40 @@ export const MyTeamPage = () => {
                         </div>
                     </div>
                 </div>
-                {team && team.isOwner && (
-                    <div className="shadow-basic p-4 max-w-xl rounded-lg mt-8">
-                        <div className="space-y-4">
-                            <h3 className="font-bold">Delete Team?</h3>
-                            <p>Are you sure you want to delete your team?</p>
-                            <p>Retype your team name to confirm deletion.</p>
+                {team &&
+                    team.isOwner &&
+                    isBefore(new Date(), teamEditCloseDate) && (
+                        <div className="shadow-basic p-4 max-w-xl rounded-lg mt-8">
+                            <div className="space-y-4">
+                                <h3 className="font-bold">Delete Team?</h3>
+                                <p>
+                                    Are you sure you want to delete your team?
+                                </p>
+                                <p>
+                                    Retype your team name to confirm deletion.
+                                </p>
+                            </div>
+                            <TextInput
+                                label="Confirm Delete Team"
+                                id="confirm-delete-team-input"
+                                placeholder="Team name"
+                                srLabel
+                                value={confirmDelete}
+                                onChange={(e) =>
+                                    setConfirmDelete(e.target.value)
+                                }
+                            />
+                            <div className="mt-3 flex items-center justify-end">
+                                <Button
+                                    disabled={confirmDelete !== team?.teamName}
+                                    intent="danger"
+                                    onClick={handleDeleteTeam}
+                                >
+                                    Delete
+                                </Button>
+                            </div>
                         </div>
-                        <TextInput
-                            label="Confirm Delete Team"
-                            id="confirm-delete-team-input"
-                            placeholder="Team name"
-                            srLabel
-                            value={confirmDelete}
-                            onChange={(e) => setConfirmDelete(e.target.value)}
-                        />
-                        <div className="mt-3 flex items-center justify-end">
-                            <Button
-                                disabled={confirmDelete !== team?.teamName}
-                                intent="danger"
-                                onClick={handleDeleteTeam}
-                            >
-                                Delete
-                            </Button>
-                        </div>
-                    </div>
-                )}
+                    )}
             </div>
             <Modal
                 open={openInviteDialog}
