@@ -3,20 +3,20 @@ import { useAuth } from "@/providers/auth.provider";
 import { verifyRSVP } from "@/services/utils";
 import { useNotification } from "@/providers/notification.provider";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { rsvpText } from "@/data";
 import { InfoCallout } from "@/components/InfoCallout/InfoCallout";
-import {
-    collection,
-    getDocs,
-    onSnapshot,
-    orderBy,
-    query,
-    where,
-} from "firebase/firestore";
-import { firestore } from "@/services/firebase";
-import { SpotDoc } from "@/services/utils/types";
-import { isAfter } from "date-fns";
+// import {
+//     collection,
+//     getDocs,
+//     onSnapshot,
+//     orderBy,
+//     query,
+//     where,
+// } from "firebase/firestore";
+// import { firestore } from "@/services/firebase";
+// import { SpotDoc } from "@/services/utils/types";
+// import { isAfter } from "date-fns";
 
 function ordinalSuffix(i: number) {
     const j = i % 10;
@@ -41,13 +41,13 @@ export const VerifyRSVP = () => {
     const { showNotification } = useNotification();
     const { currentUser, reloadUser } = useAuth();
     const navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(true);
-    const timeoutRef = useRef<number | null>(null);
-    const [spotAvailable, setSpotAvailable] = useState(false);
-    const [inWaitlist, setInWaitlist] = useState(false);
-    const [expiredSpot, setExpiredSpot] = useState(false);
+    const [isLoading] = useState(false);
+    // const timeoutRef = useRef<number | null>(null);
+    const [spotAvailable] = useState(false);
+    const [inWaitlist] = useState(false);
+    const [expiredSpot] = useState(false);
     const [refreshRSVPStatus, setRefreshRSVPStatus] = useState(false);
-    const [waitlistPos, setWaitlistPos] = useState(0);
+    const [waitlistPos] = useState(0);
 
     const verify = async () => {
         setIsVerifying(true);
@@ -97,99 +97,99 @@ export const VerifyRSVP = () => {
         if (currentUser && currentUser.rsvpVerified) navigate("/");
     }, [currentUser, navigate]);
 
-    useEffect(() => {
-        if (!currentUser || currentUser.rsvpVerified) return;
-        if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
-        timeoutRef.current = window.setTimeout(() => setIsLoading(false), 5000); // 5s timeout
+    // useEffect(() => {
+    //     if (!currentUser || currentUser.rsvpVerified) return;
+    //     if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+    //     timeoutRef.current = window.setTimeout(() => setIsLoading(false), 5000); // 5s timeout
+    //
+    //     (async () => {
+    //         try {
+    //             const q = query(
+    //                 collection(firestore, "spots"),
+    //                 where("uid", "==", currentUser.uid),
+    //                 orderBy("expiresAt", "desc")
+    //             );
+    //             const waitlistQ = query(
+    //                 collection(firestore, "waitlist"),
+    //                 orderBy("joinAt", "asc")
+    //             );
+    //             const [snap, waitSnap] = await Promise.allSettled([
+    //                 getDocs(q),
+    //                 getDocs(waitlistQ),
+    //             ]);
+    //             if (snap.status === "fulfilled") {
+    //                 const canRSVP = snap.value.size > 0;
+    //                 const data = snap.value.docs[0]?.data() as SpotDoc;
+    //                 if (data && isAfter(new Date(), data.expiresAt.toDate())) {
+    //                     setSpotAvailable(false);
+    //                     setRsvpLimitReached(true);
+    //                     setExpiredSpot(true);
+    //                 } else {
+    //                     setSpotAvailable(canRSVP);
+    //                     setRsvpLimitReached(!canRSVP);
+    //                 }
+    //             } else {
+    //                 console.error(snap.reason);
+    //             }
+    //
+    //             if (waitSnap.status === "fulfilled") {
+    //                 let inWaitlist = false;
+    //                 let position = 1;
+    //                 for (const doc of waitSnap.value.docs) {
+    //                     const data = doc.data();
+    //                     if (data.uid === currentUser.uid) {
+    //                         inWaitlist = true;
+    //                         break;
+    //                     }
+    //                     position += 1;
+    //                 }
+    //                 setInWaitlist(inWaitlist);
+    //                 setWaitlistPos(position);
+    //             } else {
+    //                 console.error(waitSnap.reason);
+    //             }
+    //             if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+    //             setIsLoading(false);
+    //         } catch (error) {
+    //             console.error(error);
+    //         }
+    //     })();
+    // }, [currentUser, refreshRSVPStatus]);
 
-        (async () => {
-            try {
-                const q = query(
-                    collection(firestore, "spots"),
-                    where("uid", "==", currentUser.uid),
-                    orderBy("expiresAt", "desc")
-                );
-                const waitlistQ = query(
-                    collection(firestore, "waitlist"),
-                    orderBy("joinAt", "asc")
-                );
-                const [snap, waitSnap] = await Promise.allSettled([
-                    getDocs(q),
-                    getDocs(waitlistQ),
-                ]);
-                if (snap.status === "fulfilled") {
-                    const canRSVP = snap.value.size > 0;
-                    const data = snap.value.docs[0]?.data() as SpotDoc;
-                    if (data && isAfter(new Date(), data.expiresAt.toDate())) {
-                        setSpotAvailable(false);
-                        setRsvpLimitReached(true);
-                        setExpiredSpot(true);
-                    } else {
-                        setSpotAvailable(canRSVP);
-                        setRsvpLimitReached(!canRSVP);
-                    }
-                } else {
-                    console.error(snap.reason);
-                }
-
-                if (waitSnap.status === "fulfilled") {
-                    let inWaitlist = false;
-                    let position = 1;
-                    for (const doc of waitSnap.value.docs) {
-                        const data = doc.data();
-                        if (data.uid === currentUser.uid) {
-                            inWaitlist = true;
-                            break;
-                        }
-                        position += 1;
-                    }
-                    setInWaitlist(inWaitlist);
-                    setWaitlistPos(position);
-                } else {
-                    console.error(waitSnap.reason);
-                }
-                if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
-                setIsLoading(false);
-            } catch (error) {
-                console.error(error);
-            }
-        })();
-    }, [currentUser, refreshRSVPStatus]);
-
-    useEffect(() => {
-        if (!currentUser || currentUser.rsvpVerified || !inWaitlist) return;
-        // listen to real time changes
-        const q = query(
-            collection(firestore, "spots"),
-            where("uid", "==", currentUser.uid)
-        );
-        const unsub = onSnapshot(q, (snap) => {
-            const data = snap.docs[0]?.data() as SpotDoc;
-            if (!data) return;
-            if (isAfter(data.expiresAt.toDate(), new Date())) {
-                setRsvpLimitReached(false);
-                setSpotAvailable(true);
-            }
-        });
-
-        // listen to waitlist position
-        const unsubWaitlist = onSnapshot(
-            collection(firestore, "waitlist"),
-            (snap) => {
-                let posDiff = 0;
-                snap.docChanges().forEach((change) => {
-                    if (change.type === "removed") {
-                        posDiff += 1;
-                    }
-                });
-                setWaitlistPos((curr) => curr - posDiff);
-            }
-        );
-        return () => {
-            unsub();
-            unsubWaitlist();
-        };
-    }, [currentUser, inWaitlist]);
+    // useEffect(() => {
+    //     if (!currentUser || currentUser.rsvpVerified || !inWaitlist) return;
+    //     // listen to real time changes
+    //     const q = query(
+    //         collection(firestore, "spots"),
+    //         where("uid", "==", currentUser.uid)
+    //     );
+    //     const unsub = onSnapshot(q, (snap) => {
+    //         const data = snap.docs[0]?.data() as SpotDoc;
+    //         if (!data) return;
+    //         if (isAfter(data.expiresAt.toDate(), new Date())) {
+    //             setRsvpLimitReached(false);
+    //             setSpotAvailable(true);
+    //         }
+    //     });
+    //
+    //     // listen to waitlist position
+    //     const unsubWaitlist = onSnapshot(
+    //         collection(firestore, "waitlist"),
+    //         (snap) => {
+    //             let posDiff = 0;
+    //             snap.docChanges().forEach((change) => {
+    //                 if (change.type === "removed") {
+    //                     posDiff += 1;
+    //                 }
+    //             });
+    //             setWaitlistPos((curr) => curr - posDiff);
+    //         }
+    //     );
+    //     return () => {
+    //         unsub();
+    //         unsubWaitlist();
+    //     };
+    // }, [currentUser, inWaitlist]);
 
     if (isLoading) return <LoadingAnimation />;
 
