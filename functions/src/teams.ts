@@ -193,6 +193,12 @@ export const createTeam = functions.https.onCall(async (data, context) => {
         return response(HttpStatus.UNAUTHORIZED, { message: "Unauthorized" });
     }
 
+    if (config.teams.allow.create_team !== "true") {
+        return response(HttpStatus.BAD_REQUEST, {
+            message: "Team creation is not available.",
+        });
+    }
+
     if (!z.string().min(1).safeParse(data.name).success) {
         return response(HttpStatus.BAD_REQUEST, {
             message: "Invalid payload.",
@@ -420,6 +426,12 @@ export const getTeamByUser = functions.https.onCall(async (_, context) => {
 export const inviteMember = functions.https.onCall(async (data, context) => {
     if (!context.auth) {
         return response(HttpStatus.UNAUTHORIZED, { message: "Unauthorized" });
+    }
+
+    if (config.teams.allow.invite_member !== "true") {
+        return response(HttpStatus.BAD_REQUEST, {
+            message: "Invite member is not available.",
+        });
     }
 
     if (!z.string().min(1).email().safeParse(data.email).success) {
@@ -717,6 +729,12 @@ export const removeMembers = functions.https.onCall(async (data, context) => {
         return response(HttpStatus.UNAUTHORIZED, { message: "Unauthorized" });
     }
 
+    if (config.teams.allow.remove_members !== "true") {
+        return response(HttpStatus.BAD_REQUEST, {
+            message: "Remove members not available.",
+        });
+    }
+
     if (!z.string().email().array().min(1).safeParse(data.emails).success) {
         return response(HttpStatus.BAD_REQUEST, { message: "Invalid payload" });
     }
@@ -787,6 +805,12 @@ export const removeMembers = functions.https.onCall(async (data, context) => {
 export const deleteTeam = functions.https.onCall(async (_, context) => {
     if (!context.auth) {
         return response(HttpStatus.UNAUTHORIZED, { message: "Unauthorized" });
+    }
+
+    if (config.teams.allow.delete_team !== "true") {
+        return response(HttpStatus.BAD_REQUEST, {
+            message: "Team deletion not available.",
+        });
     }
 
     const func = "deleteTeam";
