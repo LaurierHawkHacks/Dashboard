@@ -49,7 +49,6 @@ interface PathObject {
     myApp: string;
     ticket: string;
     perks: string;
-    location: string;
 }
 
 interface Title {
@@ -85,7 +84,6 @@ const paths: PathObject = {
     myApp: "/my-application",
     ticket: "/ticket/:ticketId",
     perks: "/perks",
-    location: "/location",
 };
 
 const titles: Record<string, Title> = {
