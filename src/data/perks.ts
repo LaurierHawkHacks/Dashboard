@@ -37,7 +37,8 @@ const perksData: {
         {
             image: PerksNEAR,
             title: "NEAR",
-            description: "NEAR is one of our titular sponsors - come back soon to see what they’re giving away!",
+            description:
+                "Providing 2 category podiums totalling to a $8,050 prize pool!",
             link: null,
             alt: "NEAR",
             buttonTitle: null,
@@ -46,7 +47,7 @@ const perksData: {
             image: PerksAvalanche,
             title: "Avalanche",
             description:
-                "To have an edge when competing in Avalanche’s prize category/bounty, we recommend you check out the Avalanche Academy before arriving. They have numerous free courses including \"Avalanche Fundamentals\" and \"Blockchain and Subnet Architecture\" with official certifications. Showing these course certificates at the Avalanche Booth may win you a little something extra! 😉",
+                'To have an edge when competing in Avalanche’s prize category/bounty, we recommend you check out the Avalanche Academy before arriving. They have numerous free courses including "Avalanche Fundamentals" and "Blockchain and Subnet Architecture" with official certifications. Showing these course certificates at the Avalanche Booth may win you a little something extra! 😉',
             link: "https://academy.avax.network/?utm_source=ambassador-dao",
             alt: "Avalanche",
             buttonTitle: "Complete Your Certificate",
@@ -54,7 +55,8 @@ const perksData: {
         {
             image: PerksDistributive,
             title: "Distributive",
-            description: "Distributive is one of our titular sponsors - come back soon to see what they’re giving away!",
+            description:
+                "Distributive is one of our titular sponsors - come back soon to see what they’re giving away!",
             link: null,
             alt: "Distributive",
             buttonTitle: null,
@@ -62,7 +64,8 @@ const perksData: {
         {
             image: PerksNeurelo,
             title: "Neurelo",
-            description: "Neurelo is one of our titular sponsors - come back soon to see what they’re giving away!",
+            description:
+                "Neurelo is one of our titular sponsors - come back soon to see what they’re giving away!",
             link: null,
             alt: "Neurelo",
             buttonTitle: null,
@@ -70,7 +73,8 @@ const perksData: {
         {
             image: PerksMetis,
             title: "Metis",
-            description: "Metis is one of our titular sponsors - come back soon to see what they’re giving away!",
+            description:
+                "Metis is one of our titular sponsors - come back soon to see what they’re giving away!",
             link: null,
             alt: "Metis",
             buttonTitle: null,
@@ -110,7 +114,7 @@ const perksData: {
             image: PerksNordVPN,
             title: "NordVPN & NordPass",
             description:
-                "As well as contributing greatly to the prize pool, NordVPN is providing a 74% coupon for NordVPN, NordPass, and NordLocker to all participants!",
+                "🔐 Get NordVPN with a whopping 68% discount PLUS enjoy NordPass and NordLocker for all participants!",
             link: "https://nordvpn.com/hackathons/?utm_medium=affiliate&utm_term=&utm_content&utm_campaign=hawkhacks24",
             alt: "NordVPN & NordPass",
             buttonTitle: "Redeem Now",
@@ -119,7 +123,7 @@ const perksData: {
             image: PerksIncogni,
             title: "Incogni",
             description:
-                "As well as contributing greatly to the prize pool, Incogni is providing all participants with a 50% coupon for Incogni to all participants!",
+                "🛡️ Delete your personal data from the internet with Incogni! Incogni is providing all participants with a 50% coupon to all participants!",
             link: "https://incogni.com/?utm_medium=affiliate&utm_term=&utm_content&utm_campaign=hawkhacks24",
             alt: "Incogni",
             buttonTitle: "Redeem Now",
@@ -136,7 +140,7 @@ const perksData: {
             image: Perks1Password,
             title: "1Password",
             description:
-                "As well as contributing to the winner prize pool, 1Password is graciously providing all participants 1 year free of 1Password Families to new users!",
+                "We're proud to offer 1 year free of 1Password Families to all participants who are new users!",
             link: "https://start.1password.com/signup/plan?c=HACK-TG35J694",
             alt: "1Password",
             buttonTitle: "Redeem Now",
@@ -145,7 +149,7 @@ const perksData: {
             image: PerksWolfram,
             title: "Wolfram",
             description:
-                "As well as contributing to the winner prize pool, Wolfram is giving all HawkHack participants access to Wolfram|One for 30 days.",
+                "Access to Wolfram|One for all your participants for thirty days! Wolfram|One includes both Desktop and Cloud access, full access to the Wolfram Language, 5000 Wolfram|Alpha API calls and more!",
             link: "https://account.wolfram.com/redeem/zHawkHacks424",
             alt: "Wolfram",
             buttonTitle: "Redeem Now",
@@ -154,7 +158,7 @@ const perksData: {
             image: PerksTaskade,
             title: "Taskade",
             description:
-                "As well as contributing to the winner prize pool, Taskade is giving all hackers promo codes for 20% off their starter tier! Once you sign up for free, contact Taskade directly with your username, email, and the exact event details to redeem.",
+                "Taskade is giving all hackers promo codes for 20% off their starter tier and a lifetime discount! Once you sign up for free, email Taskade directly with your username, email, and the exact event details to redeem.",
             link: "https://www.taskade.com/?utm_medium=affiliate&utm_term=&utm_content&utm_campaign=hawkhacks24",
             alt: "Taskade",
             buttonTitle: "Redeem Now",
@@ -189,13 +193,13 @@ const perksData: {
         {
             image: PerksCertopus,
             title: "Certopus",
-            description:
-                "Come back soon to see what they’re giving away!",
+            description: "Come back soon to see what they’re giving away!",
             link: null,
             alt: "Certopus",
             buttonTitle: null,
         },
     ],
-}
+};
 
 export { perksData };
+
