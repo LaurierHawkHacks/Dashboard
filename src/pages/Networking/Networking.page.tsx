@@ -18,6 +18,7 @@ import { useNotification } from "@/providers/notification.provider";
 import type { ResumeVisibility, Socials } from "@/services/utils/types";
 import { Modal, Select } from "@/components";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
+import { useUserStore } from "@/stores/user.store";
 
 const allowedFileTypes = [
     "image/*", //png, jpg, jpeg, jfif, pjpeg, pjp, gif, webp, bmp, svg
@@ -57,7 +58,8 @@ export const NetworkingPage = () => {
     const timeoutRef = useRef<number | null>(null);
     const gettinSocialsRef = useRef<boolean>(false);
     const { showNotification } = useNotification();
-    const [socials, setSocials] = useState<Socials | null>(null);
+    const socials = useUserStore((state) => state.socials);
+    const setSocials = useUserStore((state) => state.setSocials);
     const [isResumeSettingsOpened, setIsResumeSettingsOpened] = useState(false);
     const [newVisibility, setNewVisibility] = useState<ResumeVisibility>(
         socials?.resumeVisibility ?? "Public"
@@ -87,6 +89,12 @@ export const NetworkingPage = () => {
         "Unknown";
 
     useEffect(() => {
+        if (socials) {
+            setIsLoading(false);
+            setMediaValues({ ...socials });
+            return;
+        }
+
         if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
         timeoutRef.current = window.setTimeout(() => setIsLoading(false), 5000);
 
@@ -195,15 +203,11 @@ export const NetworkingPage = () => {
                     resumeRef: "",
                     resumeVisibility: "Public",
                 });
-                setSocials(
-                    socials
-                        ? {
-                              ...socials,
-                              resumeRef: "",
-                              resumeVisibility: "Public",
-                          }
-                        : null
-                );
+                setSocials({
+                    ...mediaValues,
+                    resumeRef: "",
+                    resumeVisibility: "Public",
+                });
                 setMediaValues({
                     ...mediaValues,
                     resumeRef: "",
@@ -239,14 +243,10 @@ export const NetworkingPage = () => {
                 ...mediaValues,
                 resumeVisibility: newVisibility,
             });
-            setSocials(
-                socials
-                    ? {
-                          ...socials,
-                          resumeVisibility: newVisibility,
-                      }
-                    : null
-            );
+            setSocials({
+                ...mediaValues,
+                resumeVisibility: newVisibility,
+            });
             setMediaValues({
                 ...mediaValues,
                 resumeVisibility: newVisibility,

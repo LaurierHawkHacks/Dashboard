@@ -25,9 +25,14 @@ export const TicketPage = () => {
     const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
-        if (currentUser) {
+        const qrCodeUrl = window.localStorage.getItem("qrCodeUrl");
+        if (qrCodeUrl) {
+            setQRCode(qrCodeUrl);
+            window.localStorage.setItem("qrCodeUrl", qrCodeUrl);
+        } else if (currentUser) {
             fetchOrGenerateTicket(currentUser.uid).then((qrCodeUrl) => {
                 setQRCode(qrCodeUrl);
+                window.localStorage.setItem("qrCodeUrl", qrCodeUrl);
             });
         }
     }, [currentUser]);
