@@ -173,7 +173,7 @@ const perksData: {
             image: PerksWolfram,
             title: "Wolfram",
             description:
-                "Access to Wolfram|One for all your participants for thirty days! Wolfram|One includes both Desktop and Cloud access, full access to the Wolfram Language, 5000 Wolfram|Alpha API calls and more!",
+                "Access to Wolfram | Reedemable for the first 500 users who sign up! Wolfram | One includes both Desktop and Cloud access, full access to the Wolfram Language, 5000 Wolfram | Alpha API calls and more!",
             link: "https://account.wolfram.com/redeem/zHawkHacks424",
             alt: "Wolfram",
             buttonTitle: "Redeem Now",
