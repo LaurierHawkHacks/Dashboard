@@ -352,7 +352,7 @@ export const SchedulePage: React.FC = () => {
                         
                         <Button 
                             onClick={scrollToList}
-                            className="mt-4 w-full"        
+                            className="mt-4 w-full lg:hidden"        
 
                         >
                             List View
@@ -474,7 +474,7 @@ export const SchedulePage: React.FC = () => {
                                 {format(event.startTime, "MMM dd")} -{" "}
                                 {format(event.endTime, "MMM dd")}
                             </p>
-                            
+
                             <p className="text-deepMarine font-semibold">
                                 {format(event.startTime, "h:mma")} -{" "}
                                 {format(event.endTime, "h:mma")}
