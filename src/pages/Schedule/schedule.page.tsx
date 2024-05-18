@@ -17,7 +17,7 @@ import {
     addMinutes,
     format,
     formatISO,
-    isWithinInterval,
+    // isWithinInterval,
     parseISO,
 } from "date-fns";
 import { getRedeemableItems } from "@/services/utils";
@@ -138,42 +138,42 @@ const lightTheme = {
     },
 };
 
-const hackathonDays = [
-    {
-        start: "2024-05-17T00:00:00",
-        end: "2024-05-17T23:59:59",
-    },
-    {
-        start: "2024-05-18T00:00:00",
-        end: "2024-05-18T23:59:59",
-    },
-    {
-        start: "2024-05-19T00:00:00",
-        end: "2024-05-19T23:59:59",
-    },
-];
+// const hackathonDays = [
+//     {
+//         start: "2024-05-17T00:00:00",
+//         end: "2024-05-17T23:59:59",
+//     },
+//     {
+//         start: "2024-05-18T00:00:00",
+//         end: "2024-05-18T23:59:59",
+//     },
+//     {
+//         start: "2024-05-19T00:00:00",
+//         end: "2024-05-19T23:59:59",
+//     },
+// ];
 
-const DayButton = ({
-    active,
-    children,
-    onClick,
-}: {
-    children: React.ReactNode;
-    active: boolean;
-    onClick: () => void;
-}) => {
-    return (
-        <button
-            className={
-                "col-span-1 px-3 py-4" +
-                (active ? " border-b-2 border-orange-400" : "")
-            }
-            onClick={onClick}
-        >
-            {children}
-        </button>
-    );
-};
+// const DayButton = ({
+//     active,
+//     children,
+//     onClick,
+// }: {
+//     children: React.ReactNode;
+//     active: boolean;
+//     onClick: () => void;
+// }) => {
+//     return (
+//         <button
+//             className={
+//                 "col-span-1 px-3 py-4" +
+//                 (active ? " border-b-2 border-orange-400" : "")
+//             }
+//             onClick={onClick}
+//         >
+//             {children}
+//         </button>
+//     );
+// };
 
 export const SchedulePage: React.FC = () => {
     const events = useEventsStore(useShallow((state) => state.events));
@@ -219,24 +219,26 @@ export const SchedulePage: React.FC = () => {
 
     const epg = useMemo(() => {
         // const { start, end } = hackathonDays[day];
-        return events
-            // .filter((evt) =>
-            //     isWithinInterval(evt.startTime, {
-            //         start,
-            //         end,
-            //     })
-            // )
-            .map((e) => ({
-                channelUuid: e.type,
-                id: e.id,
-                title: e.title,
-                description: e.description,
-                since: e.startTime,
-                till: e.endTime,
-                image: "",
-                type: e.type,
-                location: e.location,
-            }));
+        return (
+            events
+                // .filter((evt) =>
+                //     isWithinInterval(evt.startTime, {
+                //         start,
+                //         end,
+                //     })
+                // )
+                .map((e) => ({
+                    channelUuid: e.type,
+                    id: e.id,
+                    title: e.title,
+                    description: e.description,
+                    since: e.startTime,
+                    till: e.endTime,
+                    image: "",
+                    type: e.type,
+                    location: e.location,
+                }))
+        );
     }, [events]);
 
     const { getEpgProps, getLayoutProps } = useEpg({
@@ -349,11 +351,10 @@ export const SchedulePage: React.FC = () => {
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                             />
                         </svg>
-                        
-                        <Button 
-                            onClick={scrollToList}
-                            className="mt-4 w-full lg:hidden"        
 
+                        <Button
+                            onClick={scrollToList}
+                            className="mt-4 w-full lg:hidden"
                         >
                             List View
                         </Button>
@@ -469,7 +470,9 @@ export const SchedulePage: React.FC = () => {
                             key={event.id}
                             className="bg-white rounded-lg shadow-md p-4 text-gray-800"
                         >
-                            <h2 className="text-lg font-bold pb-4">{event.title}</h2>
+                            <h2 className="text-lg font-bold pb-4">
+                                {event.title}
+                            </h2>
                             <p className="text-gray-600">
                                 {format(event.startTime, "MMM dd")} -{" "}
                                 {format(event.endTime, "MMM dd")}
@@ -479,10 +482,9 @@ export const SchedulePage: React.FC = () => {
                                 {format(event.startTime, "h:mma")} -{" "}
                                 {format(event.endTime, "h:mma")}
                             </p>
-                    
+
                             <Button
                                 className="mt-4 w-1/2"
-                                
                                 onClick={() => {
                                     setActiveProgram({
                                         ...event,
@@ -501,3 +503,4 @@ export const SchedulePage: React.FC = () => {
         </>
     );
 };
+
