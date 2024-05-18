@@ -22,7 +22,7 @@ import {
 } from "date-fns";
 import { getRedeemableItems } from "@/services/utils";
 import { cva } from "class-variance-authority";
-import { Modal } from "@/components";
+import { Modal, Button } from "@/components";
 import { useEventsStore } from "@/stores/events.store";
 import { useShallow } from "zustand/react/shallow";
 import { Timestamp, doc, getDoc } from "firebase/firestore";
@@ -185,13 +185,20 @@ export const SchedulePage: React.FC = () => {
         (state) => state.setIsLocalCacheUpToDate
     );
     const cacheEvents = useEventsStore((state) => state.cacheEvents);
-    const [day, setDay] = useState(0);
+    // const [day, setDay] = useState(0);
     const [activeProgram, setActiveProgram] = useState<Program | null>(null);
     const [openProgramDetailModal, setOpenProgramDetailModal] = useState(false);
     // for the search bar
     const [searchTerm, setSearchTerm] = useState("");
     //dropdown for search bar
     const [showDropdown, setShowDropdown] = useState(false);
+
+    const timelineListView = React.createRef<HTMLDivElement>();
+    const scrollToList = () => {
+        timelineListView.current?.scrollIntoView({
+            behavior: "smooth",
+        });
+    };
 
     const filteredEvents = useMemo(() => {
         if (!searchTerm) {
@@ -211,14 +218,14 @@ export const SchedulePage: React.FC = () => {
     }, [events, searchTerm]);
 
     const epg = useMemo(() => {
-        const { start, end } = hackathonDays[day];
+        // const { start, end } = hackathonDays[day];
         return events
-            .filter((evt) =>
-                isWithinInterval(evt.startTime, {
-                    start,
-                    end,
-                })
-            )
+            // .filter((evt) =>
+            //     isWithinInterval(evt.startTime, {
+            //         start,
+            //         end,
+            //     })
+            // )
             .map((e) => ({
                 channelUuid: e.type,
                 id: e.id,
@@ -230,7 +237,7 @@ export const SchedulePage: React.FC = () => {
                 type: e.type,
                 location: e.location,
             }));
-    }, [events, day, filteredEvents]);
+    }, [events]);
 
     const { getEpgProps, getLayoutProps } = useEpg({
         epg,
@@ -262,7 +269,7 @@ export const SchedulePage: React.FC = () => {
                   addMinutes(parseISO(epg[epg.length - 1].till), 1)
               ).slice(0, -6)
             : "2024-05-18T00:00:00",
-        dayWidth: 5000,
+        dayWidth: 10000,
         isBaseTimeFormat: true,
         isCurrentTime: false,
         isLine: false,
@@ -280,6 +287,7 @@ export const SchedulePage: React.FC = () => {
         height: 600,
         // @ts-ignore
         theme: lightTheme,
+        infiniteScroll: true,
     });
 
     useEffect(() => {
@@ -341,6 +349,15 @@ export const SchedulePage: React.FC = () => {
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                             />
                         </svg>
+                        
+                        <Button 
+                            onClick={scrollToList}
+                            className="mt-4 w-full"        
+
+                        >
+                            List View
+                        </Button>
+
                         {showDropdown && (
                             <div className="absolute border top-full translate-y-2 z-10 w-full bg-white shadow-xl max-h-60 overflow-auto rounded-lg">
                                 {filteredEvents.map((event) => (
@@ -367,7 +384,7 @@ export const SchedulePage: React.FC = () => {
                 </div>
                 <div>
                     <div className="grid grid-cols-3">
-                        <DayButton active={day === 0} onClick={() => setDay(0)}>
+                        {/* <DayButton active={day === 0} onClick={() => setDay(0)}>
                             Friday
                         </DayButton>
                         <DayButton active={day === 1} onClick={() => setDay(1)}>
@@ -375,7 +392,7 @@ export const SchedulePage: React.FC = () => {
                         </DayButton>
                         <DayButton active={day === 2} onClick={() => setDay(2)}>
                             Sunday
-                        </DayButton>
+                        </DayButton> */}
                     </div>
                     <Epg {...getEpgProps()}>
                         <Layout
@@ -443,6 +460,44 @@ export const SchedulePage: React.FC = () => {
                     </div>
                 )}
             </Modal>
+
+            <div className="lg:hidden">
+                <hr className="my-6" />
+                <div className="grid grid-cols-1 gap-4" ref={timelineListView}>
+                    {events.map((event) => (
+                        <div
+                            key={event.id}
+                            className="bg-white rounded-lg shadow-md p-4 text-gray-800"
+                        >
+                            <h2 className="text-lg font-bold pb-4">{event.title}</h2>
+                            <p className="text-gray-600">
+                                {format(event.startTime, "MMM dd")} -{" "}
+                                {format(event.endTime, "MMM dd")}
+                            </p>
+                            
+                            <p className="text-deepMarine font-semibold">
+                                {format(event.startTime, "h:mma")} -{" "}
+                                {format(event.endTime, "h:mma")}
+                            </p>
+                    
+                            <Button
+                                className="mt-4 w-1/2"
+                                
+                                onClick={() => {
+                                    setActiveProgram({
+                                        ...event,
+                                        since: event.startTime,
+                                        till: event.endTime,
+                                    });
+                                    setOpenProgramDetailModal(true);
+                                }}
+                            >
+                                View Details
+                            </Button>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </>
     );
 };
