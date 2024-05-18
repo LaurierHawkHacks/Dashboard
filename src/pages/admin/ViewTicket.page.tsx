@@ -49,6 +49,8 @@ export const AdminViewTicketPage = () => {
                     message: res.message,
                 });
             }
+            if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+            setIsLoading(false);
         })();
 
         return () => {
