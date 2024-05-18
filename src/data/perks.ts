@@ -56,6 +56,10 @@ const perksData: {
                     link: "/TENAMINTxGamingDao.pdf",
                     title: "TENAMINT x GamingDAO",
                 },
+                {
+                    link: "/NEAR_Resources.pdf",
+                    title: "NEAR Resources",
+                },
             ],
         },
         {
