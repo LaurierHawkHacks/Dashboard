@@ -3,7 +3,6 @@ import {
     PerksBalsamiq,
     PerksCertopus,
     PerksEcho3D,
-    PerksFantuan,
     PerksIncogni,
     PerksIndomie,
     PerksNordVPN,
@@ -109,15 +108,6 @@ const perksData: {
         },
     ],
     food: [
-        {
-            image: PerksFantuan,
-            title: "Fantuan",
-            description:
-                "Fantuan is providing all our participants with free bubble tea! All you have to do to secure some is place a FREE pre-order on the HawkHacks Fantuan store!",
-            link: "https://order.fantuan.ca/store/Restaurant/ca-22098?shippingType=0&inviteCode=ca09jcqrt&tTraceId=MerchantShare-22098-0-68c98f2f08c048e995841671731611b3&channel=merchant_share",
-            alt: "Fantuan Delivery",
-            buttonTitle: "Pre-Order Now",
-        },
         {
             image: PerksIndomie,
             title: "Indomie",
