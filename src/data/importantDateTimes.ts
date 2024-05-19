@@ -14,7 +14,7 @@ const importantDateTimes = [
         events: {
             "Hacking Ends": "10:00 AM",
             "Judging Period": "11:00 AM - 3:00 PM",
-            "Closing Ceremony": "4:00 PM - 5:00 PM",
+            "Closing Ceremony": "5:15 PM - 6:30 PM",
         },
     },
 ];
