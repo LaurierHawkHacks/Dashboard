@@ -15,7 +15,7 @@ import {
 } from "firebase/auth";
 import { auth } from "@/services/firebase";
 import { useNotification } from "@/providers/notification.provider";
-import { getUserApplications, verifyGitHubEmail } from "@/services/utils";
+import { verifyGitHubEmail } from "@/services/utils";
 import { LoadingAnimation } from "@/components";
 
 import type { User, AuthProvider as FirebaseAuthProvider } from "firebase/auth";
@@ -152,11 +152,11 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     const completeLoginProcess = async (user: User) => {
         // check if user has a profile in firestore
         const userWithRole = await validateUser(user);
-        const app = (await getUserApplications(user.uid))[0] ?? null;
+        // const app = (await getUserApplications(user.uid))[0] ?? null;
         // make one ui update instead of two due to async function
         flushSync(() => {
             setCurrentUser(userWithRole);
-            setUserApp(app);
+            // setUserApp(app);
         });
     };
 
@@ -302,8 +302,8 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
     const refreshUserApp = async () => {
         if (!currentUser) return;
 
-        const app = (await getUserApplications(currentUser.uid))[0] ?? null;
-        setUserApp(app);
+        // const app = (await getUserApplications(currentUser.uid))[0] ?? null;
+        // setUserApp(app);
     };
 
     useEffect(() => {
