@@ -8,24 +8,24 @@ import {
 } from "react";
 import type { ComponentProps } from "@/components/types";
 import {
-    AdminPage,
+    // AdminPage,
     LoginPage,
-    NetworkingPage,
+    // NetworkingPage,
     NotFoundPage,
-    TicketPage,
+    // TicketPage,
     VerifyEmailPage,
     UserPage,
 } from "@/pages";
 import { type RouteObject } from "react-router-dom";
 import { useAuth } from "./auth.provider";
 import { ProtectedRoutes } from "@/navigation";
-import { PostSubmissionPage } from "@/pages/miscellaneous/PostSubmission.page";
-import { VerifyRSVP } from "@/pages/miscellaneous/VerifyRSVP.page";
-import { MyTeamPage } from "@/pages/MyTeam.page";
-import { ViewTicketPage } from "@/pages/miscellaneous/ViewTicket.page";
-import { JoinTeamPage } from "@/pages/JoinTeam.page";
-import { AdminViewTicketPage } from "@/pages/admin/ViewTicket.page";
-import { AdminManageEventsPage } from "@/pages/admin/ManageEvents.page";
+// import { PostSubmissionPage } from "@/pages/miscellaneous/PostSubmission.page";
+// import { VerifyRSVP } from "@/pages/miscellaneous/VerifyRSVP.page";
+// import { MyTeamPage } from "@/pages/MyTeam.page";
+// import { ViewTicketPage } from "@/pages/miscellaneous/ViewTicket.page";
+// import { JoinTeamPage } from "@/pages/JoinTeam.page";
+// import { AdminViewTicketPage } from "@/pages/admin/ViewTicket.page";
+// import { AdminManageEventsPage } from "@/pages/admin/ManageEvents.page";
 
 interface PathObject {
     admin: string;
@@ -162,13 +162,13 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
             if (timeoutRef.current !== null)
                 window.clearTimeout(timeoutRef.current);
         };
-    
+
         if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
         timeoutRef.current = window.setTimeout(
             () => setLoadingRoutes(false),
             1500
         );
-    
+
         const userRoutes = {
             path: paths.portal,
             element: <ProtectedRoutes />,
@@ -184,7 +184,7 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
                 },
             ],
         };
-    
+
         const availableRoutes: RouteObject[] = [
             {
                 path: paths.login,
@@ -196,13 +196,12 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
             },
             userRoutes,
         ];
-    
+
         setUserRoutes(userRoutes.children);
         setRoutes(availableRoutes);
-    
+
         return cleanUp;
     }, [refresh, currentUser, userApp]);
-    
 
     const refreshRoutes = () => setRefresh((r) => !r);
 
@@ -221,3 +220,4 @@ export const RoutesProvider: FC<ComponentProps> = ({ children }) => {
         </RoutesContext.Provider>
     );
 };
+

@@ -125,18 +125,18 @@ const HomePage = () => {
                                 </span>
                             </p>
                         </span>
-                        {currentUser && currentUser.type === "hacker" && (
-                            <Button
-                                onClick={() =>
-                                    !disableAllActions &&
-                                    setOpenWithdrawRSVP(true)
-                                }
-                                intent="secondary"
-                                className="rounded-lg mt-4 border-gray-300"
-                            >
-                                Not able to make it?
-                            </Button>
-                        )}
+                        {/* {currentUser && currentUser.type === "hacker" && ( */}
+                        {/*     <Button */}
+                        {/*         onClick={() => */}
+                        {/*             !disableAllActions && */}
+                        {/*             setOpenWithdrawRSVP(true) */}
+                        {/*         } */}
+                        {/*         intent="secondary" */}
+                        {/*         className="rounded-lg mt-4 border-gray-300" */}
+                        {/*     > */}
+                        {/*         Not able to make it? */}
+                        {/*     </Button> */}
+                        {/* )} */}
                     </Card>
 
                     <Card
