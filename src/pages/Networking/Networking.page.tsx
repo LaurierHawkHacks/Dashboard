@@ -266,7 +266,10 @@ export const NetworkingPage = () => {
 	if (isLoading) return <LoadingAnimation />;
 
 	return (
-		<PageWrapper>
+		<PageWrapper
+			title="Networking"
+			subTitle="A quick way to connect with new people at HawkHacks!"
+		>
 			<div>
 				<div className="flex items-center gap-10">
 					<h1 className="font-bold text-2xl">

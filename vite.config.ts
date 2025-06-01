@@ -24,6 +24,6 @@ export default defineConfig({
 		clearMocks: true,
 	},
 	define: {
-		APP_VERSION: JSON.stringify("2.6.2"),
+		__GIT_COMMIT_HASH__: JSON.stringify(process.env.GIT_COMMIT_HASH),
 	},
 });

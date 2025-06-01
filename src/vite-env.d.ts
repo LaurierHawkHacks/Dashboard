@@ -9,7 +9,6 @@ interface ImportMetaEnv {
 	VITE_FIREBASE_MEASUREMENT_ID: string;
 	VITE_CONNECT_AUTH_EMU: string;
 	VITE_GOOGLE_CLIENT_ID: string;
-	VITE_APP_VERSION: string;
 	VITE_APP_CHECK_KEY: string;
 	VITE_TICKETS_COLLECTION: string;
 	VITE_USERS_COLLECTION: string;
@@ -18,4 +17,4 @@ interface ImportMetaEnv {
 	VITE_RSVP_COLLECTION: string;
 }
 
-declare const APP_VERSION: string;
+declare const __GIT_COMMIT_HASH__: string | undefined; // defined in vite.config.ts

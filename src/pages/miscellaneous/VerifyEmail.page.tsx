@@ -1,6 +1,6 @@
-import { PageWrapper } from "@/components";
+import { LoadingAnimation, PageWrapper } from "@/components";
+import { paths } from "@/data/paths";
 import { useAuth } from "@/providers";
-import { paths } from "@/providers/RoutesProvider/data";
 import { auth } from "@/services/firebase";
 import { Button } from "@chakra-ui/react";
 import { sendEmailVerification } from "firebase/auth";
@@ -12,7 +12,7 @@ export const VerifyEmailPage = () => {
 	const [resendSeconds, setResendSeconds] = useState(0);
 	// -9999 random number to init the ref, this will hold the id for the time interval
 	const resendEmailCountdownRef = useRef<number>(-9999);
-	const { logout, reloadUser, currentUser } = useAuth();
+	const { isLoading, currentUser, reloadUser } = useAuth();
 
 	const startCountdown = () => {
 		resendEmailCountdownRef.current = window.setInterval(() => {
@@ -26,10 +26,17 @@ export const VerifyEmailPage = () => {
 		}, 1000);
 	};
 
-	if (currentUser?.emailVerified) return <Navigate to={paths.home} />;
+	if (isLoading) return <LoadingAnimation />;
+
+	if (!currentUser) return <Navigate to={paths.login} />;
+
+	if (currentUser.emailVerified) return <Navigate to={paths.home} />;
 
 	return (
-		<PageWrapper>
+		<PageWrapper
+			title="Verify Your Email"
+			subTitle="Please check your email inbox."
+		>
 			<div className="px-4 sm:px-6 lg:px-8">
 				<div className="">
 					<p className="text-2xl">One more step!</p>
@@ -44,29 +51,23 @@ export const VerifyEmailPage = () => {
 							{currentUser?.email ? currentUser.email : "N/A"}
 						</span>
 					</p>
-					{/* TODO: button is here for dev, should be taken away once side navbar is completed */}
-					<Button className="mt-4" onClick={logout}>
-						Log Out
-					</Button>
 				</div>
 				<div className="mt-12 sm:flex gap-4">
-					<div className="space-x-4">
-						<Button
-							onClick={() => {
-								if (resendSeconds <= 0 && auth.currentUser) {
-									sendEmailVerification(auth.currentUser);
-									setResendSeconds(60);
-									startCountdown();
-								}
-							}}
-							disabled={resendSeconds > 0}
-						>
-							{resendSeconds <= 0
-								? "Resend Email Verification"
-								: `${resendSeconds}s Left Before Resend`}
-						</Button>
-						<Button onClick={reloadUser}>Check Email</Button>
-					</div>
+					<Button
+						onClick={() => {
+							if (resendSeconds <= 0 && auth.currentUser) {
+								sendEmailVerification(auth.currentUser);
+								setResendSeconds(60);
+								startCountdown();
+							}
+						}}
+						disabled={resendSeconds > 0}
+					>
+						{resendSeconds <= 0
+							? "Resend Email Verification"
+							: `${resendSeconds}s Left Before Resend`}
+					</Button>
+					<Button onClick={reloadUser}>Check Email</Button>
 				</div>
 			</div>
 		</PageWrapper>
