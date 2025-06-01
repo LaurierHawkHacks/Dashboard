@@ -39,7 +39,7 @@ console.log("Impressed by what you see and want to make a difference?");
 console.log(
 	"Keep an eye out on Discord for when applications open and join the team next year!",
 );
-console.log(`Commit hash: ${__GIT_COMMIT_HASH__ ?? "running locally"}`);
+console.log(`Commit hash: ${__GIT_COMMIT_HASH__}`);
 console.log(`App env: ${import.meta.env.VITE_APP_ENV}`);
 
 const queryClient = new QueryClient();

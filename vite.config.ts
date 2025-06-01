@@ -1,3 +1,4 @@
+import * as child from "node:child_process";
 import path from "node:path";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
@@ -24,6 +25,13 @@ export default defineConfig({
 		clearMocks: true,
 	},
 	define: {
-		__GIT_COMMIT_HASH__: JSON.stringify(process.env.GIT_COMMIT_HASH),
+		__GIT_COMMIT_HASH__: JSON.stringify(
+			child
+				.execSync(
+					`git rev-parse --short ${process.env.GIT_COMMIT_HASH ?? "HEAD"}`,
+				)
+				.toString()
+				.trim(),
+		),
 	},
 });

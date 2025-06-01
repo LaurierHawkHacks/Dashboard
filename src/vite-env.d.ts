@@ -17,4 +17,4 @@ interface ImportMetaEnv {
 	VITE_RSVP_COLLECTION: string;
 }
 
-declare const __GIT_COMMIT_HASH__: string | undefined; // defined in vite.config.ts
+declare const __GIT_COMMIT_HASH__: string; // defined in vite.config.ts
