@@ -2,9 +2,9 @@ import { LoadingAnimation, PageWrapper, TextInput } from "@/components";
 import { InfoCallout } from "@/components/InfoCallout/InfoCallout";
 import { Modal } from "@/components/Modal";
 import { toaster } from "@/components/ui/toaster";
+import { paths } from "@/data/paths";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useAuth } from "@/providers";
-import { paths } from "@/providers/RoutesProvider/data";
 import {
 	createTeam,
 	deleteTeam,
@@ -370,7 +370,10 @@ export const MyTeamPage = () => {
 
 	if (!team)
 		return (
-			<PageWrapper>
+			<PageWrapper
+				title="My Team"
+				subTitle="Create your dream team! Add, manage, and view your teammates."
+			>
 				<div className="space-y-4">
 					<div className="w-fit text-lg space-y-2">
 						<InfoCallout text="It looks like you are not enrolled in a team. Create one below, or enroll in an existing team by receiving an invitation from the team owner." />
@@ -457,7 +460,10 @@ export const MyTeamPage = () => {
 		);
 
 	return (
-		<PageWrapper>
+		<PageWrapper
+			title="My Team"
+			subTitle="Create your dream team! Add, manage, and view your teammates."
+		>
 			<div>
 				<div className="flex gap-4 flex-col sm:flex-row md:flex-col lg:flex-row lg:min-h-[20rem] [&>div]:p-5 [&>div]:rounded-lg [&>div]:shadow-basic lg:[&>div]:flex-auto">
 					<div className="w-full lg:max-w-sm h-fit">

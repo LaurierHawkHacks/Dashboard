@@ -16,10 +16,6 @@ export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ text }) => {
 			<p className="text-lg md:text-2xl">
 				{text || "Loading super awesome portal..."}
 			</p>
-
-			<p className="text-md md:text-lg text-gray-500">
-				Please be patient, <u> don't refresh! </u>
-			</p>
 		</div>
 	);
 };

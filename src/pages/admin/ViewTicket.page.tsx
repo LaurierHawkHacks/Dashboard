@@ -98,7 +98,10 @@ export const AdminViewTicketPage = () => {
 		return <div>Failed to load ticket. Please ping @Juan in Discord.</div>;
 
 	return (
-		<PageWrapper>
+		<PageWrapper
+			title="Admin View Ticket"
+			subTitle="View and manage ticket details"
+		>
 			<div>
 				<div className="flex items-center gap-10">
 					<h1 className="font-bold text-2xl">

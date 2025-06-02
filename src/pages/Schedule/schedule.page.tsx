@@ -147,25 +147,36 @@ export const SchedulePage: React.FC = () => {
 	);
 
 	return (
-		<PageWrapper variant={breakpoint === "base" ? "full-height" : "default"}>
+		<PageWrapper
+			title="Schedule"
+			subTitle="View the schedule for the weekend!"
+			variant={breakpoint === "base" ? "tight" : "default"}
+		>
 			<ScheduleRoot defaultValue={scheduleEntries[0][0]}>
-				<ScheduleTabList>
-					{scheduleEntries.map(([dayKey, { dayDate }]) => (
-						<ScheduleTabTrigger key={dayKey} value={dayKey}>
-							{breakpoint === "base"
-								? // 'Saturday'
-									dayDate.toLocaleDateString("en-US", {
-										weekday: "long",
-									})
-								: // 'Saturday, July 25'
-									dayDate.toLocaleDateString("en-US", {
-										weekday: "long",
-										month: "long",
-										day: "numeric",
-									})}
-						</ScheduleTabTrigger>
-					))}
-				</ScheduleTabList>
+				<Box
+					position={{ base: "sticky", md: "unset" }}
+					shadow={{ base: "sm", md: "unset" }}
+					top={0}
+					zIndex={1}
+				>
+					<ScheduleTabList>
+						{scheduleEntries.map(([dayKey, { dayDate }]) => (
+							<ScheduleTabTrigger key={dayKey} value={dayKey}>
+								{breakpoint === "base"
+									? // 'Saturday'
+										dayDate.toLocaleDateString("en-US", {
+											weekday: "long",
+										})
+									: // 'Saturday, July 25'
+										dayDate.toLocaleDateString("en-US", {
+											weekday: "long",
+											month: "long",
+											day: "numeric",
+										})}
+							</ScheduleTabTrigger>
+						))}
+					</ScheduleTabList>
+				</Box>
 
 				{scheduleEntries.map(([dayKey, { dayDate, entries }]) => (
 					<ScheduleTabContent key={dayKey} value={dayKey}>

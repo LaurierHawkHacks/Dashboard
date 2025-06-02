@@ -182,7 +182,10 @@ export const AdminManageEventsPage = () => {
 	if (isLoading) return <LoadingAnimation />;
 
 	return (
-		<PageWrapper>
+		<PageWrapper
+			title="Manage Events"
+			subTitle="Add, edit, or delete events for the event schedule."
+		>
 			<div>
 				<div className="grid grid-cols-2 gap-4">
 					<form
@@ -274,7 +277,7 @@ export const AdminManageEventsPage = () => {
 
 				<span className="underline">
 					{" "}
-					⚠️ Please note when updating events or foods, you must refresh the page
+					! Please note when updating events or foods, you must refresh the page
 					to see the changes.{" "}
 				</span>
 

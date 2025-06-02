@@ -1,6 +1,6 @@
-import { useAuth, useRouteDefinitions } from "@/providers";
+import { paths } from "@/data/paths";
+import { useAuth } from "@/providers";
 import type { ProviderName } from "@/providers";
-import { paths } from "@/providers/RoutesProvider/data";
 import { AppleLogo, GithubLogo, GoogleLogo } from "@assets";
 import { Button } from "@chakra-ui/react";
 import { TextInput } from "@components";
@@ -44,8 +44,6 @@ export const LoginPage = () => {
 		loginWithProvider,
 		currentUser,
 	} = useAuth();
-
-	const routes = useRouteDefinitions();
 
 	const [searchParams] = useSearchParams();
 
@@ -127,23 +125,19 @@ export const LoginPage = () => {
 
 	// leverage access to current user to decide whether we need to proceed rendering page
 	if (currentUser !== null) {
-		if (currentUser.hawkAdmin) {
-			return <Navigate to={paths.admin} />;
-		}
-		const from = searchParams.get("from");
-		const available = routes.some((r) => {
-			// join team is globally available
-			if (r.path?.startsWith("/join-team")) return true;
-			return r.path === from;
-		});
+		const defaultRedirect = currentUser.hawkAdmin ? paths.admin : paths.home;
 
-		if (from?.startsWith("/verify-email") && currentUser.emailVerified) {
-			return <Navigate to="/" />;
+		const from = searchParams.get("from") ?? defaultRedirect;
+		const isValidRedirect = Object.values(paths).includes(from);
+
+		if (!isValidRedirect) {
+			return <Navigate to={defaultRedirect} />;
+		}
+		if (from === paths.verifyEmail && currentUser.emailVerified) {
+			return <Navigate to={defaultRedirect} />;
 		}
 
-		return (
-			<Navigate to={from && from !== "/" && available ? from : paths.home} />
-		);
+		return <Navigate to={from} />;
 	}
 
 	return (
