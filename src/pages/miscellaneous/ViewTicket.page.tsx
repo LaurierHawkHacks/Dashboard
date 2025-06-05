@@ -75,7 +75,7 @@ export const ViewTicketPage = () => {
 
 	// give the app a chance to decide what to display
 	return (
-		<PageWrapper>
+		<PageWrapper title="View Ticket" subTitle="Some good thing here">
 			<div className="flex items-center gap-10">
 				<h1 className="font-bold text-2xl">
 					{`${ticketData.firstName} ${ticketData.lastName}`}

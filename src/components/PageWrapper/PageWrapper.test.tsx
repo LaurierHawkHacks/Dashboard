@@ -4,7 +4,7 @@ import { PageWrapper } from "./PageWrapper";
 describe("PageWrapper Component", () => {
 	it("should render the given children", () => {
 		render(
-			<PageWrapper>
+			<PageWrapper title="Test Page" subTitle="This is a test page">
 				<p>test</p>
 			</PageWrapper>,
 		);
