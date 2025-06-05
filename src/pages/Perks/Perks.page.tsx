@@ -1,6 +1,6 @@
 import { Modal, PageWrapper } from "@/components";
 import { getButtonStyles } from "@/components/Button/Button.styles";
-import { paths } from "@/providers/RoutesProvider/data";
+import { paths } from "@/data/paths";
 import { useEffect, useRef, useState } from "react";
 import { type PerksData, perksData } from "../../data/perks";
 
@@ -106,7 +106,10 @@ const PerksPage = () => {
 	};
 
 	return (
-		<PageWrapper>
+		<PageWrapper
+			title="Perks"
+			subTitle="Explore the amazing perks available at HawkHacks!"
+		>
 			<div>
 				<div className="mb-8">
 					<h2 className="text-xl font-bold mb-4">Featured</h2>

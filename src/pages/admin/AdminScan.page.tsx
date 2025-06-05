@@ -12,7 +12,10 @@ export const AdminScanPage = () => {
 	>(null);
 
 	return (
-		<PageWrapper>
+		<PageWrapper
+			title="Scan QR Code"
+			subTitle="Scan QR codes using your device's camera"
+		>
 			{hasMediaDevicesApi ? (
 				<VStack gap="2" align="stretch">
 					<VideoInputDeviceSelector

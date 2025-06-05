@@ -30,7 +30,7 @@ export function ScheduleRoot(props: ScheduleRootProps) {
 }
 
 export function ScheduleTabList(props: React.PropsWithChildren) {
-	return <Tabs.List display="flex" {...props} />;
+	return <Tabs.List display="flex" bg="white" {...props} />;
 }
 
 interface ScheduleTabTriggerProps {

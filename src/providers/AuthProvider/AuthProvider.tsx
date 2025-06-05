@@ -1,4 +1,3 @@
-import { LoadingAnimation } from "@/components";
 import { toaster } from "@/components/ui/toaster";
 import { auth } from "@/services/firebase";
 import { verifyGitHubEmail } from "@/services/firebase/user";
@@ -28,7 +27,9 @@ import {
 
 export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
 	const [currentUser, setCurrentUser] = useState<UserWithClaims | null>(null);
-	const [isLoading, setIsLoading] = useState(false);
+	const [isLoadingInitialAuthState, setIsLoadingInitialAuthState] =
+		useState(true);
+	const [isLoadingSignUp, setIsLoadingSignUp] = useState(false);
 
 	const completeLoginProcess = async (user: User) => {
 		// check if user has a profile in firestore
@@ -111,7 +112,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
 				);
 
 				if (providerId && /github/i.test(providerId) && !user.emailVerified) {
-					setIsLoading(true);
+					setIsLoadingSignUp(true);
 					const { oauthAccessToken } = _tokenResponse as {
 						oauthAccessToken: string;
 					};
@@ -127,16 +128,17 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
 						interval = window.setInterval(async () => {
 							if (!auth.currentUser) {
 								window.clearInterval(interval);
-								setIsLoading(false);
+								setIsLoadingSignUp(false);
 							}
 							if (!auth.currentUser?.emailVerified) {
 								await reloadUser();
 							} else {
 								window.clearInterval(interval);
-								setIsLoading(false);
+								setIsLoadingSignUp(false);
 							}
 						}, 1000);
 					} else {
+						setIsLoadingSignUp(false);
 						toaster.error({
 							title: "Error Verifying Email",
 							description:
@@ -181,6 +183,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
 			} else {
 				setCurrentUser(null);
 			}
+			setIsLoadingInitialAuthState(false);
 		});
 
 		// Handle redirect result
@@ -201,6 +204,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
 	return (
 		<AuthContext.Provider
 			value={{
+				isLoading: isLoadingInitialAuthState || isLoadingSignUp,
 				currentUser,
 				login,
 				logout,
@@ -210,7 +214,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
 				reloadUser,
 			}}
 		>
-			{isLoading ? <LoadingAnimation /> : children}
+			{children}
 		</AuthContext.Provider>
 	);
 };

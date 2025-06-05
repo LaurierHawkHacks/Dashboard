@@ -1,7 +1,7 @@
 import { Logo } from "@/assets";
-import { useApplications } from "@/hooks/use-applications";
-import { useAuth, useRouteDefinitions, useUser } from "@/providers";
-import { paths } from "@/providers/RoutesProvider/data";
+import { paths } from "@/data/paths";
+import { useAuth } from "@/providers";
+import { Drawer, Portal } from "@chakra-ui/react";
 import {
 	CalendarDaysIcon,
 	CodeBracketIcon,
@@ -9,6 +9,7 @@ import {
 	ShareIcon,
 	TicketIcon,
 	UserGroupIcon,
+	XMarkIcon,
 } from "@heroicons/react/24/outline";
 import {
 	CalendarDaysIcon as CalendarDaysIconSolid,
@@ -19,311 +20,217 @@ import {
 	UserGroupIcon as UserGroupIconSolid,
 } from "@heroicons/react/24/solid";
 import Hamburger from "hamburger-react";
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { FiLogOut, FiMapPin } from "react-icons/fi";
 import { RiDiscordLine } from "react-icons/ri";
 import { RxStar, RxStarFilled } from "react-icons/rx";
 import { Link, useLocation } from "react-router-dom";
+import { twMerge } from "tailwind-merge";
 
-export const Navbar = () => {
-	const { logout } = useAuth();
+interface NavItemProps {
+	label: string;
+	path: string;
+	Icon: React.ComponentType<{ className?: string }>;
+	ActiveIcon: React.ComponentType<{ className?: string }>;
+	isActive?: boolean;
+	hasNewContentNotification?: boolean;
+	onClick?: () => void;
+	target?: string;
+}
 
-	const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-	const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-	const { user } = useUser();
-	const { applications } = useApplications();
-	const routes = useRouteDefinitions();
+function NavItem(props: NavItemProps) {
+	const [didVisit, setDidVisit] = useState(
+		window.localStorage.getItem(props.path) === "visited",
+	);
 
-	const availableRoutes = useMemo(() => {
-		return routes.filter((route) => {
-			// Default to include in navbar if no access check defined
-			if (typeof route.accessCheck === "undefined") return true;
-			if (typeof route.accessCheck === "function")
-				return route.accessCheck({ user, applications });
-			if (Array.isArray(route.accessCheck))
-				return route.accessCheck.every((check) =>
-					check({ user, applications }),
-				);
-			// Default to exclude if access check type is not recognized
-			return false;
-		});
-	}, [routes, user, applications]);
+	const IconElement = props.isActive ? props.ActiveIcon : props.Icon;
 
-	const navItems = {
-		[paths.home]: {
-			label: "Home",
-			Icon: HomeIcon,
-			ActiveIcon: HomeIconSolid,
-		},
-		[paths.schedule]: {
-			label: "Schedule",
-			Icon: CalendarDaysIcon,
-			ActiveIcon: CalendarDaysIconSolid,
-		},
-		[paths.networking]: {
-			label: "Networking",
-			Icon: ShareIcon,
-			ActiveIcon: ShareIconSolid,
-		},
-		[paths.myTicket]: {
-			label: "My Ticket",
-			Icon: TicketIcon,
-			ActiveIcon: TicketIconSolid,
-		},
-		[paths.application]: {
-			label: "Application",
-			Icon: CodeBracketIcon,
-			ActiveIcon: CodeBracketIconSolid,
-		},
-		[paths.myTeam]: {
-			label: "My Team",
-			Icon: UserGroupIcon,
-			ActiveIcon: UserGroupIconSolid,
-		},
-		[paths.perks]: {
-			label: "Perks",
-			Icon: RxStar,
-			ActiveIcon: RxStarFilled,
-		},
-	};
-
-	const location = useLocation();
-
-	const updateNavbarState = () => {
-		setIsMobile(window.innerWidth <= 768);
-	};
-
-	useEffect(() => {
-		window.addEventListener("resize", updateNavbarState);
-		return () => {
-			window.removeEventListener("resize", updateNavbarState);
-		};
-	}, []);
-
-	useEffect(() => {
-		setMobileMenuOpen(false);
-	}, [location]);
-
-	// TODO: groom routes rendering
-
-	const renderNavItems = (isMobile: boolean) => {
-		return availableRoutes
-			.filter(({ path }) => !!navItems[path as string])
-			.map(({ path }) => {
-				const { label, Icon, ActiveIcon } = navItems[path as string];
-				const isActive = location.pathname === path;
-				if (
-					(path === paths.myTeam && !window.localStorage.getItem(path)) ||
-					(path === paths.myTicket && !window.localStorage.getItem(path)) ||
-					(path === paths.perks && !window.localStorage.getItem(path))
-				) {
-					return (
-						<Link key={label} to={path as string} className="relative w-full">
-							<li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
-								{isMobile ? (
-									<>
-										{isActive ? (
-											<ActiveIcon className="w-3 h-3" />
-										) : (
-											<Icon className="w-3 h-3" />
-										)}
-										<span className="relative">
-											{label}
-											<span className="absolute flex h-2 w-2 top-0 right-0 translate-x-full">
-												<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
-												<span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500" />
-											</span>
-										</span>
-									</>
-								) : (
-									<>
-										{isActive ? (
-											<ActiveIcon className="w-5 h-5" />
-										) : (
-											<Icon className="w-5 h-5" />
-										)}
-										<span className="relative hidden md:flex">
-											{label} {/* my team and perks */}
-											<span className="absolute flex h-2 w-2 top-0 right-0 translate-x-full">
-												<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
-												<span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500" />
-											</span>
-										</span>
-									</>
-								)}
-							</li>
-						</Link>
-					);
-				}
-
-				return (
-					<Link key={label} to={path as string} className="w-full">
-						<li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
-							{isMobile ? (
-								<>
-									{isActive ? (
-										<ActiveIcon className="w-3 h-3" />
-									) : (
-										<Icon className="w-3 h-3" />
-									)}
-									<span>{label}</span>
-								</>
-							) : (
-								<>
-									{isActive ? (
-										<ActiveIcon className="w-5 h-5" />
-									) : (
-										<Icon className="w-5 h-5" />
-									)}
-									<span className="hidden md:flex">
-										{label} {/* everything else */}
-									</span>
-								</>
-							)}
-						</li>
-					</Link>
-				);
-			});
-	};
+	function onLinkClicked() {
+		setDidVisit(true);
+		window.localStorage.setItem(props.path, "visited");
+		props.onClick?.();
+	}
 
 	return (
-		<>
-			{isMobile ? (
+		<Link
+			to={props.path}
+			className="w-full"
+			onClick={onLinkClicked}
+			target={props.target}
+			rel="noopener noreferrer"
+		>
+			<li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md hover:text-black cursor-pointer flex items-center gap-2">
+				<IconElement className="w-5 h-5" />
+				<span className="relative">
+					{props.label}
+
+					{props.hasNewContentNotification && !didVisit && (
+						<span className="absolute flex h-2 w-2 top-0 -right-2.5">
+							<span className="h-full w-full rounded-full bg-orange-400 animate-ping absolute opacity-75" />
+							<span className="h-full w-full rounded-full bg-orange-500" />
+						</span>
+					)}
+				</span>
+			</li>
+		</Link>
+	);
+}
+
+function NavItems({ onClickNavItem }: { onClickNavItem?: () => void }) {
+	const { currentUser, logout } = useAuth();
+	const location = useLocation();
+
+	if (!currentUser) {
+		return null;
+	}
+
+	return (
+		<ul className="flex flex-col gap-4 w-full">
+			<NavItem
+				label="Location"
+				path="https://maps.app.goo.gl/Fxic5XJBzZjHP4Yt5"
+				target="_blank"
+				Icon={FiMapPin}
+				ActiveIcon={FiMapPin}
+			/>
+			{currentUser.emailVerified && (
 				<>
-					<nav className="flex items-center justify-between p-4 text-white border-b-2 border-b-gray-300">
-						<div className="flex items-center justify-start">
-							<Link className="flex gap-4 items-center z-10" to="/profile">
-								<img className="h-10 w-10" src={Logo} alt="HawkHacks Logo" />
-							</Link>
-						</div>
-						<div>
-							<Hamburger
-								toggled={isMobileMenuOpen}
-								toggle={setMobileMenuOpen}
-								size={24}
-								color="black"
-								label="Show navigation menu"
-							/>
-						</div>
-					</nav>
-
-					<div
-						className={`fixed z-20 right-0 top-0 h-full max-w-full p-10 py-24 bg-gray-200 backdrop-blur-xl transition-all duration-300 ease-in-out ${
-							isMobileMenuOpen
-								? "translate-x-0 opacity-100"
-								: "translate-x-full opacity-0"
-						}`}
-					>
-						<div className="absolute right-2 top-2">
-							<Hamburger
-								toggled={isMobileMenuOpen}
-								toggle={setMobileMenuOpen}
-								size={24}
-								color="black"
-								label="Show navigation menu"
-							/>
-						</div>
-						<ul className="flex flex-col items-start justify-start divide-y divide-charcoalBlack">
-							{user &&
-								(user.type === "mentor" ||
-									user.type === "volunteer" ||
-									(user.type === "hacker" && user.rsvpVerified))}
-
-							<a
-								href="https://maps.app.goo.gl/Fxic5XJBzZjHP4Yt5"
-								target="_blank"
-								rel="noopener noreferrer"
-								className="w-full"
-							>
-								<li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
-									Location
-								</li>
-							</a>
-							{user && renderNavItems(true)}
-							<a
-								href="https://discord.com/invite/GxwvFEn9TB"
-								target="_blank"
-								rel="noopener noreferrer"
-								className="w-full"
-							>
-								<li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
-									Discord Support
-								</li>
-							</a>
-						</ul>
-
-						{user && (
-							<button
-								className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full flex items-center justify-start gap-2 hover:text-black"
-								type="button"
-								onClick={logout}
-							>
-								Sign out
-							</button>
-						)}
-					</div>
+					<NavItem
+						isActive={location.pathname === paths.home}
+						label="Home"
+						path={paths.home}
+						Icon={HomeIcon}
+						ActiveIcon={HomeIconSolid}
+						onClick={onClickNavItem}
+					/>
+					<NavItem
+						isActive={location.pathname === paths.schedule}
+						label="Schedule"
+						path={paths.schedule}
+						Icon={CalendarDaysIcon}
+						ActiveIcon={CalendarDaysIconSolid}
+						onClick={onClickNavItem}
+					/>
+					<NavItem
+						isActive={location.pathname === paths.networking}
+						label="Networking"
+						path={paths.networking}
+						Icon={ShareIcon}
+						ActiveIcon={ShareIconSolid}
+						onClick={onClickNavItem}
+					/>
+					<NavItem
+						isActive={location.pathname === paths.myTicket}
+						label="My Ticket"
+						path={paths.myTicket}
+						Icon={TicketIcon}
+						ActiveIcon={TicketIconSolid}
+						hasNewContentNotification
+						onClick={onClickNavItem}
+					/>
+					<NavItem
+						isActive={location.pathname === paths.application}
+						label="Application"
+						path={paths.application}
+						Icon={CodeBracketIcon}
+						ActiveIcon={CodeBracketIconSolid}
+						onClick={onClickNavItem}
+					/>
+					<NavItem
+						isActive={location.pathname === paths.myTeam}
+						label="My Team"
+						path={paths.myTeam}
+						Icon={UserGroupIcon}
+						ActiveIcon={UserGroupIconSolid}
+						hasNewContentNotification
+						onClick={onClickNavItem}
+					/>
+					<NavItem
+						isActive={location.pathname === paths.perks}
+						label="Perks"
+						path={paths.perks}
+						Icon={RxStar}
+						ActiveIcon={RxStarFilled}
+						hasNewContentNotification
+						onClick={onClickNavItem}
+					/>
 				</>
-			) : (
-				<nav
-					className={
-						"h-screen p-4 bg-white transition-all duration-300 gap-12 flex-col w-[60px] font-medium text-cadetBlue hidden md:block md:fixed md:inset-y-0 md:z-10 md:w-72 border-r-2 border-r-gray-300"
-					}
-				>
-					<div className="flex items-start justify-start p-4">
-						<Link
-							className="flex gap-4 items-center justify-start"
-							to={paths.home}
-						>
-							<img className="h-10 w-10" src={Logo} alt="HawkHacks Logo" />
-							<span className="hidden md:flex text-2xl font-bold text-black">
-								HawkHacks
-							</span>
-						</Link>
-					</div>
-
-					<aside className="flex flex-col items-start justify-between h-[83%] overflow-y-auto">
-						<ul className="flex flex-col items-start justify-start gap-4 w-full">
-							{user &&
-								(user.type === "mentor" ||
-									user.type === "volunteer" ||
-									(user.type === "hacker" && user.rsvpVerified))}
-							<a
-								href="https://maps.app.goo.gl/Fxic5XJBzZjHP4Yt5"
-								target="_blank"
-								rel="noopener noreferrer"
-								className="w-full"
-							>
-								<li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
-									<FiMapPin className="w-5 h-5" />
-									Location
-								</li>
-							</a>
-							{user && renderNavItems(false)}
-							<a
-								href="https://discord.com/invite/GxwvFEn9TB"
-								target="_blank"
-								rel="noopener noreferrer"
-								className="w-full"
-							>
-								<li className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full hover:text-black cursor-pointer flex items-center justify-start gap-2">
-									<RiDiscordLine className="w-5 h-5" />
-									Discord Support
-								</li>
-							</a>
-						</ul>
-						{user && (
-							<button
-								className="p-4 hover:bg-slate-100 duration-300 transition-colors rounded-md w-full flex items-center justify-start gap-2 hover:text-black"
-								type="button"
-								onClick={logout}
-							>
-								<FiLogOut className="w-5 h-5" />
-								<span className="hidden md:flex">Sign out</span>
-							</button>
-						)}
-					</aside>
-				</nav>
 			)}
-		</>
+
+			<NavItem
+				label="Discord Support"
+				path="https://discord.com/invite/GxwvFEn9TB"
+				target="_blank"
+				Icon={RiDiscordLine}
+				ActiveIcon={RiDiscordLine}
+			/>
+
+			<div className="flex flex-1 flex-col justify-end">
+				<NavItem
+					label="Sign out"
+					path="#"
+					Icon={FiLogOut}
+					ActiveIcon={FiLogOut}
+					onClick={logout}
+				/>
+			</div>
+		</ul>
+	);
+}
+
+export const Navbar = ({ children }: React.PropsWithChildren) => {
+	const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+	const navItems = <NavItems onClickNavItem={() => setMobileMenuOpen(false)} />;
+
+	return (
+		<div className="flex flex-col md:flex-row md:pl-72">
+			<nav
+				className={twMerge(
+					"flex p-4 gap-2 justify-between border-b-2 border-gray-300 overflow-y-auto bg-white shrink-0",
+					"md:h-screen md:fixed md:top-0 md:left-0 md:z-20 md:flex-col md:justify-normal md:border-b-0 md:border-r-2 md:font-medium md:text-cadetBlue md:w-72",
+				)}
+			>
+				<Link className="flex gap-2 items-center" to={paths.home}>
+					<img className="h-10 w-10 m-1" src={Logo} alt="HawkHacks Logo" />
+
+					<span className="hidden md:block text-2xl font-bold text-black">
+						HawkHacks
+					</span>
+				</Link>
+
+				<div className="hidden md:flex flex-1">{navItems}</div>
+
+				<div className="md:hidden">
+					<Drawer.Root
+						open={isMobileMenuOpen}
+						onOpenChange={(e) => setMobileMenuOpen(e.open)}
+					>
+						<Drawer.Trigger asChild>
+							<Hamburger
+								toggled={isMobileMenuOpen}
+								toggle={setMobileMenuOpen}
+								size={24}
+								color="black"
+								label="Show navigation menu"
+							/>
+						</Drawer.Trigger>
+						<Portal>
+							<Drawer.Backdrop />
+							<Drawer.Positioner>
+								<Drawer.Content>
+									<Drawer.Body className="pt-14">{navItems}</Drawer.Body>
+									<Drawer.CloseTrigger>
+										<XMarkIcon className="w-8 h-8 m-3" />
+									</Drawer.CloseTrigger>
+								</Drawer.Content>
+							</Drawer.Positioner>
+						</Portal>
+					</Drawer.Root>
+				</div>
+			</nav>
+
+			{children}
+		</div>
 	);
 };
