@@ -20,7 +20,7 @@
 		"dev:withFunctions": "cd functions && tsc && cd .. && pnpm run dev"
 	},
 	"dependencies": {
-		"@chakra-ui/react": "^3.15.0",
+		"@chakra-ui/react": "^3.19.2",
 		"@emotion/react": "^11.14.0",
 		"@headlessui/react": "^1.7.19",
 		"@heroicons/react": "^2.2.0",
