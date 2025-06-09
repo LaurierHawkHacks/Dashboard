@@ -55,11 +55,8 @@ export interface TicketData {
 	discord: string;
 	resumeRef: string; // gs:// format ref
 	resumeVisibility?: ResumeVisibility;
-}
-
-export interface ExtendedTicketData extends TicketData {
-	events: string[]; // id of the event items
-	allergies: string[]; // list of allergies
+	events?: string[]; // id of the event items
+	allergies?: string[]; // list of allergies
 }
 
 export interface EventItem {

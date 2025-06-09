@@ -78,9 +78,7 @@ export const TicketPage = () => {
 			);
 			const ticketResult = await createTicket({
 				email: email,
-				pronouns: Array.isArray(userApp?.pronouns)
-					? userApp.pronouns.join(", ")
-					: (userApp?.pronouns ?? "Not specified"),
+				pronouns: userApp?.pronouns ?? "Not specified",
 			});
 			const ticketData = ticketResult.data as { url: string };
 			if (ticketData.url) {

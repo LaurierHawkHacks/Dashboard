@@ -156,6 +156,7 @@ export const ApplicationPage = () => {
 
 		const results = validateFn.safeParse(application);
 
+		console.log(results);
 		if (!results.success) {
 			setErrors(results.error.issues.map((i) => i.message));
 			return false;
@@ -169,6 +170,7 @@ export const ApplicationPage = () => {
 						? mentorSpecificValidation
 						: volunteerSpecificValidation;
 			const results = validateFn.safeParse(application);
+			console.log(results);
 			if (!results.success) {
 				setErrors(results.error.issues.map((i) => i.message));
 				return false;

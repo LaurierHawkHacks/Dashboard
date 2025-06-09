@@ -13,7 +13,7 @@ export const defaultApplication: ApplicationData = {
 	major: [],
 
 	gender: "",
-	pronouns: [],
+	pronouns: "",
 	sexuality: "",
 	race: "",
 	diets: [],

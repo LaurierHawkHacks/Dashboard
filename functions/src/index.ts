@@ -357,9 +357,22 @@ export const logEvent = onCallCustom((req) => {
 	}
 });
 
-async function internalGetTicketData(id: string, extended = false) {
+export const getTicketData = onCallCustom(async (req) => {
+	if (!req.auth) {
+		throw new HttpsError("permission-denied", "unauthorized");
+	}
+
+	const user = await getAuth().getUser(req.auth.uid);
+
+	const data = z.object({ id: z.string().uuid() }).parse(req.data);
+
+	const ticketId = data.id;
+
 	logInfo("Checking for ticket data...");
-	const ticketDoc = await getFirestore().collection("tickets").doc(id).get();
+	const ticketDoc = await getFirestore()
+		.collection("tickets")
+		.doc(ticketId)
+		.get();
 	if (!ticketDoc.exists) {
 		throw new HttpsError("not-found", "not found");
 	}
@@ -389,7 +402,6 @@ async function internalGetTicketData(id: string, extended = false) {
 	if (!app) {
 		// grab from user record
 		logInfo("No application data, taking name from user record.");
-		const user = await getAuth().getUser(ticket.userId);
 		const parts = user.displayName?.split(" ") ?? ["", ""];
 		firstName = parts[0];
 		lastName = parts[1];
@@ -428,63 +440,23 @@ async function internalGetTicketData(id: string, extended = false) {
 		} as Socials;
 	}
 
-	const data = {
+	const ticketData = {
 		firstName,
 		lastName,
 		pronouns,
-		foods: [] as string[],
-		events: [] as string[],
 		allergies,
 		...socials,
 	};
 
-	if (extended) {
-		data.foods = ticket.foods;
-		data.events = ticket.events;
-	}
-
-	return data;
-}
-
-export const getTicketData = onCallCustom(async (req) => {
-	const data = z
-		.object({
-			id: z.string().uuid(),
-		})
-		.parse(req.data);
-
-	try {
-		const ticketData = await internalGetTicketData(data.id);
+	if (user.customClaims?.admin) {
 		return {
-			message: "ok",
-			data: ticketData,
+			...ticketData,
+			foods: ticket.foods,
+			events: ticket.events,
 		};
-	} catch (e) {
-		logError("Failed to get ticket data.", { error: e });
-		throw new HttpsError("internal", "internal error");
 	}
-});
 
-export const getExtendedTicketData = onCallCustom(async (req) => {
-	const data = z
-		.object({
-			id: z.string().uuid(),
-		})
-		.parse(req.data);
-
-	try {
-		const ticketData = await internalGetTicketData(data.id, true);
-
-		return {
-			message: "ok",
-			data: ticketData,
-		};
-	} catch (e) {
-		logError("Failed to get extended ticket data.", {
-			error: e,
-		});
-		throw new HttpsError("internal", "internal error");
-	}
+	return ticketData;
 });
 
 export const redeemItem = onCallCustom(async (req) => {

@@ -3,7 +3,7 @@ import { getButtonStyles } from "@/components/Button/Button.styles";
 import { toaster } from "@/components/ui/toaster";
 import { useAuth } from "@/providers";
 import { getRedeemableItems, redeemItem } from "@/services/firebase/redeem";
-import { getExtendedTicketData } from "@/services/firebase/ticket";
+// import { getExtendedTicketData } from "@/services/firebase/ticket";
 import type { EventItem, ExtendedTicketData } from "@/services/firebase/types";
 import { Button } from "@chakra-ui/react";
 import { Tab } from "@headlessui/react";
@@ -38,6 +38,7 @@ export const AdminViewTicketPage = () => {
 
 			const res = await getExtendedTicketData(ticketId);
 			const e = await getRedeemableItems();
+			console.log("res", res);
 			if (res.status === 200) {
 				setTicketData(res.data);
 				setEvents(e);

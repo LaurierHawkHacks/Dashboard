@@ -1,81 +1,48 @@
-import { LoadingAnimation, PageWrapper } from "@/components";
-import { toaster } from "@/components/ui/toaster";
-import { useAuth } from "@/providers";
+import { Card, LoadingAnimation, PageWrapper } from "@/components";
+import { useTicketData } from "@/hooks/use-ticket-data";
+import { type UserWithClaims, useAuth } from "@/providers";
 import { getResume } from "@/services/firebase/files";
-import { getTicketData } from "@/services/firebase/ticket";
-import type { TicketData } from "@/services/firebase/types";
-import { Button } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { Alert, Button } from "@chakra-ui/react";
+import { Navigate, useParams } from "react-router-dom";
 
-type TicketDataKey = keyof TicketData;
+interface ViewTicketProps {
+	ticketId: string;
+	currentUser: UserWithClaims;
+}
 
-const socialKeys: TicketDataKey[] = [
-	"instagram",
-	"github",
-	"linkedin",
-	"discord",
-];
+function ViewTicket(props: ViewTicketProps) {
+	const ticketDataQuery = useTicketData(props.ticketId);
 
-export const ViewTicketPage = () => {
-	const [isLoading, setIsLoading] = useState(true);
-	const { ticketId } = useParams();
-	const navigate = useNavigate();
-	const { currentUser } = useAuth();
-	const timeoutRef = useRef<number | null>(null);
-	const [ticketData, setTicketData] = useState<TicketData | null>(null);
-	const [showResume, setShowResume] = useState(false);
+	if (ticketDataQuery.isLoading) {
+		return <LoadingAnimation />;
+	}
 
-	useEffect(() => {
-		if (!ticketId) return;
-		if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
-		timeoutRef.current = window.setTimeout(() => setIsLoading(false), 1500);
+	if (ticketDataQuery.error) {
+		return (
+			<Alert.Root status="error">
+				<Alert.Indicator />
+				<Alert.Content>
+					<Alert.Title>Error loading ticket data</Alert.Title>
+					<Alert.Description>{ticketDataQuery.error.message}</Alert.Description>
+				</Alert.Content>
+			</Alert.Root>
+		);
+	}
 
-		(async () => {
-			if (
-				currentUser &&
-				(currentUser.hawkAdmin ||
-					(currentUser.type === "volunteer" && currentUser.rsvpVerified))
-			) {
-				if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
-				navigate(`/admin/ticket/${ticketId}`);
-			} else {
-				if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
-				// fetch user ticket data
-				const res = await getTicketData(ticketId);
-				if (res.status === 200) {
-					setTicketData(res.data);
-					setShowResume(
-						!res.data.resumeVisibility ||
-							res.data.resumeVisibility === "Public" ||
-							(res.data.resumeVisibility === "Sponsors Only" &&
-								currentUser !== null &&
-								currentUser.type === "sponsor"),
-					);
-				} else {
-					toaster.error({
-						title: "Failed to load ticket",
-						description: res.message,
-					});
-				}
-				setIsLoading(false);
-			}
-		})();
+	if (!ticketDataQuery.data) {
+		throw new Error("Ticket data not found");
+	}
 
-		return () => {
-			if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
-		};
-	}, [currentUser, ticketId]);
+	const ticketData = ticketDataQuery.data;
 
-	if (!ticketId) return <Navigate to="/not-found" />;
+	const showResume =
+		!ticketData.resumeVisibility ||
+		ticketData.resumeVisibility === "Public" ||
+		(ticketData.resumeVisibility === "Sponsors Only" &&
+			props.currentUser.type === "sponsor");
 
-	if (isLoading) return <LoadingAnimation />;
-
-	if (!ticketData) return <Navigate to="/not-found" />;
-
-	// give the app a chance to decide what to display
 	return (
-		<PageWrapper title="View Ticket" subTitle="Some good thing here">
+		<div>
 			<div className="flex items-center gap-10">
 				<h1 className="font-bold text-2xl">
 					{`${ticketData.firstName} ${ticketData.lastName}`}
@@ -83,18 +50,15 @@ export const ViewTicketPage = () => {
 				<p>{ticketData.pronouns}</p>
 			</div>
 			<div className="flex flex-col max-w-md gap-5 mt-12">
-				{socialKeys.map((key) =>
-					ticketData[key] ? (
-						<div
-							className="bg-white shadow-md p-4 rounded-xl flex flex-col"
-							key={key}
-						>
-							<div className="mb-2 flex justify-between items-center">
-								<p className="flex-1 capitalize">{key}</p>
-							</div>
-							<p>{ticketData[key]}</p>
-						</div>
-					) : null,
+				{ticketData.instagram && (
+					<Card title="Instagram">{ticketData.instagram}</Card>
+				)}
+				{ticketData.github && <Card title="Github">{ticketData.github}</Card>}
+				{ticketData.linkedin && (
+					<Card title="LinkedIn">{ticketData.linkedin}</Card>
+				)}
+				{ticketData.discord && (
+					<Card title="Discord">{ticketData.discord}</Card>
 				)}
 				{ticketData.resumeRef && showResume && (
 					<div className="bg-white shadow-md p-4 rounded-xl flex flex-col">
@@ -113,6 +77,34 @@ export const ViewTicketPage = () => {
 					</div>
 				)}
 			</div>
+		</div>
+	);
+}
+
+export const ViewTicketPage = () => {
+	const { ticketId } = useParams();
+	const { currentUser } = useAuth();
+
+	if (!ticketId) return <Navigate to="/not-found" />;
+
+	if (!currentUser) return <LoadingAnimation />;
+
+	// give the app a chance to decide what to display
+	return (
+		<PageWrapper title="View Ticket" subTitle="Some good thing here">
+			{ticketId ? (
+				<ViewTicket ticketId={ticketId} currentUser={currentUser} />
+			) : (
+				<Alert.Root status="error">
+					<Alert.Indicator />
+					<Alert.Content>
+						<Alert.Title>Ticket id required</Alert.Title>
+						<Alert.Description>
+							Ticket ID is required to view a ticket.
+						</Alert.Description>
+					</Alert.Content>
+				</Alert.Root>
+			)}
 		</PageWrapper>
 	);
 };

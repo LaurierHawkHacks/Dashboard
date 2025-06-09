@@ -19,7 +19,7 @@ export interface HackerApplicationData {
 	instagram: string;
 	major: string[];
 	gender: string;
-	pronouns: string[];
+	pronouns: string;
 	sexuality: string;
 	race: string;
 	diets: string[];
