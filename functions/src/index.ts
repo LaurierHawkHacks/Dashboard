@@ -533,17 +533,7 @@ export const redeemItem = onCallCustom(async (req) => {
 });
 
 export {
-	isTeamNameAvailable,
-	createTeam,
-	getTeamByUser,
-	inviteMember,
-	updateTeamName,
-	removeMembers,
-	deleteTeam,
-	validateTeamInvitation,
-	rejectInvitation,
-	checkInvitation,
-	getUserInvitations,
+	checkInvitation, createTeam, deleteTeam, getTeamByUser, getUserInvitations, inviteMember, isTeamNameAvailable, rejectInvitation, removeMembers, updateTeamName, validateTeamInvitation
 } from "./teams";
 
 export { createTicket } from "./apple";
@@ -551,9 +541,7 @@ export { createTicket } from "./apple";
 export { createPassClass, createPassObject } from "./google";
 
 export {
-	verifyRSVP,
-	withdrawRSVP,
-	joinWaitlist,
-	// expiredSpotCleanup,
-	// moveToSpots,
+	joinWaitlist, verifyRSVP,
+	withdrawRSVP
 } from "./rsvp";
+

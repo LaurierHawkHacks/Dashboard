@@ -92,6 +92,12 @@ service cloud.firestore {
         allow write: if isAuthenticated();
     }
 
+    //hackathon dates 
+    match /hackathons/{year} {
+        allow read: if isAuthenticated() && (isAdmin() || isOwner(resource.data.applicantId));
+        allow write: if isAuthenticated() && isAdmin();
+    }
+
     match /rsvps-2025/{rsvpId} {
         // Only grant read access if you are owner/admin
         allow read: if isAuthenticated() && (isOwner(resource.data.uid));

@@ -1,5 +1,6 @@
 import { Logo } from "@/assets";
 import { paths } from "@/data/paths";
+import { useHackathonDates } from "@/hooks/use-hackathon-dates";
 import { useAuth } from "@/providers";
 import { Drawer, Portal } from "@chakra-ui/react";
 import {
@@ -79,7 +80,7 @@ function NavItem(props: NavItemProps) {
 function NavItems({ onClickNavItem }: { onClickNavItem?: () => void }) {
 	const { currentUser, logout } = useAuth();
 	const location = useLocation();
-
+	const { hackathonDates } = useHackathonDates();
 	if (!currentUser) {
 		return null;
 	}
