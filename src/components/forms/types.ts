@@ -65,10 +65,14 @@ export interface VolunteerSpecificAppData {
 export type ApplicationData = HackerApplicationData &
 	HackerSpecificAppData &
 	MentorSpecificAppData &
-	VolunteerSpecificAppData &{
-		rsvp?: boolean;
-		applicationStatus: "pending" | "rejected" | "accepted";
-	};
+	VolunteerSpecificAppData;
+
+export type GenericApplicationData = ApplicationData & {
+	rvsp?: boolean;
+	applicationStatus: "pending" | "rejected" | "accepted";
+}
+
+	
 
 export type ApplicationInputKeys = keyof ApplicationData;
 
