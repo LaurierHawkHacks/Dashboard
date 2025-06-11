@@ -49,6 +49,13 @@ service cloud.firestore {
         allow write: if isAuthenticated() && isAdmin();
     }
 
+     match /tickets-2025/{ticketId} {
+        // Only grant read perms to owner/admin
+        allow read: if isAuthenticated() && (isAdmin() || isOwner(resource.data.userId));
+        // Only grant write perms to admin
+        allow write: if isAuthenticated() && isAdmin();
+    }
+
     match /passClasses/{passClassId} {
         // Only grant read perms to owner/admin
         allow read: if isAuthenticated() && (isAdmin() || isOwner(resource.data.userId));
@@ -58,6 +65,12 @@ service cloud.firestore {
 
     // Applications Collection Rules
     match /applications/{applicationId} {
+        // Only grant read access if you are owner/admin
+        allow read: if isAuthenticated() && (isAdmin() || isOwner(resource.data.applicantId));
+        allow write: if isAuthenticated() && isAdmin();
+    }
+
+    match /applications-2025/{applicationId} {
         // Only grant read access if you are owner/admin
         allow read: if isAuthenticated() && (isAdmin() || isOwner(resource.data.applicantId));
         allow write: if isAuthenticated() && isAdmin();
@@ -85,6 +98,12 @@ service cloud.firestore {
         allow write: if isAuthenticated() && isAdmin();
     }
 
+    match /rsvps-2025/{rsvpId} {
+        // Only grant read access if you are owner/admin
+        allow read: if isAuthenticated() && (isOwner(resource.data.uid));
+        allow write: if isAuthenticated();
+    }
+
     match /events/{eventId} {
         // Only grant read access if you are owner/admin
         allow read: if isAuthenticated();
@@ -106,6 +125,10 @@ service cloud.firestore {
     }
 
     match /users-dev/{documentId} {
+        allow read, write: if isAuthenticated() && isAdmin();
+    }
+
+    match /users-2025/{userId} {
         allow read, write: if isAuthenticated() && isAdmin();
     }
 

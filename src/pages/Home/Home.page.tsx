@@ -75,7 +75,7 @@ const HomePage = () => {
 	};
 
 	return (
-		<PageWrapper>
+		<PageWrapper title="Home" subTitle="Welcome to the home page">
 			<section className="homepage grid gap-4">
 				<div className="grid xl:grid-cols-12 gap-4">
 					<Card title="What is HawkHacks?" className="about xl:col-span-7">

@@ -1,5 +1,15 @@
-import { Box, Grid, GridItem, Tabs } from "@chakra-ui/react";
-import { useEffect, useRef } from "react";
+import {
+	Box,
+	Grid,
+	GridItem,
+	Tabs,
+	useBreakpointValue,
+} from "@chakra-ui/react";
+import { useEffect, useRef, useState } from "react";
+
+const SCHEDULE_SIZE = "2880px";
+const DESKTOP_GRID_ITEM_HEIGHT = "100px";
+const DESKTOP_TIME_INDICATOR_HEIGHT = "32px";
 
 interface ScheduleRootProps {
 	defaultValue?: string;
@@ -7,11 +17,20 @@ interface ScheduleRootProps {
 }
 
 export function ScheduleRoot(props: ScheduleRootProps) {
-	return <Tabs.Root lazyMount {...props} />;
+	return (
+		<Tabs.Root
+			display="flex"
+			flexDirection="column"
+			flex="1"
+			minH="0"
+			lazyMount
+			{...props}
+		/>
+	);
 }
 
 export function ScheduleTabList(props: React.PropsWithChildren) {
-	return <Tabs.List display="flex" {...props} />;
+	return <Tabs.List display="flex" bg="white" {...props} />;
 }
 
 interface ScheduleTabTriggerProps {
@@ -31,22 +50,45 @@ interface ScheduleContentProps {
 }
 
 export function ScheduleTabContent(props: ScheduleContentProps) {
-	return <Tabs.Content {...props} />;
+	return (
+		<Tabs.Content
+			display="flex"
+			flexDirection="column"
+			flex="1"
+			minH="0"
+			paddingTop={{ base: "0", md: "4" }}
+			{...props}
+		/>
+	);
 }
 
 interface ScheduleGridProps {
 	children: React.ReactNode;
+	dayDate: Date;
 }
 
 // The schedule grid is 24 hours long, from 12:00 AM to 12:00 AM the next day
 // Each hour is divided into 60 minutes, so there are 24*60=1440 columns in total
 export function ScheduleGrid(props: ScheduleGridProps) {
 	return (
-		<Box w="100%" overflowX="auto" overflowY="hidden">
+		<Box
+			w="100%"
+			overflowX="auto"
+			overflowY={{ base: "auto", md: "hidden" }}
+			minH="0"
+			flex={{ base: "1", md: "none" }}
+		>
 			<Grid
-				width="2800px"
-				templateColumns="repeat(1440, 1fr)"
-				m={4}
+				width={{ base: "auto", md: SCHEDULE_SIZE }}
+				height={{ base: SCHEDULE_SIZE, md: "auto" }}
+				templateColumns={{ base: "70px", md: "repeat(1440, 1fr)" }}
+				templateRows={{
+					base: "repeat(1440, 1fr)",
+					md: DESKTOP_TIME_INDICATOR_HEIGHT,
+				}}
+				gridAutoFlow={{ base: "column", md: "row" }}
+				gridAutoRows={{ base: "unset", md: DESKTOP_GRID_ITEM_HEIGHT }}
+				gridAutoColumns={{ base: "minmax(100px, 300px)", md: "unset" }}
 				position="relative"
 			>
 				<ScheduleTimeIndicator>12:00 AM</ScheduleTimeIndicator>
@@ -73,11 +115,26 @@ export function ScheduleGrid(props: ScheduleGridProps) {
 				<ScheduleTimeIndicator>9:00 PM</ScheduleTimeIndicator>
 				<ScheduleTimeIndicator>10:00 PM</ScheduleTimeIndicator>
 				<ScheduleTimeIndicator>11:00 PM</ScheduleTimeIndicator>
-				<ScheduleGridLineContainer>
+
+				<ScheduleCurrentTimeLine dayDate={props.dayDate} />
+
+				{/* Mobile - Horizontal grid lines for time */}
+				{Array.from({ length: 24 }, (_, i) => (
+					<ScheduleGridTimeLine
+						key={i}
+						visibility={{ base: "visible", md: "hidden" }}
+						gridRow={i * 60 + 1}
+					/>
+				))}
+
+				{/* Desktop - Horizontal grid lines for streams (rows) */}
+				<ScheduleGridStreamContainer
+					visibility={{ base: "hidden", md: "visible" }}
+				>
 					{Array.from({ length: 24 }, (_, i) => (
-						<ScheduleGridLine key={i} />
+						<ScheduleGridStreamLine key={i} />
 					))}
-				</ScheduleGridLineContainer>
+				</ScheduleGridStreamContainer>
 				{props.children}
 			</Grid>
 		</Box>
@@ -86,29 +143,105 @@ export function ScheduleGrid(props: ScheduleGridProps) {
 
 function ScheduleTimeIndicator({ children }: { children: React.ReactNode }) {
 	return (
-		<GridItem h="32px" colSpan={60}>
+		<GridItem
+			colSpan={{ base: "auto", md: 60 }}
+			rowSpan={{ base: 60, md: "auto" }}
+			fontSize={{ base: "sm", md: "unset" }}
+			letterSpacing="tight"
+			ml={{ base: "4px", md: "0" }}
+		>
 			{children}
 		</GridItem>
 	);
 }
 
-export function ScheduleGridLineContainer(props: React.PropsWithChildren) {
+function ScheduleCurrentTimeLine({ dayDate }: { dayDate: Date }) {
+	const [shouldShow, setShouldShow] = useState(false);
+	const [progressPercentage, setProgressPercentage] = useState(0);
+
+	const TICK_INTERVAL = 10000; // 10 seconds
+
+	useEffect(() => {
+		const dayStart = new Date(dayDate);
+		dayStart.setHours(0, 0, 0, 0);
+		const dayEnd = new Date(dayDate);
+		dayEnd.setHours(24, 0, 0, 0);
+
+		function tick() {
+			const now = new Date();
+			const nextShouldShow = now >= dayStart && now < dayEnd;
+			setShouldShow(nextShouldShow);
+
+			if (!nextShouldShow) return;
+
+			const totalDuration = dayEnd.getTime() - dayStart.getTime();
+			const currentDuration = now.getTime() - dayStart.getTime();
+			setProgressPercentage((currentDuration / totalDuration) * 100);
+		}
+
+		tick();
+		const interval = setInterval(tick, TICK_INTERVAL);
+		return () => clearInterval(interval);
+	}, [dayDate]);
+
+	if (!shouldShow) return null;
+
 	return (
 		<Box
 			position="absolute"
-			w="100%"
-			top="36px" // time indicator height + grid gap
-			display="flex"
-			flexDir="column"
-			gap="99px" // grid item height + grid item padding top - grid line border height
+			// Swaps between horizontal and vertical lines based on the breakpoint
+			top={{ base: `${progressPercentage}%`, md: "0" }}
+			left={{ base: "0", md: `${progressPercentage}%` }}
+			height={{ base: "auto", md: "100%" }}
+			width={{ base: "100%", md: "auto" }}
+			border="1px"
+			borderColor="red.500"
+			borderStyle="solid"
+			opacity={0.8}
+			zIndex={1}
+		/>
+	);
+}
+
+function ScheduleGridTimeLine(props: React.ComponentProps<typeof GridItem>) {
+	return (
+		<GridItem
+			position="absolute"
+			left="0"
+			right="0"
+			height="1px"
+			bg="gray.subtle"
 			zIndex={-1}
 			{...props}
 		/>
 	);
 }
 
-export function ScheduleGridLine() {
-	return <Box width="100%" borderTopWidth="1px" borderColor="gray.subtle" />;
+export function ScheduleGridStreamContainer(
+	props: React.ComponentProps<typeof Box>,
+) {
+	return (
+		<Box
+			position="absolute"
+			top={DESKTOP_TIME_INDICATOR_HEIGHT}
+			left="0"
+			right="0"
+			display="flex"
+			flexDir="column"
+			zIndex={-1}
+			{...props}
+		/>
+	);
+}
+
+export function ScheduleGridStreamLine() {
+	return (
+		<Box
+			borderTopWidth="1px"
+			height={DESKTOP_GRID_ITEM_HEIGHT}
+			borderColor="gray.subtle"
+		/>
+	);
 }
 
 export interface ScheduleGridItemProps {
@@ -116,6 +249,7 @@ export interface ScheduleGridItemProps {
 	startTime: TimeType;
 	endTime: TimeType;
 	color: string;
+	onClick: () => void;
 	children: React.ReactNode;
 }
 
@@ -124,25 +258,37 @@ export function ScheduleGridItem({
 	startTime,
 	endTime,
 	color = "teal",
+	onClick,
 	children,
 }: ScheduleGridItemProps) {
 	const itemRef = useRef<HTMLDivElement>(null);
+
+	const breakpoint = useBreakpointValue(
+		{ base: "base", md: "md" },
+		{ ssr: false },
+	);
 
 	useEffect(() => {
 		if (scrollIntoViewOnMount && itemRef.current) {
 			itemRef.current.scrollIntoView({
 				behavior: "instant",
-				inline: "start",
+				inline: breakpoint === "base" ? undefined : "start",
+				block: breakpoint === "base" ? "start" : undefined,
 			});
 		}
-	}, [scrollIntoViewOnMount]);
+	}, [scrollIntoViewOnMount, breakpoint]);
 
 	return (
 		<GridItem
+			as="button"
+			textAlign="left"
+			onClick={onClick}
 			ref={itemRef}
-			colStart={scheduleColumnHelper(startTime)}
-			colEnd={scheduleColumnHelper(endTime)}
-			mt="4px"
+			colStart={{ md: scheduleColumnHelper(startTime) }}
+			colEnd={{ md: scheduleColumnHelper(endTime) }}
+			rowStart={{ base: scheduleColumnHelper(startTime), md: "auto" }}
+			rowEnd={{ base: scheduleColumnHelper(endTime), md: "auto" }}
+			mb="4px"
 			mr="4px"
 			color={`${color}.contrast`}
 			bg={`${color}.fg`}
@@ -152,9 +298,8 @@ export function ScheduleGridItem({
 			display="flex"
 			flexDir="column"
 			scrollMargin={8}
-			height="96px"
 			textWrap="nowrap"
-			overflowX="hidden"
+			overflow="hidden"
 			textOverflow="ellipsis"
 		>
 			{children}

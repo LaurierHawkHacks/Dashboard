@@ -2,11 +2,12 @@ import { AxiosError } from "axios";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 import { error as logError, info as logInfo } from "firebase-functions/logger";
-import { HttpsError, onCall } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
 import { GoogleAuth } from "google-auth-library";
 import * as jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
-import type { Context } from "./types";
+import { z } from "zod";
+import { onCallCustom } from "./utils";
 
 const credentials = {
 	type: process.env.GOOGLE_WALLET_TYPE,
@@ -30,9 +31,8 @@ const httpClient = new GoogleAuth({
 });
 
 //Google wallet class
-export const createPassClass = onCall(async (_, res) => {
-	const context = res as Context;
-	if (!context?.auth) {
+export const createPassClass = onCallCustom(async (req) => {
+	if (!req.auth) {
 		return {
 			status: 401,
 			message: "Unauthorized",
@@ -148,13 +148,18 @@ export const createPassClass = onCall(async (_, res) => {
 });
 
 //Google wallet Object
-export const createPassObject = onCall(async (data: any, res) => {
-	const context = res as Context;
-	if (!context?.auth) {
+export const createPassObject = onCallCustom(async (req) => {
+	if (!req.auth) {
 		throw new HttpsError("permission-denied", "Not authenticated");
 	}
 	const func = "createPassObject";
-	const userId = context.auth.uid;
+	const userId = req.auth.uid;
+
+	const data = z
+		.object({
+			email: z.string().email(),
+		})
+		.parse(req.data);
 
 	const user = await getAuth().getUser(userId);
 	const app = (
@@ -203,7 +208,7 @@ export const createPassObject = onCall(async (data: any, res) => {
 		});
 	}
 
-	const userEmail = context.auth.token?.email || data.email;
+	const userEmail = req.auth.token?.email || data.email;
 
 	const objectSuffix = userEmail.replace(/[^\w.-]/g, "_");
 	const objectId = `${process.env.GOOGLE_WALLET_ISSUERID}.${objectSuffix}`;

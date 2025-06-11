@@ -7,7 +7,7 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": ["./functions/lib", "./data"]
+		"ignore": ["./functions/lib", "./data", "./dist"]
 	},
 	"formatter": {
 		"enabled": true,
@@ -21,8 +21,7 @@
 		"rules": {
 			"recommended": true,
 			"suspicious": {
-				"noArrayIndexKey": "off",
-				"noExplicitAny": "off"
+				"noArrayIndexKey": "off"
 			},
 			"correctness": {
 				"useExhaustiveDependencies": "off"

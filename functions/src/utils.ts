@@ -1,18 +1,31 @@
-export enum HttpStatus {
-	OK = 200,
-	CREATED = 201,
-	BAD_REQUEST = 400,
-	UNAUTHORIZED = 401,
-	NOT_FOUND = 404,
-	INTERNAL_SERVER_ERROR = 500,
-}
+import {
+	type CallableRequest,
+	type CallableResponse,
+	HttpsError,
+	onCall,
+} from "firebase-functions/https";
+import { ZodError } from "zod";
 
-export function response<T>(
-	status: HttpStatus,
-	payload?: { message?: string; data?: T },
-) {
-	return {
-		status,
-		...payload,
-	};
+type Handler = (
+	req: CallableRequest<unknown>,
+	res: CallableResponse<unknown> | undefined,
+) => void;
+
+/**
+ * Wrapper for Firebase's onCall function with safer typing
+ * and custom error handling.
+ */
+export function onCallCustom(handler: Handler) {
+	return onCall((req, res) => {
+		try {
+			return handler(req, res);
+		} catch (error) {
+			if (error instanceof ZodError) {
+				throw new HttpsError("invalid-argument", error.message, {
+					issues: error.issues,
+				});
+			}
+			throw error;
+		}
+	});
 }

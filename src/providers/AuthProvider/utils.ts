@@ -5,7 +5,7 @@ import {
 	OAuthProvider,
 	type User,
 } from "firebase/auth";
-import type { ProviderName, UserType, UserWithClaims } from "./types";
+import type { ProviderName, UserRole, UserWithClaims } from "./types";
 
 /**
  * Validates given user for admin authorization.
@@ -18,7 +18,7 @@ export async function validateUser(user: User): Promise<UserWithClaims> {
 		hawkAdmin: Boolean(claims.admin),
 		phoneVerified: Boolean(claims.phoneVerified),
 		rsvpVerified: Boolean(claims.rsvpVerified),
-		type: (claims?.type as UserType) ?? "hacker",
+		type: (claims?.type as UserRole) ?? "hacker",
 	};
 }
 

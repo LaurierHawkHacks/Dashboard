@@ -2,7 +2,7 @@
 	"name": "functions",
 	"scripts": {
 		"build": "tsc",
-		"build:watch": "tsc --watch",
+		"dev": "tsc --watch",
 		"serve": "pnpm run build && firebase emulators:start --only functions",
 		"shell": "pnpm run build && firebase functions:shell",
 		"start": "pnpm run shell",
@@ -10,7 +10,7 @@
 		"logs": "firebase functions:log"
 	},
 	"engines": {
-		"node": "18"
+		"node": "22"
 	},
 	"main": "lib/index.js",
 	"dependencies": {

@@ -26,9 +26,9 @@ import {
 import type { Step } from "@/components/types";
 import { toaster } from "@/components/ui/toaster";
 import { referralSources } from "@/data";
+import { paths } from "@/data/paths";
 import { useApplications } from "@/hooks/use-applications";
 import { useAuth } from "@/providers";
-import { paths } from "@/providers/RoutesProvider/data";
 import { analytics } from "@/services/firebase";
 import { submitApplication } from "@/services/firebase/application";
 import {
@@ -321,7 +321,10 @@ export const ApplicationPage = () => {
 
 	if (loadingApplications)
 		return (
-			<PageWrapper>
+			<PageWrapper
+				title="Application"
+				subTitle="Apply to participate in the hackathon now!"
+			>
 				<LoadingAnimation />
 			</PageWrapper>
 		);
@@ -329,7 +332,10 @@ export const ApplicationPage = () => {
 	if (submitted) return <Navigate to={paths.submitted} />;
 
 	return (
-		<PageWrapper>
+		<PageWrapper
+			title="Application"
+			subTitle="Apply to participate in the hackathon now!"
+		>
 			<div>
 				<nav aria-label="Application progress">
 					<Steps steps={steps} onClick={jumpTo} />

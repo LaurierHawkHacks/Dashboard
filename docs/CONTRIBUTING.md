@@ -33,7 +33,7 @@
   </tr>
   <tr>
     <td>Node.js</td>
-    <td>v18 or higher</td>
+    <td>v22 or higher</td>
     <td><a href="https://nodejs.org/">Installation Guide</a></td>
   </tr>
   <tr>
@@ -56,7 +56,7 @@
 ### Setting Up Your Local Environment
 
 > Fork or Clone the Repository
-  
+
 ```sh
 # Fork the repository (if you don't have write access)
 # Then clone your fork
@@ -69,7 +69,7 @@ cd HawkHacks-Dashboard
 ```
 
 > Install Dependencies
-  
+
 ```sh
 pnpm i
 ```
@@ -89,22 +89,13 @@ firebase use --add
 ```
 
 > Start Development Server
-  
+
 ```sh
 pnpm dev # This will start the vite development server + Firebase emulators
 ```
 
-> Run Firebase Functions Locally (in a separate terminal)
-
-```sh
-cd functions
-pnpm i
-pnpm build:watch  # Build TypeScript in watch mode
-pnpm serve        # Start functions emulator
-```
-
 > Build for Production (Optional)
-  
+
 ```sh
 pnpm build
 pnpm preview  # To preview the production build
@@ -112,19 +103,18 @@ pnpm preview  # To preview the production build
 
 ### Common Commands
 
-| Command | Description |
-|:-------:|:------------|
-| `pnpm dev` | Start development server with emulators |
-| `pnpm emulators` | Start Firebase emulators only |
-| `pnpm build` | Build for production |
-| `pnpm preview` | Preview production build |
-| `firebase emulators:start` | Start Firebase emulators (alternative) |
-| `cd functions && pnpm build:watch` | Build Firebase functions in watch mode |
-| `cd functions && pnpm serve` | Start Firebase functions emulator |
-| `firebase deploy` | Deploy to Firebase (requires permissions) |
-| `firebase deploy --only functions` | Deploy only Firebase functions |
-| `firebase deploy --only hosting` | Deploy only hosting |
-| `firebase deploy --only firestore:rules` | Deploy only Firestore rules |
+|                 Command                  | Description                               |
+| :--------------------------------------: | :---------------------------------------- |
+|                `pnpm dev`                | Start development server with emulators   |
+|             `pnpm emulators`             | Start Firebase emulators only             |
+|               `pnpm build`               | Build for production                      |
+|              `pnpm preview`              | Preview production build                  |
+|        `firebase emulators:start`        | Start Firebase emulators (alternative)    |
+|       `cd functions && pnpm serve`       | Start Firebase functions emulator         |
+|            `firebase deploy`             | Deploy to Firebase (requires permissions) |
+|    `firebase deploy --only functions`    | Deploy only Firebase functions            |
+|     `firebase deploy --only hosting`     | Deploy only hosting                       |
+| `firebase deploy --only firestore:rules` | Deploy only Firestore rules               |
 
 ## 📁 Project Structure
 
@@ -228,17 +218,17 @@ gitGraph
 
 </div>
 
-| Branch Type | Pattern | Description |
-|:------------|:--------|:------------|
-| Main | `main` | Stable production code |
-| Feature | `feat/issue-number/description` | For new features |
-| Bug Fix | `bug/issue-number/description` | For bug fixes |
-| Hot Fix | `hotfix/issue-number/description` | For urgent fixes to production |
+| Branch Type | Pattern                           | Description                    |
+| :---------- | :-------------------------------- | :----------------------------- |
+| Main        | `main`                            | Stable production code         |
+| Feature     | `feat/issue-number/description`   | For new features               |
+| Bug Fix     | `bug/issue-number/description`    | For bug fixes                  |
+| Hot Fix     | `hotfix/issue-number/description` | For urgent fixes to production |
 
 ### Creating a New Feature
 
 **1. Create a new branch from `main`**
-  
+
 ```sh
 git checkout main
 git pull origin main
@@ -246,28 +236,28 @@ git checkout -b feat/123/your-feature-name
 ```
 
 **2. Make your changes and commit them**
-  
+
 ```sh
 git add .
 git commit -m "feat: add new feature"
 ```
-  
+
 **Commit Message Format:**
-  
+
 ```
 type(scope): description
 ```
-  
+
 Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`
 
 **3. Push your branch to GitHub**
-  
+
 ```sh
 git push origin feat/123/your-feature-name
 ```
 
 **4. Create a Pull Request on GitHub**
-  
+
 Go to the repository on GitHub and create a new pull request from your branch to `main`.
 
 > [!WARNING]
@@ -284,13 +274,13 @@ Go to the repository on GitHub and create a new pull request from your branch to
 
 ### TypeScript/React
 
-| ✅ Do | ❌ Don't |
-|:------|:---------|
-| Use TypeScript types for everything | Use `any` type |
-| Use functional components | Use class components |
-| Use meaningful variable and component names | Use abbreviations |
-| Follow file organization patterns | Create new patterns |
-| Use context for global state | Pass props through multiple layers |
+| ✅ Do                                       | ❌ Don't                           |
+| :------------------------------------------ | :--------------------------------- |
+| Use TypeScript types for everything         | Use `any` type                     |
+| Use functional components                   | Use class components               |
+| Use meaningful variable and component names | Use abbreviations                  |
+| Follow file organization patterns           | Create new patterns                |
+| Use context for global state                | Pass props through multiple layers |
 
 ### Firebase Integration
 
@@ -306,52 +296,53 @@ Go to the repository on GitHub and create a new pull request from your branch to
 
 ```tsx
 // Imports organized logically
-import React, { useState, useEffect } from 'react';
-import ExternalLibrary from 'external-library';
+import React, { useState, useEffect } from "react";
+import ExternalLibrary from "external-library";
 
 // Local imports
-import { TextInput, Button } from '../components';
-import { useFirestore } from '../services/firebase';
-import { User } from '../services/firebase/types';
+import { TextInput, Button } from "../components";
+import { useFirestore } from "../services/firebase";
+import { User } from "../services/firebase/types";
 
 // Props interface
 interface ProfileFormProps {
-   userId: string;
-   onSubmit: (user: User) => void;
+  userId: string;
+  onSubmit: (user: User) => void;
 }
 
 // Component implementation
-export const ProfileForm: React.FC<ProfileFormProps> = ({ userId, onSubmit }) => {
-   const [user, setUser] = useState<User | null>(null);
-   const [loading, setLoading] = useState(true);
-   const [error, setError] = useState<string | null>(null);
-   
-   useEffect(() => {
-      // Fetch user data from Firestore
-      const fetchUser = async () => {
-         try {
-            setLoading(true);
-            const userData = await useFirestore.getUser(userId);
-            setUser(userData);
-         } catch (err) {
-            setError('Failed to load user data');
-            console.error(err);
-         } finally {
-            setLoading(false);
-         }
-      };
-      
-      fetchUser();
-   }, [userId]);
-   
-   if (loading) return <LoadingAnimation />;
-   if (error) return <ErrorAlert message={error} />;
-   
-   return (
-      <form className="p-4 bg-white rounded shadow">
-         {/* Form fields */}
-      </form>
-   );
+export const ProfileForm: React.FC<ProfileFormProps> = ({
+  userId,
+  onSubmit,
+}) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Fetch user data from Firestore
+    const fetchUser = async () => {
+      try {
+        setLoading(true);
+        const userData = await useFirestore.getUser(userId);
+        setUser(userData);
+      } catch (err) {
+        setError("Failed to load user data");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [userId]);
+
+  if (loading) return <LoadingAnimation />;
+  if (error) return <ErrorAlert message={error} />;
+
+  return (
+    <form className="p-4 bg-white rounded shadow">{/* Form fields */}</form>
+  );
 };
 ```
 
@@ -372,7 +363,7 @@ flowchart LR
     D --> E[Code Review]
     E --> F[Address Feedback]
     F --> G[Merge]
-    
+
     style G fill:#4CAF50,stroke:#388E3C,stroke-width:2px,color:white
 ```
 
@@ -391,13 +382,16 @@ flowchart LR
 
 ```markdown
 ## Description
+
 [Description of the changes]
 
 ## Related Issues
+
 Fixes #123
 Related to #456
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Documentation update
@@ -406,6 +400,7 @@ Related to #456
 - [ ] Other (please describe):
 
 ## Firebase Changes
+
 - [ ] Firestore schema changes
 - [ ] Security rules updates
 - [ ] Cloud Functions changes
@@ -413,6 +408,7 @@ Related to #456
 - [ ] N/A
 
 ## Testing
+
 - [ ] Tested with Firebase emulators
 - [ ] Tested browser compatibility
 - [ ] Tested mobile responsiveness
@@ -420,6 +416,7 @@ Related to #456
 ## Screenshots (if applicable)
 
 ## Checklist
+
 - [ ] My code follows the project's coding standards
 - [ ] I have tested my changes locally with Firebase emulators
 - [ ] I have updated the documentation accordingly
@@ -463,7 +460,7 @@ firebase emulators:start --project hawkhacks-dashboard --import ./data
 - Admin SDK: `firebase-admin@^12.1.0`
 - Firebase Functions: `firebase-functions@^4.9.0`
 - Firebase Tools: `firebase-tools@^13.3.4` (CLI)
-  
+
 ### Security Rules
 
 All Firestore and Storage security rules are defined in `config/firestore.rules` and `config/storage.rules` respectively. When making changes to the data model, ensure you update the security rules accordingly.
@@ -479,10 +476,10 @@ service cloud.firestore {
       allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
       allow write: if request.auth != null && request.auth.uid == userId;
     }
-    
+
     // Helper functions
     function isAdmin() {
-      return request.auth != null && 
+      return request.auth != null &&
         exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
   }
@@ -508,9 +505,9 @@ graph TD
 
 Deployment is handled automatically through our CI/CD pipeline when changes are merged to the `main` branch.
 
-| Environment | URL | Branch | Auto-deploy |
-|:------------|:----|:-------|:------------|
-| Production | [portal.hawkhacks.ca](https://portal.hawkhacks.ca) | `dev` | ✅ |
+| Environment | URL                                                | Branch | Auto-deploy |
+| :---------- | :------------------------------------------------- | :----- | :---------- |
+| Production  | [portal.hawkhacks.ca](https://portal.hawkhacks.ca) | `dev`  | ✅          |
 
 ### Manual Deployment
 
@@ -538,6 +535,54 @@ firebase deploy --only functions:functionName
 - [Firestore Security Rules](https://firebase.google.com/docs/firestore/security/get-started)
 - [Firebase Cloud Functions](https://firebase.google.com/docs/functions)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+
+## Testing on a mobile device
+
+### Host on your local network
+
+Ensure Vite and Firebase are binding to `0.0.0.0` instead of `localhost`.
+See https://vite.dev/config/server-options#server-host for Vite.
+Add `"host": "0.0.0.0"` in a few places in firebase.json, see https://stackoverflow.com/a/60906356.
+
+Run `pnpm dev`, find your local network url (e.g. `http://10.0.0.72:5173/`),
+check that your phone is connected to the same network as your computer,
+navigate to that url on your phone.
+
+### DevTools for mobile device (Firefox + Android)
+
+Steps
+
+1. Install Firefox on desktop
+2. Install Firefox Nightly from the app store
+
+- Note: the stable channel of Firefox for Android will also work but Nightly is
+  required for testing the admin QR code functionality
+
+3. Enable Developer menu on your Android device
+4. Enable USB Debugging in the Android Developer Menu
+5. Enable file transfer and ensure that your device is not in charging-only mode
+6. Enable USB Debugging in Firefox on the Android device
+7. Connect the Android device to your computer from `about:debugging`
+
+### Testing admin QR code scanning
+
+First, follow the steps in "Host on your local network".
+
+The Web MediaDevices API requires a secure context (HTTPS or localhost).
+We don't have that when accessing the dev app over the local network.
+
+Steps (Firefox)
+
+1. Install Firefox Nightly (`about:config` is not accessible on stable)
+2. Go to `about:config`
+3. Set `media.devices.insecure.enabled` to true
+4. Set `media.getusermedia.insecure.enabled` to true
+
+Steps (Chrome)
+
+1. Consider installing Chrome Dev so that you do not disable security
+   features in the main Chrome app
+2. Follow https://stackoverflow.com/a/60983263
 
 ---
 

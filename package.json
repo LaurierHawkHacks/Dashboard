@@ -4,14 +4,14 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"dev": "concurrently \"pnpm run vite\" \"pnpm run emulators\"",
-		"build": "tsc -b && vite build",
+		"dev": "concurrently \"pnpm run vite\" \"pnpm run emulators\" \"pnpm --filter functions run dev\"",
+		"build": "vite build && pnpm --filter functions run build",
 		"lint": "biome lint --error-on-warnings .",
 		"preview": "vite preview",
 		"format": "biome check --linter-enabled=false --write .",
 		"test": "vitest",
 		"test:ci": "vitest run --coverage",
-		"typecheck": "tsc --noEmit",
+		"typecheck": "tsc -b",
 		"emulators": "firebase emulators:start --project hawkhacks-dashboard --import ./data",
 		"setup": "firebase init emulators",
 		"firebase": "firebase",
@@ -25,6 +25,7 @@
 		"@headlessui/react": "^1.7.19",
 		"@heroicons/react": "^2.2.0",
 		"@tanstack/react-query": "^5.72.2",
+		"@zxing/browser": "^0.1.5",
 		"class-variance-authority": "^0.7.1",
 		"date-fns": "^3.6.0",
 		"firebase": "^11.5.0",
@@ -71,5 +72,6 @@
 			"protobufjs",
 			"re2"
 		]
-	}
+	},
+	"packageManager": "pnpm@10.10.0+sha512.d615db246fe70f25dcfea6d8d73dee782ce23e2245e3c4f6f888249fb568149318637dca73c2c5c8ef2a4ca0d5657fb9567188bfab47f566d1ee6ce987815c39"
 }

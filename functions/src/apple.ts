@@ -3,10 +3,10 @@ import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 import { error as logError, info as logInfo } from "firebase-functions/logger";
-import { HttpsError, onCall } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
 import { PKPass } from "passkit-generator";
 import { v4 as uuidv4 } from "uuid";
-import type { Context } from "./types";
+import { onCallCustom } from "./utils";
 
 const signerCert = process.env.APPLE_WALLET_CERTS_SIGNER_CERT;
 const signerKey = process.env.APPLE_WALLET_CERTS_SIGNER_KEY;
@@ -16,14 +16,13 @@ const signerKeyPassphrase =
 const teamIdentifier = process.env.APPLE_WALLET_CERTS_TEAM_ID;
 
 // apple wallet ticket
-export const createTicket = onCall(async (_, res) => {
-	const context = res as Context;
-	if (!context?.auth) {
+export const createTicket = onCallCustom(async (req) => {
+	if (!req.auth) {
 		throw new HttpsError("permission-denied", "Not authenticated");
 	}
 
 	try {
-		const userId = context.auth.uid;
+		const userId = req.auth.uid;
 
 		const user = await getAuth().getUser(userId);
 		const app = (

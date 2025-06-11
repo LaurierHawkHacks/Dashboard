@@ -2,11 +2,10 @@ import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 import { Timestamp } from "firebase-admin/firestore";
 import { error as logError, info as logInfo } from "firebase-functions/logger";
-import { HttpsError, onCall } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
 import { Resend } from "resend";
 import { v4 as uuid } from "uuid";
-import type { Context } from "./types";
-import { HttpStatus, response } from "./utils";
+import { onCallCustom } from "./utils";
 
 const WAITLIST_COLLECTION = "waitlist";
 const SPOTS_COLLECTION = "spots";
@@ -177,14 +176,14 @@ async function sendRSVPConfirmedEmail(name: string, email: string) {
 	});
 }
 
-export const withdrawRSVP = onCall(async (_, res) => {
-	const context = res as Context;
-	if (!context?.auth)
-		return response(HttpStatus.UNAUTHORIZED, { message: "unauthorized" });
+export const withdrawRSVP = onCallCustom(async (req) => {
+	if (!req.auth) {
+		throw new HttpsError("permission-denied", "unauthorized");
+	}
 
 	try {
-		logInfo("Looking for user...", { uid: context.auth.uid });
-		const user = await getAuth().getUser(context.auth.uid);
+		logInfo("Looking for user...", { uid: req.auth.uid });
+		const user = await getAuth().getUser(req.auth.uid);
 		logInfo("Dismissing RSVP...", { email: user.email });
 		await getAuth().setCustomUserClaims(user.uid, {
 			...user.customClaims,
@@ -272,26 +271,23 @@ export const withdrawRSVP = onCall(async (_, res) => {
 		//     }
 		// }
 	} catch (error) {
-		logError("Failed to unverified rsvp", { error });
-		return response(HttpStatus.INTERNAL_SERVER_ERROR, {
-			message: "Failed to unverified rsvp",
-		});
+		logError("Failed to withdraw rsvp", { error });
+		throw new HttpsError("internal", "Failed to withdraw rsvp");
 	}
 
 	// move next in waitlist to rsvp
-	return response(HttpStatus.OK);
+	return {};
 });
 
-export const verifyRSVP = onCall(async (_, res) => {
-	const context = res as Context;
-	if (!context?.auth) {
+export const verifyRSVP = onCallCustom(async (req) => {
+	if (!req.auth) {
 		throw new HttpsError("permission-denied", "Not authenticated");
 	}
 
-	logInfo("Verify RSVP called.", { uid: context.auth.uid });
+	logInfo("Verify RSVP called.", { uid: req.auth.uid });
 
 	// only verify once
-	const user = await getAuth().getUser(context.auth.uid);
+	const user = await getAuth().getUser(req.auth.uid);
 	if (user.customClaims?.rsvpVerified) {
 		return {
 			status: 200,
@@ -372,7 +368,7 @@ export const verifyRSVP = onCall(async (_, res) => {
 		);
 	} catch (e) {
 		logError("Error verifying RSVP.", {
-			uid: context.auth.uid,
+			uid: req.auth.uid,
 			error: (e as Error).message,
 		});
 		throw new HttpsError("internal", "RSVP service down");
@@ -384,28 +380,27 @@ export const verifyRSVP = onCall(async (_, res) => {
 	};
 });
 
-export const joinWaitlist = onCall(async (_, res) => {
-	const context = res as Context;
-	if (!context?.auth)
-		return response(HttpStatus.UNAUTHORIZED, { message: "unauthorized" });
+export const joinWaitlist = onCallCustom(async (req) => {
+	if (!req.auth) {
+		throw new HttpsError("permission-denied", "unauthorized");
+	}
 	const func = "joinWaitlist";
 
 	try {
-		const user = await getAuth().getUser(context.auth.uid);
-		if (!user.customClaims)
-			return response(HttpStatus.BAD_REQUEST, {
-				message: "Missing claims",
-			});
+		const user = await getAuth().getUser(req.auth.uid);
+		if (!user.customClaims) {
+			throw new HttpsError("permission-denied", "Missing claims");
+		}
 
 		if (user.customClaims.rsvpVerified) {
-			return response(HttpStatus.BAD_REQUEST, { message: "User RSVP'd" });
+			throw new HttpsError("permission-denied", "User RSVP'd");
 		}
 
 		if (user.customClaims.hasJoinedWaitlist) {
-			return response(HttpStatus.BAD_REQUEST, {
-				message:
-					"It seems like you previously waitlisted and didn't secure your spot in time, sorry!",
-			});
+			throw new HttpsError(
+				"permission-denied",
+				"It seems like you previously waitlisted and didn't secure your spot in time, sorry!",
+			);
 		}
 
 		const snap = await getFirestore()
@@ -413,9 +408,7 @@ export const joinWaitlist = onCall(async (_, res) => {
 			.where("uid", "==", user.uid)
 			.get();
 		if (snap.size > 0) {
-			return response(HttpStatus.BAD_REQUEST, {
-				message: "User in waitlist already",
-			});
+			throw new HttpsError("permission-denied", "User in waitlist already");
 		}
 
 		// this only occurs if no one was in the waitlist and there are spots
@@ -478,7 +471,7 @@ export const joinWaitlist = onCall(async (_, res) => {
 		throw new HttpsError("internal", "Waitlist service down.");
 	}
 
-	return response(HttpStatus.OK);
+	return {};
 });
 
 // export const expiredSpotCleanup = functions.pubsub

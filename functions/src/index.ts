@@ -8,26 +8,24 @@ import {
 	info as logInfo,
 } from "firebase-functions/logger";
 import * as functions from "firebase-functions/v1";
-import { HttpsError, onCall } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
 import { Octokit } from "octokit";
 import * as QRCode from "qrcode";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
-import type { Context } from "./types";
-import { HttpStatus, response } from "./utils";
+import { onCallCustom } from "./utils";
 
 initializeApp();
 
-export const fetchOrGenerateTicket = onCall(async (_, res) => {
-	const context = res as Context;
-	if (!context || !context.auth) {
+export const fetchOrGenerateTicket = onCallCustom(async (req) => {
+	if (!req.auth) {
 		throw new HttpsError(
 			"permission-denied",
 			"User must be authenticated to initiate this operation.",
 		);
 	}
 
-	const userId = context.auth.uid;
+	const userId = req.auth.uid;
 	const ticketsRef = getFirestore().collection("tickets");
 	const ticketQuery = await ticketsRef
 		.where("userId", "==", userId)
@@ -39,7 +37,7 @@ export const fetchOrGenerateTicket = onCall(async (_, res) => {
 		let createTicket = false;
 		const snap = await getFirestore()
 			.collection("tickets")
-			.where("userId", "==", context.auth.uid)
+			.where("userId", "==", req.auth.uid)
 			.get();
 		const data = snap.docs[0]?.data();
 		if (!data) {
@@ -118,13 +116,13 @@ export const addDefaultClaims = functions.auth.user().onCreate(async (user) => {
 	}
 });
 
-// onCall Function to be called from Frontend for making user Admin
-export const addAdminRole = onCall((data: any, res) => {
-	const context = res as Context;
+export const addAdminRole = onCallCustom((req) => {
 	// If user is not an Admin, decline request
-	if (context?.auth?.token?.admin !== true) {
+	if (req.auth?.token?.admin !== true) {
 		return { error: "Only admins can add other admins" };
 	}
+	const data = z.object({ email: z.string() }).parse(req.data);
+
 	// Get USER and ADD custom claim (admin) based on Email
 	return getAuth()
 		.getUserByEmail(data.email)
@@ -154,10 +152,10 @@ interface Socials {
 	resumeVisibility: "Public" | "Private" | "Sponsors Only";
 }
 
-export const requestSocials = onCall(async (_, res) => {
-	const context = res as Context;
-	if (!context || !context.auth)
-		return response(HttpStatus.UNAUTHORIZED, { message: "unauthorized" });
+export const requestSocials = onCallCustom(async (req) => {
+	if (!req.auth) {
+		throw new HttpsError("permission-denied", "Unauthorized");
+	}
 
 	const func = "requestSocials";
 
@@ -166,14 +164,12 @@ export const requestSocials = onCall(async (_, res) => {
 	try {
 		const snap = await getFirestore()
 			.collection("socials")
-			.where("uid", "==", context.auth.uid)
+			.where("uid", "==", req.auth.uid)
 			.get();
 		socials = snap.docs[0]?.data() as Socials;
 	} catch (e) {
 		logError("Failed to get socials.", { error: e, func });
-		return response(HttpStatus.INTERNAL_SERVER_ERROR, {
-			message: "internal (get_socials) ",
-		});
+		throw new HttpsError("internal", "internal (get_socials)");
 	}
 
 	if (!socials) {
@@ -181,7 +177,7 @@ export const requestSocials = onCall(async (_, res) => {
 		const app = (
 			await getFirestore()
 				.collection("applications")
-				.where("applicantId", "==", context.auth.uid)
+				.where("applicantId", "==", req.auth.uid)
 				.get()
 		).docs[0]?.data();
 		const docId = uuidv4();
@@ -196,7 +192,7 @@ export const requestSocials = onCall(async (_, res) => {
 				discord: "",
 				resumeRef: "",
 				docId,
-				uid: context.auth.uid,
+				uid: req.auth.uid,
 				resumeVisibility: "Public",
 			};
 		} else {
@@ -211,7 +207,7 @@ export const requestSocials = onCall(async (_, res) => {
 						? app.mentorResumeRef
 						: app.generalResumeRef,
 				docId,
-				uid: context.auth.uid,
+				uid: req.auth.uid,
 				resumeVisibility: "Public",
 			};
 		}
@@ -219,32 +215,48 @@ export const requestSocials = onCall(async (_, res) => {
 		logInfo("Socials saved.");
 	}
 
-	return response(HttpStatus.OK, { message: "ok", data: socials });
+	return {
+		message: "ok",
+		data: socials,
+	};
 });
 
-export const updateSocials = onCall(async (data: any, res) => {
-	const context = res as Context;
-	if (!context || !context.auth) {
+export const updateSocials = onCallCustom(async (req) => {
+	if (!req.auth) {
 		logInfo("Authentication required.");
 		throw new HttpsError("permission-denied", "Not authenticated");
 	}
 
+	const data = z
+		.object({
+			docId: z.string().uuid(),
+			instagram: z.string().optional(),
+			github: z.string().optional(),
+			linkedin: z.string().optional(),
+			discord: z.string().optional(),
+			resumeRef: z.string().optional(),
+			resumeVisibility: z
+				.enum(["Public", "Private", "Sponsors Only"])
+				.optional(),
+		})
+		.parse(req.data);
+
 	logInfo("Updating socials:", data);
-	logInfo("User ID in Func:", context.auth.uid);
+	logInfo("User ID in Func:", req.auth.uid);
 
 	try {
 		const doc = await getFirestore()
 			.collection("socials")
 			.doc(data.docId)
 			.get();
-		if (!doc.exists)
-			return response(HttpStatus.NOT_FOUND, { message: "not found" });
+		if (!doc.exists) {
+			throw new HttpsError("not-found", "not found");
+		}
 
 		const socials = doc.data() as Socials;
-		if (socials.uid !== context.auth.uid)
-			return response(HttpStatus.UNAUTHORIZED, {
-				message: "cannot update socials",
-			});
+		if (socials.uid !== req.auth.uid) {
+			throw new HttpsError("permission-denied", "cannot update socials");
+		}
 
 		logInfo("Updating socials for application:", doc.id);
 		logInfo("Data in ref:", doc);
@@ -260,7 +272,7 @@ export const updateSocials = onCall(async (data: any, res) => {
 			resumeVisibility: data.resumeVisibility,
 		});
 		logInfo("Socials updated:", data);
-		return response(HttpStatus.OK, { message: "ok" });
+		return { message: "ok" };
 	} catch (error) {
 		logError("Failed to update socials", { error });
 		throw new HttpsError("internal", "Failed to update socials", error);
@@ -280,17 +292,19 @@ export const updateSocials = onCall(async (data: any, res) => {
  *
  * Sends back true/false of verification status
  */
-export const verifyGitHubEmail = onCall(async (data: any, res) => {
-	const context = res as Context;
-	if (!context || !context.auth) {
-		return new HttpsError("permission-denied", "Not authenticated");
+export const verifyGitHubEmail = onCallCustom(async (req) => {
+	if (!req.auth) {
+		throw new HttpsError("permission-denied", "Not authenticated");
 	}
+
+	const data = z
+		.object({
+			token: z.string(),
+			email: z.string().email(),
+		})
+		.parse(req.data);
 
 	const { token, email } = data;
-
-	if (!token || !email) {
-		return new HttpsError("failed-precondition", "Invalid Payload");
-	}
 
 	try {
 		const octokit = new Octokit({
@@ -306,44 +320,40 @@ export const verifyGitHubEmail = onCall(async (data: any, res) => {
 		if (res.status === 200) {
 			const payloadEmail = res.data.filter((data) => data.email === email)[0];
 			if (!payloadEmail)
-				return new HttpsError("aborted", "Fail to match email in payload");
+				throw new HttpsError("aborted", "Fail to match email in payload");
 
 			// since we got the email data we need, we check if its verified
-			getAuth().updateUser(context.auth.uid, {
+			getAuth().updateUser(req.auth.uid, {
 				emailVerified: payloadEmail.verified,
 			});
 			return payloadEmail.verified;
 		}
-		return new HttpsError("unavailable", "Service unavailable");
+		throw new HttpsError("unavailable", "Service unavailable");
 	} catch {
-		return new HttpsError("internal", "Failed to verify email");
+		throw new HttpsError("internal", "Failed to verify email");
 	}
 });
 
-export const logEvent = onCall((data: any, res) => {
-	const context = res as Context;
+export const logEvent = onCallCustom((req) => {
+	const uid = req.auth?.uid;
 
-	const uid = context?.auth?.uid;
+	const data = z
+		.object({
+			type: z.enum(["error", "info", "log"]),
+			data: z.any(),
+		})
+		.parse(req.data);
 
-	const payloadValidation = z.object({
-		type: z.string().refine((val) => ["error", "info", "log"].includes(val)),
-		data: z.any(),
-	});
-
-	const result = payloadValidation.safeParse(data);
-	if (!result.success) logInfo("Invalid log payload");
-	else {
-		switch (result.data.type) {
-			case "error":
-				logError({ data: result.data.data, uid });
-				break;
-			case "info":
-				logInfo({ data: result.data.data, uid });
-				break;
-			default:
-				log({ data: result.data.data, uid });
-				break;
-		}
+	switch (data.type) {
+		case "error":
+			logError({ data: data.data, uid });
+			break;
+		case "info":
+			logInfo({ data: data.data, uid });
+			break;
+		default:
+			log({ data: data.data, uid });
+			break;
 	}
 });
 
@@ -351,7 +361,7 @@ async function internalGetTicketData(id: string, extended = false) {
 	logInfo("Checking for ticket data...");
 	const ticketDoc = await getFirestore().collection("tickets").doc(id).get();
 	if (!ticketDoc.exists) {
-		return response(HttpStatus.NOT_FOUND, { message: "not found" });
+		throw new HttpsError("not-found", "not found");
 	}
 
 	const ticket = ticketDoc.data() as {
@@ -436,75 +446,71 @@ async function internalGetTicketData(id: string, extended = false) {
 	return data;
 }
 
-export const getTicketData = onCall(async (data: any) => {
-	if (!z.string().uuid().safeParse(data.id).success) {
-		return response(HttpStatus.BAD_REQUEST, { message: "bad request" });
-	}
+export const getTicketData = onCallCustom(async (req) => {
+	const data = z
+		.object({
+			id: z.string().uuid(),
+		})
+		.parse(req.data);
 
 	try {
 		const ticketData = await internalGetTicketData(data.id);
-		return response(HttpStatus.OK, {
+		return {
 			message: "ok",
 			data: ticketData,
-		});
+		};
 	} catch (e) {
 		logError("Failed to get ticket data.", { error: e });
-		return response(HttpStatus.INTERNAL_SERVER_ERROR, {
-			message: "internal error",
-		});
+		throw new HttpsError("internal", "internal error");
 	}
 });
 
-export const getExtendedTicketData = onCall(async (data: any) => {
-	if (!z.string().uuid().safeParse(data.id).success) {
-		return response(HttpStatus.BAD_REQUEST, { message: "bad request" });
-	}
+export const getExtendedTicketData = onCallCustom(async (req) => {
+	const data = z
+		.object({
+			id: z.string().uuid(),
+		})
+		.parse(req.data);
 
 	try {
 		const ticketData = await internalGetTicketData(data.id, true);
 
-		return response(HttpStatus.OK, {
+		return {
 			message: "ok",
 			data: ticketData,
-		});
+		};
 	} catch (e) {
 		logError("Failed to get extended ticket data.", {
 			error: e,
 		});
-		return response(HttpStatus.INTERNAL_SERVER_ERROR, {
-			message: "internal error",
-		});
+		throw new HttpsError("internal", "internal error");
 	}
 });
 
-export const redeemItem = onCall(async (data: any, res) => {
-	const context = res as Context;
-	if (!context || !context.auth)
-		return response(HttpStatus.UNAUTHORIZED, { message: "unauthorized" });
+export const redeemItem = onCallCustom(async (req) => {
+	if (!req.auth) {
+		throw new HttpsError("permission-denied", "unauthorized");
+	}
 
-	const user = await getAuth().getUser(context.auth.uid);
-	if (!user.customClaims?.admin)
-		return response(HttpStatus.UNAUTHORIZED, { message: "unauthorized" });
+	const user = await getAuth().getUser(req.auth.uid);
+	if (!user.customClaims?.admin) {
+		throw new HttpsError("permission-denied", "unauthorized");
+	}
 
-	const validateResults = z
+	const data = z
 		.object({
 			ticketId: z.string(),
 			itemId: z.string(),
-			action: z.string().refine((v) => v === "check" || "uncheck"),
+			action: z.enum(["check", "uncheck"]),
 		})
-		.safeParse(data);
-	if (!validateResults.success) {
-		logError("Bad request", {
-			issues: validateResults.error.issues.map((i) => i.path),
-		});
-		return response(HttpStatus.BAD_REQUEST, { message: "bad request" });
-	}
+		.parse(req.data);
 
 	const ticket = (
 		await getFirestore().collection("tickets").doc(data.ticketId).get()
 	).data();
-	if (!ticket)
-		return response(HttpStatus.NOT_FOUND, { message: "ticket not found" });
+	if (!ticket) {
+		throw new HttpsError("not-found", "ticket not found");
+	}
 
 	let events = [];
 	if (data.action === "check") {
@@ -521,7 +527,9 @@ export const redeemItem = onCall(async (data: any, res) => {
 			.update({ events });
 	}
 
-	return response(HttpStatus.OK, { data: events });
+	return {
+		data: events,
+	};
 });
 
 export {

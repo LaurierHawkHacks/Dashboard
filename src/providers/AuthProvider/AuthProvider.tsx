@@ -1,4 +1,3 @@
-import { LoadingAnimation } from "@/components";
 import { toaster } from "@/components/ui/toaster";
 import { auth } from "@/services/firebase";
 import { verifyGitHubEmail } from "@/services/firebase/user";
@@ -16,7 +15,7 @@ import {
 import { useEffect, useState } from "react";
 import { flushSync } from "react-dom";
 
-// Local imports
+import { FirebaseError } from "firebase/app";
 import { AuthContext } from "./context";
 import type { ProviderName, UserWithClaims } from "./types";
 import {
@@ -28,7 +27,9 @@ import {
 
 export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
 	const [currentUser, setCurrentUser] = useState<UserWithClaims | null>(null);
-	const [isLoading, setIsLoading] = useState(false);
+	const [isLoadingInitialAuthState, setIsLoadingInitialAuthState] =
+		useState(true);
+	const [isLoadingSignUp, setIsLoadingSignUp] = useState(false);
 
 	const completeLoginProcess = async (user: User) => {
 		// check if user has a profile in firestore
@@ -43,8 +44,10 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
 		try {
 			const { user } = await signInWithEmailAndPassword(auth, email, password);
 			await completeLoginProcess(user);
-		} catch (error: any) {
-			toaster.error(getNotificationByAuthErrCode(error.code));
+		} catch (error) {
+			if (error instanceof FirebaseError) {
+				toaster.error(getNotificationByAuthErrCode(error.code));
+			}
 		}
 	};
 
@@ -69,8 +72,10 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
 			);
 			await sendEmailVerification(user);
 			await completeLoginProcess(user);
-		} catch (error: any) {
-			toaster.error(getNotificationByAuthErrCode(error.code));
+		} catch (error) {
+			if (error instanceof FirebaseError) {
+				toaster.error(getNotificationByAuthErrCode(error.code));
+			}
 		}
 	};
 
@@ -107,7 +112,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
 				);
 
 				if (providerId && /github/i.test(providerId) && !user.emailVerified) {
-					setIsLoading(true);
+					setIsLoadingSignUp(true);
 					const { oauthAccessToken } = _tokenResponse as {
 						oauthAccessToken: string;
 					};
@@ -123,16 +128,17 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
 						interval = window.setInterval(async () => {
 							if (!auth.currentUser) {
 								window.clearInterval(interval);
-								setIsLoading(false);
+								setIsLoadingSignUp(false);
 							}
 							if (!auth.currentUser?.emailVerified) {
 								await reloadUser();
 							} else {
 								window.clearInterval(interval);
-								setIsLoading(false);
+								setIsLoadingSignUp(false);
 							}
 						}, 1000);
 					} else {
+						setIsLoadingSignUp(false);
 						toaster.error({
 							title: "Error Verifying Email",
 							description:
@@ -141,9 +147,12 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
 					}
 				}
 			}
-		} catch (error: any) {
+		} catch (error) {
 			console.error(error);
-			if (error.code === "auth/account-exists-with-different-credential") {
+			if (
+				error instanceof FirebaseError &&
+				error.code === "auth/account-exists-with-different-credential"
+			) {
 				toaster.error({
 					title: "Oops! Something went wrong.",
 					description:
@@ -174,6 +183,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
 			} else {
 				setCurrentUser(null);
 			}
+			setIsLoadingInitialAuthState(false);
 		});
 
 		// Handle redirect result
@@ -194,6 +204,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
 	return (
 		<AuthContext.Provider
 			value={{
+				isLoading: isLoadingInitialAuthState || isLoadingSignUp,
 				currentUser,
 				login,
 				logout,
@@ -203,7 +214,7 @@ export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
 				reloadUser,
 			}}
 		>
-			{isLoading ? <LoadingAnimation /> : children}
+			{children}
 		</AuthContext.Provider>
 	);
 };

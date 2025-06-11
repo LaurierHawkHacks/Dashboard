@@ -1,7 +1,7 @@
 export { AuthProvider } from "./AuthProvider";
 export { useAuth, useUser } from "./hooks";
 export type {
-	UserType,
+	UserRole,
 	UserWithClaims,
 	ProviderName,
 	AuthMethod,
