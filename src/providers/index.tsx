@@ -6,16 +6,3 @@ export type {
 	AuthMethod,
 	AuthContextValue,
 } from "./AuthProvider";
-
-export {
-	RoutesProvider,
-	useRouter,
-	useHeaderInfo,
-	useRouteDefinitions,
-} from "./RoutesProvider";
-export type {
-	HeaderInfo,
-	RoutesContextValue,
-	PathObject,
-	RouteConfig,
-} from "./RoutesProvider";

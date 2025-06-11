@@ -1,8 +1,8 @@
 import { AppleWalletBadge, GoogleWalletBadge, LoadingDots } from "@/assets";
 import { PageWrapper } from "@/components";
+import { paths } from "@/data/paths";
 import { useApplications } from "@/hooks/use-applications";
 import { useAuth } from "@/providers";
-import { paths } from "@/providers/RoutesProvider/data";
 import { logError } from "@/services/firebase/log";
 import { Logo } from "@assets";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -105,7 +105,11 @@ export const TicketPage = () => {
 	};
 
 	return (
-		<PageWrapper>
+		<PageWrapper
+			title="Ticket"
+			// biome-ignore lint/style/noUnusedTemplateLiteral: the newline requires a template literal
+			subTitle={`This ticket is required for registration at our HawkHacks sign-in desk.\nKeep this ticket safe - download or add it to your wallet for convenience!`}
+		>
 			<div className="flex justify-start">
 				<div className="bg-white drop-shadow-xl rounded-xl box-border max-w-[400px] w-full p-8 flex flex-col gap-2">
 					<div className="flex items-center font-bold text-2xl md:text-[30px]">

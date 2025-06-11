@@ -23,6 +23,7 @@ jobs:
       - name: Build
         run: pnpm build
         env:
+          GIT_COMMIT_HASH: ${{ github.event.pull_request.head.sha }}
           VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}

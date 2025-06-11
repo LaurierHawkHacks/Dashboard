@@ -1,7 +1,7 @@
 import { LoadingAnimation, PageWrapper } from "@/components";
 import { toaster } from "@/components/ui/toaster";
+import { paths } from "@/data/paths";
 import { useAuth } from "@/providers";
-import { paths } from "@/providers/RoutesProvider/data";
 import {
 	checkInvitation,
 	rejectInvitation,
@@ -110,7 +110,10 @@ export const JoinTeamPage = () => {
 	if (!invitationData) return <Navigate to="/not-found" />;
 
 	return (
-		<PageWrapper>
+		<PageWrapper
+			title="Join Team"
+			subTitle="Awesome, it looks like you have found teammates!"
+		>
 			<div className="h-screen w-screen flex items-center justify-center">
 				<div className="space-y-6">
 					<h1 className="block text-lg font-bold text-center">

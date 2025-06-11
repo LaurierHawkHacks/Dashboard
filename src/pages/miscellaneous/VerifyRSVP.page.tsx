@@ -194,7 +194,10 @@ export const VerifyRSVP = () => {
 	if (isLoading) return <LoadingAnimation />;
 
 	return (
-		<PageWrapper>
+		<PageWrapper
+			title="Verify Your RSVP"
+			subTitle="All checkboxes are required."
+		>
 			{isVerifying ? (
 				<LoadingAnimation text="Loading . . ." />
 			) : (

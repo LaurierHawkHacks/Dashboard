@@ -1,7 +1,7 @@
 import { AirBalloon, CloudLL, CloudRR, Logo } from "@/assets";
 import { getButtonStyles } from "@/components/Button/Button.styles";
+import { paths } from "@/data/paths";
 import { useApplications } from "@/hooks/use-applications";
-import { paths } from "@/providers/RoutesProvider/data";
 import { Link, Navigate } from "react-router-dom";
 
 export const PostSubmissionPage = () => {

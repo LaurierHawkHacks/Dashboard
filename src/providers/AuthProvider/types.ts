@@ -24,6 +24,7 @@ export type ProviderName = "github" | "google" | "apple";
 export type AuthMethod = "none" | "credentials" | ProviderName;
 
 export type AuthContextValue = {
+	isLoading: boolean;
 	currentUser: UserWithClaims | null;
 	login: (email: string, password: string) => Promise<void>;
 	logout: () => Promise<void>;
