@@ -43,9 +43,12 @@ export interface Socials {
 	discord: string;
 	website?: string;
 	resumeRef: string;
+	resumeFilename?: string;
+	profilePictureRef?: string;
 	docId: string;
 	uid: string;
 	resumeVisibility?: ResumeVisibility;
+	resumeConsent?: boolean;
 }
 
 export interface TicketData {

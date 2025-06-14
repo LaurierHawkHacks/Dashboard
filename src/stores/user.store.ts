@@ -8,6 +8,9 @@ export interface UserStore {
 	team: TeamData | null;
 	setTeam: (team: TeamData | null) => void;
 	updateTeamName: (name: string) => void;
+
+	profilePictureUrl: string | null;
+	setProfilePictureUrl: (url: string | null) => void;
 }
 
 export const useUserStore = create<UserStore>((set) => ({
@@ -31,6 +34,13 @@ export const useUserStore = create<UserStore>((set) => ({
 			if (state.team) {
 				state.team.teamName = name;
 			}
+			return state;
+		}),
+
+	profilePictureUrl: null,
+	setProfilePictureUrl: (url) =>
+		set((state) => {
+			state.profilePictureUrl = url;
 			return state;
 		}),
 }));

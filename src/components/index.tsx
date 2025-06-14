@@ -82,3 +82,10 @@ export { Modal } from "./Modal";
  *
  */
 export { RouterChakraLink } from "./RouterChakraLink";
+
+/*
+ *
+ * @component ProfilePicture
+ *
+ */
+export { ProfilePicture } from "./ProfilePicture";

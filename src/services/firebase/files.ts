@@ -111,3 +111,40 @@ export async function getResumeURL(gs: string) {
 		});
 	}
 }
+
+export async function uploadProfilePicture(file: File, uid: string) {
+	try {
+		const imageRef = ref(
+			storage,
+			`/profile-pictures/${uid}-profile${file.name.substring(
+				file.name.lastIndexOf("."),
+			)}`,
+		);
+		const snap = await uploadBytes(imageRef, file, {
+			customMetadata: { owner: uid },
+		});
+		return snap.ref.toString();
+	} catch (e) {
+		logEvent("error", {
+			event: "upload_profile_picture_error",
+			message: (e as Error).message,
+			name: (e as Error).name,
+			stack: (e as Error).stack,
+		});
+		throw e;
+	}
+}
+
+export async function getProfilePictureURL(gs: string) {
+	const gsRef = ref(storage, gs);
+	try {
+		const blob = await getBlob(gsRef);
+		const blobUrl = URL.createObjectURL(blob);
+		return blobUrl;
+	} catch (e) {
+		logEvent("error", {
+			event: "get_profile_picture_error",
+		});
+		return null;
+	}
+}

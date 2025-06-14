@@ -67,10 +67,14 @@ interface Socials {
 	github: string;
 	linkedin: string;
 	discord: string;
+	website?: string;
 	resumeRef: string;
+	resumeFilename?: string;
+	profilePictureRef?: string;
 	docId: string;
 	uid: string;
 	resumeVisibility: "Public" | "Private" | "Sponsors Only";
+	resumeConsent?: boolean;
 }
 
 export const requestSocials = onCall(async (req) => {
@@ -110,10 +114,14 @@ export const requestSocials = onCall(async (req) => {
 				github: "",
 				linkedin: "",
 				discord: "",
+				website: "",
 				resumeRef: "",
+				resumeFilename: "",
+				profilePictureRef: "",
 				docId,
 				uid: req.auth.uid,
 				resumeVisibility: "Public",
+				resumeConsent: false,
 			};
 		} else {
 			logInfo("Creating new socials with selected application values...");
@@ -122,13 +130,17 @@ export const requestSocials = onCall(async (req) => {
 				github: app.githubUrl ?? "",
 				linkedin: app.linkedUrl ?? "",
 				discord: app.discord,
+				website: "",
 				resumeRef:
 					app.participatingAs === "Mentor"
 						? app.mentorResumeRef
 						: app.generalResumeRef,
+				resumeFilename: "",
+				profilePictureRef: "",
 				docId,
 				uid: req.auth.uid,
 				resumeVisibility: "Public",
+				resumeConsent: false,
 			};
 		}
 
@@ -170,21 +182,30 @@ export const updateSocials = onCall(async (req) => {
 		logInfo("Data in ref:", doc);
 
 		const db = getFirestore();
-		db.settings({ ignoreUndefinedProperties: true });
 
-		await db.collection("socials").doc(doc.id).update({
-			instagram: data.instagram,
-			linkedin: data.linkedin,
-			github: data.github,
-			discord: data.discord,
-			resumeRef: data.resumeRef,
-			resumeVisibility: data.resumeVisibility,
-		});
+		const updateData = {
+			instagram: data.instagram || "",
+			linkedin: data.linkedin || "",
+			github: data.github || "",
+			discord: data.discord || "",
+			website: data.website || "",
+			resumeRef: data.resumeRef || "",
+			resumeFilename: data.resumeFilename || "",
+			profilePictureRef: data.profilePictureRef || "",
+			resumeVisibility: data.resumeVisibility || "Public",
+			resumeConsent: data.resumeConsent ?? false,
+			uid: data.uid,
+			docId: data.docId,
+		};
 
-		logInfo("Socials updated:", data);
+		logInfo("About to update with data:", updateData);
+
+		await db.collection("socials").doc(doc.id).set(updateData, { merge: true });
+
+		logInfo("Socials updated successfully:", data);
 		return response(HttpStatus.OK, { message: "ok" });
 	} catch (error) {
-		logError("Failed to update socials", { error });
+		logError("Failed to update socials - error:", error);
 		throw new HttpsError("internal", "Failed to update socials", error);
 	}
 });

@@ -10,6 +10,7 @@ import {
 } from "@/providers";
 import { paths } from "@/providers/RoutesProvider/data";
 import { useUserStore } from "@/stores/user.store";
+import { ProfilePicture } from "./ProfilePicture";
 import {
 	Box,
 	Link as ChakraLink,
@@ -373,12 +374,9 @@ const NavbarContent = ({
 						gap={2}
 					>
 						<Flex flex="1" justifyContent="start" alignItems="center" gap={4}>
-							<Image
-								src={user.photoURL ?? "/default-profile.png"}
-								alt="User photo"
-								rounded="full"
-								width="2rem"
-								height="2rem"
+							<ProfilePicture
+								size="2rem"
+								borderRadius="full"
 							/>
 							<Flex
 								flex="1"
