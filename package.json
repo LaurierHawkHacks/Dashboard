@@ -27,7 +27,7 @@
 		"@tanstack/react-query": "^5.72.2",
 		"@zxing/browser": "^0.1.5",
 		"class-variance-authority": "^0.7.1",
-		"date-fns": "^3.6.0",
+		"date-fns": "^4.1.0",
 		"firebase": "^11.5.0",
 		"hamburger-react": "^2.5.2",
 		"nanoid": "^5.1.3",
